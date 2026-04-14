@@ -11,8 +11,10 @@ Two developers working collaboratively.
 
 ## Tech stack
 
-- Three.js (WebGL)
-- React (UI overlaid on canvas)
+- React Three Fiber (R3F) — Three.js via React JSX, primary rendering layer
+- React (UI overlaid on canvas, JSX components)
+- @react-three/drei — helpers and abstractions for R3F (loaders, controls, etc.)
+- @react-three/postprocessing — post-processing effects (bloom, depth of field, etc.)
 - Vite + vite-plugin-glsl
 - Assets exported from Cinema 4D as .glb
 
@@ -53,6 +55,7 @@ src/
 
 - Modify vite.config.js, package.json or root-level files without saying so
 - Suggest additional dependencies without justification
-- Assume the UI is React-only — the WebGL scene and the React UI coexist
-  and communicate via events (EventEmitter)
+- Assume the UI is React-only — the WebGL scene (R3F) and the React UI coexist
+  in the same JSX tree; R3F components live inside `<Canvas>`, UI components outside
+- Suggest raw Three.js imperative code when an R3F/drei equivalent exists
 - Add complexity that the team did not ask for
