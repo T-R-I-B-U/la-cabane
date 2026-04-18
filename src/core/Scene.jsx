@@ -11,19 +11,21 @@ function StatsCollector({ onStats }) {
   const frames = useRef(0)
   const lastAt = useRef(performance.now())
 
-  useFrame((_, delta) => {
+  useFrame(() => {
     frames.current += 1
     const now = performance.now()
     const elapsed = now - lastAt.current
 
     if (elapsed >= 350) {
       const fps = Math.round((frames.current * 1000) / elapsed)
+      const frameMs = elapsed / frames.current
       frames.current = 0
       lastAt.current = now
 
       const info = gl.info
       onStats({
         fps,
+        frameMs,
         calls: info.render.calls,
         triangles: info.render.triangles,
         geometries: info.memory.geometries,

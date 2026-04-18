@@ -5,51 +5,95 @@
   overflow: hidden;
 }
 
-/* ── Perf monitor — top left ─────────────────────────────────────── */
+/* ── Scene Debug panel — top left ────────────────────────────────── */
 
 .perf-monitor {
   position: absolute;
   top: 14px;
   left: 14px;
-  width: min(220px, calc(100vw - 28px));
-  padding: 10px 12px;
+  width: min(240px, calc(100vw - 28px));
+  padding: 10px 12px 12px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(16, 22, 28, 0.82);
-  color: #f3f6f9;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(14, 20, 26, 0.88);
+  backdrop-filter: blur(6px);
+  color: #c8d8e4;
   pointer-events: none;
   font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.perf-monitor h2 {
-  margin: 0 0 8px;
-  font-size: 0.75rem;
-  letter-spacing: 0.06em;
+.pm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pm-title {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #d7e4ef;
+  color: #ffffff;
 }
 
-.perf-monitor dl {
+.pm-status {
+  font-size: 0.6rem;
+  padding: 2px 6px;
+  border-radius: 99px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.pm-status[data-status='loading'] { background: rgba(245,166,35,0.2); color: #f5a623; }
+.pm-status[data-status='ok']      { background: rgba(34,221,136,0.18); color: #22dd88; }
+.pm-status[data-status='error']   { background: rgba(224,68,58,0.2);   color: #e0443a; }
+
+.pm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pm-section-title {
+  margin: 0;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4a7088;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  padding-bottom: 3px;
+}
+
+.pm-grid {
   margin: 0;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px 10px;
+  gap: 5px 8px;
 }
 
-.perf-monitor dl div {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding-bottom: 4px;
+.pm-row {
+  display: flex;
+  flex-direction: column;
 }
 
-.perf-monitor dt {
-  font-size: 0.62rem;
-  opacity: 0.7;
+.pm-label {
+  font-size: 0.58rem;
+  color: #5a7a8a;
+  letter-spacing: 0.02em;
 }
 
-.perf-monitor dd {
-  margin: 2px 0 0;
-  font-size: 0.8rem;
-  color: #fff;
+.pm-value {
+  margin: 1px 0 0;
+  font-size: 0.78rem;
+  color: #ffffff;
+}
+
+.pm-unit {
+  font-size: 0.6rem;
+  color: #5a7a8a;
 }
 
 /* ── Info panel — top right ──────────────────────────────────────── */
@@ -116,6 +160,10 @@
 /* ── Responsive ──────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
+  .perf-monitor {
+    left: 14px;
+    width: auto;
+  }
   .viewer-controls {
     right: 14px;
     left: 14px;

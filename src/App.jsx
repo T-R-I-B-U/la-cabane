@@ -3,7 +3,7 @@ import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
 import './App.css'
 
-const STATS_INIT = { fps: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
+const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
 
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
@@ -24,7 +24,7 @@ export default function App() {
     <main className="viewer-page">
       <Scene onStats={setStats} onReady={onReady} onError={onError} />
 
-      {import.meta.env.DEV && <PerfMonitor stats={stats} />}
+      {import.meta.env.DEV && <PerfMonitor stats={stats} scene={info} status={status} />}
 
       <aside className="viewer-controls" aria-live="polite">
         <h1 className="controls-title">La Cabane</h1>
