@@ -66,9 +66,9 @@ function Floor() {
   )
 }
 
-const PLAYER_HEIGHT = 2.4
+const PLAYER_HEIGHT = 1.9
 const COLLISION_DIST = 0.6
-const SPEED = 0.12
+const SPEED = 0.06
 const UP = new THREE.Vector3(0, 1, 0)
 
 // WASD + collision detection for player mode.
