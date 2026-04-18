@@ -1,9 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
-import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
+import { OrbitControls, PointerLockControls, Environment, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
+
+function SkyBackground() {
+  const { scene } = useThree()
+  const texture = useTexture('/textures/sky.png')
+
+  useEffect(() => {
+    texture.mapping = THREE.EquirectangularReflectionMapping
+    scene.background = texture
+    return () => { scene.background = null }
+  }, [texture, scene])
+
+  return null
+}
 
 function StatsCollector({ onStats }) {
   const { gl } = useThree()
@@ -63,7 +76,7 @@ function Floor() {
   return (
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow userData={{ isFloor: true }}>
       <planeGeometry args={[400, 400]} />
-      <meshStandardMaterial color="#ffffff" transparent opacity={0.08} depthWrite={false} />
+      <meshStandardMaterial color="#e8e0d5" />
     </mesh>
   )
 }
@@ -163,7 +176,8 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
     >
       <StatsCollector onStats={onStats} />
 
-      <Environment preset="apartment" backgroundBlurriness={1} />
+      <SkyBackground />
+      <Environment preset="apartment" />
       <ambientLight intensity={1} />
       <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
 

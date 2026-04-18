@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
 import './App.css'
@@ -11,6 +11,13 @@ export default function App() {
   const [info, setInfo] = useState(null)
   const [playerMode, setPlayerMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
+  const [showUI, setShowUI] = useState(true)
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.code === 'F1') { e.preventDefault(); setShowUI(v => !v) } }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   const onReady = useCallback((data) => { setInfo(data); setStatus('ok') }, [])
   const onError = useCallback((msg) => { setInfo(msg); setStatus('error') }, [])
@@ -19,9 +26,9 @@ export default function App() {
     <main className="viewer-page">
       <Scene onStats={setStats} onReady={onReady} onError={onError} playerMode={playerMode} debugDoors={debugDoors} />
 
-      {import.meta.env.DEV && <PerfMonitor stats={stats} scene={info} status={status} />}
+      {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
 
-      <aside className="viewer-controls" aria-live="polite">
+      {showUI && <aside className="viewer-controls" aria-live="polite">
         <h1 className="controls-title">La Cabane</h1>
 
         <div className="controls-divider" />
@@ -65,7 +72,7 @@ export default function App() {
             </button>
           </>
         )}
-      </aside>
+      </aside>}
     </main>
   )
 }
