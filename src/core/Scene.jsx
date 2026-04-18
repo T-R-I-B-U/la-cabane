@@ -59,23 +59,29 @@ function CabaneMap({ onReady, onError }) {
 
 function Floor() {
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow userData={{ isFloor: true }}>
       <planeGeometry args={[400, 400]} />
       <meshStandardMaterial color="#ffffff" transparent opacity={0.08} depthWrite={false} />
     </mesh>
   )
 }
 
-// WASD movement for player mode
-function PlayerControls() {
-  const { camera } = useThree()
-  const keys = useRef({})
-  const SPEED = 0.12
+const PLAYER_HEIGHT = 2.4
+const COLLISION_DIST = 0.6
+const SPEED = 0.12
+const UP = new THREE.Vector3(0, 1, 0)
 
-  // Teleport camera to spawn point at ground level in front of the hut.
+// WASD + collision detection for player mode.
+// Movement is split into X and Z axes so the player slides along walls
+// instead of being fully blocked.
+function PlayerControls() {
+  const { camera, scene } = useThree()
+  const keys = useRef({})
+  const ray = useRef(new THREE.Raycaster())
+
   useEffect(() => {
     camera.position.copy(PLAYER_SPAWN)
-    camera.lookAt(HUT_POS[0], 1.7, HUT_POS[2])
+    camera.lookAt(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2])
   }, [camera])
 
   useEffect(() => {
@@ -91,17 +97,40 @@ function PlayerControls() {
 
   useFrame(() => {
     const k = keys.current
-    const dir = new THREE.Vector3()
-    const right = new THREE.Vector3()
-    camera.getWorldDirection(dir)
-    dir.y = 0
-    dir.normalize()
-    right.crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize()
+    if (!k['KeyW'] && !k['KeyS'] && !k['KeyA'] && !k['KeyD']) return
 
-    if (k['KeyW']) camera.position.addScaledVector(dir, SPEED)
-    if (k['KeyS']) camera.position.addScaledVector(dir, -SPEED)
-    if (k['KeyA']) camera.position.addScaledVector(right, -SPEED)
-    if (k['KeyD']) camera.position.addScaledVector(right, SPEED)
+    const forward = new THREE.Vector3()
+    const right = new THREE.Vector3()
+    camera.getWorldDirection(forward)
+    forward.y = 0
+    forward.normalize()
+    right.crossVectors(forward, UP).normalize()
+
+    // Desired movement vector (horizontal only)
+    const wish = new THREE.Vector3()
+    if (k['KeyW']) wish.addScaledVector(forward, SPEED)
+    if (k['KeyS']) wish.addScaledVector(forward, -SPEED)
+    if (k['KeyA']) wish.addScaledVector(right, -SPEED)
+    if (k['KeyD']) wish.addScaledVector(right, SPEED)
+
+    // Collide each axis separately so the player slides along walls.
+    const axes = [
+      new THREE.Vector3(wish.x, 0, 0),
+      new THREE.Vector3(0, 0, wish.z),
+    ]
+
+    for (const step of axes) {
+      if (step.lengthSq() === 0) continue
+      ray.current.set(camera.position, step.clone().normalize())
+      const hits = ray.current.intersectObjects(scene.children, true)
+      const blocked = hits.some(
+        (h) => h.distance < COLLISION_DIST && !h.object.userData.isFloor,
+      )
+      if (!blocked) camera.position.add(step)
+    }
+
+    // Lock vertical position to player height (no gravity).
+    camera.position.y = PLAYER_HEIGHT
   })
 
   return <PointerLockControls />
@@ -110,8 +139,8 @@ function PlayerControls() {
 // hut01 world position from cabane.json
 const HUT_POS = [-4.7842, 0.8145, -0.7126]
 
-// Player spawn: ground level (~eye height 1.7) in front of the hut entrance
-const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], 1.7, HUT_POS[2] + 6)
+// Player spawn: in front of the hut entrance at eye height
+const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2] + 6)
 
 export default function Scene({ onStats, onReady, onError, playerMode }) {
   return (
