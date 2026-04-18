@@ -114,6 +114,9 @@ function PlayerControls() {
     if (k['KeyD']) wish.addScaledVector(right, SPEED)
 
     // Collide each axis separately so the player slides along walls.
+    // Three ray heights: knee / chest / eye — catches small objects near the ground.
+    const RAY_HEIGHTS = [0.4, 1.1, PLAYER_HEIGHT]
+
     const axes = [
       new THREE.Vector3(wish.x, 0, 0),
       new THREE.Vector3(0, 0, wish.z),
@@ -121,11 +124,20 @@ function PlayerControls() {
 
     for (const step of axes) {
       if (step.lengthSq() === 0) continue
-      ray.current.set(camera.position, step.clone().normalize())
-      const hits = ray.current.intersectObjects(scene.children, true)
-      const blocked = hits.some(
-        (h) => h.distance < COLLISION_DIST && !h.object.userData.isFloor,
-      )
+      const dir = step.clone().normalize()
+      let blocked = false
+
+      for (const dy of RAY_HEIGHTS) {
+        const origin = camera.position.clone()
+        origin.y = dy
+        ray.current.set(origin, dir)
+        const hits = ray.current.intersectObjects(scene.children, true)
+        if (hits.some((h) => h.distance < COLLISION_DIST && !h.object.userData.isFloor)) {
+          blocked = true
+          break
+        }
+      }
+
       if (!blocked) camera.position.add(step)
     }
 
