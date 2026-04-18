@@ -107,7 +107,7 @@ const HUT_POS = [-4.7842, 0.8145, -0.7126]
 export default function Scene({ onStats, onReady, onError, playerMode }) {
   return (
     <Canvas
-      camera={{ fov: 60, near: 0.01, far: 500, position: [HUT_POS[0] + 8, HUT_POS[1] + 5, HUT_POS[2] + 10] }}
+      camera={{ fov: 60, near: 0.01, far: 500, position: [HUT_POS[0] + 22, HUT_POS[1] + 14, HUT_POS[2] + 28] }}
       shadows
     >
       <StatsCollector onStats={onStats} />
