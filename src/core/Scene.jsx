@@ -66,7 +66,7 @@ function Floor() {
   )
 }
 
-const PLAYER_HEIGHT = 2.1
+const PLAYER_HEIGHT = 2.2
 const COLLISION_DIST = 0.6
 const SPEED = 0.09
 const UP = new THREE.Vector3(0, 1, 0)
