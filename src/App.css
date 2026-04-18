@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
 .viewer-page {
   position: relative;
   width: 100vw;
   height: 100dvh;
   overflow: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 /* ── Scene Debug panel — top left ────────────────────────────────── */
@@ -51,11 +54,7 @@
 .pm-status[data-status='ok']      { background: rgba(34,221,136,0.18); color: #22dd88; }
 .pm-status[data-status='error']   { background: rgba(224,68,58,0.2);   color: #e0443a; }
 
-.pm-section {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
+.pm-section { display: flex; flex-direction: column; gap: 5px; }
 
 .pm-section-title {
   margin: 0;
@@ -74,27 +73,13 @@
   gap: 5px 8px;
 }
 
-.pm-row {
-  display: flex;
-  flex-direction: column;
-}
+.pm-row { display: flex; flex-direction: column; }
 
-.pm-label {
-  font-size: 0.58rem;
-  color: #5a7a8a;
-  letter-spacing: 0.02em;
-}
+.pm-label { font-size: 0.58rem; color: #5a7a8a; letter-spacing: 0.02em; }
 
-.pm-value {
-  margin: 1px 0 0;
-  font-size: 0.78rem;
-  color: #ffffff;
-}
+.pm-value { margin: 1px 0 0; font-size: 0.78rem; color: #ffffff; }
 
-.pm-unit {
-  font-size: 0.6rem;
-  color: #5a7a8a;
-}
+.pm-unit { font-size: 0.6rem; color: #5a7a8a; }
 
 /* ── Info panel — top right ──────────────────────────────────────── */
 
@@ -102,54 +87,61 @@
   position: absolute;
   top: 14px;
   right: 14px;
-  width: min(210px, calc(100vw - 28px));
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(31, 52, 66, 0.15);
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 8px 24px rgba(20, 37, 49, 0.14);
+  width: min(220px, calc(100vw - 28px));
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(20, 37, 49, 0.12);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 .controls-title {
-  margin: 0 0 4px;
-  font-size: 1rem;
+  margin: 0;
+  font-size: 0.95rem;
   font-weight: 600;
-  color: #10212b;
-  letter-spacing: -0.02em;
+  color: #0f1f2b;
+  letter-spacing: -0.03em;
+}
+
+.controls-divider {
+  height: 1px;
+  background: rgba(15, 31, 43, 0.08);
+  margin: 0 -2px;
 }
 
 .controls-status {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: #4a7088;
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .controls-error {
   margin: 0;
-  font-size: 0.76rem;
+  font-size: 0.73rem;
   color: #8c2626;
   word-break: break-all;
 }
 
 .controls-stat {
   margin: 0;
-  font-size: 0.76rem;
+  font-size: 0.73rem;
   color: #243845;
-  font-family: 'IBM Plex Mono', 'Courier New', monospace;
   display: flex;
   align-items: center;
   gap: 7px;
+  font-variant-numeric: tabular-nums;
 }
 
 .dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -157,16 +149,55 @@
 .dot--mesh  { background: #22dd88; }
 .dot--pivot { background: #8899aa; }
 
+/* ── Camera toggle ───────────────────────────────────────────────── */
+
+.camera-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 31, 43, 0.12);
+  background: rgba(15, 31, 43, 0.04);
+  color: #0f1f2b;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  text-align: left;
+}
+
+.camera-toggle:hover {
+  background: rgba(15, 31, 43, 0.08);
+}
+
+.camera-toggle--active {
+  background: rgba(15, 31, 43, 0.9);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.camera-toggle--active:hover {
+  background: rgba(15, 31, 43, 0.8);
+}
+
+.camera-toggle-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.controls-hint {
+  margin: 0;
+  font-size: 0.67rem;
+  color: #4a7088;
+  line-height: 1.5;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
-  .perf-monitor {
-    left: 14px;
-    width: auto;
-  }
-  .viewer-controls {
-    right: 14px;
-    left: 14px;
-    width: auto;
-  }
+  .perf-monitor { left: 14px; width: auto; }
+  .viewer-controls { right: 14px; left: 14px; width: auto; }
 }

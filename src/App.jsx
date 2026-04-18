@@ -9,45 +9,47 @@ export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [status, setStatus] = useState('loading')
   const [info, setInfo] = useState(null)
+  const [playerMode, setPlayerMode] = useState(false)
 
-  const onReady = useCallback((data) => {
-    setInfo(data)
-    setStatus('ok')
-  }, [])
-
-  const onError = useCallback((msg) => {
-    setInfo(msg)
-    setStatus('error')
-  }, [])
+  const onReady = useCallback((data) => { setInfo(data); setStatus('ok') }, [])
+  const onError = useCallback((msg) => { setInfo(msg); setStatus('error') }, [])
 
   return (
     <main className="viewer-page">
-      <Scene onStats={setStats} onReady={onReady} onError={onError} />
+      <Scene onStats={setStats} onReady={onReady} onError={onError} playerMode={playerMode} />
 
       {import.meta.env.DEV && <PerfMonitor stats={stats} scene={info} status={status} />}
 
       <aside className="viewer-controls" aria-live="polite">
         <h1 className="controls-title">La Cabane</h1>
 
-        {status === 'loading' && (
-          <p className="controls-status">Construction de la scène…</p>
-        )}
+        <div className="controls-divider" />
 
-        {status === 'error' && (
-          <p className="controls-error">{info}</p>
-        )}
-
+        {status === 'loading' && <p className="controls-status">Construction de la scène…</p>}
+        {status === 'error'   && <p className="controls-error">{info}</p>}
         {status === 'ok' && info && (
           <>
             <p className="controls-stat">
-              <span className="dot dot--mesh" />
-              {info.meshes} mesh{info.meshes !== 1 ? 'es' : ''} chargé{info.meshes !== 1 ? 's' : ''}
+              <span className="dot dot--mesh" />{info.meshes} mesh{info.meshes !== 1 ? 'es' : ''}
             </p>
             <p className="controls-stat">
-              <span className="dot dot--pivot" />
-              {info.pivots} pivot{info.pivots !== 1 ? 's' : ''} (assets manquants)
+              <span className="dot dot--pivot" />{info.pivots} pivot{info.pivots !== 1 ? 's' : ''} manquants
             </p>
           </>
+        )}
+
+        <div className="controls-divider" />
+
+        <button
+          className={`camera-toggle${playerMode ? ' camera-toggle--active' : ''}`}
+          onClick={() => setPlayerMode((p) => !p)}
+        >
+          <span className="camera-toggle-icon">{playerMode ? '🎮' : '🔭'}</span>
+          {playerMode ? 'Mode joueur' : 'Mode orbite'}
+        </button>
+
+        {playerMode && (
+          <p className="controls-hint">Clic pour capturer · WASD pour avancer · ESC pour quitter</p>
         )}
       </aside>
     </main>
