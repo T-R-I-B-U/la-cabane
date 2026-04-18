@@ -1,7 +1,5 @@
-import Scene from './core/Scene'
-
 function App() {
-  return <Scene />
+  return null
 }
 
 export default App
