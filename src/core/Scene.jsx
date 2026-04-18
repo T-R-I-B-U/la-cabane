@@ -58,10 +58,13 @@ function CabaneMap({ onReady, onError }) {
   return <primitive object={cabane} />
 }
 
+// hut01 world position from cabane.json — default camera target
+const HUT_POS = [-4.7842, 0.8145, -0.7126]
+
 export default function Scene({ onStats, onReady, onError }) {
   return (
     <Canvas
-      camera={{ fov: 50, near: 0.01, far: 500, position: [20, 15, 30] }}
+      camera={{ fov: 50, near: 0.01, far: 500, position: [HUT_POS[0] + 8, HUT_POS[1] + 5, HUT_POS[2] + 10] }}
       shadows
     >
       <StatsCollector onStats={onStats} />
@@ -72,7 +75,13 @@ export default function Scene({ onStats, onReady, onError }) {
 
       <CabaneMap onReady={onReady} onError={onError} />
 
-      <OrbitControls enableDamping dampingFactor={0.08} minDistance={0.5} maxDistance={200} />
+      <OrbitControls
+        enableDamping
+        dampingFactor={0.08}
+        minDistance={0.5}
+        maxDistance={200}
+        target={HUT_POS}
+      />
     </Canvas>
   )
 }
