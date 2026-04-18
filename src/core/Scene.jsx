@@ -72,6 +72,12 @@ function PlayerControls() {
   const keys = useRef({})
   const SPEED = 0.12
 
+  // Teleport camera to spawn point at ground level in front of the hut.
+  useEffect(() => {
+    camera.position.copy(PLAYER_SPAWN)
+    camera.lookAt(HUT_POS[0], 1.7, HUT_POS[2])
+  }, [camera])
+
   useEffect(() => {
     const down = (e) => { keys.current[e.code] = true }
     const up = (e) => { keys.current[e.code] = false }
@@ -103,6 +109,9 @@ function PlayerControls() {
 
 // hut01 world position from cabane.json
 const HUT_POS = [-4.7842, 0.8145, -0.7126]
+
+// Player spawn: ground level (~eye height 1.7) in front of the hut entrance
+const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], 1.7, HUT_POS[2] + 6)
 
 export default function Scene({ onStats, onReady, onError, playerMode }) {
   return (
