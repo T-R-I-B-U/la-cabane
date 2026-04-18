@@ -94,8 +94,8 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
         right,
         left,
         center:       center.clone(),
-        rightOriginX: right.position.x,
-        leftOriginX:  left.position.x,
+        rightOriginZ: right.position.z,
+        leftOriginZ:  left.position.z,
         progress:     0,
         rightRef:     { current: right },
         leftRef:      { current: left },
@@ -108,8 +108,8 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
         console.log(
           `[SlidingDoors] porte — parent: "${parent.name}"`,
           `| center: ${center.toArray().map(v => v.toFixed(2))}`,
-          `| rightOriginX: ${right.position.x.toFixed(3)}`,
-          `| leftOriginX:  ${left.position.x.toFixed(3)}`,
+          `| rightOriginZ: ${right.position.z.toFixed(3)}`,
+          `| leftOriginZ:  ${left.position.z.toFixed(3)}`,
         )
       }
     }
@@ -131,9 +131,8 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
       const target = dist < TRIGGER_DIST ? 1 : 0
       door.progress += (target - door.progress) * LERP_SPEED
 
-      // door_right est retourné à 180° → on inverse le sens du glissement
-      door.right.position.x = door.rightOriginX - door.progress * SLIDE_AMOUNT
-      door.left.position.x  = door.leftOriginX  + door.progress * SLIDE_AMOUNT
+      door.right.position.z = door.rightOriginZ - door.progress * SLIDE_AMOUNT
+      door.left.position.z  = door.leftOriginZ  + door.progress * SLIDE_AMOUNT
 
       const isOpen = door.progress > 0.5
       if (door.right.isMesh) door.right.userData.isDoorOpen = isOpen
