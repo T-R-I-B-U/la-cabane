@@ -1,0 +1,124 @@
+.viewer-page {
+  position: relative;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Perf monitor — top left ─────────────────────────────────────── */
+
+.perf-monitor {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: min(220px, calc(100vw - 28px));
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(16, 22, 28, 0.82);
+  color: #f3f6f9;
+  pointer-events: none;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+.perf-monitor h2 {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d7e4ef;
+}
+
+.perf-monitor dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px 10px;
+}
+
+.perf-monitor dl div {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 4px;
+}
+
+.perf-monitor dt {
+  font-size: 0.62rem;
+  opacity: 0.7;
+}
+
+.perf-monitor dd {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  color: #fff;
+}
+
+/* ── Info panel — top right ──────────────────────────────────────── */
+
+.viewer-controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: min(210px, calc(100vw - 28px));
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(31, 52, 66, 0.15);
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(20, 37, 49, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.controls-title {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #10212b;
+  letter-spacing: -0.02em;
+}
+
+.controls-status {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #4a7088;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+.controls-error {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #8c2626;
+  word-break: break-all;
+}
+
+.controls-stat {
+  margin: 0;
+  font-size: 0.76rem;
+  color: #243845;
+  font-family: 'IBM Plex Mono', 'Courier New', monospace;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot--mesh  { background: #22dd88; }
+.dot--pivot { background: #8899aa; }
+
+/* ── Responsive ──────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+  .viewer-controls {
+    right: 14px;
+    left: 14px;
+    width: auto;
+  }
+}
