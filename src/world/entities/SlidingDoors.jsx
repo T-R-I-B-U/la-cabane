@@ -131,8 +131,8 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
       const target = dist < TRIGGER_DIST ? 1 : 0
       door.progress += (target - door.progress) * LERP_SPEED
 
-      door.right.position.z = door.rightOriginZ - door.progress * SLIDE_AMOUNT
-      door.left.position.z  = door.leftOriginZ  + door.progress * SLIDE_AMOUNT
+      door.right.position.z = door.rightOriginZ + door.progress * SLIDE_AMOUNT
+      door.left.position.z  = door.leftOriginZ  - door.progress * SLIDE_AMOUNT
 
       const isOpen = door.progress > 0.5
       if (door.right.isMesh) door.right.userData.isDoorOpen = isOpen
