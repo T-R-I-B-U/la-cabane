@@ -79,11 +79,16 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
     for (const { right, left, parent } of pairs.values()) {
       if (!right || !left) continue
 
-      // Centre de déclenchement = world pos du grand-parent (door01),
-      // un niveau au-dessus de door01_1, pour être au milieu de l'ouverture.
-      const triggerNode  = parent.parent ?? parent
-      const center       = new THREE.Vector3()
-      triggerNode.getWorldPosition(center)
+      // Only animate door01 for now
+      let node = parent
+      let isDoor01 = false
+      while (node) { if (node.name === 'door01') { isDoor01 = true; break } node = node.parent }
+      if (!isDoor01) continue
+
+      // Centre de déclenchement = world pos du mesh door_right (fiable
+      // quelle que soit la profondeur de la hiérarchie GLB).
+      const center = new THREE.Vector3()
+      right.getWorldPosition(center)
 
       const entry = {
         right,
@@ -101,7 +106,7 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
 
       if (DEBUG) {
         console.log(
-          `[SlidingDoors] porte — parent: "${parent.name}" | triggerNode: "${triggerNode.name}"`,
+          `[SlidingDoors] porte — parent: "${parent.name}"`,
           `| center: ${center.toArray().map(v => v.toFixed(2))}`,
           `| rightOriginX: ${right.position.x.toFixed(3)}`,
           `| leftOriginX:  ${left.position.x.toFixed(3)}`,
