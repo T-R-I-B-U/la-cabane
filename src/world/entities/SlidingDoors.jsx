@@ -10,7 +10,7 @@ const DEBUG = import.meta.env.DEV
 
 function TriggerSphere({ position, open }) {
   return (
-    <mesh position={position}>
+    <mesh position={position} raycast={() => {}}>
       <sphereGeometry args={[TRIGGER_DIST, 16, 16]} />
       <meshBasicMaterial
         color={open ? '#22dd88' : '#e0443a'}
@@ -34,7 +34,7 @@ function DoorPanel({ objRef, color }) {
   })
 
   return (
-    <mesh ref={meshRef}>
+    <mesh ref={meshRef} raycast={() => {}}>
       <boxGeometry args={[1.2, 2.2, 0.08]} />
       <meshBasicMaterial color={color} transparent opacity={0.5} />
     </mesh>
