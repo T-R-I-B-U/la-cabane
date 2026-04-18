@@ -154,6 +154,7 @@ const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2] + 6
 
 export default function Scene({ onStats, onReady, onError, playerMode }) {
   const [cabane, setCabane] = useState(null)
+  const controlsRef = useRef()
 
   return (
     <Canvas
@@ -171,12 +172,13 @@ export default function Scene({ onStats, onReady, onError, playerMode }) {
       <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
 
       {/* Portes coulissantes — actives en mode joueur et en mode orbite */}
-      <SlidingDoors cabane={cabane} />
+      <SlidingDoors cabane={cabane} playerMode={playerMode} controlsRef={controlsRef} />
 
       {playerMode ? (
         <PlayerControls />
       ) : (
         <OrbitControls
+          ref={controlsRef}
           enableDamping
           dampingFactor={0.08}
           minDistance={0.5}
