@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 
@@ -117,8 +117,10 @@ export default function Scene({ onStats, onReady, onError }) {
       <StatsCollector onStats={onStats} />
       <FocusRig controlsRef={controlsRef} focusTarget={focusTarget} />
 
-      {/* Grosse lumière globale ambiante, sans directionnel */}
-      <ambientLight intensity={2.5} />
+      {/* Environment HDRI — donne aux matériaux PBR quelque chose à refléter */}
+      <Environment preset="apartment" backgroundBlurriness={1} />
+      <ambientLight intensity={1} />
+      <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
 
       <CabaneMap
         onReady={onReady}
