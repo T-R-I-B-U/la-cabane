@@ -6,7 +6,6 @@ const TRIGGER_DIST = 5
 const SLIDE_AMOUNT = 1.5
 const LERP_SPEED   = 0.07
 
-const DEBUG = import.meta.env.DEV
 
 function TriggerSphere({ position, open }) {
   return (
@@ -52,7 +51,7 @@ function DoorPanel({ objRef, color }) {
  * En mode orbite : référence = OrbitControls.target (point regardé)
  * En mode joueur : référence = camera.position
  */
-export function SlidingDoors({ cabane, playerMode, controlsRef }) {
+export function SlidingDoors({ cabane, playerMode, controlsRef, debug = false }) {
   const { camera } = useThree()
   const doors      = useRef([])
   const [debugState, setDebugState] = useState([])
@@ -104,7 +103,7 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
       doors.current.push(entry)
       dbg.push(entry)
 
-      if (DEBUG) {
+      if (debug) {
         console.log(
           `[SlidingDoors] porte — parent: "${parent.name}"`,
           `| center: ${center.toArray().map(v => v.toFixed(2))}`,
@@ -114,7 +113,7 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
       }
     }
 
-    if (DEBUG && dbg.length === 0) {
+    if (debug && dbg.length === 0) {
       console.warn('[SlidingDoors] Aucune paire door_right/door_left trouvée.')
     }
 
@@ -140,7 +139,7 @@ export function SlidingDoors({ cabane, playerMode, controlsRef }) {
     }
   })
 
-  if (!DEBUG) return null
+  if (!debug) return null
 
   return (
     <>

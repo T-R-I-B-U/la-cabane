@@ -10,13 +10,14 @@ export default function App() {
   const [status, setStatus] = useState('loading')
   const [info, setInfo] = useState(null)
   const [playerMode, setPlayerMode] = useState(false)
+  const [debugDoors, setDebugDoors] = useState(false)
 
   const onReady = useCallback((data) => { setInfo(data); setStatus('ok') }, [])
   const onError = useCallback((msg) => { setInfo(msg); setStatus('error') }, [])
 
   return (
     <main className="viewer-page">
-      <Scene onStats={setStats} onReady={onReady} onError={onError} playerMode={playerMode} />
+      <Scene onStats={setStats} onReady={onReady} onError={onError} playerMode={playerMode} debugDoors={debugDoors} />
 
       {import.meta.env.DEV && <PerfMonitor stats={stats} scene={info} status={status} />}
 
@@ -50,6 +51,19 @@ export default function App() {
 
         {playerMode && (
           <p className="controls-hint">Clic pour capturer · WASD pour avancer · ESC pour quitter</p>
+        )}
+
+        {import.meta.env.DEV && (
+          <>
+            <div className="controls-divider" />
+            <button
+              className={`camera-toggle${debugDoors ? ' camera-toggle--active' : ''}`}
+              onClick={() => setDebugDoors(p => !p)}
+            >
+              <span className="camera-toggle-icon">{debugDoors ? '🟢' : '⚫'}</span>
+              Debug portes
+            </button>
+          </>
         )}
       </aside>
     </main>

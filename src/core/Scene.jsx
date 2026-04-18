@@ -152,7 +152,7 @@ const HUT_POS = [-4.7842, 0.8145, -0.7126]
 // Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2] + 6)
 
-export default function Scene({ onStats, onReady, onError, playerMode }) {
+export default function Scene({ onStats, onReady, onError, playerMode, debugDoors }) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
 
@@ -172,7 +172,7 @@ export default function Scene({ onStats, onReady, onError, playerMode }) {
       <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
 
       {/* Portes coulissantes — actives en mode joueur et en mode orbite */}
-      <SlidingDoors cabane={cabane} playerMode={playerMode} controlsRef={controlsRef} />
+      <SlidingDoors cabane={cabane} playerMode={playerMode} controlsRef={controlsRef} debug={debugDoors} />
 
       {playerMode ? (
         <PlayerControls />
