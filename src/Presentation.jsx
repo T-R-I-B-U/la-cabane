@@ -77,7 +77,14 @@ function TopBar() {
     <header className="topbar">
       <div className="brandmark">
         <span className="dot" />
-        <span style={{ fontFamily: 'var(--serif)', fontSize: 16, fontWeight: 400, letterSpacing: '-0.01em' }}>
+        <span
+          style={{
+            fontFamily: 'var(--serif)',
+            fontSize: 16,
+            fontWeight: 400,
+            letterSpacing: '-0.01em',
+          }}
+        >
           La Cabane
         </span>
         <span style={{ color: 'var(--ink-mute)' }}>/</span>
@@ -91,7 +98,9 @@ function TopBar() {
         <a href="#workflow">Workflow</a>
       </nav>
       <div className="meta">
-        <span>branch · <em>develop</em></span>
+        <span>
+          branch · <em>develop</em>
+        </span>
         <span style={{ width: 1, height: 12, background: 'var(--line)' }} />
         <span style={{ color: 'var(--accent-2)' }}>● en développement</span>
       </div>
@@ -105,13 +114,12 @@ function Hero() {
       <div className="hero-label">Projet d'école — Gobelins · Promo 2026</div>
       <h1>
         Une <em>cabane</em>
-        <br />
-        à l'échelle du web.
+        <br />à l'échelle du web.
       </h1>
       <p className="hero-lede">
-        Expérience WebGL interactive explorable à la première personne, conçue en binôme.
-        Une architecture 3D bâtie dans Cinema&nbsp;4D, un moteur Three.js piloté par React,
-        et des shaders qui font pousser les fruits.
+        Expérience WebGL interactive explorable à la première personne, conçue en binôme. Une
+        architecture 3D bâtie dans Cinema&nbsp;4D, un moteur Three.js piloté par React, et des
+        shaders qui font pousser les fruits.
       </p>
       <div className="hero-grid">
         <div>
@@ -163,12 +171,18 @@ function Section({ num, label, title, titleEm, kicker, children }) {
 
 function Pitch() {
   return (
-    <Section num="01" label="Pitch" title="Un espace 3D à" titleEm="habiter." kicker="Intention & cadre">
+    <Section
+      num="01"
+      label="Pitch"
+      title="Un espace 3D à"
+      titleEm="habiter."
+      kicker="Intention & cadre"
+    >
       <p className="pitch-text">
-        <strong>La Cabane</strong> est une expérience WebGL navigable à la première personne.
-        Le joueur découvre un environnement construit comme un décor de théâtre : une cabane
-        perchée, une serre, un nid, des escaliers, un comptoir. Les objets interactifs réagissent
-        à la proximité du joueur via des shaders custom et un système d'événements découplé.
+        <strong>La Cabane</strong> est une expérience WebGL navigable à la première personne. Le
+        joueur découvre un environnement construit comme un décor de théâtre : une cabane perchée,
+        une serre, un nid, des escaliers, un comptoir. Les objets interactifs réagissent à la
+        proximité du joueur via des shaders custom et un système d'événements découplé.
       </p>
       <div className="pitch-tags">
         <span className="tag accent">WebGL</span>
@@ -183,7 +197,13 @@ function Pitch() {
 
 function Stack() {
   return (
-    <Section num="02" label="Stack" title="Outils" titleEm="choisis." kicker={`${STACK.length} dépendances clés`}>
+    <Section
+      num="02"
+      label="Stack"
+      title="Outils"
+      titleEm="choisis."
+      kicker={`${STACK.length} dépendances clés`}
+    >
       <div className="stack-grid">
         {STACK.map((s, i) => (
           <div className="stack-cell" key={s.tool}>
@@ -200,9 +220,15 @@ function Stack() {
 
 function Architecture() {
   return (
-    <Section num="03" label="Architecture" title="Deux couches," titleEm="zéro fuite." kicker="React ↔ Three.js">
+    <Section
+      num="03"
+      label="Architecture"
+      title="Deux couches,"
+      titleEm="zéro fuite."
+      kicker="React ↔ Three.js"
+    >
       <pre className="arch-diagram">
-{`index.html
+        {`index.html
   └── #root  ────────────────────────────  React DOM
         ├── App.jsx                          entrée React, monte le canvas
         │     └── [UI components]            pure DOM / React state
@@ -210,7 +236,7 @@ function Architecture() {
 
 `}
         <span className="hl">WebGL layer</span>
-{`  src/core/
+        {`  src/core/
         SceneManager                         scène, renderer, caméra
         Loop                                 requestAnimationFrame, delta
         Loader                               GLTF · Audio · Texture
@@ -218,7 +244,7 @@ function Architecture() {
 
 `}
         <span className="hl2">Content layer</span>
-{`  src/world/
+        {`  src/world/
         entities/                            une classe par objet 3D
         materials/                           matériaux / shaders
 
@@ -239,8 +265,8 @@ function Architecture() {
         <div className="arch-rule">
           <h4>Règle 2 — Entités</h4>
           <p>
-            Chaque fichier de <code>world/entities/</code> expose exactement <code>init()</code>{' '}
-            et <code>update(delta)</code>.
+            Chaque fichier de <code>world/entities/</code> expose exactement <code>init()</code> et{' '}
+            <code>update(delta)</code>.
           </p>
         </div>
         <div className="arch-rule">
@@ -252,7 +278,8 @@ function Architecture() {
         <div className="arch-rule">
           <h4>Règle 4 — Assets</h4>
           <p>
-            <code>public/</code> est servi statiquement et chargé au runtime. Jamais bundlé par Vite.
+            <code>public/</code> est servi statiquement et chargé au runtime. Jamais bundlé par
+            Vite.
           </p>
         </div>
       </div>
@@ -310,7 +337,13 @@ function DevLog() {
 
 function Workflow() {
   return (
-    <Section num="05" label="Workflow" title="Git" titleEm="discipline." kicker="Conventions partagées">
+    <Section
+      num="05"
+      label="Workflow"
+      title="Git"
+      titleEm="discipline."
+      kicker="Conventions partagées"
+    >
       <div className="workflow-grid">
         <div className="wf-col">
           <h4>Préfixes de branches</h4>
@@ -329,9 +362,12 @@ function Workflow() {
 
 <body: quoi, pourquoi, comment>`}</pre>
           <pre className="commit-example" style={{ marginTop: 12 }}>
-            <span className="type">feat</span>(<span className="scope">entities</span>): add TribeTree class with init + update{'\n'}
-            <span className="type">fix</span>(<span className="scope">loader</span>): correct Draco decoder path in prod{'\n'}
-            <span className="type">style</span>(<span className="scope">ui</span>): update overlay opacity transition
+            <span className="type">feat</span>(<span className="scope">entities</span>): add
+            TribeTree class with init + update{'\n'}
+            <span className="type">fix</span>(<span className="scope">loader</span>): correct Draco
+            decoder path in prod{'\n'}
+            <span className="type">style</span>(<span className="scope">ui</span>): update overlay
+            opacity transition
           </pre>
           <p className="workflow-note">
             ⛔ Jamais de commit direct sur <b>main</b>. Release via PR <code>develop → main</code>,
@@ -392,13 +428,27 @@ export default function Presentation() {
         <TopBar />
         <Hero />
       </div>
-      <div className="shell"><Pitch /></div>
-      <div className="shell"><Stack /></div>
-      <div className="shell"><Architecture /></div>
-      <div className="shell"><DevLog /></div>
-      <div className="shell"><Workflow /></div>
-      <div className="shell"><StatusStrip /></div>
-      <div className="shell"><Foot /></div>
+      <div className="shell">
+        <Pitch />
+      </div>
+      <div className="shell">
+        <Stack />
+      </div>
+      <div className="shell">
+        <Architecture />
+      </div>
+      <div className="shell">
+        <DevLog />
+      </div>
+      <div className="shell">
+        <Workflow />
+      </div>
+      <div className="shell">
+        <StatusStrip />
+      </div>
+      <div className="shell">
+        <Foot />
+      </div>
     </div>
   )
 }
