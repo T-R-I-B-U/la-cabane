@@ -28,10 +28,13 @@ function Section({ title, children }) {
  */
 export function PerfMonitor({ stats, scene, status }) {
   const fpsColor =
-    stats.fps === 0 ? '#8899aa'
-    : stats.fps >= 55 ? '#22dd88'
-    : stats.fps >= 30 ? '#f5a623'
-    : '#e0443a'
+    stats.fps === 0
+      ? '#8899aa'
+      : stats.fps >= 55
+        ? '#22dd88'
+        : stats.fps >= 30
+          ? '#f5a623'
+          : '#e0443a'
 
   return (
     <aside className="perf-monitor">
