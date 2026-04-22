@@ -50,11 +50,24 @@
   letter-spacing: 0.04em;
 }
 
-.pm-status[data-status='loading'] { background: rgba(245,166,35,0.2); color: #f5a623; }
-.pm-status[data-status='ok']      { background: rgba(34,221,136,0.18); color: #22dd88; }
-.pm-status[data-status='error']   { background: rgba(224,68,58,0.2);   color: #e0443a; }
+.pm-status[data-status='loading'] {
+  background: rgba(245, 166, 35, 0.2);
+  color: #f5a623;
+}
+.pm-status[data-status='ok'] {
+  background: rgba(34, 221, 136, 0.18);
+  color: #22dd88;
+}
+.pm-status[data-status='error'] {
+  background: rgba(224, 68, 58, 0.2);
+  color: #e0443a;
+}
 
-.pm-section { display: flex; flex-direction: column; gap: 5px; }
+.pm-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
 .pm-section-title {
   margin: 0;
@@ -62,7 +75,7 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #4a7088;
-  border-bottom: 1px solid rgba(255,255,255,0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
   padding-bottom: 3px;
 }
 
@@ -73,13 +86,27 @@
   gap: 5px 8px;
 }
 
-.pm-row { display: flex; flex-direction: column; }
+.pm-row {
+  display: flex;
+  flex-direction: column;
+}
 
-.pm-label { font-size: 0.58rem; color: #5a7a8a; letter-spacing: 0.02em; }
+.pm-label {
+  font-size: 0.58rem;
+  color: #5a7a8a;
+  letter-spacing: 0.02em;
+}
 
-.pm-value { margin: 1px 0 0; font-size: 0.78rem; color: #ffffff; }
+.pm-value {
+  margin: 1px 0 0;
+  font-size: 0.78rem;
+  color: #ffffff;
+}
 
-.pm-unit { font-size: 0.6rem; color: #5a7a8a; }
+.pm-unit {
+  font-size: 0.6rem;
+  color: #5a7a8a;
+}
 
 /* ── Info panel — top right ──────────────────────────────────────── */
 
@@ -146,8 +173,12 @@
   flex-shrink: 0;
 }
 
-.dot--mesh  { background: #22dd88; }
-.dot--pivot { background: #8899aa; }
+.dot--mesh {
+  background: #22dd88;
+}
+.dot--pivot {
+  background: #8899aa;
+}
 
 /* ── Camera toggle ───────────────────────────────────────────────── */
 
@@ -165,7 +196,9 @@
   font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   text-align: left;
 }
 
@@ -198,6 +231,13 @@
 /* ── Responsive ──────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
-  .perf-monitor { left: 14px; width: auto; }
-  .viewer-controls { right: 14px; left: 14px; width: auto; }
+  .perf-monitor {
+    left: 14px;
+    width: auto;
+  }
+  .viewer-controls {
+    right: 14px;
+    left: 14px;
+    width: auto;
+  }
 }
