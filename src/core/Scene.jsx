@@ -1,24 +1,9 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
-import { OrbitControls, PointerLockControls, Environment, useTexture } from '@react-three/drei'
+import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
-
-function SkyBackground() {
-  const texture = useTexture('/textures/sky.png')
-  const background = useMemo(() => {
-    const nextTexture = texture.clone()
-    nextTexture.mapping = THREE.EquirectangularReflectionMapping
-    return nextTexture
-  }, [texture])
-
-  useEffect(() => {
-    return () => background.dispose()
-  }, [background])
-
-  return <primitive attach="background" object={background} />
-}
 
 function StatsCollector({ onStats }) {
   const { gl } = useThree()
@@ -80,11 +65,14 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
   return <primitive object={cabane} />
 }
 
+// Top face of the hut's base ring — measured from hut01.gltf vertex data.
+const FLOOR_Y = 0.04
+
 function Floor() {
   return (
     <mesh
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, 0, 0]}
+      position={[0, FLOOR_Y, 0]}
       receiveShadow
       userData={{ isFloor: true }}
     >
@@ -94,14 +82,16 @@ function Floor() {
   )
 }
 
-const PLAYER_HEIGHT = 2.2
+const PLAYER_HEIGHT = 1.4
 const COLLISION_DIST = 0.6
 const SPEED = 0.09
 const UP = new THREE.Vector3(0, 1, 0)
+const DOWN = new THREE.Vector3(0, -1, 0)
 
 function PlayerControls() {
   const keys = useRef({})
-  const ray = useRef(new THREE.Raycaster())
+  const wallRay = useRef(new THREE.Raycaster())
+  const floorRay = useRef(new THREE.Raycaster())
   const initialized = useRef(false)
 
   useEffect(() => {
@@ -124,9 +114,30 @@ function PlayerControls() {
 
     if (!initialized.current) {
       camera.position.copy(PLAYER_SPAWN)
-      camera.lookAt(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2])
+      camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
       initialized.current = true
     }
+
+    // --- Floor / stair following ---
+    // Cast a ray straight down from just above the player's head.
+    // The first walkable surface hit determines the target floor height.
+    const fOrigin = camera.position.clone()
+    fOrigin.y += 0.5
+    floorRay.current.set(fOrigin, DOWN)
+    const fHits = floorRay.current.intersectObjects(scene.children, true)
+    const walkable = fHits.find((h) => h.object.userData.isFloor || h.object.userData.isStair)
+    const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
+    const targetCamY = targetFloorY + PLAYER_HEIGHT
+
+    const dy = targetCamY - camera.position.y
+    if (dy < 0) {
+      // Descending — snap quickly so player doesn't float above steps
+      camera.position.y += dy * 0.3
+    } else if (dy < 0.6) {
+      // Ascending — smooth lerp, limited to realistic step height
+      camera.position.y += dy * 0.2
+    }
+    // dy >= 0.6 means a wall is above — don't teleport upward
 
     const k = keys.current
     if (!k['KeyW'] && !k['KeyS'] && !k['KeyA'] && !k['KeyD']) return
@@ -144,7 +155,9 @@ function PlayerControls() {
     if (k['KeyA']) wish.addScaledVector(right, -SPEED)
     if (k['KeyD']) wish.addScaledVector(right, SPEED)
 
-    const RAY_HEIGHTS = [0.4, 1.1, PLAYER_HEIGHT]
+    // Ray heights are relative to current camera Y so they stay correct on stairs
+    const footY = camera.position.y - PLAYER_HEIGHT
+    const RAY_HEIGHTS = [footY + 0.3, footY + 0.8, camera.position.y]
     const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
 
     for (const step of axes) {
@@ -152,17 +165,18 @@ function PlayerControls() {
       const dir = step.clone().normalize()
       let blocked = false
 
-      for (const dy of RAY_HEIGHTS) {
+      for (const rayY of RAY_HEIGHTS) {
         const origin = camera.position.clone()
-        origin.y = dy
-        ray.current.set(origin, dir)
-        const hits = ray.current.intersectObjects(scene.children, true)
+        origin.y = rayY
+        wallRay.current.set(origin, dir)
+        const hits = wallRay.current.intersectObjects(scene.children, true)
         if (
           hits.some(
             (h) =>
               h.distance < COLLISION_DIST &&
               !h.object.userData.isFloor &&
-              !h.object.userData.isDoorOpen // portes ouvertes = pas de collision
+              !h.object.userData.isStair && // stairs are walked on, not into
+              !h.object.userData.isDoorOpen
           )
         ) {
           blocked = true
@@ -172,18 +186,16 @@ function PlayerControls() {
 
       if (!blocked) camera.position.add(step)
     }
-
-    camera.position.y = PLAYER_HEIGHT
   })
 
   return <PointerLockControls />
 }
 
 // hut01 world position from cabane.json
-const HUT_POS = [-4.7842, 0.8145, -0.7126]
+const HUT_POS = [-5.0111, 2.3616, 0.9556]
 
 // Spawn devant l'entrée du hut, à hauteur des yeux
-const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2] + 6)
+const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
 export default function Scene({ onStats, onReady, onError, playerMode, debugDoors }) {
   const [cabane, setCabane] = useState(null)
@@ -201,7 +213,6 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
     >
       <StatsCollector onStats={onStats} />
 
-      <SkyBackground />
       <Environment preset="apartment" />
       <ambientLight intensity={1} />
       <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />

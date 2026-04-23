@@ -54,7 +54,7 @@ function collectDoors(cabane, debug) {
   const pairs = new Map()
 
   cabane.traverse((obj) => {
-    if (obj.name !== 'door_right' && obj.name !== 'door_left') return
+    if (!obj.name.startsWith('door_right') && !obj.name.startsWith('door_left')) return
 
     const parentId = obj.parent?.uuid
     if (!parentId) return
@@ -64,7 +64,7 @@ function collectDoors(cabane, debug) {
     }
 
     const pair = pairs.get(parentId)
-    if (obj.name === 'door_right') pair.right = obj
+    if (obj.name.startsWith('door_right')) pair.right = obj
     else pair.left = obj
   })
 
@@ -74,18 +74,18 @@ function collectDoors(cabane, debug) {
     if (!right || !left) continue
 
     let node = parent
-    let isDoor01 = false
+    let isDoorModel = false
 
     while (node) {
-      if (node.name === 'door01') {
-        isDoor01 = true
+      if (/^door/i.test(node.name)) {
+        isDoorModel = true
         break
       }
 
       node = node.parent
     }
 
-    if (!isDoor01) continue
+    if (!isDoorModel) continue
 
     const center = new THREE.Vector3()
     right.getWorldPosition(center)
