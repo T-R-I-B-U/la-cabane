@@ -1,24 +1,10 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
-import { OrbitControls, PointerLockControls, Environment, useTexture } from '@react-three/drei'
+import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 
-function SkyBackground() {
-  const texture = useTexture('/textures/sky.png')
-  const background = useMemo(() => {
-    const nextTexture = texture.clone()
-    nextTexture.mapping = THREE.EquirectangularReflectionMapping
-    return nextTexture
-  }, [texture])
-
-  useEffect(() => {
-    return () => background.dispose()
-  }, [background])
-
-  return <primitive attach="background" object={background} />
-}
 
 function StatsCollector({ onStats }) {
   const { gl } = useThree()
@@ -180,7 +166,7 @@ function PlayerControls() {
 }
 
 // hut01 world position from cabane.json
-const HUT_POS = [-4.7842, 0.8145, -0.7126]
+const HUT_POS = [-5.0111, 2.3616, 0.9556]
 
 // Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2] + 6)
@@ -201,7 +187,6 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
     >
       <StatsCollector onStats={onStats} />
 
-      <SkyBackground />
       <Environment preset="apartment" />
       <ambientLight intensity={1} />
       <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
