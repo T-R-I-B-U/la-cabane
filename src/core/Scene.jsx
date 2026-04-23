@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
-import { Physics, RigidBody, CapsuleCollider, CuboidCollider, TrimeshCollider, useRapier } from '@react-three/rapier'
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
@@ -43,9 +42,9 @@ function StatsCollector({ onStats }) {
   return null
 }
 
-// Loads the cabane model and notifies parent — rendering is handled by Scene
-// so the primitive can be placed inside a RigidBody after load.
-function CabaneLoader({ onReady, onError, onCabaneLoaded }) {
+function CabaneMap({ onReady, onError, onCabaneLoaded }) {
+  const [cabane, setCabane] = useState(null)
+
   useEffect(() => {
     buildCabane()
       .then((group) => {
@@ -53,20 +52,22 @@ function CabaneLoader({ onReady, onError, onCabaneLoaded }) {
         let pivots = 0
         group.traverse((obj) => {
           if (obj === group) return
-          if (obj.isMesh) {
-            meshes++
-            // C4D Boolean objects are the platform railings — mark as barrier
-            if (obj.name.startsWith('Booléen')) obj.userData.isBarrier = true
-          } else if (obj.userData.cabaneNode) pivots++
+          if (obj.isMesh) meshes++
+          else if (obj.userData.cabaneNode) pivots++
         })
         onReady({ meshes, pivots })
         onCabaneLoaded(group)
+        setCabane(group)
       })
       .catch((err) => onError(err.message ?? String(err)))
   }, [onReady, onError, onCabaneLoaded])
 
-  return null
+  if (!cabane) return null
+  return <primitive object={cabane} />
 }
+
+// Top face of the hut's base ring — measured from hut01.gltf vertex data.
+const FLOOR_Y = 0.04
 
 function Floor() {
   return (
@@ -82,89 +83,17 @@ function Floor() {
   )
 }
 
-const FLOOR_Y = 0.04         // top face of hut base ring
 const PLAYER_HEIGHT = 1.4
-const SPEED = 0.09           // horizontal displacement per frame
-const GRAVITY = 25           // m/s² (stronger than real for snappier feel)
+const COLLISION_DIST = 0.6
+const SPEED = 0.09
 const UP = new THREE.Vector3(0, 1, 0)
+const DOWN = new THREE.Vector3(0, -1, 0)
 
-// Extracts trimesh data (world-space vertices + indices) for each collidable mesh.
-// Baking matrixWorld into the vertices avoids transform-composition issues with
-// @react-three/rapier reading position/rotation/scale separately (not matrix).
-// Barriers and animated door panels are excluded.
-function buildTrimeshData(cabane) {
-  const data = []
-  cabane.traverse((obj) => {
-    if (!obj.isMesh || obj.userData.isBarrier) return
-    if (obj.name.startsWith('door_right') || obj.name.startsWith('door_left')) return
-
-    obj.updateWorldMatrix(true, false)
-    const geo = obj.geometry.clone()
-    geo.applyMatrix4(obj.matrixWorld)  // bake world transform into vertex positions
-
-    const posAttr = geo.attributes.position
-    if (!posAttr) { geo.dispose(); return }
-
-    const vertices = Float32Array.from(posAttr.array)
-    let indices
-    if (geo.index) {
-      indices = Uint32Array.from(geo.index.array)
-    } else {
-      indices = new Uint32Array(posAttr.count)
-      for (let i = 0; i < posAttr.count; i++) indices[i] = i
-    }
-    data.push({ vertices, indices })
-    geo.dispose()  // free the clone; data lives in the typed arrays
-  })
-  return data
-}
-
-function DebugCollisions({ cabane }) {
-  const groupRef = useRef()
-
-  useEffect(() => {
-    if (!cabane || !groupRef.current) return
-    const group = groupRef.current
-
-    // One shared wireframe material for all overlays
-    const mat = new THREE.MeshBasicMaterial({ color: 0x00ff44, wireframe: true })
-
-    cabane.traverse((obj) => {
-      if (!obj.isMesh) return
-      // Compute final world transform so the overlay sits exactly on the mesh
-      obj.updateWorldMatrix(true, false)
-      const overlay = new THREE.Mesh(obj.geometry, mat)
-      overlay.matrix.copy(obj.matrixWorld)
-      overlay.matrixAutoUpdate = false
-      group.add(overlay)
-    })
-
-    return () => {
-      mat.dispose()
-      while (group.children.length) group.remove(group.children[0])
-    }
-  }, [cabane])
-
-  return <group ref={groupRef} />
-}
-
-function PlayerPhysics() {
-  const rbRef = useRef()
-  const { world } = useRapier()
-  const cc = useRef()
+function PlayerControls() {
   const keys = useRef({})
-  const velY = useRef(0)
-
-  // Build the Rapier character controller once (autostep handles stair climbing)
-  useEffect(() => {
-    const controller = world.createCharacterController(0.01)
-    controller.enableAutostep(0.4, 0.1, true) // max step height, min width, include dynamic
-    controller.enableSnapToGround(0.5)
-    controller.setMaxSlopeClimbAngle(Math.PI * 0.45) // ~81° max slope
-    controller.setSlideEnabled(true)
-    cc.current = controller
-    return () => world.removeCharacterController(controller)
-  }, [world])
+  const wallRay = useRef(new THREE.Raycaster())
+  const floorRay = useRef(new THREE.Raycaster())
+  const initialized = useRef(false)
 
   useEffect(() => {
     const down = (e) => { keys.current[e.code] = true }
@@ -177,23 +106,41 @@ function PlayerPhysics() {
     }
   }, [])
 
-  useFrame((state, delta) => {
-    const { camera } = state
-    const rb = rbRef.current
-    if (!rb || !cc.current) return
+  useFrame((state) => {
+    const { camera, scene } = state
 
-    const collider = rb.collider(0)
-    if (!collider) return  // capsule not yet attached (first frame race)
-    const pos = rb.translation()
-
-    // Gravity: accumulate vertical velocity, reset on ground contact
-    if (cc.current.computedGrounded()) {
-      velY.current = 0
-    } else {
-      velY.current -= GRAVITY * delta
+    if (!initialized.current) {
+      camera.position.copy(PLAYER_SPAWN)
+      camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
+      initialized.current = true
     }
 
-    // Horizontal movement from keyboard input
+    // --- Floor / stair following ---
+    // Cast a ray straight down from just above the player's head.
+    // The first walkable surface hit determines the target floor height.
+    const fOrigin = camera.position.clone()
+    fOrigin.y += 0.5
+    floorRay.current.set(fOrigin, DOWN)
+    const fHits = floorRay.current.intersectObjects(scene.children, true)
+    const walkable = fHits.find(
+      (h) => h.object.userData.isFloor || h.object.userData.isStair
+    )
+    const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
+    const targetCamY = targetFloorY + PLAYER_HEIGHT
+
+    const dy = targetCamY - camera.position.y
+    if (dy < 0) {
+      // Descending — snap quickly so player doesn't float above steps
+      camera.position.y += dy * 0.3
+    } else if (dy < 0.6) {
+      // Ascending — smooth lerp, limited to realistic step height
+      camera.position.y += dy * 0.2
+    }
+    // dy >= 0.6 means a wall is above — don't teleport upward
+
+    const k = keys.current
+    if (!k['KeyW'] && !k['KeyS'] && !k['KeyA'] && !k['KeyD']) return
+
     const forward = new THREE.Vector3()
     const right = new THREE.Vector3()
     camera.getWorldDirection(forward)
@@ -201,63 +148,57 @@ function PlayerPhysics() {
     forward.normalize()
     right.crossVectors(forward, UP).normalize()
 
-    const k = keys.current
-    const move = new THREE.Vector3(0, velY.current * delta, 0)
-    if (k['KeyW']) move.addScaledVector(forward, SPEED)
-    if (k['KeyS']) move.addScaledVector(forward, -SPEED)
-    if (k['KeyA']) move.addScaledVector(right, -SPEED)
-    if (k['KeyD']) move.addScaledVector(right, SPEED)
+    const wish = new THREE.Vector3()
+    if (k['KeyW']) wish.addScaledVector(forward, SPEED)
+    if (k['KeyS']) wish.addScaledVector(forward, -SPEED)
+    if (k['KeyA']) wish.addScaledVector(right, -SPEED)
+    if (k['KeyD']) wish.addScaledVector(right, SPEED)
 
-    // Let the character controller resolve collisions and slopes
-    cc.current.computeColliderMovement(collider, { x: move.x, y: move.y, z: move.z })
-    const m = cc.current.computedMovement()
+    // Ray heights are relative to current camera Y so they stay correct on stairs
+    const footY = camera.position.y - PLAYER_HEIGHT
+    const RAY_HEIGHTS = [footY + 0.3, footY + 0.8, camera.position.y]
+    const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
 
-    rb.setNextKinematicTranslation({
-      x: pos.x + m.x,
-      y: pos.y + m.y,
-      z: pos.z + m.z,
-    })
+    for (const step of axes) {
+      if (step.lengthSq() === 0) continue
+      const dir = step.clone().normalize()
+      let blocked = false
 
-    // Camera sits at eye level — centre of capsule + half its height
-    camera.position.set(
-      pos.x + m.x,
-      pos.y + m.y + PLAYER_HEIGHT / 2,
-      pos.z + m.z,
-    )
+      for (const rayY of RAY_HEIGHTS) {
+        const origin = camera.position.clone()
+        origin.y = rayY
+        wallRay.current.set(origin, dir)
+        const hits = wallRay.current.intersectObjects(scene.children, true)
+        if (
+          hits.some(
+            (h) =>
+              h.distance < COLLISION_DIST &&
+              !h.object.userData.isFloor &&
+              !h.object.userData.isStair &&   // stairs are walked on, not into
+              !h.object.userData.isDoorOpen
+          )
+        ) {
+          blocked = true
+          break
+        }
+      }
+
+      if (!blocked) camera.position.add(step)
+    }
   })
 
-  // Capsule: half-height of cylindrical body + hemisphere radius = PLAYER_HEIGHT
-  const capsuleHalf = PLAYER_HEIGHT / 2 - 0.35
-  const capsuleRadius = 0.35
-
-  return (
-    <>
-      <RigidBody
-        ref={rbRef}
-        type="kinematicPosition"
-        colliders={false}
-        position={[PLAYER_SPAWN.x, FLOOR_Y + PLAYER_HEIGHT / 2, PLAYER_SPAWN.z]}
-        enabledRotations={[false, false, false]}
-      >
-        <CapsuleCollider args={[capsuleHalf, capsuleRadius]} />
-      </RigidBody>
-      <PointerLockControls makeDefault />
-    </>
-  )
+  return <PointerLockControls />
 }
 
 // hut01 world position from cabane.json
 const HUT_POS = [-5.0111, 2.3616, 0.9556]
 
-// Spawn in front of the hut entrance
+// Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
-export default function Scene({ onStats, onReady, onError, playerMode, debugDoors, debugPlayer }) {
+export default function Scene({ onStats, onReady, onError, playerMode, debugDoors }) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
-
-  // Trimesh data derived once after model loads — world-space vertices, no re-computation
-  const trimeshData = useMemo(() => (cabane ? buildTrimeshData(cabane) : []), [cabane])
 
   return (
     <Canvas
@@ -269,58 +210,36 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
       }}
       shadows
     >
-      <Physics gravity={[0, -9.81, 0]}>
-        <StatsCollector onStats={onStats} />
+      <StatsCollector onStats={onStats} />
 
-        <Environment preset="apartment" />
-        <ambientLight intensity={1} />
-        <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
+      <Environment preset="apartment" />
+      <ambientLight intensity={1} />
+      <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
 
-        {/* Visual floor */}
-        <Floor />
-        {/* Ground physics — flat box whose top face sits at FLOOR_Y */}
-        <RigidBody type="fixed" position={[0, FLOOR_Y - 0.5, 0]}>
-          <CuboidCollider args={[200, 0.5, 200]} />
-        </RigidBody>
+      <Floor />
 
-        {/* Load the model (no render here) */}
-        <CabaneLoader onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
+      <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
 
-        {/* Visual cabane (full, with barriers and doors) */}
-        {cabane && <primitive object={cabane} />}
+      {/* Portes coulissantes — actives en mode joueur et en mode orbite */}
+      <SlidingDoors
+        cabane={cabane}
+        playerMode={playerMode}
+        controlsRef={controlsRef}
+        debug={debugDoors}
+      />
 
-        {/* Physics cabane — one TrimeshCollider per mesh, vertices in world space */}
-        {trimeshData.length > 0 && (
-          <RigidBody type="fixed" colliders={false}>
-            {trimeshData.map((t, i) => (
-              <TrimeshCollider key={i} args={[t.vertices, t.indices]} />
-            ))}
-          </RigidBody>
-        )}
-
-        {/* Sliding doors — visual only; door panels are excluded from physics trimesh */}
-        <SlidingDoors
-          cabane={cabane}
-          playerMode={playerMode}
-          controlsRef={controlsRef}
-          debug={debugDoors}
+      {playerMode ? (
+        <PlayerControls />
+      ) : (
+        <OrbitControls
+          ref={controlsRef}
+          enableDamping
+          dampingFactor={0.08}
+          minDistance={0.5}
+          maxDistance={200}
+          target={HUT_POS}
         />
-
-        {debugPlayer && <DebugCollisions cabane={cabane} />}
-
-        {playerMode ? (
-          <PlayerPhysics />
-        ) : (
-          <OrbitControls
-            ref={controlsRef}
-            enableDamping
-            dampingFactor={0.08}
-            minDistance={0.5}
-            maxDistance={200}
-            target={HUT_POS}
-          />
-        )}
-      </Physics>
+      )}
     </Canvas>
   )
 }
