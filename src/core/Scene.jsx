@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
-import { Physics, RigidBody, CapsuleCollider, CuboidCollider, useRapier } from '@react-three/rapier'
+import { Physics, RigidBody, CapsuleCollider, CuboidCollider, TrimeshCollider, useRapier } from '@react-three/rapier'
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
@@ -88,23 +88,35 @@ const SPEED = 0.09           // horizontal displacement per frame
 const GRAVITY = 25           // m/s² (stronger than real for snappier feel)
 const UP = new THREE.Vector3(0, 1, 0)
 
-// Builds a physics-only THREE.Group (invisible, no barriers, no animated door panels).
-// Geometry is shared with the visual cabane — no memory duplication.
-function buildPhysicsGroup(cabane) {
-  const group = new THREE.Group()
+// Extracts trimesh data (world-space vertices + indices) for each collidable mesh.
+// Baking matrixWorld into the vertices avoids transform-composition issues with
+// @react-three/rapier reading position/rotation/scale separately (not matrix).
+// Barriers and animated door panels are excluded.
+function buildTrimeshData(cabane) {
+  const data = []
   cabane.traverse((obj) => {
-    if (!obj.isMesh) return
-    if (obj.userData.isBarrier) return
-    // Door panels are animated — exclude them; they have no static physics
+    if (!obj.isMesh || obj.userData.isBarrier) return
     if (obj.name.startsWith('door_right') || obj.name.startsWith('door_left')) return
+
     obj.updateWorldMatrix(true, false)
-    const mesh = new THREE.Mesh(obj.geometry)
-    mesh.visible = false
-    mesh.matrixAutoUpdate = false
-    mesh.matrix.copy(obj.matrixWorld)
-    group.add(mesh)
+    const geo = obj.geometry.clone()
+    geo.applyMatrix4(obj.matrixWorld)  // bake world transform into vertex positions
+
+    const posAttr = geo.attributes.position
+    if (!posAttr) { geo.dispose(); return }
+
+    const vertices = Float32Array.from(posAttr.array)
+    let indices
+    if (geo.index) {
+      indices = Uint32Array.from(geo.index.array)
+    } else {
+      indices = new Uint32Array(posAttr.count)
+      for (let i = 0; i < posAttr.count; i++) indices[i] = i
+    }
+    data.push({ vertices, indices })
+    geo.dispose()  // free the clone; data lives in the typed arrays
   })
-  return group
+  return data
 }
 
 function DebugCollisions({ cabane }) {
@@ -171,6 +183,7 @@ function PlayerPhysics() {
     if (!rb || !cc.current) return
 
     const collider = rb.collider(0)
+    if (!collider) return  // capsule not yet attached (first frame race)
     const pos = rb.translation()
 
     // Gravity: accumulate vertical velocity, reset on ground contact
@@ -243,8 +256,8 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
 
-  // Physics group is derived once from the loaded cabane (no re-computation on re-renders)
-  const physicsGroup = useMemo(() => (cabane ? buildPhysicsGroup(cabane) : null), [cabane])
+  // Trimesh data derived once after model loads — world-space vertices, no re-computation
+  const trimeshData = useMemo(() => (cabane ? buildTrimeshData(cabane) : []), [cabane])
 
   return (
     <Canvas
@@ -276,10 +289,12 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
         {/* Visual cabane (full, with barriers and doors) */}
         {cabane && <primitive object={cabane} />}
 
-        {/* Physics cabane — trimesh without barriers or animated door panels */}
-        {physicsGroup && (
-          <RigidBody type="fixed" colliders="trimesh">
-            <primitive object={physicsGroup} />
+        {/* Physics cabane — one TrimeshCollider per mesh, vertices in world space */}
+        {trimeshData.length > 0 && (
+          <RigidBody type="fixed" colliders={false}>
+            {trimeshData.map((t, i) => (
+              <TrimeshCollider key={i} args={[t.vertices, t.indices]} />
+            ))}
           </RigidBody>
         )}
 
