@@ -3,9 +3,9 @@
     "name": "trunk",
     "type": "Object3D",
     "position": [
+      -1.611,
       0,
-      0,
-      0
+      -16.7177
     ],
     "rotation": [
       0,
