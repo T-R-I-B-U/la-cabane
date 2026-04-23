@@ -85,7 +85,8 @@ const PLAYER_HEIGHT = 1.4
 const COLLISION_DIST = 0.6
 const SPEED = 0.09
 const STEP_CLIMB_SPEED = 0.12 // max Y gain per frame when stepping up
-const FLOOR_SNAP = 0.15       // lerp factor when descending
+const FLOOR_SNAP = 0.06       // lerp factor when descending (lower = smoother)
+const MAX_FALL_SPEED = 0.18   // max Y loss per frame
 const UP = new THREE.Vector3(0, 1, 0)
 const DOWN = new THREE.Vector3(0, -1, 0)
 
@@ -130,12 +131,14 @@ function PlayerControls() {
         // Climbing — capped to avoid teleporting over tall walls
         camera.position.y += Math.min(targetY - camera.position.y, STEP_CLIMB_SPEED)
       } else {
-        // Descending / flat — smooth lerp
-        camera.position.y += (targetY - camera.position.y) * FLOOR_SNAP
+        // Descending / flat — capped lerp to avoid abrupt drops
+        const fallDelta = (targetY - camera.position.y) * FLOOR_SNAP
+        camera.position.y += Math.max(fallDelta, -MAX_FALL_SPEED)
       }
     } else {
-      // No floor within range — fall back to base level
-      camera.position.y += (FLOOR_Y + PLAYER_HEIGHT - camera.position.y) * FLOOR_SNAP
+      // No floor within range — fall back to base level, capped
+      const fallDelta = (FLOOR_Y + PLAYER_HEIGHT - camera.position.y) * FLOOR_SNAP
+      camera.position.y += Math.max(fallDelta, -MAX_FALL_SPEED)
     }
 
     const k = keys.current
@@ -154,9 +157,9 @@ function PlayerControls() {
     if (k['KeyA']) wish.addScaledVector(right, -SPEED)
     if (k['KeyD']) wish.addScaledVector(right, SPEED)
 
-    // Wall rays at mid-body and head (relative to camera Y).
-    // Intentionally skip feet-level so stair risers (~0.26 m) don't block movement.
-    const RAY_OFFSETS = [-PLAYER_HEIGHT / 2, -0.1]
+    // Wall rays: barrier-low (35 cm above floor) clears stair risers (~0.26 m) but blocks
+    // barriers; mid-body and head catch walls at all heights.
+    const RAY_OFFSETS = [-(PLAYER_HEIGHT - 0.35), -PLAYER_HEIGHT / 2, -0.1]
     const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
 
     for (const step of axes) {
