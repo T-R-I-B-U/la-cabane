@@ -52,8 +52,11 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
         let pivots = 0
         group.traverse((obj) => {
           if (obj === group) return
-          if (obj.isMesh) meshes++
-          else if (obj.userData.cabaneNode) pivots++
+          if (obj.isMesh) {
+            meshes++
+            // Barriers (C4D Boolean objects around the platform) are passable
+            if (obj.name.startsWith('Booléen')) obj.userData.isBarrier = true
+          } else if (obj.userData.cabaneNode) pivots++
         })
         onReady({ meshes, pivots })
         onCabaneLoaded(group)
@@ -84,9 +87,9 @@ const FLOOR_Y = 0.04         // top face of hut base ring
 const PLAYER_HEIGHT = 1.4
 const COLLISION_DIST = 0.6
 const SPEED = 0.09
-const STEP_CLIMB_SPEED = 0.3  // max Y gain per frame — covers one full stair (~0.263 m) in one frame
-// Wall ray heights relative to camera Y (barrier-low / mid-body / head)
-const RAY_OFFSETS = [-(PLAYER_HEIGHT - 0.35), -PLAYER_HEIGHT / 2, -0.1]
+const STEP_CLIMB_LERP = 0.35  // lerp factor upward — follows any slope smoothly (ramp feel)
+// Wall ray heights relative to camera Y (mid-body / head)
+const RAY_OFFSETS = [-PLAYER_HEIGHT / 2, -0.1]
 const FLOOR_SNAP = 0.06       // lerp factor when descending (lower = smoother)
 const MAX_FALL_SPEED = 0.18   // max Y loss per frame
 const UP = new THREE.Vector3(0, 1, 0)
@@ -154,13 +157,14 @@ function PlayerControls() {
     // Floor detection — drives stair climbing and terrain following
     floorRay.current.set(camera.position, DOWN)
     const downHits = floorRay.current.intersectObjects(scene.children, true)
-    const floorHit = downHits.find((h) => !h.object.userData.isDoorOpen)
+    // Skip open doors and barriers (barriers are passable — player walks through them)
+    const floorHit = downHits.find((h) => !h.object.userData.isDoorOpen && !h.object.userData.isBarrier)
 
     if (floorHit) {
       const targetY = floorHit.point.y + PLAYER_HEIGHT
       if (targetY > camera.position.y) {
-        // Climbing — capped to avoid teleporting over tall walls
-        camera.position.y += Math.min(targetY - camera.position.y, STEP_CLIMB_SPEED)
+        // Climbing — smooth lerp gives a ramp feel on any slope geometry
+        camera.position.y += (targetY - camera.position.y) * STEP_CLIMB_LERP
       } else {
         // Descending / flat — capped lerp to avoid abrupt drops
         const fallDelta = (targetY - camera.position.y) * FLOOR_SNAP
@@ -205,7 +209,8 @@ function PlayerControls() {
             (h) =>
               h.distance < COLLISION_DIST &&
               !h.object.userData.isFloor &&
-              !h.object.userData.isDoorOpen
+              !h.object.userData.isDoorOpen &&
+              !h.object.userData.isBarrier
           )
         ) {
           blocked = true
