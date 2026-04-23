@@ -5,7 +5,6 @@ import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 
-
 function StatsCollector({ onStats }) {
   const { gl } = useThree()
   const frames = useRef(0)
@@ -96,8 +95,12 @@ function PlayerControls() {
   const initialized = useRef(false)
 
   useEffect(() => {
-    const down = (e) => { keys.current[e.code] = true }
-    const up = (e) => { keys.current[e.code] = false }
+    const down = (e) => {
+      keys.current[e.code] = true
+    }
+    const up = (e) => {
+      keys.current[e.code] = false
+    }
     window.addEventListener('keydown', down)
     window.addEventListener('keyup', up)
     return () => {
@@ -122,9 +125,7 @@ function PlayerControls() {
     fOrigin.y += 0.5
     floorRay.current.set(fOrigin, DOWN)
     const fHits = floorRay.current.intersectObjects(scene.children, true)
-    const walkable = fHits.find(
-      (h) => h.object.userData.isFloor || h.object.userData.isStair
-    )
+    const walkable = fHits.find((h) => h.object.userData.isFloor || h.object.userData.isStair)
     const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
     const targetCamY = targetFloorY + PLAYER_HEIGHT
 
@@ -174,7 +175,7 @@ function PlayerControls() {
             (h) =>
               h.distance < COLLISION_DIST &&
               !h.object.userData.isFloor &&
-              !h.object.userData.isStair &&   // stairs are walked on, not into
+              !h.object.userData.isStair && // stairs are walked on, not into
               !h.object.userData.isDoorOpen
           )
         ) {

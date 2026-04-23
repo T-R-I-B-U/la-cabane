@@ -5,7 +5,6 @@ const _loader = new GLTFLoader()
 // Promise cache — concurrent requests for the same path share one load.
 const _cache = new Map()
 
-
 /**
  * Load a GLB/GLTF and return a cloned scene root.
  * The raw GLTF is parsed once and cached; callers get independent clones.

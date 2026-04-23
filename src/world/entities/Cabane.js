@@ -60,9 +60,7 @@ async function buildNode(node, basePath) {
   }
 
   if (node.children?.length > 0) {
-    const children = await Promise.all(
-      node.children.map((child) => buildNode(child, basePath))
-    )
+    const children = await Promise.all(node.children.map((child) => buildNode(child, basePath)))
     for (const child of children) {
       if (child) object3d.add(child)
     }
