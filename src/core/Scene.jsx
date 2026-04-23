@@ -92,14 +92,40 @@ const MAX_FALL_SPEED = 0.18   // max Y loss per frame
 const UP = new THREE.Vector3(0, 1, 0)
 const DOWN = new THREE.Vector3(0, -1, 0)
 
-function PlayerControls({ debug = false }) {
+function DebugCollisions({ cabane }) {
+  const groupRef = useRef()
+
+  useEffect(() => {
+    if (!cabane || !groupRef.current) return
+    const group = groupRef.current
+
+    // One shared wireframe material for all overlays
+    const mat = new THREE.MeshBasicMaterial({ color: 0x00ff44, wireframe: true })
+
+    cabane.traverse((obj) => {
+      if (!obj.isMesh) return
+      // Compute final world transform so the overlay sits exactly on the mesh
+      obj.updateWorldMatrix(true, false)
+      const overlay = new THREE.Mesh(obj.geometry, mat)
+      overlay.matrix.copy(obj.matrixWorld)
+      overlay.matrixAutoUpdate = false
+      group.add(overlay)
+    })
+
+    return () => {
+      mat.dispose()
+      while (group.children.length) group.remove(group.children[0])
+    }
+  }, [cabane])
+
+  return <group ref={groupRef} />
+}
+
+function PlayerControls() {
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster(new THREE.Vector3(), DOWN, 0, PLAYER_HEIGHT + 3))
   const initialized = useRef(false)
-  // Debug refs — updated imperatively each frame to avoid React re-renders
-  const floorMarkerRef = useRef()
-  const wallMarkerRefs = useRef([])
 
   useEffect(() => {
     const down = (e) => {
@@ -130,16 +156,6 @@ function PlayerControls({ debug = false }) {
     const downHits = floorRay.current.intersectObjects(scene.children, true)
     const floorHit = downHits.find((h) => !h.object.userData.isDoorOpen)
 
-    // Debug: green sphere tracks the exact floor contact point
-    if (debug && floorMarkerRef.current) {
-      if (floorHit) {
-        floorMarkerRef.current.position.copy(floorHit.point)
-        floorMarkerRef.current.visible = true
-      } else {
-        floorMarkerRef.current.visible = false
-      }
-    }
-
     if (floorHit) {
       const targetY = floorHit.point.y + PLAYER_HEIGHT
       if (targetY > camera.position.y) {
@@ -154,14 +170,6 @@ function PlayerControls({ debug = false }) {
       // No floor within range — fall back to base level, capped
       const fallDelta = (FLOOR_Y + PLAYER_HEIGHT - camera.position.y) * FLOOR_SNAP
       camera.position.y += Math.max(fallDelta, -MAX_FALL_SPEED)
-    }
-
-    // Debug: colored spheres show the 3 wall-ray heights around the player
-    if (debug) {
-      RAY_OFFSETS.forEach((offset, i) => {
-        const m = wallMarkerRefs.current[i]
-        if (m) m.position.set(camera.position.x, camera.position.y + offset, camera.position.z)
-      })
     }
 
     const k = keys.current
@@ -209,32 +217,7 @@ function PlayerControls({ debug = false }) {
     }
   })
 
-  if (!debug) return <PointerLockControls />
-
-  // Debug colors match ray semantics: orange=barrier-low, yellow=mid-body, white=head
-  const RAY_COLORS = ['#ff8800', '#ffee00', '#ffffff']
-
-  return (
-    <>
-      <PointerLockControls />
-      {/* Floor contact point */}
-      <mesh ref={floorMarkerRef} raycast={() => {}}>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshBasicMaterial color="#00ff44" depthTest={false} />
-      </mesh>
-      {/* Wall ray origins — one sphere per height offset */}
-      {RAY_OFFSETS.map((_, i) => (
-        <mesh
-          key={i}
-          ref={(el) => { wallMarkerRefs.current[i] = el }}
-          raycast={() => {}}
-        >
-          <sphereGeometry args={[0.05, 6, 6]} />
-          <meshBasicMaterial color={RAY_COLORS[i]} depthTest={false} />
-        </mesh>
-      ))}
-    </>
-  )
+  return <PointerLockControls />
 }
 
 // hut01 world position from cabane.json
@@ -275,8 +258,10 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
         debug={debugDoors}
       />
 
+      {debugPlayer && <DebugCollisions cabane={cabane} />}
+
       {playerMode ? (
-        <PlayerControls debug={debugPlayer} />
+        <PlayerControls />
       ) : (
         <OrbitControls
           ref={controlsRef}
