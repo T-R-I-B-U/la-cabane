@@ -84,17 +84,22 @@ const FLOOR_Y = 0.04         // top face of hut base ring
 const PLAYER_HEIGHT = 1.4
 const COLLISION_DIST = 0.6
 const SPEED = 0.09
-const STEP_CLIMB_SPEED = 0.12 // max Y gain per frame when stepping up
+const STEP_CLIMB_SPEED = 0.3  // max Y gain per frame — covers one full stair (~0.263 m) in one frame
+// Wall ray heights relative to camera Y (barrier-low / mid-body / head)
+const RAY_OFFSETS = [-(PLAYER_HEIGHT - 0.35), -PLAYER_HEIGHT / 2, -0.1]
 const FLOOR_SNAP = 0.06       // lerp factor when descending (lower = smoother)
 const MAX_FALL_SPEED = 0.18   // max Y loss per frame
 const UP = new THREE.Vector3(0, 1, 0)
 const DOWN = new THREE.Vector3(0, -1, 0)
 
-function PlayerControls() {
+function PlayerControls({ debug = false }) {
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster(new THREE.Vector3(), DOWN, 0, PLAYER_HEIGHT + 3))
   const initialized = useRef(false)
+  // Debug refs — updated imperatively each frame to avoid React re-renders
+  const floorMarkerRef = useRef()
+  const wallMarkerRefs = useRef([])
 
   useEffect(() => {
     const down = (e) => {
@@ -125,6 +130,16 @@ function PlayerControls() {
     const downHits = floorRay.current.intersectObjects(scene.children, true)
     const floorHit = downHits.find((h) => !h.object.userData.isDoorOpen)
 
+    // Debug: green sphere tracks the exact floor contact point
+    if (debug && floorMarkerRef.current) {
+      if (floorHit) {
+        floorMarkerRef.current.position.copy(floorHit.point)
+        floorMarkerRef.current.visible = true
+      } else {
+        floorMarkerRef.current.visible = false
+      }
+    }
+
     if (floorHit) {
       const targetY = floorHit.point.y + PLAYER_HEIGHT
       if (targetY > camera.position.y) {
@@ -139,6 +154,14 @@ function PlayerControls() {
       // No floor within range — fall back to base level, capped
       const fallDelta = (FLOOR_Y + PLAYER_HEIGHT - camera.position.y) * FLOOR_SNAP
       camera.position.y += Math.max(fallDelta, -MAX_FALL_SPEED)
+    }
+
+    // Debug: colored spheres show the 3 wall-ray heights around the player
+    if (debug) {
+      RAY_OFFSETS.forEach((offset, i) => {
+        const m = wallMarkerRefs.current[i]
+        if (m) m.position.set(camera.position.x, camera.position.y + offset, camera.position.z)
+      })
     }
 
     const k = keys.current
@@ -157,9 +180,6 @@ function PlayerControls() {
     if (k['KeyA']) wish.addScaledVector(right, -SPEED)
     if (k['KeyD']) wish.addScaledVector(right, SPEED)
 
-    // Wall rays: barrier-low (35 cm above floor) clears stair risers (~0.26 m) but blocks
-    // barriers; mid-body and head catch walls at all heights.
-    const RAY_OFFSETS = [-(PLAYER_HEIGHT - 0.35), -PLAYER_HEIGHT / 2, -0.1]
     const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
 
     for (const step of axes) {
@@ -189,7 +209,32 @@ function PlayerControls() {
     }
   })
 
-  return <PointerLockControls />
+  if (!debug) return <PointerLockControls />
+
+  // Debug colors match ray semantics: orange=barrier-low, yellow=mid-body, white=head
+  const RAY_COLORS = ['#ff8800', '#ffee00', '#ffffff']
+
+  return (
+    <>
+      <PointerLockControls />
+      {/* Floor contact point */}
+      <mesh ref={floorMarkerRef} raycast={() => {}}>
+        <sphereGeometry args={[0.08, 8, 8]} />
+        <meshBasicMaterial color="#00ff44" depthTest={false} />
+      </mesh>
+      {/* Wall ray origins — one sphere per height offset */}
+      {RAY_OFFSETS.map((_, i) => (
+        <mesh
+          key={i}
+          ref={(el) => { wallMarkerRefs.current[i] = el }}
+          raycast={() => {}}
+        >
+          <sphereGeometry args={[0.05, 6, 6]} />
+          <meshBasicMaterial color={RAY_COLORS[i]} depthTest={false} />
+        </mesh>
+      ))}
+    </>
+  )
 }
 
 // hut01 world position from cabane.json
@@ -198,7 +243,7 @@ const HUT_POS = [-5.0111, 2.3616, 0.9556]
 // Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
-export default function Scene({ onStats, onReady, onError, playerMode, debugDoors }) {
+export default function Scene({ onStats, onReady, onError, playerMode, debugDoors, debugPlayer }) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
 
@@ -231,7 +276,7 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
       />
 
       {playerMode ? (
-        <PlayerControls />
+        <PlayerControls debug={debugPlayer} />
       ) : (
         <OrbitControls
           ref={controlsRef}
