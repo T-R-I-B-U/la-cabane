@@ -98,5 +98,13 @@ export async function buildCabane({
     if (obj) root.add(obj)
   }
 
+  // Tag stair step meshes so the player controller treats them as walkable
+  // surfaces instead of horizontal walls.
+  root.traverse((obj) => {
+    if (obj.isMesh && /^stairs-marche/i.test(obj.name)) {
+      obj.userData.isStair = true
+    }
+  })
+
   return root
 }
