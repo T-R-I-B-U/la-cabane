@@ -1,10 +1,10 @@
 [
   {
-    "name": "trunk",
+    "name": "tree01",
     "type": "Object3D",
     "position": [
       -1.611,
-      0,
+      10.1507,
       -16.7177
     ],
     "rotation": [
