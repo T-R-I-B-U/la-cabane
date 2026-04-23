@@ -70,7 +70,7 @@ function Floor() {
   return (
     <mesh
       rotation={[-Math.PI / 2, 0, 0]}
-      position={[0, 0, 0]}
+      position={[0, FLOOR_Y, 0]}
       receiveShadow
       userData={{ isFloor: true }}
     >
@@ -80,14 +80,19 @@ function Floor() {
   )
 }
 
-const PLAYER_HEIGHT = 2.2
+const FLOOR_Y = 0.04         // top face of hut base ring
+const PLAYER_HEIGHT = 1.4
 const COLLISION_DIST = 0.6
 const SPEED = 0.09
+const STEP_CLIMB_SPEED = 0.12 // max Y gain per frame when stepping up
+const FLOOR_SNAP = 0.15       // lerp factor when descending
 const UP = new THREE.Vector3(0, 1, 0)
+const DOWN = new THREE.Vector3(0, -1, 0)
 
 function PlayerControls() {
   const keys = useRef({})
-  const ray = useRef(new THREE.Raycaster())
+  const wallRay = useRef(new THREE.Raycaster())
+  const floorRay = useRef(new THREE.Raycaster(new THREE.Vector3(), DOWN, 0, PLAYER_HEIGHT + 3))
   const initialized = useRef(false)
 
   useEffect(() => {
@@ -109,9 +114,28 @@ function PlayerControls() {
     const { camera, scene } = state
 
     if (!initialized.current) {
-      camera.position.copy(PLAYER_SPAWN)
-      camera.lookAt(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2])
+      camera.position.set(PLAYER_SPAWN.x, FLOOR_Y + PLAYER_HEIGHT, PLAYER_SPAWN.z)
+      camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
       initialized.current = true
+    }
+
+    // Floor detection — drives stair climbing and terrain following
+    floorRay.current.set(camera.position, DOWN)
+    const downHits = floorRay.current.intersectObjects(scene.children, true)
+    const floorHit = downHits.find((h) => !h.object.userData.isDoorOpen)
+
+    if (floorHit) {
+      const targetY = floorHit.point.y + PLAYER_HEIGHT
+      if (targetY > camera.position.y) {
+        // Climbing — capped to avoid teleporting over tall walls
+        camera.position.y += Math.min(targetY - camera.position.y, STEP_CLIMB_SPEED)
+      } else {
+        // Descending / flat — smooth lerp
+        camera.position.y += (targetY - camera.position.y) * FLOOR_SNAP
+      }
+    } else {
+      // No floor within range — fall back to base level
+      camera.position.y += (FLOOR_Y + PLAYER_HEIGHT - camera.position.y) * FLOOR_SNAP
     }
 
     const k = keys.current
@@ -130,7 +154,9 @@ function PlayerControls() {
     if (k['KeyA']) wish.addScaledVector(right, -SPEED)
     if (k['KeyD']) wish.addScaledVector(right, SPEED)
 
-    const RAY_HEIGHTS = [0.4, 1.1, PLAYER_HEIGHT]
+    // Wall rays at mid-body and head (relative to camera Y).
+    // Intentionally skip feet-level so stair risers (~0.26 m) don't block movement.
+    const RAY_OFFSETS = [-PLAYER_HEIGHT / 2, -0.1]
     const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
 
     for (const step of axes) {
@@ -138,17 +164,17 @@ function PlayerControls() {
       const dir = step.clone().normalize()
       let blocked = false
 
-      for (const dy of RAY_HEIGHTS) {
+      for (const relDy of RAY_OFFSETS) {
         const origin = camera.position.clone()
-        origin.y = dy
-        ray.current.set(origin, dir)
-        const hits = ray.current.intersectObjects(scene.children, true)
+        origin.y += relDy
+        wallRay.current.set(origin, dir)
+        const hits = wallRay.current.intersectObjects(scene.children, true)
         if (
           hits.some(
             (h) =>
               h.distance < COLLISION_DIST &&
               !h.object.userData.isFloor &&
-              !h.object.userData.isDoorOpen // portes ouvertes = pas de collision
+              !h.object.userData.isDoorOpen
           )
         ) {
           blocked = true
@@ -158,8 +184,6 @@ function PlayerControls() {
 
       if (!blocked) camera.position.add(step)
     }
-
-    camera.position.y = PLAYER_HEIGHT
   })
 
   return <PointerLockControls />
@@ -169,7 +193,7 @@ function PlayerControls() {
 const HUT_POS = [-5.0111, 2.3616, 0.9556]
 
 // Spawn devant l'entrée du hut, à hauteur des yeux
-const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], PLAYER_HEIGHT, HUT_POS[2] + 6)
+const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
 export default function Scene({ onStats, onReady, onError, playerMode, debugDoors }) {
   const [cabane, setCabane] = useState(null)
