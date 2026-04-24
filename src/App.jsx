@@ -36,6 +36,8 @@ export default function App() {
   const [showUI, setShowUI] = useState(true)
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
+  const [introWaitingAtDoor, setIntroWaitingAtDoor] = useState(false)
+  const [introShouldAdvance, setIntroShouldAdvance] = useState(false)
   const [debugCamera, setDebugCamera] = useState(false)
   const [liveCamera, setLiveCamera] = useState(null)
   const dialogTimers = useRef([])
@@ -67,8 +69,13 @@ export default function App() {
   }, [])
 
   function handleIntroEvent(event) {
-    if (event === 'door:open') setIntroDoorOpen(true)
-    if (event === 'inside') setIntroActive(false)
+    if (event === 'wait:door')    setIntroWaitingAtDoor(true)
+    if (event === 'door:clicked') {
+      setIntroWaitingAtDoor(false)
+      setIntroShouldAdvance(true)
+    }
+    if (event === 'door:open')    setIntroDoorOpen(true)
+    if (event === 'inside')       setIntroActive(false)
   }
 
   function captureWaypoint(index, live) {
@@ -82,6 +89,8 @@ export default function App() {
 
   function launchIntro() {
     setIntroDoorOpen(false)
+    setIntroWaitingAtDoor(false)
+    setIntroShouldAdvance(false)
     setIntroActive(true)
   }
 
@@ -109,6 +118,8 @@ export default function App() {
         debugCollisions={debugCollisions}
         introActive={introActive}
         introDoorOpen={introDoorOpen}
+        introWaitingAtDoor={introWaitingAtDoor}
+        introShouldAdvance={introShouldAdvance}
         onIntroEvent={handleIntroEvent}
         onCameraChange={debugCamera ? setLiveCamera : null}
       />

@@ -4,8 +4,10 @@ import { OrbitControls, PointerLockControls, Environment } from '@react-three/dr
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
+import { ClickableDoor } from '../world/entities/ClickableDoor'
 import IntroCamera from '../world/entities/IntroCamera'
 import { CameraTracker } from './IntroCameraDebug'
+import { EffectComposer, Outline, Selection } from '@react-three/postprocessing'
 
 // Color code: orange = wall, green = floor, yellow = stair.
 function CollisionDebug({ cabane }) {
@@ -248,6 +250,8 @@ export default function Scene({
   debugCollisions,
   introActive,
   introDoorOpen,
+  introWaitingAtDoor,
+  introShouldAdvance,
   onIntroEvent,
   onCameraChange,
 }) {
@@ -273,11 +277,22 @@ export default function Scene({
 
       <Floor />
 
-      <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
+      <Selection>
+        <EffectComposer autoClear={false}>
+          <Outline blur visibleEdgeColor={0xffd580} edgeStrength={5} width={600} />
+        </EffectComposer>
+
+        <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
+
+        <ClickableDoor
+          cabane={cabane}
+          active={introWaitingAtDoor}
+          onDoorClick={() => onIntroEvent?.('door:clicked')}
+        />
+      </Selection>
 
       {debugCollisions && <CollisionDebug cabane={cabane} />}
 
-      {/* Portes coulissantes — actives en mode joueur et en mode orbite */}
       <SlidingDoors
         cabane={cabane}
         playerMode={playerMode}
@@ -287,7 +302,11 @@ export default function Scene({
       />
 
       {introActive ? (
-        <IntroCamera active={introActive} onEvent={onIntroEvent} />
+        <IntroCamera
+          active={introActive}
+          shouldAdvance={introShouldAdvance}
+          onEvent={onIntroEvent}
+        />
       ) : playerMode ? (
         <PlayerControls />
       ) : (
