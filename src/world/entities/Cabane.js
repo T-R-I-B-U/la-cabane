@@ -16,7 +16,89 @@ function applyTransform(object3d, node) {
   object3d.scale.set(sx, sy, sz)
 }
 
+// Load a .bin file produced by the mapper's InstancedMesh export.
+// Format: [uint32 count][float32 × 16 × count] (column-major 4×4 matrices, little-endian).
+// Returns an InstancedMesh, or an empty Group if the file is missing.
+async function buildInstancedMesh(node, basePath) {
+  const baseName = modelBaseName(node.name)
+
+  // Load the template geometry (.glb or .gltf)
+  let template = null
+  for (const ext of ['.glb', '.gltf']) {
+    try {
+      template = await loadModel(`${basePath}${baseName}${ext}`)
+      break
+    } catch {
+      // try next extension
+    }
+  }
+
+  // Load instance transforms (.bin alongside the geometry file)
+  let count = 0
+  const matrices = []
+  try {
+    const res = await fetch(`${basePath}${baseName}.bin`)
+    if (res.ok) {
+      const buf = await res.arrayBuffer()
+      count = new DataView(buf).getUint32(0, true)
+      const floats = new Float32Array(buf, 4, count * 16)
+      const m = new THREE.Matrix4()
+      for (let i = 0; i < count; i++) {
+        m.fromArray(floats, i * 16)
+        matrices.push(m.clone())
+      }
+    }
+  } catch {
+    // .bin not available yet — fall through to empty fallback
+  }
+
+  // Fallback: no geometry or no instances → empty pivot
+  if (!template || count === 0) {
+    const group = new THREE.Group()
+    group.name = node.name
+    group.userData.cabaneNode = true
+    applyTransform(group, node)
+    return group
+  }
+
+  // Extract first mesh geometry + material from the template
+  let geometry = null
+  let material = null
+  template.traverse((child) => {
+    if (!geometry && child.isMesh) {
+      geometry = child.geometry
+      material = child.material.clone()
+      material.side = THREE.DoubleSide
+    }
+  })
+
+  if (!geometry) {
+    const group = new THREE.Group()
+    group.name = node.name
+    group.userData.cabaneNode = true
+    applyTransform(group, node)
+    return group
+  }
+
+  const mesh = new THREE.InstancedMesh(geometry, material, count)
+  mesh.name = node.name
+  mesh.userData.cabaneNode = true
+  // Matrices are in C4D tree-local space (tree at C4D origin).
+  // Shift the container by the cabane.json position so leaves land on the trunk.
+  applyTransform(mesh, node)
+  // Bounding sphere computed from instance 0 only — skip culling to avoid pop-in.
+  mesh.frustumCulled = false
+  matrices.forEach((mat, i) => mesh.setMatrixAt(i, mat))
+  mesh.instanceMatrix.needsUpdate = true
+
+  return mesh
+}
+
 async function buildNode(node, basePath) {
+  if (node.type === 'InstancedMesh') {
+    return buildInstancedMesh(node, basePath)
+  }
+
   let object3d
 
   const baseName = modelBaseName(node.name)
