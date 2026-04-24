@@ -66,8 +66,6 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     }
   }, [shouldAdvance])
 
-  // Priorité 1 — s'exécute après PointerLockControls (priorité 0 par défaut)
-  // afin d'écraser sa rotation et de garder la caméra sur les rails.
   useFrame((_, rawDelta) => {
     if (!active) return
 
@@ -121,7 +119,7 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
         waitingRef.current = true
       }
     }
-  }, 1)
+  })
 
   return null
 }
