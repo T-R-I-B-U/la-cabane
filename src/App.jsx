@@ -1,7 +1,15 @@
 import { useState, useCallback, useEffect } from 'react'
 import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
+import Subtitles from './core/audio/Subtitles'
+import { showDialog, hideDialog } from './utils/audioStore'
 import './App.css'
+
+const TEST_LINES = [
+  "Bienvenue dans la cabane.",
+  "Elle vit au rythme de la forêt.",
+  "Chaque objet ici a une histoire.",
+]
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
 
@@ -34,8 +42,17 @@ export default function App() {
     setStatus('error')
   }, [])
 
+  function triggerTestSequence() {
+    let t = 0
+    TEST_LINES.forEach((line) => {
+      setTimeout(() => showDialog(line, 2800), t)
+      t += 3200
+    })
+  }
+
   return (
     <main className="viewer-page">
+      <Subtitles />
       <Scene
         onStats={setStats}
         onReady={onReady}
@@ -100,6 +117,21 @@ export default function App() {
               >
                 <span className="camera-toggle-icon">{debugCollisions ? '🟢' : '⚫'}</span>
                 Debug collisions
+              </button>
+              <div className="controls-divider" />
+              <button
+                className="camera-toggle"
+                onClick={triggerTestSequence}
+              >
+                <span className="camera-toggle-icon">💬</span>
+                Test dialogue
+              </button>
+              <button
+                className="camera-toggle"
+                onClick={() => hideDialog()}
+              >
+                <span className="camera-toggle-icon">✖</span>
+                Masquer dialogue
               </button>
             </>
           )}
