@@ -164,10 +164,9 @@ function PlayerControls({ skipSpawn = false }) {
     const { camera, scene } = state
 
     if (!initialized.current) {
-      if (!skipSpawn) {
-        camera.position.copy(PLAYER_SPAWN)
-        camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
-      }
+      const spawn = skipSpawn ? PLAYER_SPAWN_INSIDE : PLAYER_SPAWN
+      camera.position.copy(spawn)
+      camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
       initialized.current = true
     }
 
@@ -239,8 +238,10 @@ function PlayerControls({ skipSpawn = false }) {
 // hut01 world position from cabane.json
 const HUT_POS = [-5.0111, 2.3616, 0.9556]
 
-// Spawn devant l'entrée du hut, à hauteur des yeux
+// Spawn devant l'entrée (mode joueur manuel)
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
+// Spawn à l'intérieur — utilisé après la cinématique d'intro
+const PLAYER_SPAWN_INSIDE = new THREE.Vector3(-8, FLOOR_Y + PLAYER_HEIGHT, 0)
 
 export default function Scene({
   onStats,
