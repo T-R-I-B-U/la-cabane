@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import IntroCamera from '../world/entities/IntroCamera'
+import { CameraTracker } from './IntroCameraDebug'
 
 // Color code: orange = wall, green = floor, yellow = stair.
 function CollisionDebug({ cabane }) {
@@ -248,6 +249,7 @@ export default function Scene({
   introActive,
   introDoorOpen,
   onIntroEvent,
+  onCameraChange,
 }) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
@@ -263,6 +265,7 @@ export default function Scene({
       shadows
     >
       <StatsCollector onStats={onStats} />
+      {onCameraChange && <CameraTracker controlsRef={controlsRef} onChange={onCameraChange} />}
 
       <Environment preset="apartment" />
       <ambientLight intensity={1} />

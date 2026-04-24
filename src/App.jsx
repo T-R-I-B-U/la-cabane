@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
+import IntroCameraPanel from './core/IntroCameraPanel'
 import { showDialog, hideDialog } from './utils/audioStore'
 import './App.css'
 
@@ -23,6 +24,14 @@ export default function App() {
   const [showUI, setShowUI] = useState(true)
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
+  const [debugCamera, setDebugCamera] = useState(false)
+  const [liveCamera, setLiveCamera] = useState(null)
+  const [waypoints, setWaypoints] = useState([
+    { position: null, target: null },
+    { position: null, target: null },
+    { position: null, target: null },
+    { position: null, target: null },
+  ])
 
   useEffect(() => {
     const onKey = (e) => {
@@ -47,6 +56,15 @@ export default function App() {
   function handleIntroEvent(event) {
     if (event === 'door:open') setIntroDoorOpen(true)
     if (event === 'inside') setIntroActive(false)
+  }
+
+  function captureWaypoint(index, live) {
+    if (!live) return
+    setWaypoints((prev) => {
+      const next = [...prev]
+      next[index] = { position: live.position, target: live.target }
+      return next
+    })
   }
 
   function launchIntro() {
@@ -75,9 +93,17 @@ export default function App() {
         introActive={introActive}
         introDoorOpen={introDoorOpen}
         onIntroEvent={handleIntroEvent}
+        onCameraChange={debugCamera ? setLiveCamera : null}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
+      {import.meta.env.DEV && debugCamera && (
+        <IntroCameraPanel
+          live={liveCamera}
+          waypoints={waypoints}
+          onCapture={captureWaypoint}
+        />
+      )}
 
       {showUI && (
         <aside className="viewer-controls" aria-live="polite">
@@ -143,6 +169,14 @@ export default function App() {
               >
                 <span className="camera-toggle-icon">{debugCollisions ? '🟢' : '⚫'}</span>
                 Debug collisions
+              </button>
+              <div className="controls-divider" />
+              <button
+                className={`camera-toggle${debugCamera ? ' camera-toggle--active' : ''}`}
+                onClick={() => setDebugCamera((p) => !p)}
+              >
+                <span className="camera-toggle-icon">{debugCamera ? '🟢' : '⚫'}</span>
+                Éditeur waypoints
               </button>
               <div className="controls-divider" />
               <button
