@@ -139,7 +139,7 @@ function isBlockingHit(h) {
   return true
 }
 
-function PlayerControls() {
+function PlayerControls({ skipSpawn = false }) {
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster())
@@ -164,8 +164,10 @@ function PlayerControls() {
     const { camera, scene } = state
 
     if (!initialized.current) {
-      camera.position.copy(PLAYER_SPAWN)
-      camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
+      if (!skipSpawn) {
+        camera.position.copy(PLAYER_SPAWN)
+        camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
+      }
       initialized.current = true
     }
 
@@ -251,6 +253,7 @@ export default function Scene({
   introDoorOpen,
   introWaitingAtDoor,
   introShouldAdvance,
+  skipPlayerSpawn,
   onIntroEvent,
   onCameraChange,
 }) {
@@ -301,7 +304,7 @@ export default function Scene({
           onEvent={onIntroEvent}
         />
       ) : playerMode ? (
-        <PlayerControls />
+        <PlayerControls skipSpawn={skipPlayerSpawn} />
       ) : (
         <OrbitControls
           ref={controlsRef}

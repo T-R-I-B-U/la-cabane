@@ -13,11 +13,10 @@ function findDoorMeshes(cabane) {
   return meshes
 }
 
-const CENTER = new THREE.Vector2(0, 0)
-
 export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
   const hoveredRef = useRef(false)
+  const mouseRef   = useRef(new THREE.Vector2())
   const raycaster  = useRef(new THREE.Raycaster())
 
   // Clone materials so we don't mutate shared GLB materials.
@@ -30,16 +29,26 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   }, [cabane])
 
   useEffect(() => {
-    console.log('[ClickableDoor] active:', active, '| meshes trouvés:', doorMeshes.length,
-      doorMeshes.map(m => `${m.name} (mat: ${m.material?.type ?? 'none'})`))
+    console.log('[ClickableDoor] active:', active, '| meshes:', doorMeshes.length,
+      doorMeshes.map(m => m.name))
 
     if (!active || !doorMeshes.length) return
 
     const canvas = gl.domElement
+
+    const onMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      mouseRef.current.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1
+      mouseRef.current.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1
+    }
+
     const onClick = () => { if (hoveredRef.current) onDoorClick?.() }
+
+    canvas.addEventListener('mousemove', onMouseMove)
     canvas.addEventListener('click', onClick)
 
     return () => {
+      canvas.removeEventListener('mousemove', onMouseMove)
       canvas.removeEventListener('click', onClick)
       document.body.style.cursor = 'default'
       doorMeshes.forEach((mesh) => {
@@ -54,8 +63,7 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   useFrame(() => {
     if (!active || !doorMeshes.length) return
 
-    // FreeLook rotates the camera to follow the mouse — center screen = what you're aiming at.
-    raycaster.current.setFromCamera(CENTER, camera)
+    raycaster.current.setFromCamera(mouseRef.current, camera)
     const hits = raycaster.current.intersectObjects(doorMeshes, true)
     const isHovered = hits.length > 0
 
