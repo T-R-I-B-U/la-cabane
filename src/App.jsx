@@ -163,7 +163,7 @@ export default function App() {
         />
       )}
 
-      {showUI && (
+      {showUI && !introPending && !introActive && !postIntro && (
         <aside className="viewer-controls" aria-live="polite">
           <h1 className="controls-title">La Cabane</h1>
 

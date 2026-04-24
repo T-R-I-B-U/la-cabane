@@ -279,7 +279,6 @@
   position: fixed;
   inset: 0;
   z-index: 10;
-  background: rgba(0, 0, 0, 0.78);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -287,12 +286,17 @@
 }
 
 .intro-loader-hint {
-  font-size: 0.8rem;
+  padding: 14px 22px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(20, 37, 49, 0.12);
+  font-size: 0.78rem;
   font-family: 'Inter', system-ui, sans-serif;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.55);
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+  color: #0f1f2b;
+  letter-spacing: 0.05em;
   user-select: none;
 }
 
