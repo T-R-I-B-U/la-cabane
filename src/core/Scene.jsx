@@ -1,41 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Canvas, useThree, useFrame } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
-
-// Free-look first-person rotation at waiting point — no pointer lock, clicks stay free.
-// Camera base orientation is captured on mount (whatever IntroCamera left it at).
-// Mouse position (NDC) drives a yaw/pitch offset from that base.
-function FreeLook() {
-  const { camera, gl } = useThree()
-  const mouseNDC  = useRef(new THREE.Vector2(0, 0))
-  const baseEuler = useRef(null)
-
-  useEffect(() => {
-    baseEuler.current = new THREE.Euler().setFromQuaternion(camera.quaternion, 'YXZ')
-
-    const canvas = gl.domElement
-    const onMove = (e) => {
-      const r = canvas.getBoundingClientRect()
-      mouseNDC.current.x =  ((e.clientX - r.left) / r.width)  * 2 - 1
-      mouseNDC.current.y = -((e.clientY - r.top)  / r.height) * 2 + 1
-    }
-    canvas.addEventListener('mousemove', onMove)
-    return () => canvas.removeEventListener('mousemove', onMove)
-  }, [camera, gl])
-
-  useFrame(() => {
-    if (!baseEuler.current) return
-    const e = new THREE.Euler(
-      baseEuler.current.x - mouseNDC.current.y * 0.4,
-      baseEuler.current.y - mouseNDC.current.x * 0.7,
-      0,
-      'YXZ',
-    )
-    camera.quaternion.setFromEuler(e)
-  })
-
-  return null
-}
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
@@ -286,7 +251,6 @@ export default function Scene({
   introDoorOpen,
   introWaitingAtDoor,
   introShouldAdvance,
-  freeLook,
   onIntroEvent,
   onCameraChange,
 }) {
@@ -338,8 +302,6 @@ export default function Scene({
         />
       ) : playerMode ? (
         <PlayerControls />
-      ) : freeLook ? (
-        <FreeLook />
       ) : (
         <OrbitControls
           ref={controlsRef}

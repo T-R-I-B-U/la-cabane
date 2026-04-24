@@ -38,7 +38,6 @@ export default function App() {
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
   const [introWaitingAtDoor, setIntroWaitingAtDoor] = useState(false)
   const [introShouldAdvance, setIntroShouldAdvance] = useState(false)
-  const [freeLook, setFreeLook] = useState(false)
   const [debugCamera, setDebugCamera] = useState(false)
   const [liveCamera, setLiveCamera] = useState(null)
   const dialogTimers = useRef([])
@@ -77,7 +76,7 @@ export default function App() {
       setIntroShouldAdvance(true)
     }
     if (event === 'door:open')    setIntroDoorOpen(true)
-    if (event === 'inside') { setIntroActive(false); setFreeLook(true) }
+    if (event === 'inside')       setIntroActive(false)
   }
 
   function captureWaypoint(index, live) {
@@ -93,7 +92,6 @@ export default function App() {
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
-    setFreeLook(false)
     setIntroActive(true)
   }
 
@@ -123,7 +121,6 @@ export default function App() {
         introDoorOpen={introDoorOpen}
         introWaitingAtDoor={introWaitingAtDoor}
         introShouldAdvance={introShouldAdvance}
-        freeLook={freeLook}
         onIntroEvent={handleIntroEvent}
         onCameraChange={debugCamera ? setLiveCamera : null}
       />
@@ -173,7 +170,7 @@ export default function App() {
 
           <button
             className={`camera-toggle${playerMode ? ' camera-toggle--active' : ''}`}
-            onClick={() => { setPlayerMode((p) => !p); setFreeLook(false) }}
+            onClick={() => setPlayerMode((p) => !p)}
           >
             <span className="camera-toggle-icon">{playerMode ? '🎮' : '🔭'}</span>
             {playerMode ? 'Mode joueur' : 'Mode orbite'}
