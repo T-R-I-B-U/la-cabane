@@ -286,6 +286,7 @@ export default function Scene({
   introDoorOpen,
   introWaitingAtDoor,
   introShouldAdvance,
+  freeLook,
   onIntroEvent,
   onCameraChange,
 }) {
@@ -330,16 +331,15 @@ export default function Scene({
       />
 
       {introActive ? (
-        <>
-          <IntroCamera
-            active={introActive}
-            shouldAdvance={introShouldAdvance}
-            onEvent={onIntroEvent}
-          />
-          {introWaitingAtDoor && <FreeLook />}
-        </>
+        <IntroCamera
+          active={introActive}
+          shouldAdvance={introShouldAdvance}
+          onEvent={onIntroEvent}
+        />
       ) : playerMode ? (
         <PlayerControls />
+      ) : freeLook ? (
+        <FreeLook />
       ) : (
         <OrbitControls
           ref={controlsRef}
