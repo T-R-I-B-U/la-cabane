@@ -35,25 +35,20 @@ async function buildInstancedMesh(node, basePath) {
 
   // Load instance transforms (.bin alongside the geometry file)
   let count = 0
-  const matrices = []
+  let floats = null
   try {
     const res = await fetch(`${basePath}${baseName}.bin`)
     if (res.ok) {
       const buf = await res.arrayBuffer()
       count = new DataView(buf).getUint32(0, true)
-      const floats = new Float32Array(buf, 4, count * 16)
-      const m = new THREE.Matrix4()
-      for (let i = 0; i < count; i++) {
-        m.fromArray(floats, i * 16)
-        matrices.push(m.clone())
-      }
+      floats = new Float32Array(buf, 4, count * 16)
     }
   } catch {
     // .bin not available yet — fall through to empty fallback
   }
 
   // Fallback: no geometry or no instances → empty pivot
-  if (!template || count === 0) {
+  if (!template || count === 0 || !floats) {
     const group = new THREE.Group()
     group.name = node.name
     group.userData.cabaneNode = true
@@ -83,12 +78,13 @@ async function buildInstancedMesh(node, basePath) {
   const mesh = new THREE.InstancedMesh(geometry, material, count)
   mesh.name = node.name
   mesh.userData.cabaneNode = true
-  // Matrices are in C4D tree-local space (tree at C4D origin).
-  // Shift the container by the cabane.json position so leaves land on the trunk.
   applyTransform(mesh, node)
-  // Bounding sphere computed from instance 0 only — skip culling to avoid pop-in.
   mesh.frustumCulled = false
-  matrices.forEach((mat, i) => mesh.setMatrixAt(i, mat))
+  // Leaves must never block raycasts — each of 32 000 instances would be tested
+  // every frame against every collision/floor ray, killing first-person perf.
+  mesh.raycast = () => {}
+  // Direct typed-array copy avoids allocating count Matrix4 objects on the main thread.
+  mesh.instanceMatrix.array.set(floats)
   mesh.instanceMatrix.needsUpdate = true
 
   return mesh
