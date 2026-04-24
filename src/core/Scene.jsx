@@ -5,6 +5,37 @@ import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 
+// Color code: orange = wall, green = floor, yellow = stair.
+function CollisionDebug({ cabane }) {
+  const groupRef = useRef()
+
+  useEffect(() => {
+    if (!cabane || !groupRef.current) return
+    const group = groupRef.current
+
+    cabane.traverse((obj) => {
+      if (!obj.isMesh || obj.isInstancedMesh) return
+      const color = obj.userData.isFloor ? 0x00ff44 : obj.userData.isStair ? 0xffee00 : 0xff4400
+      const edges = new THREE.EdgesGeometry(obj.geometry)
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color }))
+      line.raycast = () => {} // must not interfere with collision raycasters
+      obj.updateWorldMatrix(true, false)
+      line.applyMatrix4(obj.matrixWorld)
+      group.add(line)
+    })
+
+    return () => {
+      group.children.forEach((c) => {
+        c.geometry.dispose()
+        c.material.dispose()
+      })
+      group.clear()
+    }
+  }, [cabane])
+
+  return <group ref={groupRef} />
+}
+
 function StatsCollector({ onStats }) {
   const { gl } = useThree()
   const frames = useRef(0)
@@ -45,8 +76,10 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
   const [cabane, setCabane] = useState(null)
 
   useEffect(() => {
+    let cancelled = false
     buildCabane()
       .then((group) => {
+        if (cancelled) return
         let meshes = 0
         let pivots = 0
         group.traverse((obj) => {
@@ -58,7 +91,13 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
         onCabaneLoaded(group)
         setCabane(group)
       })
-      .catch((err) => onError(err.message ?? String(err)))
+      .catch((err) => {
+        if (cancelled) return
+        onError(err.message ?? String(err))
+      })
+    return () => {
+      cancelled = true
+    }
   }, [onReady, onError, onCabaneLoaded])
 
   if (!cabane) return null
@@ -87,6 +126,15 @@ const COLLISION_DIST = 0.6
 const SPEED = 0.09
 const UP = new THREE.Vector3(0, 1, 0)
 const DOWN = new THREE.Vector3(0, -1, 0)
+
+// Returns true when a raycast hit should stop the player.
+function isBlockingHit(h) {
+  if (h.distance >= COLLISION_DIST) return false
+  if (h.object.userData.isFloor) return false
+  if (h.object.userData.isDoorOpen) return false
+  if (h.object.userData.isStair) return false
+  return true
+}
 
 function PlayerControls() {
   const keys = useRef({})
@@ -158,8 +206,9 @@ function PlayerControls() {
     // Ray heights are relative to current camera Y so they stay correct on stairs
     const footY = camera.position.y - PLAYER_HEIGHT
     const RAY_HEIGHTS = [footY + 0.3, footY + 0.8, camera.position.y]
-    const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
 
+    // Axis-split: test X and Z independently so the player slides along walls.
+    const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
     for (const step of axes) {
       if (step.lengthSq() === 0) continue
       const dir = step.clone().normalize()
@@ -169,16 +218,7 @@ function PlayerControls() {
         const origin = camera.position.clone()
         origin.y = rayY
         wallRay.current.set(origin, dir)
-        const hits = wallRay.current.intersectObjects(scene.children, true)
-        if (
-          hits.some(
-            (h) =>
-              h.distance < COLLISION_DIST &&
-              !h.object.userData.isFloor &&
-              !h.object.userData.isStair && // stairs are walked on, not into
-              !h.object.userData.isDoorOpen
-          )
-        ) {
+        if (wallRay.current.intersectObjects(scene.children, true).some(isBlockingHit)) {
           blocked = true
           break
         }
@@ -197,7 +237,14 @@ const HUT_POS = [-5.0111, 2.3616, 0.9556]
 // Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
-export default function Scene({ onStats, onReady, onError, playerMode, debugDoors }) {
+export default function Scene({
+  onStats,
+  onReady,
+  onError,
+  playerMode,
+  debugDoors,
+  debugCollisions,
+}) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
 
@@ -220,6 +267,8 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
       <Floor />
 
       <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
+
+      {debugCollisions && <CollisionDebug cabane={cabane} />}
 
       {/* Portes coulissantes — actives en mode joueur et en mode orbite */}
       <SlidingDoors

@@ -16,7 +16,85 @@ function applyTransform(object3d, node) {
   object3d.scale.set(sx, sy, sz)
 }
 
+// Load a .bin file produced by the mapper's InstancedMesh export.
+// Format: [uint32 count][float32 × 16 × count] (column-major 4×4 matrices, little-endian).
+// Returns an InstancedMesh, or an empty Group if the file is missing.
+async function buildInstancedMesh(node, basePath) {
+  const baseName = modelBaseName(node.name)
+
+  // Load the template geometry (.glb or .gltf)
+  let template = null
+  for (const ext of ['.glb', '.gltf']) {
+    try {
+      template = await loadModel(`${basePath}${baseName}${ext}`)
+      break
+    } catch {
+      // try next extension
+    }
+  }
+
+  // Load instance transforms (.bin alongside the geometry file)
+  let count = 0
+  let floats = null
+  try {
+    const res = await fetch(`${basePath}${baseName}.bin`)
+    if (res.ok) {
+      const buf = await res.arrayBuffer()
+      count = new DataView(buf).getUint32(0, true)
+      floats = new Float32Array(buf, 4, count * 16)
+    }
+  } catch {
+    // .bin not available yet — fall through to empty fallback
+  }
+
+  // Fallback: no geometry or no instances → empty pivot
+  if (!template || count === 0 || !floats) {
+    const group = new THREE.Group()
+    group.name = node.name
+    group.userData.cabaneNode = true
+    applyTransform(group, node)
+    return group
+  }
+
+  // Extract first mesh geometry + material from the template
+  let geometry = null
+  let material = null
+  template.traverse((child) => {
+    if (!geometry && child.isMesh) {
+      geometry = child.geometry
+      material = child.material.clone()
+      material.side = THREE.DoubleSide
+    }
+  })
+
+  if (!geometry) {
+    const group = new THREE.Group()
+    group.name = node.name
+    group.userData.cabaneNode = true
+    applyTransform(group, node)
+    return group
+  }
+
+  const mesh = new THREE.InstancedMesh(geometry, material, count)
+  mesh.name = node.name
+  mesh.userData.cabaneNode = true
+  applyTransform(mesh, node)
+  mesh.frustumCulled = false
+  // Leaves must never block raycasts — each of 32 000 instances would be tested
+  // every frame against every collision/floor ray, killing first-person perf.
+  mesh.raycast = () => {}
+  // Direct typed-array copy avoids allocating count Matrix4 objects on the main thread.
+  mesh.instanceMatrix.array.set(floats)
+  mesh.instanceMatrix.needsUpdate = true
+
+  return mesh
+}
+
 async function buildNode(node, basePath) {
+  if (node.type === 'InstancedMesh') {
+    return buildInstancedMesh(node, basePath)
+  }
+
   let object3d
 
   const baseName = modelBaseName(node.name)

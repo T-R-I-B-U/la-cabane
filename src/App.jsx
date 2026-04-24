@@ -11,6 +11,7 @@ export default function App() {
   const [info, setInfo] = useState(null)
   const [playerMode, setPlayerMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
+  const [debugCollisions, setDebugCollisions] = useState(false)
   const [showUI, setShowUI] = useState(true)
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function App() {
         onError={onError}
         playerMode={playerMode}
         debugDoors={debugDoors}
+        debugCollisions={debugCollisions}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
@@ -91,6 +93,13 @@ export default function App() {
               >
                 <span className="camera-toggle-icon">{debugDoors ? '🟢' : '⚫'}</span>
                 Debug portes
+              </button>
+              <button
+                className={`camera-toggle${debugCollisions ? ' camera-toggle--active' : ''}`}
+                onClick={() => setDebugCollisions((p) => !p)}
+              >
+                <span className="camera-toggle-icon">{debugCollisions ? '🟢' : '⚫'}</span>
+                Debug collisions
               </button>
             </>
           )}

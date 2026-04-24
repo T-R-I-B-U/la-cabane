@@ -1,11 +1,30 @@
 [
   {
-    "name": "tree01",
+    "name": "trunk",
     "type": "Object3D",
     "position": [
-      -1.611,
-      10.1507,
-      -16.7177
+      -2.3079,
+      -2,
+      -0.633
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "leaf-template",
+    "type": "InstancedMesh",
+    "position": [
+      -2.3079,
+      -1.457,
+      -0.633
     ],
     "rotation": [
       0,
