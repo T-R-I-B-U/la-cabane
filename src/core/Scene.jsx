@@ -76,8 +76,10 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
   const [cabane, setCabane] = useState(null)
 
   useEffect(() => {
+    let cancelled = false
     buildCabane()
       .then((group) => {
+        if (cancelled) return
         let meshes = 0
         let pivots = 0
         group.traverse((obj) => {
@@ -89,7 +91,13 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
         onCabaneLoaded(group)
         setCabane(group)
       })
-      .catch((err) => onError(err.message ?? String(err)))
+      .catch((err) => {
+        if (cancelled) return
+        onError(err.message ?? String(err))
+      })
+    return () => {
+      cancelled = true
+    }
   }, [onReady, onError, onCabaneLoaded])
 
   if (!cabane) return null
@@ -118,6 +126,15 @@ const COLLISION_DIST = 0.6
 const SPEED = 0.09
 const UP = new THREE.Vector3(0, 1, 0)
 const DOWN = new THREE.Vector3(0, -1, 0)
+
+// Returns true when a raycast hit should stop the player.
+function isBlockingHit(h) {
+  if (h.distance >= COLLISION_DIST) return false
+  if (h.object.userData.isFloor) return false
+  if (h.object.userData.isDoorOpen) return false
+  if (h.object.userData.isStair) return false
+  return true
+}
 
 function PlayerControls() {
   const keys = useRef({})
@@ -189,8 +206,9 @@ function PlayerControls() {
     // Ray heights are relative to current camera Y so they stay correct on stairs
     const footY = camera.position.y - PLAYER_HEIGHT
     const RAY_HEIGHTS = [footY + 0.3, footY + 0.8, camera.position.y]
-    const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
 
+    // Axis-split: test X and Z independently so the player slides along walls.
+    const axes = [new THREE.Vector3(wish.x, 0, 0), new THREE.Vector3(0, 0, wish.z)]
     for (const step of axes) {
       if (step.lengthSq() === 0) continue
       const dir = step.clone().normalize()
@@ -200,22 +218,7 @@ function PlayerControls() {
         const origin = camera.position.clone()
         origin.y = rayY
         wallRay.current.set(origin, dir)
-        const hits = wallRay.current.intersectObjects(scene.children, true)
-        if (
-          hits.some((h) => {
-            if (h.distance >= COLLISION_DIST) return false
-            if (h.object.userData.isFloor) return false
-            if (h.object.userData.isDoorOpen) return false
-            if (h.object.userData.isStair) {
-              // Only skip collision on upward-facing stair surfaces (walkable tops).
-              // Vertical faces — risers, side railings — still block the player.
-              if (!h.face) return true
-              const n = h.face.normal.clone().transformDirection(h.object.matrixWorld)
-              return n.y <= 0.5
-            }
-            return true
-          })
-        ) {
+        if (wallRay.current.intersectObjects(scene.children, true).some(isBlockingHit)) {
           blocked = true
           break
         }
