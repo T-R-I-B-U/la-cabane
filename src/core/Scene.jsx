@@ -5,6 +5,36 @@ import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 
+// Color code: orange = wall, green = floor, yellow = stair.
+function CollisionDebug({ cabane }) {
+  const groupRef = useRef()
+
+  useEffect(() => {
+    if (!cabane || !groupRef.current) return
+    const group = groupRef.current
+
+    cabane.traverse((obj) => {
+      if (!obj.isMesh || obj.isInstancedMesh) return
+      const color = obj.userData.isFloor ? 0x00ff44 : obj.userData.isStair ? 0xffee00 : 0xff4400
+      const edges = new THREE.EdgesGeometry(obj.geometry)
+      const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color }))
+      obj.updateWorldMatrix(true, false)
+      line.applyMatrix4(obj.matrixWorld)
+      group.add(line)
+    })
+
+    return () => {
+      group.children.forEach((c) => {
+        c.geometry.dispose()
+        c.material.dispose()
+      })
+      group.clear()
+    }
+  }, [cabane])
+
+  return <group ref={groupRef} />
+}
+
 function StatsCollector({ onStats }) {
   const { gl } = useThree()
   const frames = useRef(0)
@@ -197,7 +227,7 @@ const HUT_POS = [-5.0111, 2.3616, 0.9556]
 // Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
-export default function Scene({ onStats, onReady, onError, playerMode, debugDoors }) {
+export default function Scene({ onStats, onReady, onError, playerMode, debugDoors, debugCollisions }) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
 
@@ -220,6 +250,8 @@ export default function Scene({ onStats, onReady, onError, playerMode, debugDoor
       <Floor />
 
       <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
+
+      {debugCollisions && <CollisionDebug cabane={cabane} />}
 
       {/* Portes coulissantes — actives en mode joueur et en mode orbite */}
       <SlidingDoors
