@@ -295,11 +295,16 @@ export default function Scene({
       />
 
       {introActive ? (
-        <IntroCamera
-          active={introActive}
-          shouldAdvance={introShouldAdvance}
-          onEvent={onIntroEvent}
-        />
+        <>
+          <IntroCamera
+            active={introActive}
+            shouldAdvance={introShouldAdvance}
+            onEvent={onIntroEvent}
+          />
+          {/* Pointer lock uniquement pendant l'attente à la porte — IntroCamera ne
+              modifie pas la rotation à ce moment, donc PointerLockControls est libre */}
+          {introWaitingAtDoor && <PointerLockControls />}
+        </>
       ) : playerMode ? (
         <PlayerControls />
       ) : (
