@@ -15,7 +15,7 @@ const WAYPOINTS = [
     position: new THREE.Vector3(-81.2843, 28.5625, -16.8399),
     target:   HUT.clone(),
     duration: 0,
-    delay:    5,
+    delay:    2,
   },
   {
     position: new THREE.Vector3(-34.3023, 10.5207, -5.8784),

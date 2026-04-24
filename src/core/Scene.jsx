@@ -278,9 +278,11 @@ export default function Scene({
       <Floor />
 
       <Selection>
-        <EffectComposer autoClear={false}>
-          <Outline blur visibleEdgeColor={0xffd580} edgeStrength={5} width={600} />
-        </EffectComposer>
+        {introWaitingAtDoor && (
+          <EffectComposer autoClear={false}>
+            <Outline blur visibleEdgeColor={0xffd580} edgeStrength={5} width={600} />
+          </EffectComposer>
+        )}
 
         <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
 
