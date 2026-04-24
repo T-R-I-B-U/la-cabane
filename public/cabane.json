@@ -4,7 +4,7 @@
     "type": "Object3D",
     "position": [
       -2.3079,
-      -0.5,
+      -2,
       -0.633
     ],
     "rotation": [
@@ -23,7 +23,7 @@
     "type": "InstancedMesh",
     "position": [
       -2.3079,
-      0.043,
+      -1.457,
       -0.633
     ],
     "rotation": [
