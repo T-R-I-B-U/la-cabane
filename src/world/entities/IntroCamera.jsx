@@ -14,28 +14,29 @@ const HUT = new THREE.Vector3(-5.0111, 2.3616, 0.9556)
 // event : identifiant émis via onEvent() à l'arrivée sur ce waypoint.
 const WAYPOINTS = [
   {
-    position: new THREE.Vector3(HUT.x + 22, HUT.y + 14, HUT.z + 28),
-    target: HUT.clone(),
+    // Vue extérieure — départ
+    position: new THREE.Vector3(-81.2843, 28.5625, -16.8399),
+    target:   new THREE.Vector3(-5.0111, 2.3616, 0.9556),
     duration: 0,
   },
   {
-    // Approche de la porte depuis l'extérieur
-    position: new THREE.Vector3(HUT.x, 4, HUT.z + 8),
-    target: new THREE.Vector3(HUT.x, 3, HUT.z),
+    // Approche de la porte
+    position: new THREE.Vector3(-34.3023, 10.5207, -5.8784),
+    target:   new THREE.Vector3(-5.0111, 2.3616, 0.9556),
     duration: 3.5,
   },
   {
     // Devant la porte — déclenche l'ouverture
-    position: new THREE.Vector3(HUT.x, 3.5, HUT.z + 3),
-    target: new THREE.Vector3(HUT.x, 3, HUT.z - 1),
-    duration: 2.0,
+    position: new THREE.Vector3(-20.864, 1.3988, -0.9681),
+    target:   new THREE.Vector3(-5.0111, 2.3616, 0.9556),
+    duration: 2.5,
     event: 'door:open',
   },
   {
-    // Entrée dans la cabane
-    position: new THREE.Vector3(HUT.x, 3.5, HUT.z - 0.5),
-    target: new THREE.Vector3(HUT.x, 3, HUT.z - 4),
-    duration: 2.5,
+    // Intérieur — arrivée
+    position: new THREE.Vector3(-11.0133, 1.4437, -0.9188),
+    target:   new THREE.Vector3(-5.0111, 2.3616, 0.9556),
+    duration: 2.0,
     event: 'inside',
   },
 ]
