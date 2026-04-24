@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber'
-import { Select } from '@react-three/postprocessing'
+import { useEffect, useMemo, useRef } from 'react'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-// Trouve les meshes door_right / door_left dans la hiérarchie du cabane.
 function findDoorMeshes(cabane) {
   const meshes = []
   if (!cabane) return meshes
@@ -15,74 +13,68 @@ function findDoorMeshes(cabane) {
   return meshes
 }
 
-// Calcule le centre monde de la porte à partir des meshes.
-function computeDoorCenter(meshes) {
-  if (!meshes.length) return new THREE.Vector3(-5.0111, 3.2, 0.9556)
-  const pos = new THREE.Vector3()
-  meshes.forEach((m) => {
-    const p = new THREE.Vector3()
-    m.getWorldPosition(p)
-    pos.add(p)
-  })
-  pos.divideScalar(meshes.length)
-  return pos
-}
-
 export function ClickableDoor({ cabane, active, onDoorClick }) {
-  const [hovered, setHovered] = useState(false)
-  const meshesRef = useRef([])
+  const { camera, gl } = useThree()
+  const hoveredRef  = useRef(false)
+  const mouseRef    = useRef(new THREE.Vector2())
+  const raycaster   = useRef(new THREE.Raycaster())
 
+  // Clone les matériaux pour ne pas modifier les matériaux partagés du GLB.
   const doorMeshes = useMemo(() => {
     const found = findDoorMeshes(cabane)
-    meshesRef.current = found
+    found.forEach((mesh) => {
+      if (mesh.material) mesh.material = mesh.material.clone()
+    })
     return found
   }, [cabane])
 
-  const doorCenter = useMemo(() => computeDoorCenter(doorMeshes), [doorMeshes])
-
-  // Curseur pointer quand on survole
   useEffect(() => {
-    if (!active) {
-      document.body.style.cursor = 'default'
-      return
-    }
-    document.body.style.cursor = hovered ? 'pointer' : 'default'
-    return () => { document.body.style.cursor = 'default' }
-  }, [hovered, active])
+    if (!active || !doorMeshes.length) return
 
-  // Emissive glow sur les meshes de la porte
-  useFrame(() => {
-    for (const mesh of meshesRef.current) {
-      if (!mesh.material || !mesh.material.emissive) continue
-      if (active && hovered) {
-        mesh.material.emissive.set(0xffd580)
-        mesh.material.emissiveIntensity = 0.6
-      } else {
-        mesh.material.emissive.set(0x000000)
-        mesh.material.emissiveIntensity = 0
-      }
+    const canvas = gl.domElement
+
+    const onMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      mouseRef.current.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1
+      mouseRef.current.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1
     }
+
+    const onClick = () => {
+      if (hoveredRef.current) onDoorClick?.()
+    }
+
+    canvas.addEventListener('mousemove', onMouseMove)
+    canvas.addEventListener('click', onClick)
+
+    return () => {
+      canvas.removeEventListener('mousemove', onMouseMove)
+      canvas.removeEventListener('click', onClick)
+      document.body.style.cursor = 'default'
+      doorMeshes.forEach((mesh) => {
+        if (mesh.material?.emissive) {
+          mesh.material.emissive.set(0x000000)
+          mesh.material.emissiveIntensity = 0
+        }
+      })
+    }
+  }, [active, gl, doorMeshes, onDoorClick])
+
+  useFrame(() => {
+    if (!active || !doorMeshes.length) return
+
+    raycaster.current.setFromCamera(mouseRef.current, camera)
+    const hits = raycaster.current.intersectObjects(doorMeshes, false)
+    const isHovered = hits.length > 0
+    hoveredRef.current = isHovered
+
+    doorMeshes.forEach((mesh) => {
+      if (!mesh.material?.emissive) return
+      mesh.material.emissive.set(isHovered ? 0xffd580 : 0x000000)
+      mesh.material.emissiveIntensity = isHovered ? 0.6 : 0
+    })
+
+    document.body.style.cursor = isHovered ? 'pointer' : 'default'
   })
 
-  if (!active) return null
-
-  // Zone de clic invisible positionnée devant la porte,
-  // orientée pour faire face à la caméra d'approche.
-  return (
-    <Select enabled={hovered}>
-      <mesh
-        position={doorCenter}
-        rotation={[0, -Math.PI / 2, 0]}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        onClick={(e) => {
-          e.stopPropagation()
-          onDoorClick?.()
-        }}
-      >
-        <planeGeometry args={[3, 2.8]} />
-        <meshBasicMaterial transparent opacity={0} side={THREE.DoubleSide} depthWrite={false} />
-      </mesh>
-    </Select>
-  )
+  return null
 }

@@ -7,7 +7,6 @@ import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { ClickableDoor } from '../world/entities/ClickableDoor'
 import IntroCamera from '../world/entities/IntroCamera'
 import { CameraTracker } from './IntroCameraDebug'
-import { EffectComposer, Outline, Selection } from '@react-three/postprocessing'
 
 // Color code: orange = wall, green = floor, yellow = stair.
 function CollisionDebug({ cabane }) {
@@ -277,21 +276,13 @@ export default function Scene({
 
       <Floor />
 
-      <Selection>
-        {introWaitingAtDoor && (
-          <EffectComposer autoClear={false}>
-            <Outline blur visibleEdgeColor={0xffd580} edgeStrength={5} width={600} />
-          </EffectComposer>
-        )}
+      <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
 
-        <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
-
-        <ClickableDoor
-          cabane={cabane}
-          active={introWaitingAtDoor}
-          onDoorClick={() => onIntroEvent?.('door:clicked')}
-        />
-      </Selection>
+      <ClickableDoor
+        cabane={cabane}
+        active={introWaitingAtDoor}
+        onDoorClick={() => onIntroEvent?.('door:clicked')}
+      />
 
       {debugCollisions && <CollisionDebug cabane={cabane} />}
 
