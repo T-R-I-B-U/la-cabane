@@ -4,6 +4,7 @@ import { OrbitControls, PointerLockControls, Environment } from '@react-three/dr
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
+import IntroCamera from '../world/entities/IntroCamera'
 
 // Color code: orange = wall, green = floor, yellow = stair.
 function CollisionDebug({ cabane }) {
@@ -244,6 +245,9 @@ export default function Scene({
   playerMode,
   debugDoors,
   debugCollisions,
+  introActive,
+  introDoorOpen,
+  onIntroEvent,
 }) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
@@ -276,9 +280,12 @@ export default function Scene({
         playerMode={playerMode}
         controlsRef={controlsRef}
         debug={debugDoors}
+        forceOpen={introDoorOpen}
       />
 
-      {playerMode ? (
+      {introActive ? (
+        <IntroCamera active={introActive} onEvent={onIntroEvent} />
+      ) : playerMode ? (
         <PlayerControls />
       ) : (
         <OrbitControls

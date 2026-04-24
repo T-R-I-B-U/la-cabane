@@ -21,6 +21,8 @@ export default function App() {
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [showUI, setShowUI] = useState(true)
+  const [introActive, setIntroActive] = useState(false)
+  const [introDoorOpen, setIntroDoorOpen] = useState(false)
 
   useEffect(() => {
     const onKey = (e) => {
@@ -42,6 +44,16 @@ export default function App() {
     setStatus('error')
   }, [])
 
+  function handleIntroEvent(event) {
+    if (event === 'door:open') setIntroDoorOpen(true)
+    if (event === 'inside') setIntroActive(false)
+  }
+
+  function launchIntro() {
+    setIntroDoorOpen(false)
+    setIntroActive(true)
+  }
+
   function triggerTestSequence() {
     let t = 0
     TEST_LINES.forEach((line) => {
@@ -60,6 +72,9 @@ export default function App() {
         playerMode={playerMode}
         debugDoors={debugDoors}
         debugCollisions={debugCollisions}
+        introActive={introActive}
+        introDoorOpen={introDoorOpen}
+        onIntroEvent={handleIntroEvent}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
@@ -84,6 +99,17 @@ export default function App() {
               </p>
             </>
           )}
+
+          <div className="controls-divider" />
+
+          <button
+            className="camera-toggle"
+            onClick={launchIntro}
+            disabled={introActive}
+          >
+            <span className="camera-toggle-icon">▶</span>
+            {introActive ? 'Intro en cours…' : 'Lancer l\'histoire'}
+          </button>
 
           <div className="controls-divider" />
 
