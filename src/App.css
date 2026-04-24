@@ -228,6 +228,51 @@
   line-height: 1.5;
 }
 
+/* ── Dev sections rétractables ───────────────────────────────────── */
+
+.dev-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dev-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 5px 2px;
+  border: none;
+  background: transparent;
+  color: #4a7088;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.dev-section-header:hover {
+  color: #0f1f2b;
+}
+
+.dev-section-arrow {
+  font-size: 0.7rem;
+  line-height: 1;
+  width: 10px;
+  flex-shrink: 0;
+}
+
+.dev-section-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 0 6px 0;
+}
+
 /* ── Responsive ──────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {

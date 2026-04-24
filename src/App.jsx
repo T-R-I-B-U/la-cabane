@@ -1,16 +1,28 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import IntroCameraPanel from './core/IntroCameraPanel'
-import { showDialog, hideDialog } from './utils/audioStore'
+import { showDialog } from './utils/audioStore'
 import './App.css'
 
 const TEST_LINES = [
-  "Bienvenue dans la cabane.",
-  "Elle vit au rythme de la forêt.",
-  "Chaque objet ici a une histoire.",
+  "Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !",
+  "Tu es nouveau toi ici, je suis bien heureux de te recevoir !",
 ]
+
+function DevSection({ title, children }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="dev-section">
+      <button className="dev-section-header" onClick={() => setOpen((o) => !o)}>
+        <span className="dev-section-arrow">{open ? '▾' : '▸'}</span>
+        {title}
+      </button>
+      {open && <div className="dev-section-body">{children}</div>}
+    </div>
+  )
+}
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
 
@@ -26,6 +38,7 @@ export default function App() {
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
   const [debugCamera, setDebugCamera] = useState(false)
   const [liveCamera, setLiveCamera] = useState(null)
+  const dialogTimers = useRef([])
   const [waypoints, setWaypoints] = useState([
     { position: null, target: null },
     { position: null, target: null },
@@ -73,10 +86,14 @@ export default function App() {
   }
 
   function triggerTestSequence() {
+    dialogTimers.current.forEach(clearTimeout)
+    dialogTimers.current = []
     let t = 0
-    TEST_LINES.forEach((line) => {
-      setTimeout(() => showDialog(line, 2800), t)
-      t += 3200
+    TEST_LINES.forEach((line, i) => {
+      const duration = i === TEST_LINES.length - 1 ? 3000 : 0
+      const id = setTimeout(() => showDialog(line, duration), t)
+      dialogTimers.current.push(id)
+      t += 3400
     })
   }
 
@@ -156,43 +173,37 @@ export default function App() {
           {import.meta.env.DEV && (
             <>
               <div className="controls-divider" />
-              <button
-                className={`camera-toggle${debugDoors ? ' camera-toggle--active' : ''}`}
-                onClick={() => setDebugDoors((p) => !p)}
-              >
-                <span className="camera-toggle-icon">{debugDoors ? '🟢' : '⚫'}</span>
-                Debug portes
-              </button>
-              <button
-                className={`camera-toggle${debugCollisions ? ' camera-toggle--active' : ''}`}
-                onClick={() => setDebugCollisions((p) => !p)}
-              >
-                <span className="camera-toggle-icon">{debugCollisions ? '🟢' : '⚫'}</span>
-                Debug collisions
-              </button>
-              <div className="controls-divider" />
-              <button
-                className={`camera-toggle${debugCamera ? ' camera-toggle--active' : ''}`}
-                onClick={() => setDebugCamera((p) => !p)}
-              >
-                <span className="camera-toggle-icon">{debugCamera ? '🟢' : '⚫'}</span>
-                Éditeur waypoints
-              </button>
-              <div className="controls-divider" />
-              <button
-                className="camera-toggle"
-                onClick={triggerTestSequence}
-              >
-                <span className="camera-toggle-icon">💬</span>
-                Test dialogue
-              </button>
-              <button
-                className="camera-toggle"
-                onClick={() => hideDialog()}
-              >
-                <span className="camera-toggle-icon">✖</span>
-                Masquer dialogue
-              </button>
+              <DevSection title="Caméra">
+                <button
+                  className={`camera-toggle${debugCamera ? ' camera-toggle--active' : ''}`}
+                  onClick={() => setDebugCamera((p) => !p)}
+                >
+                  <span className="camera-toggle-icon">{debugCamera ? '🟢' : '⚫'}</span>
+                  Éditeur waypoints
+                </button>
+              </DevSection>
+              <DevSection title="Dialogue">
+                <button className="camera-toggle" onClick={triggerTestSequence}>
+                  <span className="camera-toggle-icon">💬</span>
+                  Test dialogue
+                </button>
+              </DevSection>
+              <DevSection title="Scène">
+                <button
+                  className={`camera-toggle${debugDoors ? ' camera-toggle--active' : ''}`}
+                  onClick={() => setDebugDoors((p) => !p)}
+                >
+                  <span className="camera-toggle-icon">{debugDoors ? '🟢' : '⚫'}</span>
+                  Debug portes
+                </button>
+                <button
+                  className={`camera-toggle${debugCollisions ? ' camera-toggle--active' : ''}`}
+                  onClick={() => setDebugCollisions((p) => !p)}
+                >
+                  <span className="camera-toggle-icon">{debugCollisions ? '🟢' : '⚫'}</span>
+                  Debug collisions
+                </button>
+              </DevSection>
             </>
           )}
         </aside>
