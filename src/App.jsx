@@ -69,6 +69,7 @@ export default function App() {
   }, [])
 
   function handleIntroEvent(event) {
+    console.log('[Intro event]', event)
     if (event === 'wait:door')    setIntroWaitingAtDoor(true)
     if (event === 'door:clicked') {
       setIntroWaitingAtDoor(false)

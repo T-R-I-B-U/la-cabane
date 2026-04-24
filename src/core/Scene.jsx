@@ -295,11 +295,15 @@ export default function Scene({
       />
 
       {introActive ? (
-        <IntroCamera
-          active={introActive}
-          shouldAdvance={introShouldAdvance}
-          onEvent={onIntroEvent}
-        />
+        <>
+          <IntroCamera
+            active={introActive}
+            shouldAdvance={introShouldAdvance}
+            onEvent={onIntroEvent}
+          />
+          {/* Pointer lock première personne — IntroCamera écrase la rotation (priorité 1) */}
+          <PointerLockControls />
+        </>
       ) : playerMode ? (
         <PlayerControls />
       ) : (

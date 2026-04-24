@@ -6,7 +6,7 @@ function findDoorMeshes(cabane) {
   const meshes = []
   if (!cabane) return meshes
   cabane.traverse((obj) => {
-    if (obj.isMesh && (obj.name === 'door_right' || obj.name === 'door_left')) {
+    if (obj.isMesh && (obj.name.startsWith('door_right') || obj.name.startsWith('door_left'))) {
       meshes.push(obj)
     }
   })
@@ -29,11 +29,15 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   }, [cabane])
 
   useEffect(() => {
+    console.log('[ClickableDoor] active:', active, '| meshes trouvés:', doorMeshes.length,
+      doorMeshes.map(m => `${m.name} (mat: ${m.material?.type ?? 'none'})`))
+
     if (!active || !doorMeshes.length) return
 
     const canvas = gl.domElement
 
     const onMouseMove = (e) => {
+      if (document.pointerLockElement) return // pointer locked → use center (see useFrame)
       const rect = canvas.getBoundingClientRect()
       mouseRef.current.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1
       mouseRef.current.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1
@@ -45,6 +49,7 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
 
     canvas.addEventListener('mousemove', onMouseMove)
     canvas.addEventListener('click', onClick)
+    console.log('[ClickableDoor] listeners actifs')
 
     return () => {
       canvas.removeEventListener('mousemove', onMouseMove)
@@ -62,9 +67,14 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   useFrame(() => {
     if (!active || !doorMeshes.length) return
 
-    raycaster.current.setFromCamera(mouseRef.current, camera)
-    const hits = raycaster.current.intersectObjects(doorMeshes, false)
+    // When pointer is locked (first-person mode), aim from center of screen
+    const aimPos = document.pointerLockElement ? new THREE.Vector2(0, 0) : mouseRef.current
+    raycaster.current.setFromCamera(aimPos, camera)
+    const hits = raycaster.current.intersectObjects(doorMeshes, true)
     const isHovered = hits.length > 0
+    if (isHovered !== hoveredRef.current) {
+      console.log('[ClickableDoor] hover:', isHovered, hits[0]?.object?.name)
+    }
     hoveredRef.current = isHovered
 
     doorMeshes.forEach((mesh) => {
