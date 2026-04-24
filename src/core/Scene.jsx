@@ -18,6 +18,7 @@ function CollisionDebug({ cabane }) {
       const color = obj.userData.isFloor ? 0x00ff44 : obj.userData.isStair ? 0xffee00 : 0xff4400
       const edges = new THREE.EdgesGeometry(obj.geometry)
       const line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color }))
+      line.raycast = () => {} // must not interfere with collision raycasters
       obj.updateWorldMatrix(true, false)
       line.applyMatrix4(obj.matrixWorld)
       group.add(line)
