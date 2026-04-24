@@ -139,7 +139,7 @@ function isBlockingHit(h) {
   return true
 }
 
-function PlayerControls({ skipSpawn = false }) {
+function PlayerControls() {
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster())
@@ -164,8 +164,7 @@ function PlayerControls({ skipSpawn = false }) {
     const { camera, scene } = state
 
     if (!initialized.current) {
-      const spawn = skipSpawn ? PLAYER_SPAWN_INSIDE : PLAYER_SPAWN
-      camera.position.copy(spawn)
+      camera.position.copy(PLAYER_SPAWN)
       camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
       initialized.current = true
     }
@@ -238,10 +237,7 @@ function PlayerControls({ skipSpawn = false }) {
 // hut01 world position from cabane.json
 const HUT_POS = [-5.0111, 2.3616, 0.9556]
 
-// Spawn devant l'entrée (mode joueur manuel)
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
-// Spawn à l'intérieur — utilisé après la cinématique d'intro
-const PLAYER_SPAWN_INSIDE = new THREE.Vector3(-8, FLOOR_Y + PLAYER_HEIGHT, 0)
 
 export default function Scene({
   onStats,
@@ -254,7 +250,7 @@ export default function Scene({
   introDoorOpen,
   introWaitingAtDoor,
   introShouldAdvance,
-  skipPlayerSpawn,
+  postIntro,
   onIntroEvent,
   onCameraChange,
 }) {
@@ -305,7 +301,9 @@ export default function Scene({
           onEvent={onIntroEvent}
         />
       ) : playerMode ? (
-        <PlayerControls skipSpawn={skipPlayerSpawn} />
+        <PlayerControls />
+      ) : postIntro ? (
+        null
       ) : (
         <OrbitControls
           ref={controlsRef}
