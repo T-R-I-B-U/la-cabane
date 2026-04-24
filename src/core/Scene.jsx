@@ -202,13 +202,19 @@ function PlayerControls() {
         wallRay.current.set(origin, dir)
         const hits = wallRay.current.intersectObjects(scene.children, true)
         if (
-          hits.some(
-            (h) =>
-              h.distance < COLLISION_DIST &&
-              !h.object.userData.isFloor &&
-              !h.object.userData.isStair && // stairs are walked on, not into
-              !h.object.userData.isDoorOpen
-          )
+          hits.some((h) => {
+            if (h.distance >= COLLISION_DIST) return false
+            if (h.object.userData.isFloor) return false
+            if (h.object.userData.isDoorOpen) return false
+            if (h.object.userData.isStair) {
+              // Only skip collision on upward-facing stair surfaces (walkable tops).
+              // Vertical faces — risers, side railings — still block the player.
+              if (!h.face) return true
+              const n = h.face.normal.clone().transformDirection(h.object.matrixWorld)
+              return n.y <= 0.5
+            }
+            return true
+          })
         ) {
           blocked = true
           break
