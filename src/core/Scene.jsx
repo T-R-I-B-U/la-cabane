@@ -237,7 +237,14 @@ const HUT_POS = [-5.0111, 2.3616, 0.9556]
 // Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
-export default function Scene({ onStats, onReady, onError, playerMode, debugDoors, debugCollisions }) {
+export default function Scene({
+  onStats,
+  onReady,
+  onError,
+  playerMode,
+  debugDoors,
+  debugCollisions,
+}) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
 
