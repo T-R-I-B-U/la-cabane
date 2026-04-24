@@ -38,6 +38,7 @@ export default function App() {
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
   const [introWaitingAtDoor, setIntroWaitingAtDoor] = useState(false)
   const [introShouldAdvance, setIntroShouldAdvance] = useState(false)
+  const [introPending, setIntroPending] = useState(false)
   const [postIntro, setPostIntro] = useState(false)
   const [debugCamera, setDebugCamera] = useState(false)
   const [liveCamera, setLiveCamera] = useState(null)
@@ -49,16 +50,36 @@ export default function App() {
     { position: null, target: null },
   ])
 
+  const exitIntro = useCallback(() => {
+    setIntroActive(false)
+    setIntroPending(false)
+    setPostIntro(false)
+    setIntroDoorOpen(false)
+    setIntroWaitingAtDoor(false)
+    setIntroShouldAdvance(false)
+  }, [])
+
+  // ESC → exit any intro state; F1 → toggle UI
   useEffect(() => {
     const onKey = (e) => {
-      if (e.code === 'F1') {
-        e.preventDefault()
-        setShowUI((v) => !v)
-      }
+      if (e.code === 'F1') { e.preventDefault(); setShowUI((v) => !v) }
+      if (e.code === 'Escape') exitIntro()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }, [exitIntro])
+
+  // When pointer unlocks in postIntro (user pressed ESC while locked) → exit
+  useEffect(() => {
+    if (!postIntro) return
+    let wasLocked = false
+    const onChange = () => {
+      if (document.pointerLockElement) wasLocked = true
+      else if (wasLocked) exitIntro()
+    }
+    document.addEventListener('pointerlockchange', onChange)
+    return () => document.removeEventListener('pointerlockchange', onChange)
+  }, [postIntro, exitIntro])
 
   const onReady = useCallback((data) => {
     setInfo(data)
@@ -90,10 +111,15 @@ export default function App() {
   }
 
   function launchIntro() {
+    setPostIntro(false)
+    setIntroPending(true)
+  }
+
+  function startAnimation() {
+    setIntroPending(false)
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
-    setPostIntro(false)
     setIntroActive(true)
   }
 
@@ -163,10 +189,10 @@ export default function App() {
           <button
             className="camera-toggle"
             onClick={launchIntro}
-            disabled={introActive}
+            disabled={introPending || introActive}
           >
             <span className="camera-toggle-icon">▶</span>
-            {introActive ? 'Intro en cours…' : 'Lancer l\'histoire'}
+            {introActive ? 'Intro en cours…' : introPending ? 'En attente…' : 'Lancer l\'histoire'}
           </button>
 
           <div className="controls-divider" />
@@ -222,6 +248,12 @@ export default function App() {
             </>
           )}
         </aside>
+      )}
+
+      {introPending && (
+        <div className="intro-loader" onClick={startAnimation}>
+          <p className="intro-loader-hint">Cliquer pour commencer</p>
+        </div>
       )}
     </main>
   )
