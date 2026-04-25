@@ -2,14 +2,8 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
-import IntroCameraPanel from './core/IntroCameraPanel'
 import { showDialog, hideDialog } from './utils/audioStore'
 import './App.css'
-
-const TEST_LINES = [
-  'Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !',
-  'Tu es nouveau toi ici, je suis bien heureux de te recevoir !',
-]
 
 const DIALOGUE_1 = [
   'Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !',
@@ -27,6 +21,15 @@ const DIALOGUE_2 = [
   "J'ai entendu dire que tu as beaucoup hésité à venir, je comprends que cela peut sembler intimidant.",
   "Commençons par l'accueil.",
 ]
+
+const MARIE_CLIPS = [
+  'Armature|mixamo.com|Layer0',
+  'marie-sitting-idle',
+  'marie-standiing-idle',
+  'marie-standingup',
+]
+
+const THOMAS_CLIPS = ['thomas-back', 'thomas-front', 'thomas-turn']
 
 function playLines(lines, { msPerLine = 3800, onDone, timers } = {}) {
   let t = 0
@@ -92,6 +95,24 @@ function DevSection({ title, children }) {
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
 
+function CharacterAnimationControls({ title, activeClip, clips, onSelect }) {
+  return (
+    <DevSection title={title}>
+      {clips.map((clip) => (
+        <button
+          key={clip}
+          type="button"
+          className={`camera-toggle${activeClip === clip ? ' camera-toggle--active' : ''}`}
+          aria-pressed={activeClip === clip}
+          onClick={() => onSelect(clip)}
+        >
+          {clip}
+        </button>
+      ))}
+    </DevSection>
+  )
+}
+
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [status, setStatus] = useState('loading')
@@ -108,16 +129,10 @@ export default function App() {
   const [postIntro, setPostIntro] = useState(false)
   const [showNameInput, setShowNameInput] = useState(false)
   const [loaderFading, setLoaderFading] = useState(false)
-  const [debugCamera, setDebugCamera] = useState(false)
-  const [liveCamera, setLiveCamera] = useState(null)
+  const [marieClip, setMarieClip] = useState('marie-standiing-idle')
+  const [thomasClip, setThomasClip] = useState('thomas-front')
   const dialogTimers = useRef([])
   const ignoreNextPointerUnlockRef = useRef(false)
-  const [waypoints, setWaypoints] = useState([
-    { position: null, target: null },
-    { position: null, target: null },
-    { position: null, target: null },
-    { position: null, target: null },
-  ])
 
   const exitIntro = useCallback(() => {
     setIntroActive(false)
@@ -208,15 +223,6 @@ export default function App() {
     }
   }
 
-  function captureWaypoint(index, live) {
-    if (!live) return
-    setWaypoints((prev) => {
-      const next = [...prev]
-      next[index] = { position: live.position, target: live.target }
-      return next
-    })
-  }
-
   function handleNameSubmit(name) {
     setShowNameInput(false)
     playLines(DIALOGUE_2, { msPerLine: 4200, timers: dialogTimers.current })
@@ -251,18 +257,6 @@ export default function App() {
     setIntroPending(false)
   }
 
-  function triggerTestSequence() {
-    dialogTimers.current.forEach(clearTimeout)
-    dialogTimers.current = []
-    let t = 0
-    TEST_LINES.forEach((line, i) => {
-      const duration = i === TEST_LINES.length - 1 ? 3000 : 0
-      const id = setTimeout(() => showDialog(line, duration), t)
-      dialogTimers.current.push(id)
-      t += 3400
-    })
-  }
-
   return (
     <main className="viewer-page">
       <Subtitles />
@@ -280,13 +274,11 @@ export default function App() {
         postIntro={postIntro}
         postIntroLocked={!showNameInput}
         onIntroEvent={handleIntroEvent}
-        onCameraChange={debugCamera ? setLiveCamera : null}
+        marieClip={marieClip}
+        thomasClip={thomasClip}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
-      {import.meta.env.DEV && debugCamera && (
-        <IntroCameraPanel live={liveCamera} waypoints={waypoints} onCapture={captureWaypoint} />
-      )}
 
       {showUI && !introPending && !introActive && !postIntro && (
         <aside className="viewer-controls" aria-live="polite">
@@ -349,27 +341,18 @@ export default function App() {
           {import.meta.env.DEV && (
             <>
               <div className="controls-divider" />
-              <DevSection title="Caméra">
-                <button
-                  type="button"
-                  className={`camera-toggle${debugCamera ? ' camera-toggle--active' : ''}`}
-                  aria-pressed={debugCamera}
-                  onClick={() => setDebugCamera((p) => !p)}
-                >
-                  <span className="camera-toggle-icon" aria-hidden="true">
-                    {debugCamera ? '🟢' : '⚫'}
-                  </span>
-                  Éditeur waypoints
-                </button>
-              </DevSection>
-              <DevSection title="Dialogue">
-                <button type="button" className="camera-toggle" onClick={triggerTestSequence}>
-                  <span className="camera-toggle-icon" aria-hidden="true">
-                    💬
-                  </span>
-                  Test dialogue
-                </button>
-              </DevSection>
+              <CharacterAnimationControls
+                title="Marie"
+                activeClip={marieClip}
+                clips={MARIE_CLIPS}
+                onSelect={setMarieClip}
+              />
+              <CharacterAnimationControls
+                title="Thomas"
+                activeClip={thomasClip}
+                clips={THOMAS_CLIPS}
+                onSelect={setThomasClip}
+              />
               <DevSection title="Scène">
                 <button
                   type="button"

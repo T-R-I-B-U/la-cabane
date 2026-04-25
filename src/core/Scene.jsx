@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
+import { AnimatedCharacter } from '../world/entities/AnimatedCharacter'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { ClickableDoor } from '../world/entities/ClickableDoor'
@@ -8,9 +9,8 @@ import IntroCamera from '../world/entities/IntroCamera'
 import { CollisionDebug } from './CollisionDebug'
 import { disposeObject3D } from './disposeObject3D'
 import { Floor } from './Floor'
-import { CameraTracker } from './IntroCameraDebug'
 import { PlayerControls } from './PlayerControls'
-import { DEFAULT_HUT_POS } from './SceneConfig'
+import { DEFAULT_HUT_POS, FLOOR_Y } from './SceneConfig'
 import { StatsCollector } from './StatsCollector'
 
 function CabaneMap({ onReady, onError, onCabaneLoaded }) {
@@ -66,7 +66,8 @@ export default function Scene({
   postIntro,
   postIntroLocked,
   onIntroEvent,
-  onCameraChange,
+  marieClip,
+  thomasClip,
 }) {
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
@@ -90,7 +91,6 @@ export default function Scene({
       shadows
     >
       <StatsCollector onStats={onStats} />
-      {onCameraChange && <CameraTracker controlsRef={controlsRef} onChange={onCameraChange} />}
 
       <Environment preset="apartment" />
       <ambientLight intensity={1} />
@@ -99,6 +99,23 @@ export default function Scene({
       <Floor />
 
       <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={setCabane} />
+
+      <Suspense fallback={null}>
+        <AnimatedCharacter
+          url="/models/marie-animated.glb"
+          clip={marieClip}
+          position={[hutPosition[0] - 2.4, FLOOR_Y, hutPosition[2] - 8.5]}
+          rotation={[0, Math.PI * 0.2, 0]}
+          scale={9}
+        />
+        <AnimatedCharacter
+          url="/models/thomas-animated.glb"
+          clip={thomasClip}
+          position={[hutPosition[0] - 1.1, FLOOR_Y, hutPosition[2] - 8.5]}
+          rotation={[0, Math.PI * 1.2, 0]}
+          scale={9}
+        />
+      </Suspense>
 
       <ClickableDoor
         cabane={cabane}
