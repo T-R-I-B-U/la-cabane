@@ -5,7 +5,10 @@ import * as THREE from 'three'
 import { FLOOR_Y, HUT_POS, PLAYER_HEIGHT, PLAYER_SPAWN } from './SceneConfig'
 
 const COLLISION_DIST = 0.6
-const SPEED = 0.09
+const MOVE_SPEED = 5.4
+const DESCEND_SMOOTHING = 0.3
+const ASCEND_SMOOTHING = 0.2
+const MAX_FRAME_DELTA = 0.05
 const UP = new THREE.Vector3(0, 1, 0)
 const DOWN = new THREE.Vector3(0, -1, 0)
 
@@ -39,8 +42,9 @@ export function PlayerControls() {
     }
   }, [])
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const { camera, scene } = state
+    const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
 
     if (!initialized.current) {
       camera.position.copy(PLAYER_SPAWN)
@@ -62,10 +66,12 @@ export function PlayerControls() {
     const dy = targetCamY - camera.position.y
     if (dy < 0) {
       // Descending — snap quickly so player doesn't float above steps
-      camera.position.y += dy * 0.3
+      const descendAlpha = 1 - Math.pow(1 - DESCEND_SMOOTHING, frameDelta * 60)
+      camera.position.y += dy * descendAlpha
     } else if (dy < 0.6) {
       // Ascending — smooth lerp, limited to realistic step height
-      camera.position.y += dy * 0.2
+      const ascendAlpha = 1 - Math.pow(1 - ASCEND_SMOOTHING, frameDelta * 60)
+      camera.position.y += dy * ascendAlpha
     }
     // dy >= 0.6 means a wall is above — don't teleport upward
 
@@ -80,10 +86,11 @@ export function PlayerControls() {
     right.crossVectors(forward, UP).normalize()
 
     const wish = new THREE.Vector3()
-    if (k['KeyW']) wish.addScaledVector(forward, SPEED)
-    if (k['KeyS']) wish.addScaledVector(forward, -SPEED)
-    if (k['KeyA']) wish.addScaledVector(right, -SPEED)
-    if (k['KeyD']) wish.addScaledVector(right, SPEED)
+    const moveStep = MOVE_SPEED * frameDelta
+    if (k['KeyW']) wish.addScaledVector(forward, moveStep)
+    if (k['KeyS']) wish.addScaledVector(forward, -moveStep)
+    if (k['KeyA']) wish.addScaledVector(right, -moveStep)
+    if (k['KeyD']) wish.addScaledVector(right, moveStep)
 
     // Ray heights are relative to current camera Y so they stay correct on stairs
     const footY = camera.position.y - PLAYER_HEIGHT
