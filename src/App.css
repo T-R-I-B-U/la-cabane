@@ -279,6 +279,7 @@
   position: fixed;
   inset: 0;
   z-index: 10;
+  background: #e8e0d5;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -288,7 +289,7 @@
 .intro-loader-hint {
   padding: 14px 22px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(15, 31, 43, 0.1);
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 32px rgba(20, 37, 49, 0.12);
@@ -298,6 +299,62 @@
   color: #0f1f2b;
   letter-spacing: 0.05em;
   user-select: none;
+}
+
+/* ── Name input interaction ──────────────────────────────────────── */
+
+.name-input-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 80px;
+  pointer-events: none;
+}
+
+.name-input-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(20, 37, 49, 0.12);
+  pointer-events: all;
+}
+
+.name-input-label {
+  margin: 0;
+  font-size: 0.78rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  color: #4a7088;
+  white-space: nowrap;
+}
+
+.name-input-field {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(15, 31, 43, 0.15);
+  background: rgba(255, 255, 255, 0.9);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: #0f1f2b;
+  outline: none;
+  width: 160px;
+}
+
+.name-input-field:focus {
+  border-color: rgba(15, 31, 43, 0.35);
+}
+
+.name-input-submit {
+  width: auto;
+  padding: 6px 14px;
 }
 
 /* ── Responsive ──────────────────────────────────────────────────── */

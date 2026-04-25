@@ -3,13 +3,70 @@ import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import IntroCameraPanel from './core/IntroCameraPanel'
-import { showDialog } from './utils/audioStore'
+import { showDialog, hideDialog } from './utils/audioStore'
 import './App.css'
 
 const TEST_LINES = [
   "Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !",
   "Tu es nouveau toi ici, je suis bien heureux de te recevoir !",
 ]
+
+const DIALOGUE_1 = [
+  "Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !",
+  "Tu es nouveau toi ici, je suis bien heureux de te recevoir !",
+  "J'ai hâte de te présenter le concept de La Cabane et son fonctionnement.",
+  "Ne sois pas timide, présente toi rapidement.",
+]
+
+const DIALOGUE_2 = [
+  "Parfait ! Je vais pouvoir commencer la visite, j'espère que tu as hâte toi aussi.",
+  "La Cabane c'est un espace de vie partagé au service du savoir commun.",
+  "Ici tout le monde peut apprendre et faire apprendre, échanger, partager et recevoir.",
+  "C'est un modèle novateur qui brise la transmission descendante du savoir.",
+  "Ici peu importe l'âge, le métier, les origines, nous avons tous quelque chose à apprendre.",
+  "J'ai entendu dire que tu as beaucoup hésité à venir, je comprends que cela peut sembler intimidant.",
+  "Commençons par l'accueil.",
+]
+
+function playLines(lines, { msPerLine = 3800, onDone, timers } = {}) {
+  let t = 0
+  lines.forEach((line, i) => {
+    const isLast = i === lines.length - 1
+    const id = setTimeout(() => showDialog(line, isLast ? 2800 : 0), t)
+    if (timers) timers.push(id)
+    t += msPerLine
+  })
+  if (onDone) {
+    const id = setTimeout(onDone, t)
+    if (timers) timers.push(id)
+  }
+}
+
+function NameInput({ onSubmit }) {
+  const [name, setName] = useState('')
+  return (
+    <div className="name-input-overlay">
+      <div className="name-input-card">
+        <p className="name-input-label">Comment t'appelles-tu ?</p>
+        <input
+          className="name-input-field"
+          type="text"
+          placeholder="Ton prénom…"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && name.trim() && onSubmit(name.trim())}
+          autoFocus
+        />
+        <button
+          className="name-input-submit camera-toggle"
+          onClick={() => name.trim() && onSubmit(name.trim())}
+        >
+          Continuer
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function DevSection({ title, children }) {
   const [open, setOpen] = useState(false)
@@ -40,6 +97,7 @@ export default function App() {
   const [introShouldAdvance, setIntroShouldAdvance] = useState(false)
   const [introPending, setIntroPending] = useState(false)
   const [postIntro, setPostIntro] = useState(false)
+  const [showNameInput, setShowNameInput] = useState(false)
   const [debugCamera, setDebugCamera] = useState(false)
   const [liveCamera, setLiveCamera] = useState(null)
   const dialogTimers = useRef([])
@@ -54,9 +112,13 @@ export default function App() {
     setIntroActive(false)
     setIntroPending(false)
     setPostIntro(false)
+    setShowNameInput(false)
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
+    dialogTimers.current.forEach(clearTimeout)
+    dialogTimers.current = []
+    hideDialog()
   }, [])
 
   // ESC → exit any intro state; F1 → toggle UI
@@ -98,7 +160,15 @@ export default function App() {
       setIntroShouldAdvance(true)
     }
     if (event === 'door:open')    setIntroDoorOpen(true)
-    if (event === 'inside') { setIntroActive(false); setPostIntro(true) }
+    if (event === 'inside') {
+      setIntroActive(false)
+      setPostIntro(true)
+      playLines(DIALOGUE_1, {
+        msPerLine: 3800,
+        timers: dialogTimers.current,
+        onDone: () => setShowNameInput(true),
+      })
+    }
   }
 
   function captureWaypoint(index, live) {
@@ -110,8 +180,15 @@ export default function App() {
     })
   }
 
+  function handleNameSubmit(name) {
+    setShowNameInput(false)
+    playLines(DIALOGUE_2, { msPerLine: 4200, timers: dialogTimers.current })
+    console.log('[Intro] nom du joueur:', name)
+  }
+
   function launchIntro() {
     setPostIntro(false)
+    setShowNameInput(false)
     setIntroPending(true)
   }
 
@@ -249,6 +326,8 @@ export default function App() {
           )}
         </aside>
       )}
+
+      {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
       {introPending && (
         <div className="intro-loader" onClick={startAnimation}>
