@@ -15,9 +15,10 @@ function findDoorMeshes(cabane) {
 
 export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
-  const hoveredRef = useRef(false)
-  const mouseRef   = useRef(new THREE.Vector2())
-  const raycaster  = useRef(new THREE.Raycaster())
+  const hoveredRef    = useRef(false)
+  const mouseRef      = useRef(new THREE.Vector2())
+  const mouseMovedRef = useRef(false)
+  const raycaster     = useRef(new THREE.Raycaster())
 
   // Clone materials so we don't mutate shared GLB materials.
   const doorMeshes = useMemo(() => {
@@ -34,9 +35,12 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
 
     if (!active || !doorMeshes.length) return
 
+    mouseMovedRef.current = false // reset on each activation
+
     const canvas = gl.domElement
 
     const onMouseMove = (e) => {
+      mouseMovedRef.current = true
       const rect = canvas.getBoundingClientRect()
       mouseRef.current.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1
       mouseRef.current.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1
@@ -61,7 +65,7 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   }, [active, gl, doorMeshes, onDoorClick])
 
   useFrame(() => {
-    if (!active || !doorMeshes.length) return
+    if (!active || !doorMeshes.length || !mouseMovedRef.current) return
 
     raycaster.current.setFromCamera(mouseRef.current, camera)
     const hits = raycaster.current.intersectObjects(doorMeshes, true)

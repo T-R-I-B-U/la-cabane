@@ -143,6 +143,20 @@ export default function App() {
     return () => document.removeEventListener('pointerlockchange', onChange)
   }, [postIntro, exitIntro])
 
+  // Hide cursor during cinematic movement, show it when waiting at door
+  useEffect(() => {
+    const hide = introActive && !introWaitingAtDoor
+    document.body.style.cursor = hide ? 'none' : ''
+    return () => { document.body.style.cursor = '' }
+  }, [introActive, introWaitingAtDoor])
+
+  // Unlock pointer and freeze camera when name input appears
+  useEffect(() => {
+    if (showNameInput && document.pointerLockElement) {
+      document.exitPointerLock()
+    }
+  }, [showNameInput])
+
   const onReady = useCallback((data) => {
     setInfo(data)
     setStatus('ok')
@@ -227,6 +241,7 @@ export default function App() {
         introWaitingAtDoor={introWaitingAtDoor}
         introShouldAdvance={introShouldAdvance}
         postIntro={postIntro}
+        postIntroLocked={!showNameInput}
         onIntroEvent={handleIntroEvent}
         onCameraChange={debugCamera ? setLiveCamera : null}
       />

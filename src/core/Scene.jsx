@@ -251,6 +251,7 @@ export default function Scene({
   introWaitingAtDoor,
   introShouldAdvance,
   postIntro,
+  postIntroLocked,
   onIntroEvent,
   onCameraChange,
 }) {
@@ -303,7 +304,7 @@ export default function Scene({
       ) : playerMode ? (
         <PlayerControls />
       ) : postIntro ? (
-        <PointerLockControls />
+        postIntroLocked ? <PointerLockControls /> : null
       ) : (
         <OrbitControls
           ref={controlsRef}
