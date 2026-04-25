@@ -1,6 +1,6 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, Environment } from '@react-three/drei'
+import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
 import { AnimatedCharacter } from '../world/entities/AnimatedCharacter'
 import { InteractionPoint } from '../world/entities/InteractionPoint'
 import { buildCabane } from '../world/entities/Cabane'
@@ -66,6 +66,8 @@ export default function Scene({
   introShouldAdvance,
   postIntro,
   postIntroLocked,
+  movementLocked,
+  interactionLocked,
   onIntroEvent,
   marieClip,
   thomasClip,
@@ -75,6 +77,7 @@ export default function Scene({
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()
+  const firstPersonMode = playerMode || (postIntro && postIntroLocked)
   // Tracks which NPCs are hovered to emit a single boolean up to App
   const npcHoveredMap = useRef({ marie: false, thomas: false })
   const onMarieHover = useCallback(
@@ -139,13 +142,13 @@ export default function Scene({
       {/* Interaction points in front of each NPC — positions may need tuning once in scene */}
       <InteractionPoint
         position={[hutPosition[0] - 2.4, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
-        active={playerMode || postIntro}
+        active={(playerMode || postIntro) && !interactionLocked}
         onInteract={() => onNpcInteract?.('marie')}
         onHoverChange={onMarieHover}
       />
       <InteractionPoint
         position={[hutPosition[0] - 1.1, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
-        active={playerMode || postIntro}
+        active={(playerMode || postIntro) && !interactionLocked}
         onInteract={() => onNpcInteract?.('thomas')}
         onHoverChange={onThomasHover}
       />
@@ -160,42 +163,22 @@ export default function Scene({
 
       <SlidingDoors
         cabane={cabane}
-        playerMode={playerMode}
+        firstPersonMode={firstPersonMode}
         controlsRef={controlsRef}
         debug={debugDoors}
         forceOpen={introDoorOpen}
       />
 
       {introActive ? (
-        introWaitingAtDoor ? (
-          <>
-            <IntroCamera
-              active={introActive}
-              shouldAdvance={introShouldAdvance}
-              onEvent={onIntroEvent}
-            />
-            <OrbitControls
-              ref={controlsRef}
-              enablePan={false}
-              enableZoom={false}
-              enableDamping
-              dampingFactor={0.08}
-              target={hutPosition}
-            />
-          </>
-        ) : (
-          <IntroCamera
-            active={introActive}
-            shouldAdvance={introShouldAdvance}
-            onEvent={onIntroEvent}
-          />
-        )
+        <IntroCamera
+          active={introActive}
+          shouldAdvance={introShouldAdvance}
+          onEvent={onIntroEvent}
+        />
       ) : playerMode ? (
-        <PlayerControls hutPosition={hutPosition} />
+        <PlayerControls canMove={!movementLocked} />
       ) : postIntro ? (
-        postIntroLocked ? (
-          <PlayerControls hutPosition={hutPosition} />
-        ) : null
+        postIntroLocked ? <PlayerControls canMove={!movementLocked} /> : null
       ) : (
         <OrbitControls
           ref={controlsRef}

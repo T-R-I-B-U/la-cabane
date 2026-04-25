@@ -47,35 +47,26 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
   const hoveredRef = useRef(false)
   const mouseRef = useRef(new THREE.Vector2())
+  const mouseMovedRef = useRef(false)
+  const prevActiveRef = useRef(false)
   const onDoorClickRef = useRef(onDoorClick)
   const outlinesRef = useRef([])
   const materialStatesRef = useRef(new Map())
   const raycaster = useRef(new THREE.Raycaster())
-
-  const doorMeshes = useMemo(() => findDoorMeshes(cabane), [cabane])
-
-  const updateMouseFromEvent = useCallback((canvas, event) => {
-    const rect = canvas.getBoundingClientRect()
-    mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
-    mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
-  }, [])
-
-  const isDoorHit = useCallback(() => {
-    raycaster.current.setFromCamera(mouseRef.current, camera)
-    return raycaster.current.intersectObjects(doorMeshes, true).length > 0
-  }, [camera, doorMeshes])
 
   // Keep the callback ref current without re-running the event-listener effect.
   useEffect(() => {
     onDoorClickRef.current = onDoorClick
   }, [onDoorClick])
 
-  // Clone materials once per loaded cabane so hover feedback stays local to the door meshes.
-  useEffect(() => {
-    doorMeshes.forEach((mesh) => {
+  // Clone materials so we don't mutate shared GLB materials.
+  const doorMeshes = useMemo(() => {
+    const found = findDoorMeshes(cabane)
+    found.forEach((mesh) => {
       if (mesh.material) mesh.material = cloneMaterial(mesh.material)
     })
-  }, [doorMeshes])
+    return found
+  }, [cabane])
 
   useEffect(() => {
     const outlines = doorMeshes.map((mesh) => {
@@ -132,48 +123,43 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   )
 
   useEffect(() => {
+    // Reset the "mouse has moved" flag only when active transitions false → true.
+    if (active && !prevActiveRef.current) mouseMovedRef.current = false
+    prevActiveRef.current = active
+
     if (!active || !doorMeshes.length) return
 
     const canvas = gl.domElement
 
-    const onPointerMove = (event) => {
-      updateMouseFromEvent(canvas, event)
-      const isHovered = isDoorHit()
-
-      if (hoveredRef.current !== isHovered) {
-        hoveredRef.current = isHovered
-        setDoorHover(isHovered)
-      }
-
-      document.body.style.cursor = isHovered ? 'pointer' : 'default'
+    const onMouseMove = (e) => {
+      mouseMovedRef.current = true
+      const rect = canvas.getBoundingClientRect()
+      mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
+      mouseRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
     }
 
-    const onClick = (event) => {
-      updateMouseFromEvent(canvas, event)
-
-      if (isDoorHit()) {
-        hoveredRef.current = true
-        setDoorHover(true)
-        onDoorClickRef.current?.()
-      }
+    const onClick = () => {
+      if (hoveredRef.current) onDoorClickRef.current?.()
     }
 
-    canvas.addEventListener('pointermove', onPointerMove)
+    canvas.addEventListener('mousemove', onMouseMove)
     canvas.addEventListener('click', onClick)
 
     return () => {
-      canvas.removeEventListener('pointermove', onPointerMove)
+      canvas.removeEventListener('mousemove', onMouseMove)
       canvas.removeEventListener('click', onClick)
       hoveredRef.current = false
       setDoorHover(false)
       document.body.style.cursor = 'default'
     }
-  }, [active, doorMeshes, gl, isDoorHit, setDoorHover, updateMouseFromEvent])
+  }, [active, gl, doorMeshes, setDoorHover])
 
   useFrame(() => {
-    if (!active || !doorMeshes.length) return
+    if (!active || !doorMeshes.length || !mouseMovedRef.current) return
 
-    const isHovered = isDoorHit()
+    raycaster.current.setFromCamera(mouseRef.current, camera)
+    const hits = raycaster.current.intersectObjects(doorMeshes, true)
+    const isHovered = hits.length > 0
 
     if (hoveredRef.current !== isHovered) {
       hoveredRef.current = isHovered

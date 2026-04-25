@@ -142,11 +142,11 @@ export default function App() {
   const [marieClip, setMarieClip] = useState('marie-standiing-idle')
   const [thomasClip, setThomasClip] = useState('thomas-front')
   const [npcHovered, setNpcHovered] = useState(false)
+  const [dialogueActive, setDialogueActive] = useState(false)
+  const [introMovementLocked, setIntroMovementLocked] = useState(false)
   const dialogTimers = useRef([])
   const ignoreNextPointerUnlockRef = useRef(false)
-
   const sceneReady = status === 'ok'
-  const canLaunchIntro = sceneReady && !introPending && !introActive
 
   function clearDialogTimers() {
     dialogTimers.current.forEach(clearTimeout)
@@ -161,10 +161,25 @@ export default function App() {
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
+    setDialogueActive(false)
+    setIntroMovementLocked(false)
     ignoreNextPointerUnlockRef.current = false
     clearDialogTimers()
     hideDialog()
   }, [])
+
+  function playDialogue(lines, { msPerLine = 3800, onDone } = {}) {
+    setDialogueActive(true)
+    clearDialogTimers()
+    playLines(lines, {
+      msPerLine,
+      timers: dialogTimers.current,
+      onDone: () => {
+        setDialogueActive(false)
+        onDone?.()
+      },
+    })
+  }
 
   // ESC → exit any intro state; F1 → toggle UI
   useEffect(() => {
@@ -222,7 +237,6 @@ export default function App() {
   }, [])
 
   function handleIntroEvent(event) {
-    if (import.meta.env.DEV) console.log('[Intro event]', event)
     if (event === 'wait:door') setIntroWaitingAtDoor(true)
     if (event === 'door:clicked') {
       setIntroWaitingAtDoor(false)
@@ -230,34 +244,36 @@ export default function App() {
     }
     if (event === 'door:open') setIntroDoorOpen(true)
     if (event === 'inside') {
+      setIntroDoorOpen(false)
       setIntroShouldAdvance(false)
       setIntroActive(false)
       setPostIntro(true)
-      playLines(DIALOGUE_1, {
+      setIntroMovementLocked(true)
+      playDialogue(DIALOGUE_1, {
         msPerLine: 3800,
-        timers: dialogTimers.current,
         onDone: () => setShowNameInput(true),
       })
     }
   }
 
   function handleNpcInteract(id) {
-    clearDialogTimers()
+    if (dialogueActive || introMovementLocked || showNameInput) return
+
     const lines = id === 'marie' ? MARIE_DIALOGUE : THOMAS_DIALOGUE
-    playLines(lines, { msPerLine: 3800, timers: dialogTimers.current })
+    playDialogue(lines, { msPerLine: 3800 })
   }
 
-  function handleNameSubmit(name) {
+  function handleNameSubmit() {
     setShowNameInput(false)
-    clearDialogTimers()
-    playLines(DIALOGUE_2, { msPerLine: 4200, timers: dialogTimers.current })
-    if (import.meta.env.DEV) console.log('[Intro] nom du joueur:', name)
+    setIntroMovementLocked(true)
+    playDialogue(DIALOGUE_2, {
+      msPerLine: 4200,
+      onDone: () => setIntroMovementLocked(false),
+    })
   }
 
   function launchIntro() {
-    if (!canLaunchIntro) return
-    clearDialogTimers()
-    hideDialog()
+    if (!sceneReady) return
     setPostIntro(false)
     setShowNameInput(false)
     ignoreNextPointerUnlockRef.current = false
@@ -265,7 +281,7 @@ export default function App() {
   }
 
   function handleLoaderClick() {
-    if (!sceneReady || loaderFading || !introPending || introActive) return
+    if (!sceneReady || loaderFading) return
     // Start the cinematic immediately so it plays under the fading loader.
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
@@ -310,6 +326,8 @@ export default function App() {
         introShouldAdvance={introShouldAdvance}
         postIntro={postIntro}
         postIntroLocked={!showNameInput}
+        movementLocked={introMovementLocked}
+        interactionLocked={dialogueActive || introMovementLocked || showNameInput}
         onIntroEvent={handleIntroEvent}
         marieClip={marieClip}
         thomasClip={thomasClip}
@@ -346,17 +364,17 @@ export default function App() {
             type="button"
             className="camera-toggle"
             onClick={launchIntro}
-            disabled={!canLaunchIntro}
+            disabled={!sceneReady || introPending || introActive}
           >
             <span className="camera-toggle-icon" aria-hidden="true">
               ▶
             </span>
-            {introActive
-              ? 'Intro en cours…'
-              : introPending
-                ? 'En attente…'
-                : !sceneReady
-                  ? 'Scène en chargement…'
+            {!sceneReady
+              ? 'Scène en chargement…'
+              : introActive
+                ? 'Intro en cours…'
+                : introPending
+                  ? 'En attente…'
                   : "Lancer l'histoire"}
           </button>
 
