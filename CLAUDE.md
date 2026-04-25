@@ -50,6 +50,8 @@ src/
 - If an architectural decision needs to be made, present options rather than
   imposing a choice
 - Flag clearly when a suggestion deviates from the established architecture
+- **Always run `npm run lint` before pushing.** Fix every error before the push
+  goes out — no lint errors may land in a PR
 
 ## What Claude must not do
 
