@@ -51,6 +51,7 @@ function NameInput({ onSubmit }) {
         <input
           className="name-input-field"
           type="text"
+          aria-label="Ton prénom"
           placeholder="Ton prénom…"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -58,6 +59,7 @@ function NameInput({ onSubmit }) {
           autoFocus
         />
         <button
+          type="button"
           className="name-input-submit camera-toggle"
           onClick={() => name.trim() && onSubmit(name.trim())}
         >
@@ -72,8 +74,15 @@ function DevSection({ title, children }) {
   const [open, setOpen] = useState(false)
   return (
     <div className="dev-section">
-      <button className="dev-section-header" onClick={() => setOpen((o) => !o)}>
-        <span className="dev-section-arrow">{open ? '▾' : '▸'}</span>
+      <button
+        type="button"
+        className="dev-section-header"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="dev-section-arrow" aria-hidden="true">
+          {open ? '▾' : '▸'}
+        </span>
         {title}
       </button>
       {open && <div className="dev-section-body">{children}</div>}
@@ -221,6 +230,12 @@ export default function App() {
     setLoaderFading(true)
   }
 
+  function handleLoaderKeyDown(event) {
+    if (loaderFading || (event.key !== 'Enter' && event.key !== ' ')) return
+    event.preventDefault()
+    handleLoaderClick()
+  }
+
   function dismissLoader() {
     // Called when fade-out ends — just unmount the loader.
     setLoaderFading(false)
@@ -288,24 +303,31 @@ export default function App() {
           <div className="controls-divider" />
 
           <button
+            type="button"
             className="camera-toggle"
             onClick={launchIntro}
             disabled={introPending || introActive}
           >
-            <span className="camera-toggle-icon">▶</span>
+            <span className="camera-toggle-icon" aria-hidden="true">
+              ▶
+            </span>
             {introActive ? 'Intro en cours…' : introPending ? 'En attente…' : "Lancer l'histoire"}
           </button>
 
           <div className="controls-divider" />
 
           <button
+            type="button"
             className={`camera-toggle${playerMode ? ' camera-toggle--active' : ''}`}
+            aria-pressed={playerMode}
             onClick={() => {
               setPlayerMode((p) => !p)
               setPostIntro(false)
             }}
           >
-            <span className="camera-toggle-icon">{playerMode ? '🎮' : '🔭'}</span>
+            <span className="camera-toggle-icon" aria-hidden="true">
+              {playerMode ? '🎮' : '🔭'}
+            </span>
             {playerMode ? 'Mode joueur' : 'Mode orbite'}
           </button>
 
@@ -320,32 +342,46 @@ export default function App() {
               <div className="controls-divider" />
               <DevSection title="Caméra">
                 <button
+                  type="button"
                   className={`camera-toggle${debugCamera ? ' camera-toggle--active' : ''}`}
+                  aria-pressed={debugCamera}
                   onClick={() => setDebugCamera((p) => !p)}
                 >
-                  <span className="camera-toggle-icon">{debugCamera ? '🟢' : '⚫'}</span>
+                  <span className="camera-toggle-icon" aria-hidden="true">
+                    {debugCamera ? '🟢' : '⚫'}
+                  </span>
                   Éditeur waypoints
                 </button>
               </DevSection>
               <DevSection title="Dialogue">
-                <button className="camera-toggle" onClick={triggerTestSequence}>
-                  <span className="camera-toggle-icon">💬</span>
+                <button type="button" className="camera-toggle" onClick={triggerTestSequence}>
+                  <span className="camera-toggle-icon" aria-hidden="true">
+                    💬
+                  </span>
                   Test dialogue
                 </button>
               </DevSection>
               <DevSection title="Scène">
                 <button
+                  type="button"
                   className={`camera-toggle${debugDoors ? ' camera-toggle--active' : ''}`}
+                  aria-pressed={debugDoors}
                   onClick={() => setDebugDoors((p) => !p)}
                 >
-                  <span className="camera-toggle-icon">{debugDoors ? '🟢' : '⚫'}</span>
+                  <span className="camera-toggle-icon" aria-hidden="true">
+                    {debugDoors ? '🟢' : '⚫'}
+                  </span>
                   Debug portes
                 </button>
                 <button
+                  type="button"
                   className={`camera-toggle${debugCollisions ? ' camera-toggle--active' : ''}`}
+                  aria-pressed={debugCollisions}
                   onClick={() => setDebugCollisions((p) => !p)}
                 >
-                  <span className="camera-toggle-icon">{debugCollisions ? '🟢' : '⚫'}</span>
+                  <span className="camera-toggle-icon" aria-hidden="true">
+                    {debugCollisions ? '🟢' : '⚫'}
+                  </span>
                   Debug collisions
                 </button>
               </DevSection>
@@ -359,7 +395,11 @@ export default function App() {
       {introPending && (
         <div
           className={`intro-loader${loaderFading ? ' intro-loader--fading' : ''}`}
+          role="button"
+          tabIndex={loaderFading ? -1 : 0}
+          aria-label="Commencer l'introduction"
           onClick={!loaderFading ? handleLoaderClick : undefined}
+          onKeyDown={handleLoaderKeyDown}
           onAnimationEnd={loaderFading ? dismissLoader : undefined}
         >
           <p className="intro-loader-hint">Cliquer pour commencer</p>
