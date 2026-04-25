@@ -178,7 +178,9 @@ export default function Scene({
       ) : playerMode ? (
         <PlayerControls canMove={!movementLocked} />
       ) : postIntro ? (
-        postIntroLocked ? <PlayerControls canMove={!movementLocked} /> : null
+        postIntroLocked ? (
+          <PlayerControls canMove={!movementLocked} />
+        ) : null
       ) : (
         <OrbitControls
           ref={controlsRef}
