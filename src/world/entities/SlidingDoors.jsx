@@ -129,7 +129,13 @@ function collectDoors(cabane, debug) {
  * En mode orbite : référence = OrbitControls.target (point regardé)
  * En mode joueur : référence = camera.position
  */
-export function SlidingDoors({ cabane, playerMode, controlsRef, debug = false }) {
+export function SlidingDoors({
+  cabane,
+  playerMode,
+  controlsRef,
+  debug = false,
+  forceOpen = false,
+}) {
   const { camera } = useThree()
   const progressRef = useRef(new Map())
   const doors = useMemo(() => collectDoors(cabane, debug), [cabane, debug])
@@ -149,7 +155,7 @@ export function SlidingDoors({ cabane, playerMode, controlsRef, debug = false })
       if (!right || !left) continue
 
       const dist = viewerPos.distanceTo(door.center)
-      const target = dist < TRIGGER_DIST ? 1 : 0
+      const target = forceOpen || dist < TRIGGER_DIST ? 1 : 0
       const progress = getDoorProgress(progressRef, door.id)
       const nextProgress = progress + (target - progress) * LERP_SPEED
 

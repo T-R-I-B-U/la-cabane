@@ -50,6 +50,9 @@ src/
 - If an architectural decision needs to be made, present options rather than
   imposing a choice
 - Flag clearly when a suggestion deviates from the established architecture
+- **Always run `npm run lint` and `npx prettier --check "src/**/*.{js,jsx,css,json}"` before pushing.**
+  Fix every error and formatting issue before the push goes out — neither lint errors
+  nor prettier warnings may land in a PR
 
 ## What Claude must not do
 

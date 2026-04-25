@@ -4,6 +4,9 @@ import { OrbitControls, PointerLockControls, Environment } from '@react-three/dr
 import * as THREE from 'three'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
+import { ClickableDoor } from '../world/entities/ClickableDoor'
+import IntroCamera from '../world/entities/IntroCamera'
+import { CameraTracker } from './IntroCameraDebug'
 
 // Color code: orange = wall, green = floor, yellow = stair.
 function CollisionDebug({ cabane }) {
@@ -234,7 +237,6 @@ function PlayerControls() {
 // hut01 world position from cabane.json
 const HUT_POS = [-5.0111, 2.3616, 0.9556]
 
-// Spawn devant l'entrée du hut, à hauteur des yeux
 const PLAYER_SPAWN = new THREE.Vector3(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2] + 6)
 
 export default function Scene({
@@ -244,6 +246,14 @@ export default function Scene({
   playerMode,
   debugDoors,
   debugCollisions,
+  introActive,
+  introDoorOpen,
+  introWaitingAtDoor,
+  introShouldAdvance,
+  postIntro,
+  postIntroLocked,
+  onIntroEvent,
+  onCameraChange,
 }) {
   const [cabane, setCabane] = useState(null)
   const controlsRef = useRef()
@@ -259,6 +269,7 @@ export default function Scene({
       shadows
     >
       <StatsCollector onStats={onStats} />
+      {onCameraChange && <CameraTracker controlsRef={controlsRef} onChange={onCameraChange} />}
 
       <Environment preset="apartment" />
       <ambientLight intensity={1} />
@@ -268,18 +279,34 @@ export default function Scene({
 
       <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
 
+      <ClickableDoor
+        cabane={cabane}
+        active={introWaitingAtDoor}
+        onDoorClick={() => onIntroEvent?.('door:clicked')}
+      />
+
       {debugCollisions && <CollisionDebug cabane={cabane} />}
 
-      {/* Portes coulissantes — actives en mode joueur et en mode orbite */}
       <SlidingDoors
         cabane={cabane}
         playerMode={playerMode}
         controlsRef={controlsRef}
         debug={debugDoors}
+        forceOpen={introDoorOpen}
       />
 
-      {playerMode ? (
+      {introActive ? (
+        <IntroCamera
+          active={introActive}
+          shouldAdvance={introShouldAdvance}
+          onEvent={onIntroEvent}
+        />
+      ) : playerMode ? (
         <PlayerControls />
+      ) : postIntro ? (
+        postIntroLocked ? (
+          <PointerLockControls />
+        ) : null
       ) : (
         <OrbitControls
           ref={controlsRef}
