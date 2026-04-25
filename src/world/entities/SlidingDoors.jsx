@@ -5,6 +5,7 @@ import * as THREE from 'three'
 const TRIGGER_DIST = 5
 const SLIDE_AMOUNT = 1.5
 const LERP_SPEED = 0.07
+const MAX_FRAME_DELTA = 0.05
 
 function getDoorProgress(progressRef, doorId) {
   return progressRef.current.get(doorId) ?? 0
@@ -144,7 +145,9 @@ export function SlidingDoors({
     progressRef.current = new Map()
   }, [doors])
 
-  useFrame(() => {
+  useFrame((_, delta) => {
+    const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
+    const lerpAlpha = 1 - Math.pow(1 - LERP_SPEED, frameDelta * 60)
     const viewerPos = playerMode
       ? camera.position
       : (controlsRef?.current?.target ?? camera.position)
@@ -157,7 +160,7 @@ export function SlidingDoors({
       const dist = viewerPos.distanceTo(door.center)
       const target = forceOpen || dist < TRIGGER_DIST ? 1 : 0
       const progress = getDoorProgress(progressRef, door.id)
-      const nextProgress = progress + (target - progress) * LERP_SPEED
+      const nextProgress = progress + (target - progress) * lerpAlpha
 
       progressRef.current.set(door.id, nextProgress)
 

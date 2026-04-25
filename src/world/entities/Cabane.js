@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { loadModel } from '../../core/Loader.js'
+import { disposeObject3D } from '../../core/disposeObject3D.js'
 
 // C4D Cloner names instances like "arbre_01", "arbre_02" — strip the suffix
 // so it maps to the actual file on disk ("arbre.glb").
@@ -16,6 +17,34 @@ function applyTransform(object3d, node) {
   object3d.scale.set(sx, sy, sz)
 }
 
+function warnMissingAsset(message) {
+  if (!import.meta.env.DEV) return
+  console.warn(`[Cabane] ${message}`)
+}
+
+function cloneMaterialWithTextures(material) {
+  const clone = material.clone()
+
+  for (const [key, value] of Object.entries(clone)) {
+    if (value?.isTexture) clone[key] = value.clone()
+  }
+
+  return clone
+}
+
+function findNodePosition(nodes, name) {
+  for (const node of nodes) {
+    if (node.name === name && Array.isArray(node.position)) return node.position
+
+    if (node.children?.length) {
+      const position = findNodePosition(node.children, name)
+      if (position) return position
+    }
+  }
+
+  return null
+}
+
 // Load a .bin file produced by the mapper's InstancedMesh export.
 // Format: [uint32 count][float32 × 16 × count] (column-major 4×4 matrices, little-endian).
 // Returns an InstancedMesh, or an empty Group if the file is missing.
@@ -24,27 +53,40 @@ async function buildInstancedMesh(node, basePath) {
 
   // Load the template geometry (.glb or .gltf)
   let template = null
+  const templatePaths = []
   for (const ext of ['.glb', '.gltf']) {
+    const modelPath = `${basePath}${baseName}${ext}`
+    templatePaths.push(modelPath)
     try {
-      template = await loadModel(`${basePath}${baseName}${ext}`)
+      template = await loadModel(modelPath)
       break
     } catch {
       // try next extension
     }
   }
 
+  if (!template) {
+    warnMissingAsset(`No template model found for "${node.name}" (${templatePaths.join(', ')})`)
+  }
+
   // Load instance transforms (.bin alongside the geometry file)
   let count = 0
   let floats = null
+  const instancePath = `${basePath}${baseName}.bin`
   try {
-    const res = await fetch(`${basePath}${baseName}.bin`)
+    const res = await fetch(instancePath)
     if (res.ok) {
       const buf = await res.arrayBuffer()
       count = new DataView(buf).getUint32(0, true)
       floats = new Float32Array(buf, 4, count * 16)
+    } else {
+      warnMissingAsset(`No instance matrix file found for "${node.name}" (${instancePath})`)
     }
-  } catch {
+  } catch (err) {
     // .bin not available yet — fall through to empty fallback
+    warnMissingAsset(
+      `Cannot load instance matrix file for "${node.name}" (${instancePath}): ${err}`
+    )
   }
 
   // Fallback: no geometry or no instances → empty pivot
@@ -61,13 +103,15 @@ async function buildInstancedMesh(node, basePath) {
   let material = null
   template.traverse((child) => {
     if (!geometry && child.isMesh) {
-      geometry = child.geometry
-      material = child.material.clone()
+      geometry = child.geometry.clone()
+      material = cloneMaterialWithTextures(child.material)
       material.side = THREE.DoubleSide
     }
   })
 
   if (!geometry) {
+    warnMissingAsset(`Template model for "${node.name}" does not contain a mesh`)
+    disposeObject3D(template)
     const group = new THREE.Group()
     group.name = node.name
     group.userData.cabaneNode = true
@@ -86,6 +130,7 @@ async function buildInstancedMesh(node, basePath) {
   // Direct typed-array copy avoids allocating count Matrix4 objects on the main thread.
   mesh.instanceMatrix.array.set(floats)
   mesh.instanceMatrix.needsUpdate = true
+  disposeObject3D(template)
 
   return mesh
 }
@@ -98,9 +143,12 @@ async function buildNode(node, basePath) {
   let object3d
 
   const baseName = modelBaseName(node.name)
+  const modelPaths = []
   for (const ext of ['.glb', '.gltf']) {
+    const modelPath = `${basePath}${baseName}${ext}`
+    modelPaths.push(modelPath)
     try {
-      object3d = await loadModel(`${basePath}${baseName}${ext}`)
+      object3d = await loadModel(modelPath)
       object3d.name = node.name
       break
     } catch {
@@ -110,6 +158,7 @@ async function buildNode(node, basePath) {
 
   // Fallback to empty pivot so the rest of the hierarchy still places correctly.
   if (!object3d) {
+    warnMissingAsset(`No model found for "${node.name}" (${modelPaths.join(', ')})`)
     object3d = new THREE.Group()
     object3d.name = node.name
   }
@@ -169,6 +218,7 @@ export async function buildCabane({
   root.name = 'cabane'
 
   const nodes = Array.isArray(data) ? data : [data]
+  root.userData.hutPosition = findNodePosition(nodes, 'hut01')
   const built = await Promise.all(nodes.map((node) => buildNode(node, basePath)))
   for (const obj of built) {
     if (obj) root.add(obj)
