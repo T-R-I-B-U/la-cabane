@@ -14,9 +14,8 @@ Two developers working collaboratively.
 - React Three Fiber (R3F) — Three.js via React JSX, primary rendering layer
 - React (UI overlaid on canvas, JSX components)
 - @react-three/drei — helpers and abstractions for R3F (loaders, controls, etc.)
-- @react-three/postprocessing — post-processing effects (bloom, depth of field, etc.)
 - Vite + vite-plugin-glsl
-- Assets exported from Cinema 4D as .glb
+- Assets exported from Cinema 4D as .gltf/.glb
 
 ## Folder structure
 
@@ -24,17 +23,17 @@ Current state — folders exist but most are still empty (scaffolded).
 
 ```
 public/
-  models/       → .glb files (Cinema 4D exports)
+  models/       → .gltf/.glb files (Cinema 4D exports)
   textures/
   audio/
 
 src/
   assets/       → static assets imported by Vite (SVG, images)
-  core/         → engine lifecycle (scene, camera, renderer, loop, loader)
+  core/         → R3F scene setup, controls, loaders, diagnostics
   world/
-    entities/   → one class per 3D object
+    entities/   → one module/component per 3D object or scene behavior
     materials/  → reusable materials / shaders
-  utils/        → shared helpers (event emitter, debug, constants)
+  utils/        → shared stateless helpers
 ```
 
 > `public/draco/` will be added when Draco-compressed .glb files are introduced.
