@@ -15,6 +15,13 @@ const subtitleState = {
   current: '',
   listeners: new Set(),
   rafId: 0,
+  hideTimeoutId: 0,
+}
+
+function _clearDialogHideTimeout() {
+  if (!subtitleState.hideTimeoutId) return
+  clearTimeout(subtitleState.hideTimeoutId)
+  subtitleState.hideTimeoutId = 0
 }
 
 export function initAudio(camera) {
@@ -156,16 +163,26 @@ export function subscribeSubtitles(fn) {
 // duration > 0 : disparaît automatiquement après N ms.
 // duration = 0 : reste affiché jusqu'au prochain appel.
 export function showDialog(text, duration = 0) {
+  _clearDialogHideTimeout()
+
   if (subtitleState.rafId) {
     cancelAnimationFrame(subtitleState.rafId)
     subtitleState.rafId = 0
     subtitleState.activeId = null
   }
+
   _emitSubtitle(text)
-  if (duration > 0) setTimeout(() => _emitSubtitle(''), duration)
+
+  if (duration > 0) {
+    subtitleState.hideTimeoutId = setTimeout(() => {
+      subtitleState.hideTimeoutId = 0
+      _emitSubtitle('')
+    }, duration)
+  }
 }
 
 export function hideDialog() {
+  _clearDialogHideTimeout()
   _emitSubtitle('')
 }
 

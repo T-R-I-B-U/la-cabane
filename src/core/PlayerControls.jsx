@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { PointerLockControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { DEFAULT_HUT_POS, FLOOR_Y, getPlayerSpawn, PLAYER_HEIGHT } from './SceneConfig'
+import { FLOOR_Y, PLAYER_HEIGHT } from './SceneConfig'
 
 const COLLISION_DIST = 0.6
 const MOVE_SPEED = 5.4
@@ -21,11 +21,10 @@ function isBlockingHit(h) {
   return true
 }
 
-export function PlayerControls({ hutPosition = DEFAULT_HUT_POS }) {
+export function PlayerControls({ canMove = true }) {
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster())
-  const initialized = useRef(false)
 
   useEffect(() => {
     const down = (e) => {
@@ -45,12 +44,6 @@ export function PlayerControls({ hutPosition = DEFAULT_HUT_POS }) {
   useFrame((state, delta) => {
     const { camera, scene } = state
     const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
-
-    if (!initialized.current) {
-      camera.position.copy(getPlayerSpawn(hutPosition))
-      camera.lookAt(hutPosition[0], FLOOR_Y + PLAYER_HEIGHT, hutPosition[2])
-      initialized.current = true
-    }
 
     // --- Floor / stair following ---
     // Cast a ray straight down from just above the player's head.
@@ -74,6 +67,8 @@ export function PlayerControls({ hutPosition = DEFAULT_HUT_POS }) {
       camera.position.y += dy * ascendAlpha
     }
     // dy >= 0.6 means a wall is above — don't teleport upward
+
+    if (!canMove) return
 
     const k = keys.current
     if (!k['KeyW'] && !k['KeyS'] && !k['KeyA'] && !k['KeyD']) return

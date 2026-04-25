@@ -7,6 +7,17 @@ function easeInOut(t) {
 }
 
 const HUT = new THREE.Vector3(-5.0111, 2.3616, 0.9556)
+const FINAL_POSITION = new THREE.Vector3(-9.6, 1.4437, -0.55)
+const INSIDE_LOOK_AT = FINAL_POSITION.clone()
+  .add(
+    HUT.clone()
+      .sub(FINAL_POSITION)
+      .setY(0)
+      .normalize()
+      .applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(72))
+      .multiplyScalar(6)
+  )
+  .setY(1.8)
 
 const WAYPOINTS = [
   {
@@ -34,9 +45,9 @@ const WAYPOINTS = [
     event: 'door:open',
   },
   {
-    position: new THREE.Vector3(-11.0133, 1.4437, -0.9188),
-    target: HUT.clone(),
-    duration: 0,
+    position: FINAL_POSITION.clone(),
+    target: INSIDE_LOOK_AT.clone(),
+    duration: 1.15,
     event: 'inside',
   },
 ]

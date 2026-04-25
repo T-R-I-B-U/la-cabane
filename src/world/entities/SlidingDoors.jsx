@@ -132,7 +132,7 @@ function collectDoors(cabane, debug) {
  */
 export function SlidingDoors({
   cabane,
-  playerMode,
+  firstPersonMode,
   controlsRef,
   debug = false,
   forceOpen = false,
@@ -148,7 +148,7 @@ export function SlidingDoors({
   useFrame((_, delta) => {
     const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
     const lerpAlpha = 1 - Math.pow(1 - LERP_SPEED, frameDelta * 60)
-    const viewerPos = playerMode
+    const viewerPos = firstPersonMode
       ? camera.position
       : (controlsRef?.current?.target ?? camera.position)
 

@@ -2,6 +2,7 @@ import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
 import { AnimatedCharacter } from '../world/entities/AnimatedCharacter'
+import { InteractionPoint } from '../world/entities/InteractionPoint'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { ClickableDoor } from '../world/entities/ClickableDoor'
@@ -65,13 +66,34 @@ export default function Scene({
   introShouldAdvance,
   postIntro,
   postIntroLocked,
+  movementLocked,
+  interactionLocked,
   onIntroEvent,
   marieClip,
   thomasClip,
+  onNpcInteract,
+  onNpcHover,
 }) {
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()
+  const firstPersonMode = playerMode || (postIntro && postIntroLocked)
+  // Tracks which NPCs are hovered to emit a single boolean up to App
+  const npcHoveredMap = useRef({ marie: false, thomas: false })
+  const onMarieHover = useCallback(
+    (isHovered) => {
+      npcHoveredMap.current.marie = isHovered
+      onNpcHover?.(Object.values(npcHoveredMap.current).some(Boolean))
+    },
+    [onNpcHover]
+  )
+  const onThomasHover = useCallback(
+    (isHovered) => {
+      npcHoveredMap.current.thomas = isHovered
+      onNpcHover?.(Object.values(npcHoveredMap.current).some(Boolean))
+    },
+    [onNpcHover]
+  )
   const handleReady = useCallback(
     (data) => {
       if (Array.isArray(data.hutPosition)) setHutPosition(data.hutPosition)
@@ -117,6 +139,20 @@ export default function Scene({
         />
       </Suspense>
 
+      {/* Interaction points in front of each NPC — positions may need tuning once in scene */}
+      <InteractionPoint
+        position={[hutPosition[0] - 2.4, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+        active={(playerMode || postIntro) && !interactionLocked}
+        onInteract={() => onNpcInteract?.('marie')}
+        onHoverChange={onMarieHover}
+      />
+      <InteractionPoint
+        position={[hutPosition[0] - 1.1, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+        active={(playerMode || postIntro) && !interactionLocked}
+        onInteract={() => onNpcInteract?.('thomas')}
+        onHoverChange={onThomasHover}
+      />
+
       <ClickableDoor
         cabane={cabane}
         active={introWaitingAtDoor}
@@ -127,7 +163,7 @@ export default function Scene({
 
       <SlidingDoors
         cabane={cabane}
-        playerMode={playerMode}
+        firstPersonMode={firstPersonMode}
         controlsRef={controlsRef}
         debug={debugDoors}
         forceOpen={introDoorOpen}
@@ -140,10 +176,10 @@ export default function Scene({
           onEvent={onIntroEvent}
         />
       ) : playerMode ? (
-        <PlayerControls hutPosition={hutPosition} />
+        <PlayerControls canMove={!movementLocked} />
       ) : postIntro ? (
         postIntroLocked ? (
-          <PointerLockControls />
+          <PlayerControls canMove={!movementLocked} />
         ) : null
       ) : (
         <OrbitControls
