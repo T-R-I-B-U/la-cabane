@@ -11,57 +11,57 @@ const HUT = new THREE.Vector3(-5.0111, 2.3616, 0.9556)
 const WAYPOINTS = [
   {
     position: new THREE.Vector3(-81.2843, 28.5625, -16.8399),
-    target:   HUT.clone(),
+    target: HUT.clone(),
     duration: 0,
-    delay:    2,
+    delay: 2,
   },
   {
     position: new THREE.Vector3(-34.3023, 10.5207, -5.8784),
-    target:   HUT.clone(),
+    target: HUT.clone(),
     duration: 3.5,
   },
   {
     position: new THREE.Vector3(-20.864, 1.3988, -0.9681),
-    target:   HUT.clone(),
+    target: HUT.clone(),
     duration: 2.5,
-    event:    'wait:door',
+    event: 'wait:door',
     waitForInput: true,
   },
   {
     position: new THREE.Vector3(-11.0133, 1.4437, -0.9188),
-    target:   HUT.clone(),
+    target: HUT.clone(),
     duration: 2.0,
-    event:    'door:open',
+    event: 'door:open',
   },
   {
     position: new THREE.Vector3(-11.0133, 1.4437, -0.9188),
-    target:   HUT.clone(),
+    target: HUT.clone(),
     duration: 0,
-    event:    'inside',
+    event: 'inside',
   },
 ]
 
 export default function IntroCamera({ active, shouldAdvance, onEvent }) {
   const { camera } = useThree()
-  const stepRef     = useRef(-1)
+  const stepRef = useRef(-1)
   const progressRef = useRef(0)
-  const delayRef    = useRef(0)
-  const waitingRef  = useRef(false)
+  const delayRef = useRef(0)
+  const waitingRef = useRef(false)
   const advancedRef = useRef(false)
 
   useEffect(() => {
     if (active) {
-      stepRef.current     = -1
+      stepRef.current = -1
       progressRef.current = 0
-      delayRef.current    = 0
-      waitingRef.current  = false
+      delayRef.current = 0
+      waitingRef.current = false
       advancedRef.current = false
     }
   }, [active])
 
   useEffect(() => {
     if (shouldAdvance && waitingRef.current && !advancedRef.current) {
-      waitingRef.current  = false
+      waitingRef.current = false
       advancedRef.current = true
     }
   }, [shouldAdvance])
@@ -84,7 +84,7 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     if (waitingRef.current) return
 
     const from = WAYPOINTS[step]
-    const to   = WAYPOINTS[step + 1]
+    const to = WAYPOINTS[step + 1]
 
     if (from.delay && delayRef.current < from.delay) {
       delayRef.current += delta
@@ -96,7 +96,7 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
       camera.lookAt(to.target)
       stepRef.current += 1
       progressRef.current = 0
-      delayRef.current    = 0
+      delayRef.current = 0
       if (to.event) onEvent?.(to.event)
       return
     }
@@ -109,9 +109,9 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     camera.lookAt(lookAt)
 
     if (progressRef.current >= 1) {
-      stepRef.current    += 1
+      stepRef.current += 1
       progressRef.current = 0
-      delayRef.current    = 0
+      delayRef.current = 0
 
       if (to.event) onEvent?.(to.event)
 

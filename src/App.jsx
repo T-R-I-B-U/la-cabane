@@ -7,21 +7,21 @@ import { showDialog, hideDialog } from './utils/audioStore'
 import './App.css'
 
 const TEST_LINES = [
-  "Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !",
-  "Tu es nouveau toi ici, je suis bien heureux de te recevoir !",
+  'Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !',
+  'Tu es nouveau toi ici, je suis bien heureux de te recevoir !',
 ]
 
 const DIALOGUE_1 = [
-  "Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !",
-  "Tu es nouveau toi ici, je suis bien heureux de te recevoir !",
+  'Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !',
+  'Tu es nouveau toi ici, je suis bien heureux de te recevoir !',
   "J'ai hâte de te présenter le concept de La Cabane et son fonctionnement.",
-  "Ne sois pas timide, présente toi rapidement.",
+  'Ne sois pas timide, présente toi rapidement.',
 ]
 
 const DIALOGUE_2 = [
   "Parfait ! Je vais pouvoir commencer la visite, j'espère que tu as hâte toi aussi.",
   "La Cabane c'est un espace de vie partagé au service du savoir commun.",
-  "Ici tout le monde peut apprendre et faire apprendre, échanger, partager et recevoir.",
+  'Ici tout le monde peut apprendre et faire apprendre, échanger, partager et recevoir.',
   "C'est un modèle novateur qui brise la transmission descendante du savoir.",
   "Ici peu importe l'âge, le métier, les origines, nous avons tous quelque chose à apprendre.",
   "J'ai entendu dire que tu as beaucoup hésité à venir, je comprends que cela peut sembler intimidant.",
@@ -125,7 +125,10 @@ export default function App() {
   // ESC → exit any intro state; F1 → toggle UI
   useEffect(() => {
     const onKey = (e) => {
-      if (e.code === 'F1') { e.preventDefault(); setShowUI((v) => !v) }
+      if (e.code === 'F1') {
+        e.preventDefault()
+        setShowUI((v) => !v)
+      }
       if (e.code === 'Escape') exitIntro()
     }
     window.addEventListener('keydown', onKey)
@@ -148,7 +151,9 @@ export default function App() {
   useEffect(() => {
     const hide = introActive && !introWaitingAtDoor
     document.body.style.cursor = hide ? 'none' : ''
-    return () => { document.body.style.cursor = '' }
+    return () => {
+      document.body.style.cursor = ''
+    }
   }, [introActive, introWaitingAtDoor])
 
   // Unlock pointer and freeze camera when name input appears
@@ -169,12 +174,12 @@ export default function App() {
 
   function handleIntroEvent(event) {
     console.log('[Intro event]', event)
-    if (event === 'wait:door')    setIntroWaitingAtDoor(true)
+    if (event === 'wait:door') setIntroWaitingAtDoor(true)
     if (event === 'door:clicked') {
       setIntroWaitingAtDoor(false)
       setIntroShouldAdvance(true)
     }
-    if (event === 'door:open')    setIntroDoorOpen(true)
+    if (event === 'door:open') setIntroDoorOpen(true)
     if (event === 'inside') {
       setIntroActive(false)
       setPostIntro(true)
@@ -256,11 +261,7 @@ export default function App() {
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
       {import.meta.env.DEV && debugCamera && (
-        <IntroCameraPanel
-          live={liveCamera}
-          waypoints={waypoints}
-          onCapture={captureWaypoint}
-        />
+        <IntroCameraPanel live={liveCamera} waypoints={waypoints} onCapture={captureWaypoint} />
       )}
 
       {showUI && !introPending && !introActive && !postIntro && (
@@ -292,14 +293,17 @@ export default function App() {
             disabled={introPending || introActive}
           >
             <span className="camera-toggle-icon">▶</span>
-            {introActive ? 'Intro en cours…' : introPending ? 'En attente…' : 'Lancer l\'histoire'}
+            {introActive ? 'Intro en cours…' : introPending ? 'En attente…' : "Lancer l'histoire"}
           </button>
 
           <div className="controls-divider" />
 
           <button
             className={`camera-toggle${playerMode ? ' camera-toggle--active' : ''}`}
-            onClick={() => { setPlayerMode((p) => !p); setPostIntro(false) }}
+            onClick={() => {
+              setPlayerMode((p) => !p)
+              setPostIntro(false)
+            }}
           >
             <span className="camera-toggle-icon">{playerMode ? '🎮' : '🔭'}</span>
             {playerMode ? 'Mode joueur' : 'Mode orbite'}

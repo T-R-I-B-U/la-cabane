@@ -30,7 +30,7 @@ export default function IntroCameraPanel({ live, onCapture, waypoints }) {
     const out = waypoints.map((wp, i) => ({
       label: LABELS[i],
       position: wp.position ?? { x: 0, y: 0, z: 0 },
-      target:   wp.target   ?? { x: 0, y: 0, z: 0 },
+      target: wp.target ?? { x: 0, y: 0, z: 0 },
     }))
     navigator.clipboard.writeText(JSON.stringify(out, null, 2))
     setCopied(true)
@@ -85,7 +85,14 @@ export default function IntroCameraPanel({ live, onCapture, waypoints }) {
                 padding: '8px 10px',
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: 4,
+                }}
+              >
                 <span style={{ fontSize: 11, color: captured ? '#8de' : '#888' }}>
                   WP{i} — {label}
                 </span>
@@ -110,9 +117,7 @@ export default function IntroCameraPanel({ live, onCapture, waypoints }) {
                   <CoordRow label="target" value={wp.target} />
                 </>
               )}
-              {!captured && (
-                <span style={{ fontSize: 11, color: '#666' }}>non capturé</span>
-              )}
+              {!captured && <span style={{ fontSize: 11, color: '#666' }}>non capturé</span>}
             </div>
           )
         })}

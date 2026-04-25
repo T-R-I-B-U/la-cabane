@@ -15,7 +15,7 @@ export function CameraTracker({ controlsRef, onChange }) {
 
     onChange({
       position: { x: +pos.x.toFixed(4), y: +pos.y.toFixed(4), z: +pos.z.toFixed(4) },
-      target:   tgt
+      target: tgt
         ? { x: +tgt.x.toFixed(4), y: +tgt.y.toFixed(4), z: +tgt.z.toFixed(4) }
         : { x: +pos.x.toFixed(4), y: +pos.y.toFixed(4), z: +pos.z.toFixed(4) },
     })

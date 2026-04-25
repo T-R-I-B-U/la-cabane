@@ -129,7 +129,13 @@ function collectDoors(cabane, debug) {
  * En mode orbite : référence = OrbitControls.target (point regardé)
  * En mode joueur : référence = camera.position
  */
-export function SlidingDoors({ cabane, playerMode, controlsRef, debug = false, forceOpen = false }) {
+export function SlidingDoors({
+  cabane,
+  playerMode,
+  controlsRef,
+  debug = false,
+  forceOpen = false,
+}) {
   const { camera } = useThree()
   const progressRef = useRef(new Map())
   const doors = useMemo(() => collectDoors(cabane, debug), [cabane, debug])

@@ -304,7 +304,9 @@ export default function Scene({
       ) : playerMode ? (
         <PlayerControls />
       ) : postIntro ? (
-        postIntroLocked ? <PointerLockControls /> : null
+        postIntroLocked ? (
+          <PointerLockControls />
+        ) : null
       ) : (
         <OrbitControls
           ref={controlsRef}

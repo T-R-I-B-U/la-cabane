@@ -15,15 +15,17 @@ function findDoorMeshes(cabane) {
 
 export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
-  const hoveredRef      = useRef(false)
-  const mouseRef        = useRef(new THREE.Vector2())
-  const mouseMovedRef   = useRef(false)
-  const prevActiveRef   = useRef(false)
-  const onDoorClickRef  = useRef(onDoorClick)
-  const raycaster       = useRef(new THREE.Raycaster())
+  const hoveredRef = useRef(false)
+  const mouseRef = useRef(new THREE.Vector2())
+  const mouseMovedRef = useRef(false)
+  const prevActiveRef = useRef(false)
+  const onDoorClickRef = useRef(onDoorClick)
+  const raycaster = useRef(new THREE.Raycaster())
 
   // Keep the callback ref current without re-running the event-listener effect.
-  useEffect(() => { onDoorClickRef.current = onDoorClick }, [onDoorClick])
+  useEffect(() => {
+    onDoorClickRef.current = onDoorClick
+  }, [onDoorClick])
 
   // Clone materials so we don't mutate shared GLB materials.
   const doorMeshes = useMemo(() => {
@@ -46,11 +48,13 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     const onMouseMove = (e) => {
       mouseMovedRef.current = true
       const rect = canvas.getBoundingClientRect()
-      mouseRef.current.x =  ((e.clientX - rect.left) / rect.width)  * 2 - 1
-      mouseRef.current.y = -((e.clientY - rect.top)  / rect.height) * 2 + 1
+      mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
+      mouseRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
     }
 
-    const onClick = () => { if (hoveredRef.current) onDoorClickRef.current?.() }
+    const onClick = () => {
+      if (hoveredRef.current) onDoorClickRef.current?.()
+    }
 
     canvas.addEventListener('mousemove', onMouseMove)
     canvas.addEventListener('click', onClick)

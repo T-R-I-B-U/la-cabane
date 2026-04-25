@@ -27,7 +27,7 @@ export function initAudio(camera) {
 function _srtTimeToSec(t) {
   const [h, m, rest] = t.split(':')
   const [s, ms] = rest.split(',')
-  return (+h) * 3600 + (+m) * 60 + (+s) + (+ms) / 1000
+  return +h * 3600 + +m * 60 + +s + +ms / 1000
 }
 
 function _parseSRT(src) {
@@ -91,7 +91,10 @@ function _loadTracks() {
 }
 
 function _whenReady(id, fn) {
-  if (store.tracks[id]) { fn(); return }
+  if (store.tracks[id]) {
+    fn()
+    return
+  }
   if (!store.pending[id]) store.pending[id] = []
   store.pending[id].push(fn)
 }
@@ -126,9 +129,7 @@ function _tickSubtitles() {
     return
   }
   const elapsed = (performance.now() - subtitleState.startedAt) / 1000
-  const cue = (track.cfg.subtitles || []).find(
-    (s) => elapsed >= s.from && elapsed < s.to
-  )
+  const cue = (track.cfg.subtitles || []).find((s) => elapsed >= s.from && elapsed < s.to)
   _emitSubtitle(cue ? cue.text : '')
   subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
 }
@@ -252,7 +253,9 @@ export function fade(id, to, duration = 500) {
     cfg.volume = to
 
     if (to === 0) {
-      setTimeout(() => { if (audio.isPlaying) audio.stop() }, duration)
+      setTimeout(() => {
+        if (audio.isPlaying) audio.stop()
+      }, duration)
     }
   })
 }
@@ -271,6 +274,12 @@ export function setGlobalVolume(volume) {
   }
 }
 
-export function getConfig() { return config }
-export function getTracks() { return store.tracks }
-export function getGlobalVolume() { return store.globalVolume }
+export function getConfig() {
+  return config
+}
+export function getTracks() {
+  return store.tracks
+}
+export function getGlobalVolume() {
+  return store.globalVolume
+}
