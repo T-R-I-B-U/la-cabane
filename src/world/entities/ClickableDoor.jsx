@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-const CENTER_NDC = new THREE.Vector2(0, 0)
 const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
 const OUTLINE_COLOR = 0xffffff
@@ -44,7 +43,7 @@ function createDoorOutline(mesh) {
   return outline
 }
 
-export function ClickableDoor({ cabane, active, lockPointer = false, onDoorClick }) {
+export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
   const hoveredRef = useRef(false)
   const mouseRef = useRef(new THREE.Vector2())
@@ -62,10 +61,9 @@ export function ClickableDoor({ cabane, active, lockPointer = false, onDoorClick
   }, [])
 
   const isDoorHit = useCallback(() => {
-    const targetNdc = lockPointer ? CENTER_NDC : mouseRef.current
-    raycaster.current.setFromCamera(targetNdc, camera)
+    raycaster.current.setFromCamera(mouseRef.current, camera)
     return raycaster.current.intersectObjects(doorMeshes, true).length > 0
-  }, [camera, doorMeshes, lockPointer])
+  }, [camera, doorMeshes])
 
   // Keep the callback ref current without re-running the event-listener effect.
   useEffect(() => {
@@ -138,27 +136,6 @@ export function ClickableDoor({ cabane, active, lockPointer = false, onDoorClick
 
     const canvas = gl.domElement
 
-    if (lockPointer) {
-      const onPointerDown = (event) => {
-        if (event.button !== 0) return
-
-        if (isDoorHit()) {
-          hoveredRef.current = true
-          setDoorHover(true)
-          onDoorClickRef.current?.()
-        }
-      }
-
-      document.addEventListener('pointerdown', onPointerDown)
-
-      return () => {
-        document.removeEventListener('pointerdown', onPointerDown)
-        hoveredRef.current = false
-        setDoorHover(false)
-        document.body.style.cursor = 'default'
-      }
-    }
-
     const onPointerMove = (event) => {
       updateMouseFromEvent(canvas, event)
       const isHovered = isDoorHit()
@@ -191,7 +168,7 @@ export function ClickableDoor({ cabane, active, lockPointer = false, onDoorClick
       setDoorHover(false)
       document.body.style.cursor = 'default'
     }
-  }, [active, doorMeshes, gl, isDoorHit, lockPointer, setDoorHover, updateMouseFromEvent])
+  }, [active, doorMeshes, gl, isDoorHit, setDoorHover, updateMouseFromEvent])
 
   useFrame(() => {
     if (!active || !doorMeshes.length) return

@@ -1,6 +1,6 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
+import { OrbitControls, Environment } from '@react-three/drei'
 import { AnimatedCharacter } from '../world/entities/AnimatedCharacter'
 import { InteractionPoint } from '../world/entities/InteractionPoint'
 import { buildCabane } from '../world/entities/Cabane'
@@ -153,7 +153,6 @@ export default function Scene({
       <ClickableDoor
         cabane={cabane}
         active={introWaitingAtDoor}
-        lockPointer={introWaitingAtDoor}
         onDoorClick={() => onIntroEvent?.('door:clicked')}
       />
 
@@ -168,14 +167,29 @@ export default function Scene({
       />
 
       {introActive ? (
-        <>
+        introWaitingAtDoor ? (
+          <>
+            <IntroCamera
+              active={introActive}
+              shouldAdvance={introShouldAdvance}
+              onEvent={onIntroEvent}
+            />
+            <OrbitControls
+              ref={controlsRef}
+              enablePan={false}
+              enableZoom={false}
+              enableDamping
+              dampingFactor={0.08}
+              target={hutPosition}
+            />
+          </>
+        ) : (
           <IntroCamera
             active={introActive}
             shouldAdvance={introShouldAdvance}
             onEvent={onIntroEvent}
           />
-          {introWaitingAtDoor && <PointerLockControls />}
-        </>
+        )
       ) : playerMode ? (
         <PlayerControls hutPosition={hutPosition} />
       ) : postIntro ? (

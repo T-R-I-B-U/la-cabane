@@ -290,7 +290,7 @@ export default function App() {
     <main className="viewer-page">
       <Subtitles />
 
-      {(playerMode || postIntro || introWaitingAtDoor) && !showNameInput && (
+      {(playerMode || postIntro) && !showNameInput && (
         <div className={`crosshair${npcHovered ? ' crosshair--active' : ''}`} aria-hidden="true">
           <div className="crosshair-ring" />
           <div className="crosshair-dot" />
