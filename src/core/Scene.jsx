@@ -153,6 +153,7 @@ export default function Scene({
       <ClickableDoor
         cabane={cabane}
         active={introWaitingAtDoor}
+        lockPointer={introWaitingAtDoor}
         onDoorClick={() => onIntroEvent?.('door:clicked')}
       />
 
@@ -167,11 +168,14 @@ export default function Scene({
       />
 
       {introActive ? (
-        <IntroCamera
-          active={introActive}
-          shouldAdvance={introShouldAdvance}
-          onEvent={onIntroEvent}
-        />
+        <>
+          <IntroCamera
+            active={introActive}
+            shouldAdvance={introShouldAdvance}
+            onEvent={onIntroEvent}
+          />
+          {introWaitingAtDoor && <PointerLockControls />}
+        </>
       ) : playerMode ? (
         <PlayerControls hutPosition={hutPosition} />
       ) : postIntro ? (

@@ -145,7 +145,8 @@ export default function App() {
   const dialogTimers = useRef([])
   const ignoreNextPointerUnlockRef = useRef(false)
 
-  const canLaunchIntro = status === 'ok' && !introPending && !introActive
+  const sceneReady = status === 'ok'
+  const canLaunchIntro = sceneReady && !introPending && !introActive
 
   function clearDialogTimers() {
     dialogTimers.current.forEach(clearTimeout)
@@ -264,7 +265,7 @@ export default function App() {
   }
 
   function handleLoaderClick() {
-    if (!canLaunchIntro) return
+    if (!sceneReady || loaderFading || !introPending || introActive) return
     // Start the cinematic immediately so it plays under the fading loader.
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
@@ -289,7 +290,7 @@ export default function App() {
     <main className="viewer-page">
       <Subtitles />
 
-      {(playerMode || postIntro) && !showNameInput && (
+      {(playerMode || postIntro || introWaitingAtDoor) && !showNameInput && (
         <div className={`crosshair${npcHovered ? ' crosshair--active' : ''}`} aria-hidden="true">
           <div className="crosshair-ring" />
           <div className="crosshair-dot" />
@@ -354,7 +355,7 @@ export default function App() {
               ? 'Intro en cours…'
               : introPending
                 ? 'En attente…'
-                : status !== 'ok'
+                : !sceneReady
                   ? 'Scène en chargement…'
                   : "Lancer l'histoire"}
           </button>
