@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
 import { buildCabane } from '../world/entities/Cabane'
@@ -10,7 +10,7 @@ import { disposeObject3D } from './disposeObject3D'
 import { Floor } from './Floor'
 import { CameraTracker } from './IntroCameraDebug'
 import { PlayerControls } from './PlayerControls'
-import { HUT_POS } from './SceneConfig'
+import { DEFAULT_HUT_POS } from './SceneConfig'
 import { StatsCollector } from './StatsCollector'
 
 function CabaneMap({ onReady, onError, onCabaneLoaded }) {
@@ -33,7 +33,7 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
           if (obj.isMesh) meshes++
           else if (obj.userData.cabaneNode) pivots++
         })
-        onReady({ meshes, pivots })
+        onReady({ meshes, pivots, hutPosition: group.userData.hutPosition })
         onCabaneLoaded(group)
         setCabane(group)
       })
@@ -69,7 +69,15 @@ export default function Scene({
   onCameraChange,
 }) {
   const [cabane, setCabane] = useState(null)
+  const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()
+  const handleReady = useCallback(
+    (data) => {
+      if (Array.isArray(data.hutPosition)) setHutPosition(data.hutPosition)
+      onReady(data)
+    },
+    [onReady]
+  )
 
   return (
     <Canvas
@@ -77,7 +85,7 @@ export default function Scene({
         fov: 60,
         near: 0.01,
         far: 500,
-        position: [HUT_POS[0] + 22, HUT_POS[1] + 14, HUT_POS[2] + 28],
+        position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
       shadows
     >
@@ -90,7 +98,7 @@ export default function Scene({
 
       <Floor />
 
-      <CabaneMap onReady={onReady} onError={onError} onCabaneLoaded={setCabane} />
+      <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={setCabane} />
 
       <ClickableDoor
         cabane={cabane}
@@ -115,7 +123,7 @@ export default function Scene({
           onEvent={onIntroEvent}
         />
       ) : playerMode ? (
-        <PlayerControls />
+        <PlayerControls hutPosition={hutPosition} />
       ) : postIntro ? (
         postIntroLocked ? (
           <PointerLockControls />
@@ -127,7 +135,7 @@ export default function Scene({
           dampingFactor={0.08}
           minDistance={0.5}
           maxDistance={200}
-          target={HUT_POS}
+          target={hutPosition}
         />
       )}
     </Canvas>

@@ -32,6 +32,19 @@ function cloneMaterialWithTextures(material) {
   return clone
 }
 
+function findNodePosition(nodes, name) {
+  for (const node of nodes) {
+    if (node.name === name && Array.isArray(node.position)) return node.position
+
+    if (node.children?.length) {
+      const position = findNodePosition(node.children, name)
+      if (position) return position
+    }
+  }
+
+  return null
+}
+
 // Load a .bin file produced by the mapper's InstancedMesh export.
 // Format: [uint32 count][float32 × 16 × count] (column-major 4×4 matrices, little-endian).
 // Returns an InstancedMesh, or an empty Group if the file is missing.
@@ -205,6 +218,7 @@ export async function buildCabane({
   root.name = 'cabane'
 
   const nodes = Array.isArray(data) ? data : [data]
+  root.userData.hutPosition = findNodePosition(nodes, 'hut01')
   const built = await Promise.all(nodes.map((node) => buildNode(node, basePath)))
   for (const obj of built) {
     if (obj) root.add(obj)

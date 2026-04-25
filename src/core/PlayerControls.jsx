@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { PointerLockControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
-import { FLOOR_Y, HUT_POS, PLAYER_HEIGHT, PLAYER_SPAWN } from './SceneConfig'
+import { DEFAULT_HUT_POS, FLOOR_Y, getPlayerSpawn, PLAYER_HEIGHT } from './SceneConfig'
 
 const COLLISION_DIST = 0.6
 const MOVE_SPEED = 5.4
@@ -21,7 +21,7 @@ function isBlockingHit(h) {
   return true
 }
 
-export function PlayerControls() {
+export function PlayerControls({ hutPosition = DEFAULT_HUT_POS }) {
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster())
@@ -47,8 +47,8 @@ export function PlayerControls() {
     const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
 
     if (!initialized.current) {
-      camera.position.copy(PLAYER_SPAWN)
-      camera.lookAt(HUT_POS[0], FLOOR_Y + PLAYER_HEIGHT, HUT_POS[2])
+      camera.position.copy(getPlayerSpawn(hutPosition))
+      camera.lookAt(hutPosition[0], FLOOR_Y + PLAYER_HEIGHT, hutPosition[2])
       initialized.current = true
     }
 
