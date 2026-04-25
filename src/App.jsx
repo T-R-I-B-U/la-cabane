@@ -111,6 +111,7 @@ export default function App() {
   const [debugCamera, setDebugCamera] = useState(false)
   const [liveCamera, setLiveCamera] = useState(null)
   const dialogTimers = useRef([])
+  const ignoreNextPointerUnlockRef = useRef(false)
   const [waypoints, setWaypoints] = useState([
     { position: null, target: null },
     { position: null, target: null },
@@ -126,6 +127,7 @@ export default function App() {
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
+    ignoreNextPointerUnlockRef.current = false
     dialogTimers.current.forEach(clearTimeout)
     dialogTimers.current = []
     hideDialog()
@@ -150,7 +152,11 @@ export default function App() {
     let wasLocked = false
     const onChange = () => {
       if (document.pointerLockElement) wasLocked = true
-      else if (wasLocked) exitIntro()
+      else if (ignoreNextPointerUnlockRef.current) {
+        ignoreNextPointerUnlockRef.current = false
+      } else if (wasLocked) {
+        exitIntro()
+      }
     }
     document.addEventListener('pointerlockchange', onChange)
     return () => document.removeEventListener('pointerlockchange', onChange)
@@ -168,6 +174,7 @@ export default function App() {
   // Unlock pointer and freeze camera when name input appears
   useEffect(() => {
     if (showNameInput && document.pointerLockElement) {
+      ignoreNextPointerUnlockRef.current = true
       document.exitPointerLock()
     }
   }, [showNameInput])
@@ -190,6 +197,7 @@ export default function App() {
     }
     if (event === 'door:open') setIntroDoorOpen(true)
     if (event === 'inside') {
+      setIntroShouldAdvance(false)
       setIntroActive(false)
       setPostIntro(true)
       playLines(DIALOGUE_1, {
@@ -218,6 +226,7 @@ export default function App() {
   function launchIntro() {
     setPostIntro(false)
     setShowNameInput(false)
+    ignoreNextPointerUnlockRef.current = false
     setIntroPending(true)
   }
 

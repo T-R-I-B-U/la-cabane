@@ -1,6 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+
+const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
+const HOVER_EMISSIVE_INTENSITY = 0.45
+const OUTLINE_COLOR = 0xffffff
+const OUTLINE_OPACITY = 0.9
 
 function findDoorMeshes(cabane) {
   const meshes = []
@@ -13,6 +18,31 @@ function findDoorMeshes(cabane) {
   return meshes
 }
 
+function forEachMaterial(material, callback) {
+  if (Array.isArray(material)) material.forEach(callback)
+  else if (material) callback(material)
+}
+
+function cloneMaterial(material) {
+  return Array.isArray(material) ? material.map((entry) => entry.clone()) : material.clone()
+}
+
+function createDoorOutline(mesh) {
+  const geometry = new THREE.EdgesGeometry(mesh.geometry, 20)
+  const material = new THREE.LineBasicMaterial({
+    color: OUTLINE_COLOR,
+    transparent: true,
+    opacity: OUTLINE_OPACITY,
+    depthTest: false,
+  })
+  const outline = new THREE.LineSegments(geometry, material)
+  outline.name = `${mesh.name}-hover-outline`
+  outline.visible = false
+  outline.renderOrder = 10
+  outline.raycast = () => {}
+  return outline
+}
+
 export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
   const hoveredRef = useRef(false)
@@ -20,6 +50,8 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const mouseMovedRef = useRef(false)
   const prevActiveRef = useRef(false)
   const onDoorClickRef = useRef(onDoorClick)
+  const outlinesRef = useRef([])
+  const materialStatesRef = useRef(new Map())
   const raycaster = useRef(new THREE.Raycaster())
 
   // Keep the callback ref current without re-running the event-listener effect.
@@ -31,10 +63,64 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const doorMeshes = useMemo(() => {
     const found = findDoorMeshes(cabane)
     found.forEach((mesh) => {
-      if (mesh.material) mesh.material = mesh.material.clone()
+      if (mesh.material) mesh.material = cloneMaterial(mesh.material)
     })
     return found
   }, [cabane])
+
+  useEffect(() => {
+    const outlines = doorMeshes.map((mesh) => {
+      const outline = createDoorOutline(mesh)
+      mesh.add(outline)
+      return outline
+    })
+
+    outlinesRef.current = outlines
+    materialStatesRef.current = new Map()
+
+    doorMeshes.forEach((mesh) => {
+      forEachMaterial(mesh.material, (material) => {
+        if (!material.emissive) return
+        materialStatesRef.current.set(material, {
+          emissive: material.emissive.clone(),
+          emissiveIntensity: material.emissiveIntensity ?? 0,
+        })
+      })
+    })
+
+    return () => {
+      outlines.forEach((outline) => {
+        outline.removeFromParent()
+        outline.geometry.dispose()
+        outline.material.dispose()
+      })
+      outlinesRef.current = []
+    }
+  }, [doorMeshes])
+
+  const setDoorHover = useCallback(
+    (isHovered) => {
+      outlinesRef.current.forEach((outline) => {
+        outline.visible = isHovered
+      })
+
+      doorMeshes.forEach((mesh) => {
+        forEachMaterial(mesh.material, (material) => {
+          const original = materialStatesRef.current.get(material)
+          if (!original || !material.emissive) return
+
+          if (isHovered) {
+            material.emissive.copy(HOVER_EMISSIVE)
+            material.emissiveIntensity = HOVER_EMISSIVE_INTENSITY
+          } else {
+            material.emissive.copy(original.emissive)
+            material.emissiveIntensity = original.emissiveIntensity
+          }
+        })
+      })
+    },
+    [doorMeshes]
+  )
 
   useEffect(() => {
     // Reset the "mouse has moved" flag only when active transitions false → true.
@@ -62,15 +148,11 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     return () => {
       canvas.removeEventListener('mousemove', onMouseMove)
       canvas.removeEventListener('click', onClick)
+      hoveredRef.current = false
+      setDoorHover(false)
       document.body.style.cursor = 'default'
-      doorMeshes.forEach((mesh) => {
-        if (mesh.material?.emissive) {
-          mesh.material.emissive.set(0x000000)
-          mesh.material.emissiveIntensity = 0
-        }
-      })
     }
-  }, [active, gl, doorMeshes])
+  }, [active, gl, doorMeshes, setDoorHover])
 
   useFrame(() => {
     if (!active || !doorMeshes.length || !mouseMovedRef.current) return
@@ -79,13 +161,10 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     const hits = raycaster.current.intersectObjects(doorMeshes, true)
     const isHovered = hits.length > 0
 
-    hoveredRef.current = isHovered
-
-    doorMeshes.forEach((mesh) => {
-      if (!mesh.material?.emissive) return
-      mesh.material.emissive.set(isHovered ? 0xffd580 : 0x000000)
-      mesh.material.emissiveIntensity = isHovered ? 0.6 : 0
-    })
+    if (hoveredRef.current !== isHovered) {
+      hoveredRef.current = isHovered
+      setDoorHover(isHovered)
+    }
 
     document.body.style.cursor = isHovered ? 'pointer' : 'default'
   })
