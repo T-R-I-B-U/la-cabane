@@ -6,6 +6,7 @@ import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { ClickableDoor } from '../world/entities/ClickableDoor'
 import IntroCamera from '../world/entities/IntroCamera'
 import { CollisionDebug } from './CollisionDebug'
+import { disposeObject3D } from './disposeObject3D'
 import { Floor } from './Floor'
 import { CameraTracker } from './IntroCameraDebug'
 import { PlayerControls } from './PlayerControls'
@@ -17,9 +18,14 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
 
   useEffect(() => {
     let cancelled = false
+    let loadedCabane = null
     buildCabane()
       .then((group) => {
-        if (cancelled) return
+        if (cancelled) {
+          disposeObject3D(group)
+          return
+        }
+        loadedCabane = group
         let meshes = 0
         let pivots = 0
         group.traverse((obj) => {
@@ -37,6 +43,8 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
       })
     return () => {
       cancelled = true
+      if (loadedCabane) disposeObject3D(loadedCabane)
+      onCabaneLoaded(null)
     }
   }, [onReady, onError, onCabaneLoaded])
 
