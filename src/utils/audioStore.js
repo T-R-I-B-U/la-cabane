@@ -15,6 +15,22 @@ const subtitleState = {
   current: '',
   listeners: new Set(),
   rafId: 0,
+  dialogTimeoutId: 0,
+}
+
+function _clearDialogTimeout() {
+  if (!subtitleState.dialogTimeoutId) return
+  clearTimeout(subtitleState.dialogTimeoutId)
+  subtitleState.dialogTimeoutId = 0
+}
+
+function _stopSubtitleUpdates() {
+  if (subtitleState.rafId) {
+    cancelAnimationFrame(subtitleState.rafId)
+    subtitleState.rafId = 0
+  }
+
+  subtitleState.activeId = null
 }
 
 export function initAudio(camera) {
@@ -139,6 +155,7 @@ function _startSubtitles(id) {
   if (!track) return
   const subs = track.cfg.subtitles
   if (!subs || subs.length === 0) return
+  _clearDialogTimeout()
   subtitleState.activeId = id
   subtitleState.startedAt = performance.now()
   if (!subtitleState.rafId) {
@@ -156,16 +173,21 @@ export function subscribeSubtitles(fn) {
 // duration > 0 : disparaît automatiquement après N ms.
 // duration = 0 : reste affiché jusqu'au prochain appel.
 export function showDialog(text, duration = 0) {
-  if (subtitleState.rafId) {
-    cancelAnimationFrame(subtitleState.rafId)
-    subtitleState.rafId = 0
-    subtitleState.activeId = null
-  }
+  _stopSubtitleUpdates()
+  _clearDialogTimeout()
   _emitSubtitle(text)
-  if (duration > 0) setTimeout(() => _emitSubtitle(''), duration)
+
+  if (duration > 0) {
+    subtitleState.dialogTimeoutId = setTimeout(() => {
+      subtitleState.dialogTimeoutId = 0
+      _emitSubtitle('')
+    }, duration)
+  }
 }
 
 export function hideDialog() {
+  _stopSubtitleUpdates()
+  _clearDialogTimeout()
   _emitSubtitle('')
 }
 

@@ -22,6 +22,16 @@ const DIALOGUE_2 = [
   "Commençons par l'accueil.",
 ]
 
+const MARIE_DIALOGUE = [
+  'Bonjour et bienvenue ! Je suis Marie.',
+  "N'hésite pas si tu as des questions sur La Cabane.",
+]
+
+const THOMAS_DIALOGUE = [
+  "Salut ! Moi c'est Thomas.",
+  'Je suis là pour te présenter les ateliers disponibles.',
+]
+
 const MARIE_CLIPS = [
   'Armature|mixamo.com|Layer0',
   'marie-sitting-idle',
@@ -131,8 +141,16 @@ export default function App() {
   const [loaderFading, setLoaderFading] = useState(false)
   const [marieClip, setMarieClip] = useState('marie-standiing-idle')
   const [thomasClip, setThomasClip] = useState('thomas-front')
+  const [npcHovered, setNpcHovered] = useState(false)
   const dialogTimers = useRef([])
   const ignoreNextPointerUnlockRef = useRef(false)
+
+  const canLaunchIntro = status === 'ok' && !introPending && !introActive
+
+  function clearDialogTimers() {
+    dialogTimers.current.forEach(clearTimeout)
+    dialogTimers.current = []
+  }
 
   const exitIntro = useCallback(() => {
     setIntroActive(false)
@@ -143,8 +161,7 @@ export default function App() {
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
     ignoreNextPointerUnlockRef.current = false
-    dialogTimers.current.forEach(clearTimeout)
-    dialogTimers.current = []
+    clearDialogTimers()
     hideDialog()
   }, [])
 
@@ -204,7 +221,7 @@ export default function App() {
   }, [])
 
   function handleIntroEvent(event) {
-    console.log('[Intro event]', event)
+    if (import.meta.env.DEV) console.log('[Intro event]', event)
     if (event === 'wait:door') setIntroWaitingAtDoor(true)
     if (event === 'door:clicked') {
       setIntroWaitingAtDoor(false)
@@ -223,13 +240,23 @@ export default function App() {
     }
   }
 
+  function handleNpcInteract(id) {
+    clearDialogTimers()
+    const lines = id === 'marie' ? MARIE_DIALOGUE : THOMAS_DIALOGUE
+    playLines(lines, { msPerLine: 3800, timers: dialogTimers.current })
+  }
+
   function handleNameSubmit(name) {
     setShowNameInput(false)
+    clearDialogTimers()
     playLines(DIALOGUE_2, { msPerLine: 4200, timers: dialogTimers.current })
-    console.log('[Intro] nom du joueur:', name)
+    if (import.meta.env.DEV) console.log('[Intro] nom du joueur:', name)
   }
 
   function launchIntro() {
+    if (!canLaunchIntro) return
+    clearDialogTimers()
+    hideDialog()
     setPostIntro(false)
     setShowNameInput(false)
     ignoreNextPointerUnlockRef.current = false
@@ -237,6 +264,7 @@ export default function App() {
   }
 
   function handleLoaderClick() {
+    if (!canLaunchIntro) return
     // Start the cinematic immediately so it plays under the fading loader.
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
@@ -260,6 +288,14 @@ export default function App() {
   return (
     <main className="viewer-page">
       <Subtitles />
+
+      {(playerMode || postIntro) && !showNameInput && (
+        <div className={`crosshair${npcHovered ? ' crosshair--active' : ''}`} aria-hidden="true">
+          <div className="crosshair-ring" />
+          <div className="crosshair-dot" />
+        </div>
+      )}
+
       <Scene
         onStats={setStats}
         onReady={onReady}
@@ -276,6 +312,8 @@ export default function App() {
         onIntroEvent={handleIntroEvent}
         marieClip={marieClip}
         thomasClip={thomasClip}
+        onNpcInteract={handleNpcInteract}
+        onNpcHover={setNpcHovered}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
@@ -307,12 +345,18 @@ export default function App() {
             type="button"
             className="camera-toggle"
             onClick={launchIntro}
-            disabled={introPending || introActive}
+            disabled={!canLaunchIntro}
           >
             <span className="camera-toggle-icon" aria-hidden="true">
               ▶
             </span>
-            {introActive ? 'Intro en cours…' : introPending ? 'En attente…' : "Lancer l'histoire"}
+            {introActive
+              ? 'Intro en cours…'
+              : introPending
+                ? 'En attente…'
+                : status !== 'ok'
+                  ? 'Scène en chargement…'
+                  : "Lancer l'histoire"}
           </button>
 
           <div className="controls-divider" />

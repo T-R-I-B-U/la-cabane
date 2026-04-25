@@ -380,6 +380,51 @@
   padding: 6px 14px;
 }
 
+/* ── Crosshair (mode joueur / pointer-lock) ──────────────────────── */
+
+.crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crosshair-ring {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  transition:
+    width 0.12s ease,
+    height 0.12s ease,
+    border-color 0.12s ease;
+}
+
+.crosshair-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+  transition: background 0.12s ease;
+}
+
+.crosshair--active .crosshair-dot {
+  background: rgba(255, 221, 60, 0.95);
+}
+
+.crosshair--active .crosshair-ring {
+  width: 24px;
+  height: 24px;
+  border-color: rgba(255, 221, 60, 0.7);
+}
+
 /* ── Responsive ──────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
