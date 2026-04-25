@@ -4,7 +4,7 @@ Repository playbook for human and AI coding agents.
 Apply these rules unless an explicit user instruction overrides them.
 
 ## 1) Project Context
-- Stack: React 19, Vite 8, Three.js, `vite-plugin-glsl`
+- Stack: React 19, Vite 7, Three.js, React Three Fiber, Drei, `vite-plugin-glsl`
 - Language: JavaScript + JSX (ES modules)
 - Linting: ESLint flat config (`eslint.config.js`)
 - Build: Vite (`vite.config.js`)
@@ -51,7 +51,7 @@ Rules:
 - include body for non-trivial changes
 
 ## 4) Commands (Build/Lint/Test)
-Run from repo root: `/Users/pierrelouisrousseaux/Developer/Gobelins/threejs`.
+Run from repo root: `/Users/pierrelouisrousseaux/Developer/Gobelins/la-cabane`.
 
 ### Install
 ```bash
@@ -83,6 +83,16 @@ npm run lint
 npx eslint src/App.jsx
 ```
 
+### Format all source files
+```bash
+npm run format
+```
+
+### Check formatting
+```bash
+npm run format:check
+```
+
 ### Tests (current status + single-test guidance)
 Current state:
 - no `npm test` script in `package.json`
@@ -98,11 +108,12 @@ npx vitest run src/path/to/file.test.js -t "specific test name"
 
 ## 5) Folder Ownership and Architecture
 Keep code within existing structure:
-- `src/core/`: engine lifecycle (scene, camera, renderer, loop, loader)
-- `src/world/entities/`: one module/class per 3D object
+- `src/core/`: React Three Fiber canvas setup, loaders, controls, diagnostics
+- `src/world/entities/`: one module/component per 3D object or scene behavior
 - `src/world/materials/`: reusable materials/shaders
 - `src/utils/`: shared helpers/utilities
-- `public/models`, `public/textures`, `public/audio`, `public/draco`: static assets
+- `public/models`, `public/textures`, `public/audio`: static assets
+- `public/draco`: Draco decoder files if compressed GLB assets are introduced
 
 Do not create new top-level folders without explicit rationale.
 
@@ -146,9 +157,10 @@ Do not create new top-level folders without explicit rationale.
 - avoid redundant comments for obvious code
 
 ### React / Three.js Separation
-- keep engine concerns in `core/`
-- keep scene content orchestration in `world/`
-- avoid mixing React UI state logic with low-level Three.js lifecycle code
+- keep DOM overlay state and controls in React UI components
+- keep R3F canvas setup, scene controls, loaders, and diagnostics in `core/`
+- keep project-specific 3D content and entity behavior in `world/`
+- avoid putting DOM UI concerns inside low-level Three.js/R3F scene code
 - clean up listeners/resources on teardown
 
 ## 7) Pull Request Quality Bar

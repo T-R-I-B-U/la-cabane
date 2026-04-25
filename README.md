@@ -11,10 +11,10 @@ Built by a team of 2 developers.
 |---|---|---|
 | [Three.js](https://threejs.org/) | 0.183 | WebGL engine |
 | [React](https://react.dev/) | 19 | UI layer (DOM overlay on the canvas) |
-| [Vite](https://vitejs.dev/) | 8 | Bundler + HMR |
+| [Vite](https://vitejs.dev/) | 7 | Bundler + HMR |
 | [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl) | — | Native `.glsl` file imports |
 | [ESLint](https://eslint.org/) (flat config) | — | JS/JSX linting |
-| Cinema 4D → `.glb` | — | 3D asset export pipeline |
+| Cinema 4D → `.gltf` / `.glb` | — | 3D asset export pipeline |
 
 ---
 
@@ -22,36 +22,36 @@ Built by a team of 2 developers.
 
 ### Core principle
 
-Two layers coexist on screen and communicate exclusively through a custom `EventEmitter`. React never drives the engine directly, and Three.js never reads React state.
+The app is split between a React DOM overlay and a React Three Fiber canvas. React owns UI state and passes scene options to the canvas through component props; Three.js-specific behavior stays inside R3F scene components and world entities.
 
 ```
 index.html
   └── #root (React)
-        ├── App.jsx                ← React entry point, mounts the canvas
-        │     └── [UI components] ← pure DOM / React state
-        └── <canvas>               ← owned by Three.js
+        └── App.jsx                  ← React UI shell and debug controls
+              ├── core/Scene.jsx     ← React Three Fiber canvas + scene setup
+              ├── core/PerfMonitor   ← DOM performance overlay
+              └── App.css            ← UI styling
 
-  WebGL layer  (src/core/)
-        SceneManager               ← scene, renderer, camera setup
-        Loop                       ← requestAnimationFrame, delta time
-        Loader                     ← GLTFLoader, AudioLoader, TextureLoader
-        World.js                   ← orchestrates all entities
+  R3F scene layer (src/core/)
+        Scene.jsx                    ← Canvas, lights, controls, floor, stats
+        Loader.js                    ← shared GLTFLoader cache
 
-  Content layer  (src/world/)
-        entities/                  ← one class per 3D object (init + update)
-        materials/                 ← reusable materials / custom shaders
+  World content layer (src/world/)
+        entities/Cabane.js           ← builds the scene graph from cabane.json
+        entities/SlidingDoors.jsx    ← animated interactive doors
+        materials/                   ← reusable materials / custom shaders
 
-  Cross-layer communication  (src/utils/)
-        EventEmitter
-        React → EventEmitter.emit()    → Three.js handler
-        Three.js → EventEmitter.emit() → React setState
+  Runtime assets (public/)
+        cabane.json                  ← exported scene placement data
+        models/                      ← GLTF/GLB models and instance matrices
 ```
 
 ### Architecture rules
 
-- `core/` is **content-agnostic** — a generic engine with no project-specific logic.
-- `world/` owns the scene content. Each entity exposes exactly `init()` and `update(delta)`.
-- `utils/` is **stateless** and has no Three.js dependency.
+- `App.jsx` owns the DOM overlay state and passes display/debug options to `Scene`.
+- `core/` owns the R3F canvas, scene setup, controls, loaders, and rendering diagnostics.
+- `world/` owns project-specific scene content and entity behavior.
+- `utils/` is reserved for shared stateless helpers.
 - Assets in `public/` are served statically and loaded at runtime — they are never bundled by Vite.
 
 ---
@@ -60,17 +60,17 @@ index.html
 
 ```
 public/
-  models/       → .glb files exported from Cinema 4D (loaded via GLTFLoader)
+  models/       → .gltf/.glb files exported from Cinema 4D (loaded via GLTFLoader)
   textures/     → textures (loaded via TextureLoader)
   audio/        → ambience tracks and sound effects (loaded via AudioLoader)
   draco/        → Draco decoder (added when compressed .glb files are introduced)
 
 src/
-  core/         → Three.js engine (SceneManager, Loop, Loader, Camera, Sizes)
+  core/         → React Three Fiber scene setup, loaders, controls, debug helpers
   world/
-    entities/   → one file / class per 3D object
+    entities/   → one module/component per 3D object or scene behavior
     materials/  → reusable Three.js materials and custom shaders
-  utils/        → EventEmitter, Debug, constants, audio helpers
+  utils/        → shared stateless helpers
   assets/       → static assets imported directly by Vite (SVG, images)
   App.jsx       → React root component
   main.jsx      → single entry point — mounts React and boots the engine
@@ -154,6 +154,8 @@ npm run build           # production build
 npm run preview         # preview the production build locally
 npm run lint            # lint all JS/JSX files
 npx eslint src/App.jsx  # lint a single file
+npm run format          # format source files
+npm run format:check    # check source formatting
 ```
 
 ---
