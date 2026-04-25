@@ -284,6 +284,22 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  animation: intro-fade-in 0.5s ease both;
+}
+
+@keyframes intro-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes intro-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.intro-loader--fading {
+  animation: intro-fade-out 0.5s ease both;
+  pointer-events: none;
 }
 
 .intro-loader-hint {

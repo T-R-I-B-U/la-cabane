@@ -98,6 +98,7 @@ export default function App() {
   const [introPending, setIntroPending] = useState(false)
   const [postIntro, setPostIntro] = useState(false)
   const [showNameInput, setShowNameInput] = useState(false)
+  const [loaderFading, setLoaderFading] = useState(false)
   const [debugCamera, setDebugCamera] = useState(false)
   const [liveCamera, setLiveCamera] = useState(null)
   const dialogTimers = useRef([])
@@ -206,12 +207,19 @@ export default function App() {
     setIntroPending(true)
   }
 
-  function startAnimation() {
-    setIntroPending(false)
+  function handleLoaderClick() {
+    // Start the cinematic immediately so it plays under the fading loader.
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
     setIntroActive(true)
+    setLoaderFading(true)
+  }
+
+  function dismissLoader() {
+    // Called when fade-out ends — just unmount the loader.
+    setLoaderFading(false)
+    setIntroPending(false)
   }
 
   function triggerTestSequence() {
@@ -345,7 +353,11 @@ export default function App() {
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
       {introPending && (
-        <div className="intro-loader" onClick={startAnimation}>
+        <div
+          className={`intro-loader${loaderFading ? ' intro-loader--fading' : ''}`}
+          onClick={!loaderFading ? handleLoaderClick : undefined}
+          onAnimationEnd={loaderFading ? dismissLoader : undefined}
+        >
           <p className="intro-loader-hint">Cliquer pour commencer</p>
         </div>
       )}
