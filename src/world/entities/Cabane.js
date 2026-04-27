@@ -75,11 +75,13 @@ function registerAvailableTextures() {
     const ext = TEXTURE_EXTENSIONS.find((entry) => fileName.toLowerCase().endsWith(entry))
     if (!ext) continue
 
+    // Files in public/ are served at root — strip the /public prefix from the URL.
+    const resolvedUrl = url.replace(/^\/public/, '')
     const key = fileName.slice(0, -ext.length).toLowerCase()
-    registerTextureKey(key, url)
-    registerTextureKey(key.normalize('NFC'), url)
-    registerTextureKey(key.normalize('NFD'), url)
-    registerTextureKey(normalizeAssetName(key), url)
+    registerTextureKey(key, resolvedUrl)
+    registerTextureKey(key.normalize('NFC'), resolvedUrl)
+    registerTextureKey(key.normalize('NFD'), resolvedUrl)
+    registerTextureKey(normalizeAssetName(key), resolvedUrl)
   }
 }
 
