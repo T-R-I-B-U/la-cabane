@@ -3,6 +3,7 @@ import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
 import { NameInput } from './app/NameInput'
 import { useIntroFlow } from './app/useIntroFlow'
+import { useNpcDialogue } from './app/useNpcDialogue'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
 import { getPlatformSpawn } from './core/SceneConfig'
@@ -20,9 +21,6 @@ export default function App() {
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [showUI, setShowUI] = useState(true)
-  const [marieClip, setMarieClip] = useState('marie-standiing-idle')
-  const [thomasClip, setThomasClip] = useState('thomas-front')
-  const [npcHovered, setNpcHovered] = useState(false)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
@@ -47,6 +45,19 @@ export default function App() {
     playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+  const interactionLocked = dialogueActive || introMovementLocked || showNameInput
+  const {
+    handleNpcInteract,
+    marieClip,
+    npcHovered,
+    setMarieClip,
+    setNpcHovered,
+    setThomasClip,
+    thomasClip,
+  } = useNpcDialogue({
+    playDialogue,
+    interactionLocked,
+  })
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -68,12 +79,6 @@ export default function App() {
     setInfo(msg)
     setStatus('error')
   }, [])
-
-  function handleNpcInteract(id) {
-    if (dialogueActive || introMovementLocked || showNameInput) return
-
-    playDialogue(id === 'marie' ? 'marieDialogue' : 'thomasDialogue')
-  }
 
   function goToPlatform() {
     setPostIntro(false)
@@ -112,7 +117,7 @@ export default function App() {
           shouldAdvance: introShouldAdvance,
           postIntro,
           postIntroLocked: !showNameInput,
-          interactionLocked: dialogueActive || introMovementLocked || showNameInput,
+          interactionLocked,
           onEvent: handleIntroEvent,
         }}
         characters={{
