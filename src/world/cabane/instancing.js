@@ -9,19 +9,23 @@ export async function buildInstancedMesh(node, basePath) {
 
   let template = null
   const templatePaths = []
+  const loadErrors = []
   for (const ext of ['.glb', '.gltf']) {
     const modelPath = `${basePath}${baseName}${ext}`
     templatePaths.push(modelPath)
     try {
       template = await loadModel(modelPath)
       break
-    } catch {
+    } catch (error) {
+      loadErrors.push(`${modelPath}: ${error.message ?? error}`)
       // Try next extension.
     }
   }
 
   if (!template) {
-    warnMissingAsset(`No template model found for "${node.name}" (${templatePaths.join(', ')})`)
+    warnMissingAsset(
+      `No template model found for "${node.name}" (${templatePaths.join(', ')}). ${loadErrors.join(' | ')}`
+    )
   }
 
   let count = 0
