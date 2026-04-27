@@ -50,6 +50,7 @@ export async function buildInstancedMesh(node, basePath) {
 
   let geometry = null
   let material = null
+  const templateRoot = template.children[0] ?? null
   template.traverse((child) => {
     if (!geometry && child.isMesh) {
       geometry = child.geometry.clone()
@@ -71,7 +72,23 @@ export async function buildInstancedMesh(node, basePath) {
   const mesh = new THREE.InstancedMesh(geometry, material, count)
   mesh.name = node.name
   mesh.userData.cabaneNode = true
-  applyTransform(mesh, node)
+  const [px, py, pz] = node.position
+  const [rx, ry, rz] = node.rotation
+  const [sx, sy, sz] = node.scale
+  if (templateRoot) {
+    // Mapper-exported instance matrices are authored in the source scene space.
+    // Shift only by the delta between the exported template root and the cabane
+    // target node so the whole cloud lands at the expected scene offset.
+    mesh.position.set(
+      px - templateRoot.position.x,
+      py - templateRoot.position.y,
+      pz - templateRoot.position.z
+    )
+    mesh.rotation.set(rx, ry, rz)
+    mesh.scale.set(sx, sy, sz)
+  } else {
+    applyTransform(mesh, node)
+  }
   mesh.frustumCulled = false
   mesh.raycast = () => {}
   mesh.instanceMatrix.array.set(floats)

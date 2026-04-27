@@ -32,13 +32,9 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
-  const [platformFloorCollider, setPlatformFloorCollider] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const collisionObjects = useMemo(
-    () => [cabane, mainFloorCollider, platformFloorCollider].filter(Boolean),
-    [cabane, mainFloorCollider, platformFloorCollider]
-  )
+  const collisionObjects = useMemo(() => [cabane, mainFloorCollider].filter(Boolean), [cabane, mainFloorCollider])
   const handleReady = useCallback(
     (data) => {
       if (Array.isArray(data.hutPosition)) setHutPosition(data.hutPosition)
@@ -62,7 +58,7 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
 
       <SceneLighting />
 
-      <Floor mainFloorRef={setMainFloorCollider} platformFloorRef={setPlatformFloorCollider} />
+      <Floor mainFloorRef={setMainFloorCollider} />
 
       <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={setCabane} />
 

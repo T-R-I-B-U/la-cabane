@@ -82,7 +82,7 @@ export default function App() {
 
   function goToPlatform() {
     setPostIntro(false)
-    setPlayerSpawn(getPlatformSpawn())
+    setPlayerSpawn(getPlatformSpawn(info?.platformPosition))
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setPlayerMode(true)

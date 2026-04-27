@@ -39,13 +39,14 @@ export async function buildNode(node, basePath) {
     const [px, py, pz] = node.position
     const [rx, ry, rz] = node.rotation
     const [sx, sy, sz] = node.scale
-    object3d.position.set(
-      px - firstChild.position.x,
-      py - firstChild.position.y,
-      pz - firstChild.position.z
-    )
-    object3d.rotation.set(rx, ry, rz)
-    object3d.scale.set(sx, sy, sz)
+    const targetPosition = new THREE.Vector3(px, py, pz)
+    const targetQuaternion = new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz))
+    const targetScale = new THREE.Vector3(sx, sy, sz)
+    const targetMatrix = new THREE.Matrix4().compose(targetPosition, targetQuaternion, targetScale)
+    const childInverseMatrix = firstChild.matrix.clone().invert()
+    const wrapperMatrix = targetMatrix.multiply(childInverseMatrix)
+
+    wrapperMatrix.decompose(object3d.position, object3d.quaternion, object3d.scale)
   } else {
     applyTransform(object3d, node)
   }
