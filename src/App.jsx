@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import Scene from './core/Scene'
+import { getPlatformSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import { playDialogue as _playDialogue, stopDialogue } from './utils/audioStore'
@@ -103,6 +104,8 @@ export default function App() {
   const [npcHovered, setNpcHovered] = useState(false)
   const [dialogueActive, setDialogueActive] = useState(false)
   const [introMovementLocked, setIntroMovementLocked] = useState(false)
+  const [playerSpawn, setPlayerSpawn] = useState(null)
+  const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const ignoreNextPointerUnlockRef = useRef(false)
   const sceneReady = status === 'ok'
 
@@ -219,6 +222,13 @@ export default function App() {
     })
   }
 
+  function goToPlatform() {
+    setPostIntro(false)
+    setPlayerSpawn(getPlatformSpawn())
+    setPlayerSpawnKey((k) => k + 1)
+    setPlayerMode(true)
+  }
+
   function launchIntro() {
     if (!sceneReady) return
     setPostIntro(false)
@@ -280,6 +290,8 @@ export default function App() {
         thomasClip={thomasClip}
         onNpcInteract={handleNpcInteract}
         onNpcHover={setNpcHovered}
+        playerSpawn={playerSpawn}
+        playerSpawnKey={playerSpawnKey}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
@@ -363,6 +375,16 @@ export default function App() {
                 clips={THOMAS_CLIPS}
                 onSelect={setThomasClip}
               />
+              <DevSection title="Caméra">
+                <button
+                  type="button"
+                  className="camera-toggle"
+                  disabled={!sceneReady}
+                  onClick={goToPlatform}
+                >
+                  Vue plateforme
+                </button>
+              </DevSection>
               <DevSection title="Scène">
                 <button
                   type="button"

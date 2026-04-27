@@ -74,6 +74,8 @@ export default function Scene({
   thomasClip,
   onNpcInteract,
   onNpcHover,
+  playerSpawn,
+  playerSpawnKey,
 }) {
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
@@ -178,7 +180,7 @@ export default function Scene({
           onEvent={onIntroEvent}
         />
       ) : playerMode ? (
-        <PlayerControls canMove={!movementLocked} />
+        <PlayerControls key={playerSpawnKey} canMove={!movementLocked} spawnAt={playerSpawn} />
       ) : postIntro ? (
         postIntroLocked ? (
           <PlayerControls canMove={!movementLocked} />
