@@ -1,7 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
+import { useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import outlineVert from '../materials/leafOutline.vert.glsl'
-import outlineFrag from '../materials/leafOutline.frag.glsl'
+import { createConditionalEdgesGeometry } from '../../utils/ConditionalEdgesGeometry'
+import conditionalLineVertShader from '../materials/conditionalLine.vert.glsl'
+import conditionalLineFragShader from '../materials/conditionalLine.frag.glsl'
 
 const _instanceMatrix = new THREE.Matrix4()
 const _worldMatrix = new THREE.Matrix4()
@@ -9,33 +11,88 @@ const _pos = new THREE.Vector3()
 const _quat = new THREE.Quaternion()
 const _scl = new THREE.Vector3()
 
-// Module-level singleton — ShaderMaterial created once, never disposed
-const _outlineMaterial = new THREE.ShaderMaterial({
-  vertexShader: outlineVert,
-  fragmentShader: outlineFrag,
-  side: THREE.BackSide,
-})
-
 export function TreeLeaves({ leafMesh }) {
   const proxyRef = useRef(null)
+  const { gl } = useThree()
+
+  const edgesGeometry = useMemo(() => {
+    if (!leafMesh) return null
+    // Threshold angle determines which internal edges are pre-filtered out (e.g. 40 degrees)
+    const baseGeo = createConditionalEdgesGeometry(leafMesh.geometry, 40)
+
+    // Create an instanced geometry to simulate thickness by drawing the line multiple times
+    const instancedGeo = new THREE.InstancedBufferGeometry()
+    instancedGeo.copy(baseGeo)
+
+    // Create a 2px radius outline (13 instances) or 1px (5 instances)
+    // Here we use a 3x3 grid (9 instances) for a nice 3px thick line.
+    const offsets = [-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1]
+
+    instancedGeo.setAttribute(
+      'instanceOffset',
+      new THREE.InstancedBufferAttribute(new Float32Array(offsets), 2)
+    )
+    instancedGeo.instanceCount = offsets.length / 2
+
+    return instancedGeo
+  }, [leafMesh])
+
+  const _outlineMaterial = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      vertexShader: conditionalLineVertShader,
+      fragmentShader: conditionalLineFragShader,
+      uniforms: {
+        diffuse: { value: new THREE.Color(0xffffff) },
+        opacity: { value: 1.0 },
+        resolution: { value: new THREE.Vector2() },
+      },
+      transparent: false,
+    })
+  }, [])
+
+  // Keep resolution uniform updated so the thickness is consistent in pixel scale
+  useEffect(() => {
+    const updateResolution = () => {
+      const canvas = gl.domElement
+      // Use pixel ratio to maintain consistent real pixel thickness
+      const pixelRatio = gl.getPixelRatio()
+      _outlineMaterial.uniforms.resolution.value.set(
+        canvas.clientWidth * pixelRatio,
+        canvas.clientHeight * pixelRatio
+      )
+    }
+    updateResolution()
+    window.addEventListener('resize', updateResolution)
+    return () => window.removeEventListener('resize', updateResolution)
+  }, [gl, _outlineMaterial])
 
   useEffect(() => {
     if (!leafMesh) return
+    const originalRaycast = leafMesh.raycast
+
+    // Ensure raycasting hits from both sides if the material doesn't already allow it
+    // Sometimes thin models are hard to hover from behind.
+    // If leaf material uses FrontSide, backfaces won't be picked up by raycaster.
+    const origSide = leafMesh.material.side
+    // eslint-disable-next-line react-hooks/immutability
+    leafMesh.material.side = THREE.DoubleSide
+
     return () => {
-      leafMesh.raycast = () => {}
+      leafMesh.raycast = originalRaycast
+
+      leafMesh.material.side = origSide
     }
   }, [leafMesh])
 
-  if (!leafMesh) return null
+  if (!leafMesh || !edgesGeometry) return null
 
   function syncProxy(id) {
     if (!proxyRef.current) return
     leafMesh.getMatrixAt(id, _instanceMatrix)
     // Instance world matrix = InstancedMesh.matrixWorld × instance local matrix
     _worldMatrix.multiplyMatrices(leafMesh.matrixWorld, _instanceMatrix)
-    // Decompose, scale 1.1× so back faces extend past leaf edges, recompose
+    // Decompose and recompose (no 1.1 scale anymore, exact 1:1 match)
     _worldMatrix.decompose(_pos, _quat, _scl)
-    _scl.multiplyScalar(1.1)
     proxyRef.current.matrix.compose(_pos, _quat, _scl)
     proxyRef.current.matrixAutoUpdate = false
     proxyRef.current.matrixWorldNeedsUpdate = true
@@ -50,7 +107,6 @@ export function TreeLeaves({ leafMesh }) {
           const id = e.instanceId
           if (id === undefined) return
           syncProxy(id)
-          // Direct mutation — no useState, no re-render
           if (proxyRef.current) proxyRef.current.visible = true
           document.body.style.cursor = 'pointer'
         }}
@@ -60,10 +116,9 @@ export function TreeLeaves({ leafMesh }) {
         }}
       />
 
-      {/* Proxy always mounted — visible=false means 0 draw calls, 0 triangles counted */}
-      <mesh
+      <lineSegments
         ref={proxyRef}
-        geometry={leafMesh.geometry}
+        geometry={edgesGeometry}
         material={_outlineMaterial}
         visible={false}
         matrixAutoUpdate={false}

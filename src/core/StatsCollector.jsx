@@ -10,6 +10,7 @@ export function StatsCollector({ onStats }) {
   // autoReset=true (default), each call resets info.render — so we'd only see
   // the last pass. Disable it and reset manually so all passes accumulate.
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
     gl.info.autoReset = false
     return () => {
       gl.info.autoReset = true
