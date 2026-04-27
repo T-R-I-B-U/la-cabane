@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { PointerLockControls } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { FLOOR_Y, PLAYER_HEIGHT } from './SceneConfig'
 
@@ -21,10 +21,17 @@ function isBlockingHit(h) {
   return true
 }
 
-export function PlayerControls({ canMove = true }) {
+export function PlayerControls({ canMove = true, spawnAt }) {
+  const { camera } = useThree()
+  const spawnRef = useRef(spawnAt)
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster())
+
+  // Teleport camera once on mount — key prop on the parent re-triggers this effect.
+  useEffect(() => {
+    if (spawnRef.current) camera.position.copy(spawnRef.current)
+  }, [camera])
 
   useEffect(() => {
     const down = (e) => {
