@@ -4,7 +4,7 @@ import { OrbitControls, PointerLockControls, Environment } from '@react-three/dr
 import AudioManager from './audio/AudioManager'
 import { AnimatedCharacter } from '../world/entities/AnimatedCharacter'
 import { InteractionPoint } from '../world/entities/InteractionPoint'
-import { buildCabane } from '../world/entities/Cabane'
+import { buildCabane, clearTextureCache } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { ClickableDoor } from '../world/entities/ClickableDoor'
 import IntroCamera from '../world/entities/IntroCamera'
@@ -45,7 +45,10 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
       })
     return () => {
       cancelled = true
-      if (loadedCabane) disposeObject3D(loadedCabane)
+      if (loadedCabane) {
+        clearTextureCache()
+        disposeObject3D(loadedCabane)
+      }
       onCabaneLoaded(null)
     }
   }, [onReady, onError, onCabaneLoaded])

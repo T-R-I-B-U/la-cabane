@@ -21,6 +21,12 @@ const textureLoader = new THREE.TextureLoader()
 const textureCache = new Map()
 const availableTextures = new Map()
 
+// Temporary mesh-name → texture-name aliases.
+// Remove each entry once the designer renames the mesh in C4D and re-exports.
+const MESH_TEXTURE_ALIASES = {
+  'platform-details': 'railling',
+}
+
 // C4D Cloner names instances like "arbre_01", "arbre_02" — strip the suffix
 // so it maps to the actual file on disk ("arbre.glb").
 function modelBaseName(name) {
@@ -123,8 +129,25 @@ async function applyAutoTextures(object3d, fallbackName) {
 
   object3d.traverse((obj) => {
     if (!obj.isMesh || !obj.material) return
-    const textureNames =
-      fallbackName && fallbackName !== obj.name ? [obj.name, fallbackName] : [obj.name]
+    // Check own name, then walk up ancestors — allows a group alias to
+    // propagate to all its children (e.g. platform-details → railling).
+    const directAlias = MESH_TEXTURE_ALIASES[obj.name]
+    const ancestorAlias = !directAlias
+      ? (() => {
+          let cur = obj.parent
+          while (cur && cur !== object3d) {
+            if (MESH_TEXTURE_ALIASES[cur.name]) return MESH_TEXTURE_ALIASES[cur.name]
+            cur = cur.parent
+          }
+          return null
+        })()
+      : null
+    const effectiveAlias = directAlias || ancestorAlias
+    const textureNames = effectiveAlias
+      ? [effectiveAlias, obj.name, fallbackName].filter((n, i, a) => n && a.indexOf(n) === i)
+      : fallbackName && fallbackName !== obj.name
+        ? [obj.name, fallbackName]
+        : [obj.name]
 
     forEachMaterial(obj.material, (material) => {
       material.side = THREE.DoubleSide
@@ -334,6 +357,10 @@ async function buildNode(node, basePath) {
   }
 
   return object3d
+}
+
+export function clearTextureCache() {
+  textureCache.clear()
 }
 
 /**
