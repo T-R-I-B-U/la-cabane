@@ -4,11 +4,7 @@ import { disposeObject3D } from '../../core/disposeObject3D.js'
 
 const TEXTURE_BASE_PATH = '/textures/'
 const TEXTURE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp']
-const textureModules = import.meta.glob('/public/textures/*.{png,jpg,jpeg,webp}', {
-  eager: true,
-  query: '?url',
-  import: 'default',
-})
+const textureModules = import.meta.glob('/public/textures/*.{png,jpg,jpeg,webp}')
 const TEXTURE_SLOTS = [
   { suffix: 'color', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
   { suffix: 'basecolor', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
@@ -70,16 +66,18 @@ function registerTextureKey(key, url) {
 function registerAvailableTextures() {
   if (availableTextures.size > 0) return
 
-  for (const [path, url] of Object.entries(textureModules)) {
+  for (const path of Object.keys(textureModules)) {
     const fileName = path.split('/').at(-1)
     const ext = TEXTURE_EXTENSIONS.find((entry) => fileName.toLowerCase().endsWith(entry))
     if (!ext) continue
 
+    // Build the URL directly — import.meta.glob returns /public/…?url which is unusable.
+    const resolvedUrl = `${TEXTURE_BASE_PATH}${fileName}`
     const key = fileName.slice(0, -ext.length).toLowerCase()
-    registerTextureKey(key, url)
-    registerTextureKey(key.normalize('NFC'), url)
-    registerTextureKey(key.normalize('NFD'), url)
-    registerTextureKey(normalizeAssetName(key), url)
+    registerTextureKey(key, resolvedUrl)
+    registerTextureKey(key.normalize('NFC'), resolvedUrl)
+    registerTextureKey(key.normalize('NFD'), resolvedUrl)
+    registerTextureKey(normalizeAssetName(key), resolvedUrl)
   }
 }
 

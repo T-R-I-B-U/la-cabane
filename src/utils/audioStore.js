@@ -271,9 +271,7 @@ export function playDialogue(id, { onDone } = {}) {
     })
 
     if (onDone) {
-      subtitleState.textTimers.push(
-        setTimeout(onDone, cues[cues.length - 1].to * 1000)
-      )
+      subtitleState.textTimers.push(setTimeout(onDone, cues[cues.length - 1].to * 1000))
     }
   })
 }
