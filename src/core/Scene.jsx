@@ -1,6 +1,7 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
+import AudioManager from './audio/AudioManager'
 import { AnimatedCharacter } from '../world/entities/AnimatedCharacter'
 import { InteractionPoint } from '../world/entities/InteractionPoint'
 import { buildCabane } from '../world/entities/Cabane'
@@ -113,6 +114,7 @@ export default function Scene({
       shadows
     >
       <StatsCollector onStats={onStats} />
+      <AudioManager />
 
       <Environment preset="apartment" />
       <ambientLight intensity={1} />

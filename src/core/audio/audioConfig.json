@@ -1,4 +1,37 @@
 {
   "globalVolume": 1,
-  "tracks": []
+  "tracks": [
+    {
+      "id": "dialogue1",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "dialogue-1.srt"
+    },
+    {
+      "id": "dialogue2",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "dialogue-2.srt"
+    },
+    {
+      "id": "marieDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "marie-dialogue.srt"
+    },
+    {
+      "id": "thomasDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "thomas-dialogue.srt"
+    }
+  ]
 }

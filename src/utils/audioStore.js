@@ -16,12 +16,28 @@ const subtitleState = {
   listeners: new Set(),
   rafId: 0,
   hideTimeoutId: 0,
+  textTimers: [],
 }
 
 function _clearDialogHideTimeout() {
   if (!subtitleState.hideTimeoutId) return
   clearTimeout(subtitleState.hideTimeoutId)
   subtitleState.hideTimeoutId = 0
+}
+
+function _clearTextTimers() {
+  subtitleState.textTimers.forEach(clearTimeout)
+  subtitleState.textTimers = []
+}
+
+function _stopCurrentDialogue() {
+  _clearTextTimers()
+  _clearDialogHideTimeout()
+  if (subtitleState.rafId) {
+    cancelAnimationFrame(subtitleState.rafId)
+    subtitleState.rafId = 0
+    subtitleState.activeId = null
+  }
 }
 
 export function initAudio(camera) {
@@ -55,6 +71,39 @@ function _parseSRT(src) {
     .filter(Boolean)
 }
 
+function _flushPending(id) {
+  const queued = store.pending[id]
+  if (!queued) return
+  queued.forEach((fn) => fn())
+  delete store.pending[id]
+}
+
+// Charge le SRT puis enregistre la track (pour les tracks sans src audio).
+function _loadSubtitlesThenRegister(trackCfg) {
+  const registered = { audio: null, cfg: { ...trackCfg, subtitles: [] } }
+  const srt = trackCfg.subtitles
+  if (!srt || typeof srt !== 'string') {
+    store.tracks[trackCfg.id] = registered
+    _flushPending(trackCfg.id)
+    return
+  }
+  fetch(`/subtitles/${srt}`)
+    .then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      return r.text()
+    })
+    .then((txt) => {
+      registered.cfg.subtitles = _parseSRT(txt)
+    })
+    .catch(() => {
+      registered.cfg.subtitles = []
+    })
+    .finally(() => {
+      store.tracks[trackCfg.id] = registered
+      _flushPending(trackCfg.id)
+    })
+}
+
 function _loadSubtitles(trackCfg, registered) {
   const srt = trackCfg.subtitles
   if (!srt || typeof srt !== 'string') return
@@ -75,6 +124,12 @@ function _loadTracks() {
   const loader = new THREE.AudioLoader()
 
   for (const trackCfg of config.tracks) {
+    // Tracks sans audio — pilotées uniquement par les timings SRT
+    if (!trackCfg.src) {
+      _loadSubtitlesThenRegister(trackCfg)
+      continue
+    }
+
     const audio = new THREE.Audio(store.listener)
 
     loader.load(`/audio/${trackCfg.src}`, (buffer) => {
@@ -115,7 +170,7 @@ export function unlockAndPlay() {
   store.unlocked = true
   _resumeContext()
   for (const [, { audio, cfg }] of Object.entries(store.tracks)) {
-    if (cfg.autoplay && !audio.isPlaying) audio.play()
+    if (audio && cfg.autoplay && !audio.isPlaying) audio.play()
   }
 }
 
@@ -163,14 +218,7 @@ export function subscribeSubtitles(fn) {
 // duration > 0 : disparaît automatiquement après N ms.
 // duration = 0 : reste affiché jusqu'au prochain appel.
 export function showDialog(text, duration = 0) {
-  _clearDialogHideTimeout()
-
-  if (subtitleState.rafId) {
-    cancelAnimationFrame(subtitleState.rafId)
-    subtitleState.rafId = 0
-    subtitleState.activeId = null
-  }
-
+  _stopCurrentDialogue()
   _emitSubtitle(text)
 
   if (duration > 0) {
@@ -182,7 +230,56 @@ export function showDialog(text, duration = 0) {
 }
 
 export function hideDialog() {
-  _clearDialogHideTimeout()
+  _stopCurrentDialogue()
+  _emitSubtitle('')
+}
+
+// Joue un dialogue par son id (déclaré dans audioConfig.json).
+// Si la track a un src audio : joue l'audio + sous-titres RAF.
+// Sinon : pilote l'affichage directement via les timings SRT.
+export function playDialogue(id, { onDone } = {}) {
+  _whenReady(id, () => {
+    _stopCurrentDialogue()
+    const track = store.tracks[id]
+    const cues = track.cfg.subtitles
+
+    if (track.audio) {
+      _resumeContext()
+      if (track.audio.isPlaying) track.audio.stop()
+      track.audio.play()
+      _startSubtitles(id)
+      if (onDone) {
+        const prev = track.audio.onEnded
+        track.audio.onEnded = function () {
+          prev.call(this)
+          track.audio.onEnded = prev
+          onDone()
+        }
+      }
+      return
+    }
+
+    // Text-only : setTimeout calés sur les timings SRT
+    if (!cues || cues.length === 0) {
+      onDone?.()
+      return
+    }
+
+    cues.forEach((cue) => {
+      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle(cue.text), cue.from * 1000))
+      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle(''), cue.to * 1000))
+    })
+
+    if (onDone) {
+      subtitleState.textTimers.push(
+        setTimeout(onDone, cues[cues.length - 1].to * 1000)
+      )
+    }
+  })
+}
+
+export function stopDialogue() {
+  _stopCurrentDialogue()
   _emitSubtitle('')
 }
 

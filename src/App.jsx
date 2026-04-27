@@ -2,35 +2,8 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import Scene from './core/Scene'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
-import { showDialog, hideDialog } from './utils/audioStore'
+import { playDialogue as _playDialogue, stopDialogue } from './utils/audioStore'
 import './App.css'
-
-const DIALOGUE_1 = [
-  'Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !',
-  'Tu es nouveau toi ici, je suis bien heureux de te recevoir !',
-  "J'ai hâte de te présenter le concept de La Cabane et son fonctionnement.",
-  'Ne sois pas timide, présente toi rapidement.',
-]
-
-const DIALOGUE_2 = [
-  "Parfait ! Je vais pouvoir commencer la visite, j'espère que tu as hâte toi aussi.",
-  "La Cabane c'est un espace de vie partagé au service du savoir commun.",
-  'Ici tout le monde peut apprendre et faire apprendre, échanger, partager et recevoir.',
-  "C'est un modèle novateur qui brise la transmission descendante du savoir.",
-  "Ici peu importe l'âge, le métier, les origines, nous avons tous quelque chose à apprendre.",
-  "J'ai entendu dire que tu as beaucoup hésité à venir, je comprends que cela peut sembler intimidant.",
-  "Commençons par l'accueil.",
-]
-
-const MARIE_DIALOGUE = [
-  'Bonjour et bienvenue ! Je suis Marie.',
-  "N'hésite pas si tu as des questions sur La Cabane.",
-]
-
-const THOMAS_DIALOGUE = [
-  "Salut ! Moi c'est Thomas.",
-  'Je suis là pour te présenter les ateliers disponibles.',
-]
 
 const MARIE_CLIPS = [
   'Armature|mixamo.com|Layer0',
@@ -40,20 +13,6 @@ const MARIE_CLIPS = [
 ]
 
 const THOMAS_CLIPS = ['thomas-back', 'thomas-front', 'thomas-turn']
-
-function playLines(lines, { msPerLine = 3800, onDone, timers } = {}) {
-  let t = 0
-  lines.forEach((line, i) => {
-    const isLast = i === lines.length - 1
-    const id = setTimeout(() => showDialog(line, isLast ? 2800 : 0), t)
-    if (timers) timers.push(id)
-    t += msPerLine
-  })
-  if (onDone) {
-    const id = setTimeout(onDone, t)
-    if (timers) timers.push(id)
-  }
-}
 
 function NameInput({ onSubmit }) {
   const [name, setName] = useState('')
@@ -144,14 +103,8 @@ export default function App() {
   const [npcHovered, setNpcHovered] = useState(false)
   const [dialogueActive, setDialogueActive] = useState(false)
   const [introMovementLocked, setIntroMovementLocked] = useState(false)
-  const dialogTimers = useRef([])
   const ignoreNextPointerUnlockRef = useRef(false)
   const sceneReady = status === 'ok'
-
-  function clearDialogTimers() {
-    dialogTimers.current.forEach(clearTimeout)
-    dialogTimers.current = []
-  }
 
   const exitIntro = useCallback(() => {
     setIntroActive(false)
@@ -164,16 +117,13 @@ export default function App() {
     setDialogueActive(false)
     setIntroMovementLocked(false)
     ignoreNextPointerUnlockRef.current = false
-    clearDialogTimers()
-    hideDialog()
+    stopDialogue()
   }, [])
 
-  function playDialogue(lines, { msPerLine = 3800, onDone } = {}) {
+  // Wrapper local : ajoute la gestion de dialogueActive autour de la lecture SRT
+  function playDialogue(id, { onDone } = {}) {
     setDialogueActive(true)
-    clearDialogTimers()
-    playLines(lines, {
-      msPerLine,
-      timers: dialogTimers.current,
+    _playDialogue(id, {
       onDone: () => {
         setDialogueActive(false)
         onDone?.()
@@ -249,8 +199,7 @@ export default function App() {
       setIntroActive(false)
       setPostIntro(true)
       setIntroMovementLocked(true)
-      playDialogue(DIALOGUE_1, {
-        msPerLine: 3800,
+      playDialogue('dialogue1', {
         onDone: () => setShowNameInput(true),
       })
     }
@@ -259,15 +208,13 @@ export default function App() {
   function handleNpcInteract(id) {
     if (dialogueActive || introMovementLocked || showNameInput) return
 
-    const lines = id === 'marie' ? MARIE_DIALOGUE : THOMAS_DIALOGUE
-    playDialogue(lines, { msPerLine: 3800 })
+    playDialogue(id === 'marie' ? 'marieDialogue' : 'thomasDialogue')
   }
 
   function handleNameSubmit() {
     setShowNameInput(false)
     setIntroMovementLocked(true)
-    playDialogue(DIALOGUE_2, {
-      msPerLine: 4200,
+    playDialogue('dialogue2', {
       onDone: () => setIntroMovementLocked(false),
     })
   }
