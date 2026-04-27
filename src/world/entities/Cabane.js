@@ -2,10 +2,151 @@ import * as THREE from 'three'
 import { loadModel } from '../../core/Loader.js'
 import { disposeObject3D } from '../../core/disposeObject3D.js'
 
+const TEXTURE_BASE_PATH = '/textures/'
+const TEXTURE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp']
+const textureModules = import.meta.glob('/public/textures/*.{png,jpg,jpeg,webp}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+})
+const TEXTURE_SLOTS = [
+  { suffix: 'color', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
+  { suffix: 'basecolor', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
+  { suffix: 'albedo', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
+  { suffix: 'metallic', materialKey: 'metalnessMap' },
+  { suffix: 'metalness', materialKey: 'metalnessMap' },
+  { suffix: 'roughness', materialKey: 'roughnessMap' },
+  { suffix: 'normal', materialKey: 'normalMap' },
+  { suffix: 'ao', materialKey: 'aoMap' },
+  { suffix: 'occlusion', materialKey: 'aoMap' },
+  { suffix: 'emissive', materialKey: 'emissiveMap', colorSpace: THREE.SRGBColorSpace },
+]
+const textureLoader = new THREE.TextureLoader()
+const textureCache = new Map()
+const availableTextures = new Map()
+
 // C4D Cloner names instances like "arbre_01", "arbre_02" — strip the suffix
 // so it maps to the actual file on disk ("arbre.glb").
 function modelBaseName(name) {
+  if (/^window0[23]$/i.test(name)) return 'window01'
+
   return name.replace(/_\d+$/, '')
+}
+
+function normalizeAssetName(name) {
+  return name
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+}
+
+function textureNameCandidates(name) {
+  const baseName = name.replace(/[_-]\d+$/, '')
+  const trimmed = baseName.toLowerCase().trim()
+  const normalized = normalizeAssetName(baseName)
+  const preservedHyphen = trimmed.replace(/[^a-z0-9\p{L}]+/gu, '-').replace(/^-|-$/g, '')
+  const preservedUnderscore = trimmed.replace(/[^a-z0-9\p{L}]+/gu, '_').replace(/^_|_$/g, '')
+  const decomposedUnderscore = preservedUnderscore.normalize('NFD')
+  const candidates = [
+    normalizeAssetName(name),
+    normalized,
+    normalized.replaceAll('-', '_'),
+    preservedHyphen,
+    preservedUnderscore,
+    decomposedUnderscore,
+  ]
+
+  return [...new Set(candidates.filter(Boolean))]
+}
+
+function registerTextureKey(key, url) {
+  if (!key) return
+  if (!availableTextures.has(key)) availableTextures.set(key, url)
+}
+
+function registerAvailableTextures() {
+  if (availableTextures.size > 0) return
+
+  for (const [path, url] of Object.entries(textureModules)) {
+    const fileName = path.split('/').at(-1)
+    const ext = TEXTURE_EXTENSIONS.find((entry) => fileName.toLowerCase().endsWith(entry))
+    if (!ext) continue
+
+    const key = fileName.slice(0, -ext.length).toLowerCase()
+    registerTextureKey(key, url)
+    registerTextureKey(key.normalize('NFC'), url)
+    registerTextureKey(key.normalize('NFD'), url)
+    registerTextureKey(normalizeAssetName(key), url)
+  }
+}
+
+function findTextureUrl(names, suffix) {
+  registerAvailableTextures()
+
+  for (const name of names) {
+    for (const candidate of textureNameCandidates(name)) {
+      const key = `${candidate}-${suffix}`.toLowerCase()
+      const url =
+        availableTextures.get(key) ||
+        availableTextures.get(key.normalize('NFC')) ||
+        availableTextures.get(key.normalize('NFD')) ||
+        availableTextures.get(normalizeAssetName(key))
+
+      if (url) return url
+    }
+  }
+
+  return null
+}
+
+async function loadTexture(url, colorSpace) {
+  if (!textureCache.has(url)) {
+    const promise = textureLoader.loadAsync(url).then((texture) => {
+      texture.flipY = false
+      if (colorSpace) texture.colorSpace = colorSpace
+      return texture
+    })
+    textureCache.set(url, promise)
+  }
+
+  return textureCache.get(url)
+}
+
+function forEachMaterial(material, callback) {
+  if (Array.isArray(material)) material.forEach(callback)
+  else if (material) callback(material)
+}
+
+async function applyAutoTextures(object3d, fallbackName) {
+  const tasks = []
+
+  object3d.traverse((obj) => {
+    if (!obj.isMesh || !obj.material) return
+    const textureNames =
+      fallbackName && fallbackName !== obj.name ? [obj.name, fallbackName] : [obj.name]
+
+    forEachMaterial(obj.material, (material) => {
+      material.side = THREE.DoubleSide
+      tasks.push(
+        Promise.all(
+          TEXTURE_SLOTS.map(async ({ suffix, materialKey, colorSpace }) => {
+            if (material[materialKey]) return
+
+            const url = findTextureUrl(textureNames, suffix)
+            if (!url) return
+
+            material[materialKey] = await loadTexture(url, colorSpace)
+            material.needsUpdate = true
+          })
+        )
+      )
+    })
+  })
+
+  await Promise.all(tasks)
 }
 
 function applyTransform(object3d, node) {
@@ -149,6 +290,7 @@ async function buildNode(node, basePath) {
     modelPaths.push(modelPath)
     try {
       object3d = await loadModel(modelPath)
+      await applyAutoTextures(object3d, baseName)
       object3d.name = node.name
       break
     } catch {
