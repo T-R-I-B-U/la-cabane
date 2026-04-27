@@ -79,6 +79,64 @@ src/
 
 ---
 
+## Runtime Flows
+
+### Intro flow
+
+`App.jsx` delegates the intro state machine to `src/app/useIntroFlow.js`.
+
+Flow:
+- idle overlay → `launchIntro()`
+- intro loader overlay → click to start cinematic
+- `IntroCamera` emits scene events (`wait:door`, `door:open`, `inside`)
+- `ClickableDoor` unlocks the next intro step
+- post-intro dialogue starts
+- name input appears
+- second dialogue ends and movement unlocks
+
+### Dialogue and subtitles flow
+
+- `useIntroFlow` and `useNpcDialogue` trigger `playDialogue()` from `src/utils/audioStore.js`
+- `audioStore` supports both audio-backed tracks and text-only subtitle tracks
+- `core/audio/Subtitles.jsx` subscribes to subtitle updates and renders the current line
+
+### Cabane asset build flow
+
+`src/world/entities/Cabane.js` is the public entrypoint for scene assembly.
+
+Internal modules:
+- `src/world/cabane/assetNaming.js` → asset naming normalization and model base-name resolution
+- `src/world/cabane/textureResolver.js` → runtime texture lookup and auto-application
+- `src/world/cabane/instancing.js` → `.bin` instanced mesh reconstruction
+- `src/world/cabane/nodeBuilder.js` → recursive node/model assembly
+- `src/world/cabane/runtime.js` → shared transform and warning helpers
+
+### Player movement and collisions flow
+
+- `Scene` builds an explicit collider list from the cabane root and floor colliders
+- `SceneControls` passes that list into `PlayerControls`
+- `PlayerControls` raycasts only against those collision targets, not the full scene tree
+
+---
+
+## Where To Add Code
+
+- New DOM overlay UI: `src/app/`
+- New scene orchestration pieces: `src/core/scene/`
+- New reusable core runtime helpers: `src/core/`
+- New project-specific 3D entities or interactions: `src/world/entities/`
+- New cabane build logic: `src/world/cabane/`
+- New shared stateless helpers: `src/utils/`
+- New runtime assets: `public/models`, `public/textures`, `public/audio`, `public/subtitles`
+
+When adding a new entity:
+- add the runtime component in `src/world/entities/`
+- keep DOM/UI concerns out of the entity
+- wire it from `Scene.jsx` or a focused `src/core/scene/*` orchestrator component
+- if it needs collisions or interaction, opt it into the existing explicit scene wiring rather than reading the whole scene graph blindly
+
+---
+
 ## Git Workflow
 
 ### Branch model
