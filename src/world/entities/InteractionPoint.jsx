@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useStableInteractionCallback } from '../interactions/useStableInteractionCallback'
 
 const CENTER_NDC = new THREE.Vector2(0, 0)
 const SHOW_DIST = 8
@@ -17,16 +18,8 @@ export function InteractionPoint({ position, active, onInteract, onHoverChange }
   const materialRef = useRef()
   const hoveredRef = useRef(false)
   const raycaster = useRef(new THREE.Raycaster())
-  const onInteractRef = useRef(onInteract)
-  const onHoverChangeRef = useRef(onHoverChange)
-
-  useEffect(() => {
-    onInteractRef.current = onInteract
-  }, [onInteract])
-
-  useEffect(() => {
-    onHoverChangeRef.current = onHoverChange
-  }, [onHoverChange])
+  const onInteractRef = useStableInteractionCallback(onInteract)
+  const onHoverChangeRef = useStableInteractionCallback(onHoverChange)
 
   useEffect(() => {
     // Use document-level pointerdown: in pointer-lock mode, click events may be
@@ -37,7 +30,7 @@ export function InteractionPoint({ position, active, onInteract, onHoverChange }
     }
     document.addEventListener('pointerdown', onPointerDown)
     return () => document.removeEventListener('pointerdown', onPointerDown)
-  }, [])
+  }, [onInteractRef])
 
   useFrame(() => {
     const mesh = meshRef.current
@@ -49,6 +42,11 @@ export function InteractionPoint({ position, active, onInteract, onHoverChange }
 
     if (!active) {
       if (mesh.visible) mesh.visible = false
+      if (hoveredRef.current) {
+        hoveredRef.current = false
+        onHoverChangeRef.current?.(false)
+        material.color.copy(COLOR_IDLE)
+      }
       return
     }
 

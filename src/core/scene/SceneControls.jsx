@@ -3,6 +3,7 @@ import IntroCamera from '../../world/entities/IntroCamera'
 import { PlayerControls } from '../PlayerControls'
 
 export function SceneControls({
+  collisionObjects,
   introActive,
   introShouldAdvance,
   onIntroEvent,
@@ -20,11 +21,20 @@ export function SceneControls({
   }
 
   if (playerMode) {
-    return <PlayerControls key={playerSpawnKey} canMove={!movementLocked} spawnAt={playerSpawn} />
+    return (
+      <PlayerControls
+        key={playerSpawnKey}
+        canMove={!movementLocked}
+        spawnAt={playerSpawn}
+        collisionObjects={collisionObjects}
+      />
+    )
   }
 
   if (postIntro) {
-    return postIntroLocked ? <PlayerControls canMove={!movementLocked} /> : null
+    return postIntroLocked ? (
+      <PlayerControls canMove={!movementLocked} collisionObjects={collisionObjects} />
+    ) : null
   }
 
   return (

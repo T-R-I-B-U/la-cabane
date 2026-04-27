@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
@@ -31,8 +31,14 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
 
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
+  const [mainFloorCollider, setMainFloorCollider] = useState(null)
+  const [platformFloorCollider, setPlatformFloorCollider] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
+  const collisionObjects = useMemo(
+    () => [cabane, mainFloorCollider, platformFloorCollider].filter(Boolean),
+    [cabane, mainFloorCollider, platformFloorCollider]
+  )
   const handleReady = useCallback(
     (data) => {
       if (Array.isArray(data.hutPosition)) setHutPosition(data.hutPosition)
@@ -56,7 +62,7 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
 
       <SceneLighting />
 
-      <Floor />
+      <Floor mainFloorRef={setMainFloorCollider} platformFloorRef={setPlatformFloorCollider} />
 
       <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={setCabane} />
 
@@ -85,6 +91,7 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
       />
 
       <SceneControls
+        collisionObjects={collisionObjects}
         introActive={introActive}
         introShouldAdvance={introShouldAdvance}
         onIntroEvent={onIntroEvent}

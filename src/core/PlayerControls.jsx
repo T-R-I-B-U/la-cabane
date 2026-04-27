@@ -21,7 +21,7 @@ function isBlockingHit(h) {
   return true
 }
 
-export function PlayerControls({ canMove = true, spawnAt }) {
+export function PlayerControls({ canMove = true, spawnAt, collisionObjects = [] }) {
   const { camera } = useThree()
   const spawnRef = useRef(spawnAt)
   const keys = useRef({})
@@ -49,7 +49,7 @@ export function PlayerControls({ canMove = true, spawnAt }) {
   }, [])
 
   useFrame((state, delta) => {
-    const { camera, scene } = state
+    const { camera } = state
     const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
 
     // --- Floor / stair following ---
@@ -58,7 +58,7 @@ export function PlayerControls({ canMove = true, spawnAt }) {
     const fOrigin = camera.position.clone()
     fOrigin.y += 0.5
     floorRay.current.set(fOrigin, DOWN)
-    const fHits = floorRay.current.intersectObjects(scene.children, true)
+    const fHits = floorRay.current.intersectObjects(collisionObjects, true)
     const walkable = fHits.find((h) => h.object.userData.isFloor || h.object.userData.isStair)
     const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
     const targetCamY = targetFloorY + PLAYER_HEIGHT
@@ -109,7 +109,7 @@ export function PlayerControls({ canMove = true, spawnAt }) {
         const origin = camera.position.clone()
         origin.y = rayY
         wallRay.current.set(origin, dir)
-        if (wallRay.current.intersectObjects(scene.children, true).some(isBlockingHit)) {
+        if (wallRay.current.intersectObjects(collisionObjects, true).some(isBlockingHit)) {
           blocked = true
           break
         }
