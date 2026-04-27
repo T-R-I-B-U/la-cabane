@@ -7,6 +7,7 @@ const store = {
   globalVolume: config.globalVolume,
   unlocked: false,
   pending: {},
+  fadeTimeouts: new Map(),
 }
 
 const subtitleState = {
@@ -25,6 +26,27 @@ function _clearDialogHideTimeout() {
   subtitleState.hideTimeoutId = 0
 }
 
+function _clearFadeTimeout(id) {
+  const timeoutId = store.fadeTimeouts.get(id)
+  if (!timeoutId) return
+  clearTimeout(timeoutId)
+  store.fadeTimeouts.delete(id)
+}
+
+function _runPreviousOnEnded(previousOnEnded, context) {
+  if (typeof previousOnEnded === 'function') previousOnEnded.call(context)
+}
+
+function _getTrack(id) {
+  return store.tracks[id] ?? null
+}
+
+function _getAudioTrack(id) {
+  const track = _getTrack(id)
+  if (!track?.audio) return null
+  return track
+}
+
 function _clearTextTimers() {
   subtitleState.textTimers.forEach(clearTimeout)
   subtitleState.textTimers = []
@@ -33,10 +55,10 @@ function _clearTextTimers() {
 function _stopCurrentDialogue() {
   _clearTextTimers()
   _clearDialogHideTimeout()
+  subtitleState.activeId = null
   if (subtitleState.rafId) {
     cancelAnimationFrame(subtitleState.rafId)
     subtitleState.rafId = 0
-    subtitleState.activeId = null
   }
 }
 
@@ -169,7 +191,7 @@ function _resumeContext() {
 export function unlockAndPlay() {
   store.unlocked = true
   _resumeContext()
-  for (const [, { audio, cfg }] of Object.entries(store.tracks)) {
+  for (const { audio, cfg } of Object.values(store.tracks)) {
     if (audio && cfg.autoplay && !audio.isPlaying) audio.play()
   }
 }
@@ -183,7 +205,7 @@ function _emitSubtitle(text) {
 function _tickSubtitles() {
   const id = subtitleState.activeId
   if (!id) return
-  const track = store.tracks[id]
+  const track = _getAudioTrack(id)
   if (!track || !track.audio.isPlaying) {
     subtitleState.activeId = null
     subtitleState.rafId = 0
@@ -240,7 +262,12 @@ export function hideDialog() {
 export function playDialogue(id, { onDone } = {}) {
   _whenReady(id, () => {
     _stopCurrentDialogue()
-    const track = store.tracks[id]
+    const track = _getTrack(id)
+    if (!track) {
+      onDone?.()
+      return
+    }
+
     const cues = track.cfg.subtitles
 
     if (track.audio) {
@@ -251,7 +278,7 @@ export function playDialogue(id, { onDone } = {}) {
       if (onDone) {
         const prev = track.audio.onEnded
         track.audio.onEnded = function () {
-          prev.call(this)
+          _runPreviousOnEnded(prev, this)
           track.audio.onEnded = prev
           onDone()
         }
@@ -283,8 +310,11 @@ export function stopDialogue() {
 
 export function play(id) {
   _whenReady(id, () => {
+    const track = _getAudioTrack(id)
+    if (!track) return
+
     _resumeContext()
-    const { audio } = store.tracks[id]
+    const { audio } = track
     if (!audio.isPlaying) audio.play()
     _startSubtitles(id)
   })
@@ -292,8 +322,11 @@ export function play(id) {
 
 export function playOnce(id) {
   _whenReady(id, () => {
+    const track = _getAudioTrack(id)
+    if (!track) return
+
     _resumeContext()
-    const { audio } = store.tracks[id]
+    const { audio } = track
     if (audio.isPlaying) audio.stop()
     audio.play()
     _startSubtitles(id)
@@ -301,14 +334,16 @@ export function playOnce(id) {
 }
 
 export function stop(id) {
-  const track = store.tracks[id]
+  _clearFadeTimeout(id)
+  const track = _getAudioTrack(id)
   if (!track || !track.audio.isPlaying) return
   track.audio.stop()
 }
 
 export function stopAll() {
-  for (const { audio } of Object.values(store.tracks)) {
-    if (audio.isPlaying) audio.stop()
+  for (const [id, track] of Object.entries(store.tracks)) {
+    _clearFadeTimeout(id)
+    if (track.audio?.isPlaying) track.audio.stop()
   }
 }
 
@@ -318,7 +353,7 @@ function _playAndWait(audio, id) {
     if (audio.isPlaying) audio.stop()
     const prev = audio.onEnded
     audio.onEnded = function () {
-      prev.call(this)
+      _runPreviousOnEnded(prev, this)
       audio.onEnded = prev
       resolve()
     }
@@ -331,7 +366,13 @@ export async function playSequence(ids, { gap = 0, stopOthers = false } = {}) {
   for (const id of ids) {
     await new Promise((resolve) => {
       _whenReady(id, async () => {
-        const { audio, cfg } = store.tracks[id]
+        const track = _getAudioTrack(id)
+        if (!track) {
+          resolve()
+          return
+        }
+
+        const { audio, cfg } = track
         if (cfg.loop) {
           if (!audio.isPlaying) audio.play()
           resolve()
@@ -348,8 +389,11 @@ export async function playSequence(ids, { gap = 0, stopOthers = false } = {}) {
 
 export function fade(id, to, duration = 500) {
   _whenReady(id, () => {
+    const track = _getAudioTrack(id)
+    if (!track) return
+
     _resumeContext()
-    const { audio, cfg } = store.tracks[id]
+    const { audio, cfg } = track
     const ctx = audio.context
     const gain = audio.gain.gain
     const target = to * store.globalVolume
@@ -363,26 +407,29 @@ export function fade(id, to, duration = 500) {
     gain.linearRampToValueAtTime(target, end)
 
     cfg.volume = to
+    _clearFadeTimeout(id)
 
     if (to === 0) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
+        store.fadeTimeouts.delete(id)
         if (audio.isPlaying) audio.stop()
       }, duration)
+      store.fadeTimeouts.set(id, timeoutId)
     }
   })
 }
 
 export function setTrackVolume(id, volume) {
-  const track = store.tracks[id]
+  const track = _getTrack(id)
   if (!track) return
   track.cfg.volume = volume
-  track.audio.setVolume(volume * store.globalVolume)
+  track.audio?.setVolume(volume * store.globalVolume)
 }
 
 export function setGlobalVolume(volume) {
   store.globalVolume = volume
   for (const { audio, cfg } of Object.values(store.tracks)) {
-    audio.setVolume(cfg.volume * volume)
+    audio?.setVolume(cfg.volume * volume)
   }
 }
 

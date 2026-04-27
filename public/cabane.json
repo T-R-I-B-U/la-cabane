@@ -1,10 +1,10 @@
 [
   {
-    "name": "trunk",
-    "type": "Object3D",
+    "name": "ground-hut",
+    "type": "Mesh",
     "position": [
       -2.3079,
-      -2,
+      0,
       -0.633
     ],
     "rotation": [
@@ -22,8 +22,27 @@
     "name": "leaf",
     "type": "InstancedMesh",
     "position": [
+      -0.9141,
+      20.8444,
+      -32.8025
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "trunk",
+    "type": "Mesh",
+    "position": [
       -2.3079,
-      -1.457,
+      -0.5431,
       -0.633
     ],
     "rotation": [
@@ -100,7 +119,7 @@
     "position": [
       -9.5119,
       0,
-      -3.5972
+      -6.7099
     ],
     "rotation": [
       0,
@@ -171,25 +190,6 @@
     ]
   },
   {
-    "name": "platform",
-    "type": "Object3D",
-    "position": [
-      -2.3079,
-      23.1922,
-      20.3107
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "growingfruit",
     "type": "Mesh",
     "position": [
@@ -214,6 +214,101 @@
     "position": [
       -2.3079,
       0,
+      -0.633
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "workbench01",
+    "type": "Object3D",
+    "position": [
+      -2.2208,
+      5.5143,
+      -8.5333
+    ],
+    "rotation": [
+      0,
+      1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform-hut",
+    "type": "Mesh",
+    "position": [
+      -2.3079,
+      4.7198,
+      -0.633
+    ],
+    "rotation": [
+      -3.1416,
+      -0.9325,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "railling-hut",
+    "type": "Object3D",
+    "position": [
+      -2.3079,
+      4.7562,
+      -0.633
+    ],
+    "rotation": [
+      0,
+      0.0558,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "railling",
+    "type": "Object3D",
+    "position": [
+      -2.3079,
+      22.8757,
+      -0.633
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform",
+    "type": "Mesh",
+    "position": [
+      -2.3079,
+      22.8757,
       -0.633
     ],
     "rotation": [

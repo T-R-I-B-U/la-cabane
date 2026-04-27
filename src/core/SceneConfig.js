@@ -8,15 +8,18 @@ export const DEFAULT_HUT_POS = [-5.0111, 2.3616, 0.9556]
 
 export const PLAYER_HEIGHT = 1.4
 
-// World position of the platform mesh surface.
-// Derived from cabane.json group [-2.3079, 23.1922, 20.3107] + GLTF mesh local offset [+0.06, -0.29, -21.28].
-export const PLATFORM_POS = [-2.25, 22.9, -0.97]
+// Fallback until cabane.json has loaded and the real platform world position is known.
+export const PLATFORM_POS = [-2.3079, 23.1922, 20.21005]
 
 export function getPlayerSpawn(hutPosition = DEFAULT_HUT_POS) {
   return new THREE.Vector3(hutPosition[0], FLOOR_Y + PLAYER_HEIGHT, hutPosition[2] + 6)
 }
 
-export function getPlatformSpawn() {
+export function getPlatformSpawn(platformPosition = PLATFORM_POS) {
   // Spawn well above the surface — floor raycaster snaps the player down to the collider.
-  return new THREE.Vector3(PLATFORM_POS[0], PLATFORM_POS[1] + PLAYER_HEIGHT + 3, PLATFORM_POS[2])
+  return new THREE.Vector3(
+    platformPosition[0],
+    platformPosition[1] + PLAYER_HEIGHT + 3,
+    platformPosition[2]
+  )
 }

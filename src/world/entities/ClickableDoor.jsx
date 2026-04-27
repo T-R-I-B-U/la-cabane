@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useStableInteractionCallback } from '../interactions/useStableInteractionCallback'
 
 const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
@@ -49,15 +50,10 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const mouseRef = useRef(new THREE.Vector2())
   const mouseMovedRef = useRef(false)
   const prevActiveRef = useRef(false)
-  const onDoorClickRef = useRef(onDoorClick)
+  const onDoorClickRef = useStableInteractionCallback(onDoorClick)
   const outlinesRef = useRef([])
   const materialStatesRef = useRef(new Map())
   const raycaster = useRef(new THREE.Raycaster())
-
-  // Keep the callback ref current without re-running the event-listener effect.
-  useEffect(() => {
-    onDoorClickRef.current = onDoorClick
-  }, [onDoorClick])
 
   // Clone materials so we don't mutate shared GLB materials.
   const doorMeshes = useMemo(() => {
@@ -149,10 +145,11 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
       canvas.removeEventListener('mousemove', onMouseMove)
       canvas.removeEventListener('click', onClick)
       hoveredRef.current = false
+      mouseMovedRef.current = false
       setDoorHover(false)
       document.body.style.cursor = 'default'
     }
-  }, [active, gl, doorMeshes, setDoorHover])
+  }, [active, gl, doorMeshes, onDoorClickRef, setDoorHover])
 
   useFrame(() => {
     if (!active || !doorMeshes.length || !mouseMovedRef.current) return
