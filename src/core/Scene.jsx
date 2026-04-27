@@ -57,29 +57,23 @@ function CabaneMap({ onReady, onError, onCabaneLoaded }) {
   return <primitive object={cabane} />
 }
 
-export default function Scene({
-  onStats,
-  onReady,
-  onError,
-  playerMode,
-  debugDoors,
-  debugCollisions,
-  introActive,
-  introDoorOpen,
-  introWaitingAtDoor,
-  introShouldAdvance,
-  postIntro,
-  postIntroLocked,
-  movementLocked,
-  interactionLocked,
-  onIntroEvent,
-  marieClip,
-  thomasClip,
-  onNpcInteract,
-  onNpcHover,
-  playerSpawn,
-  playerSpawnKey,
-}) {
+export default function Scene({ sceneState, player, debug, intro, characters, interactions }) {
+  const { onStats, onReady, onError } = sceneState
+  const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey, movementLocked } = player
+  const { doors: debugDoors, collisions: debugCollisions } = debug
+  const {
+    active: introActive,
+    doorOpen: introDoorOpen,
+    waitingAtDoor: introWaitingAtDoor,
+    shouldAdvance: introShouldAdvance,
+    postIntro,
+    postIntroLocked,
+    interactionLocked,
+    onEvent: onIntroEvent,
+  } = intro
+  const { marieClip, thomasClip } = characters
+  const { onNpcInteract, onNpcHover } = interactions
+
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()

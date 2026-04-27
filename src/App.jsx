@@ -90,27 +90,39 @@ export default function App() {
       <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={npcHovered} />
 
       <Scene
-        onStats={setStats}
-        onReady={onReady}
-        onError={onError}
-        playerMode={playerMode}
-        debugDoors={debugDoors}
-        debugCollisions={debugCollisions}
-        introActive={introActive}
-        introDoorOpen={introDoorOpen}
-        introWaitingAtDoor={introWaitingAtDoor}
-        introShouldAdvance={introShouldAdvance}
-        postIntro={postIntro}
-        postIntroLocked={!showNameInput}
-        movementLocked={introMovementLocked || userMovementLocked}
-        interactionLocked={dialogueActive || introMovementLocked || showNameInput}
-        onIntroEvent={handleIntroEvent}
-        marieClip={marieClip}
-        thomasClip={thomasClip}
-        onNpcInteract={handleNpcInteract}
-        onNpcHover={setNpcHovered}
-        playerSpawn={playerSpawn}
-        playerSpawnKey={playerSpawnKey}
+        sceneState={{
+          onStats: setStats,
+          onReady,
+          onError,
+        }}
+        player={{
+          mode: playerMode,
+          spawn: playerSpawn,
+          spawnKey: playerSpawnKey,
+          movementLocked: introMovementLocked || userMovementLocked,
+        }}
+        debug={{
+          doors: debugDoors,
+          collisions: debugCollisions,
+        }}
+        intro={{
+          active: introActive,
+          doorOpen: introDoorOpen,
+          waitingAtDoor: introWaitingAtDoor,
+          shouldAdvance: introShouldAdvance,
+          postIntro,
+          postIntroLocked: !showNameInput,
+          interactionLocked: dialogueActive || introMovementLocked || showNameInput,
+          onEvent: handleIntroEvent,
+        }}
+        characters={{
+          marieClip,
+          thomasClip,
+        }}
+        interactions={{
+          onNpcInteract: handleNpcInteract,
+          onNpcHover: setNpcHovered,
+        }}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
