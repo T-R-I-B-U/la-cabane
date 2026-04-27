@@ -86,7 +86,12 @@ export function ViewerControls({
         {playerMode ? 'Mode joueur' : 'Mode orbite'}
       </button>
 
-      <button type="button" className="camera-toggle" disabled={!sceneReady} onClick={onGoToPlatform}>
+      <button
+        type="button"
+        className="camera-toggle"
+        disabled={!sceneReady}
+        onClick={onGoToPlatform}
+      >
         Vue plateforme
       </button>
 

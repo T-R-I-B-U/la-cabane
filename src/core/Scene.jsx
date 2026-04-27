@@ -34,7 +34,10 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const collisionObjects = useMemo(() => [cabane, mainFloorCollider].filter(Boolean), [cabane, mainFloorCollider])
+  const collisionObjects = useMemo(
+    () => [cabane, mainFloorCollider].filter(Boolean),
+    [cabane, mainFloorCollider]
+  )
   const handleReady = useCallback(
     (data) => {
       if (Array.isArray(data.hutPosition)) setHutPosition(data.hutPosition)

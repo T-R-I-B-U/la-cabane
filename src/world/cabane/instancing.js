@@ -37,7 +37,9 @@ export async function buildInstancedMesh(node, basePath) {
       warnMissingAsset(`No instance matrix file found for "${node.name}" (${instancePath})`)
     }
   } catch (error) {
-    warnMissingAsset(`Cannot load instance matrix file for "${node.name}" (${instancePath}): ${error}`)
+    warnMissingAsset(
+      `Cannot load instance matrix file for "${node.name}" (${instancePath}): ${error}`
+    )
   }
 
   if (!template || count === 0 || !floats) {

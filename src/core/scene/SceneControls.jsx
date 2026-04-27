@@ -17,7 +17,9 @@ export function SceneControls({
   hutPosition,
 }) {
   if (introActive) {
-    return <IntroCamera active={introActive} shouldAdvance={introShouldAdvance} onEvent={onIntroEvent} />
+    return (
+      <IntroCamera active={introActive} shouldAdvance={introShouldAdvance} onEvent={onIntroEvent} />
+    )
   }
 
   if (playerMode) {
