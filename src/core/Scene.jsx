@@ -123,6 +123,10 @@ export default function Scene({
       // Restore prototype raycast (was disabled in buildInstancedMesh for first-person perf).
       // Safe here: pointer events only fire on mouse move, not every frame.
       delete found.raycast
+      // Remove from cabane group so TreeLeaves is the sole owner of this mesh.
+      // Without this, the mesh is drawn twice: once inside the cabane group and
+      // once via <primitive object={leafMesh} /> in TreeLeaves.
+      found.parent?.remove(found)
     }
     setLeafMesh(found ?? null)
   }, [])
