@@ -19,18 +19,35 @@ export function TreeLeaves({ leafMesh }) {
     if (!leafMesh) return null
     // Threshold angle determines which internal edges are pre-filtered out (e.g. 40 degrees)
     const baseGeo = createConditionalEdgesGeometry(leafMesh.geometry, 40)
-
     // Create an instanced geometry to simulate thickness by drawing the line multiple times
     const instancedGeo = new THREE.InstancedBufferGeometry()
     instancedGeo.copy(baseGeo)
 
-    // Create a 2px radius outline (13 instances) or 1px (5 instances)
-    // Here we use a 3x3 grid (9 instances) for a nice 3px thick line.
-    const offsets = [-1, -1, 0, -1, 1, -1, -1, 0, 0, 0, 1, 0, -1, 1, 0, 1, 1, 1]
+    // Generate offsets and opacities for a glow effect
+    const radius = 3 // px radius for glow
+    const offsets = []
+    const opacities = []
+
+    for (let x = -radius; x <= radius; x++) {
+      for (let y = -radius; y <= radius; y++) {
+        const dist = Math.sqrt(x * x + y * y)
+        if (dist <= radius) {
+          offsets.push(x, y)
+          // Stronger opacity in the center, decaying towards the edges
+          const op = Math.max(0, 1.0 - dist / radius)
+          // Use a power for a softer falloff
+          opacities.push(Math.pow(op, 1.5) * 0.4) // reduce max opacity because they add up
+        }
+      }
+    }
 
     instancedGeo.setAttribute(
       'instanceOffset',
       new THREE.InstancedBufferAttribute(new Float32Array(offsets), 2)
+    )
+    instancedGeo.setAttribute(
+      'instanceOpacity',
+      new THREE.InstancedBufferAttribute(new Float32Array(opacities), 1)
     )
     instancedGeo.instanceCount = offsets.length / 2
 
@@ -46,7 +63,9 @@ export function TreeLeaves({ leafMesh }) {
         opacity: { value: 1.0 },
         resolution: { value: new THREE.Vector2() },
       },
-      transparent: false,
+      transparent: true,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
     })
   }, [])
 

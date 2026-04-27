@@ -3,8 +3,10 @@ attribute vec3 control1;
 attribute vec3 direction;
 attribute float collapse;
 attribute vec2 instanceOffset;
+attribute float instanceOpacity;
 
 uniform vec2 resolution;
+varying float vOpacity;
 
 #include <common>
 #include <color_pars_vertex>
@@ -48,6 +50,8 @@ void main() {
     vec2 ndcOffset = (instanceOffset / resolution) * 2.0;
     gl_Position.xy += ndcOffset * gl_Position.w;
   }
+
+  vOpacity = instanceOpacity;
 
   #include <logdepthbuf_vertex>
   #include <clipping_planes_vertex>
