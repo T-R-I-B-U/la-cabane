@@ -80,6 +80,16 @@
   display: flex;
   gap: 22px;
 }
+
+.topbar .menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--ink);
+  margin-left: auto;
+}
 .topbar nav a {
   text-decoration: none;
   color: var(--ink-mute);
@@ -676,6 +686,14 @@ section.block {
   }
   .topbar nav {
     display: none;
+  }
+  .topbar .menu-toggle {
+    display: block;
+  }
+  .topbar nav.open {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   .presentation footer {
     grid-template-columns: 1fr;
