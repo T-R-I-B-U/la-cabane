@@ -364,12 +364,12 @@ export async function buildCabane({
     if (obj) root.add(obj)
   }
 
-  // Tag stair step meshes so the player controller treats them as walkable
-  // surfaces instead of horizontal walls.
   root.traverse((obj) => {
-    if (obj.isMesh && /^stairs-marche/i.test(obj.name)) {
-      obj.userData.isStair = true
-    }
+    if (!obj.isMesh) return
+    // Stair steps — walkable ramps instead of vertical walls.
+    if (/^stairs-marche/i.test(obj.name)) obj.userData.isStair = true
+    // Platform walkable surface — floor raycaster must recognise it.
+    if (obj.name === 'platform') obj.userData.isFloor = true
   })
 
   return root
