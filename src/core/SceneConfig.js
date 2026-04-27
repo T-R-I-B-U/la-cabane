@@ -17,6 +17,6 @@ export function getPlayerSpawn(hutPosition = DEFAULT_HUT_POS) {
 }
 
 export function getPlatformSpawn() {
-  // Spawn slightly above surface — floor raycaster snaps the player down to the mesh.
-  return new THREE.Vector3(PLATFORM_POS[0], PLATFORM_POS[1] + PLAYER_HEIGHT + 1, PLATFORM_POS[2])
+  // Spawn well above the surface — floor raycaster snaps the player down to the collider.
+  return new THREE.Vector3(PLATFORM_POS[0], PLATFORM_POS[1] + PLAYER_HEIGHT + 3, PLATFORM_POS[2])
 }
