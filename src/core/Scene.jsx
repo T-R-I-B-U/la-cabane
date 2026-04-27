@@ -1,12 +1,14 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PointerLockControls, Environment } from '@react-three/drei'
+import { Selection, EffectComposer, Outline } from '@react-three/postprocessing'
 import AudioManager from './audio/AudioManager'
 import { AnimatedCharacter } from '../world/entities/AnimatedCharacter'
 import { InteractionPoint } from '../world/entities/InteractionPoint'
 import { buildCabane } from '../world/entities/Cabane'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { ClickableDoor } from '../world/entities/ClickableDoor'
+import { TreeLeaves } from '../world/entities/TreeLeaves'
 import IntroCamera from '../world/entities/IntroCamera'
 import { CollisionDebug } from './CollisionDebug'
 import { disposeObject3D } from './disposeObject3D'
@@ -78,6 +80,7 @@ export default function Scene({
   playerSpawnKey,
 }) {
   const [cabane, setCabane] = useState(null)
+  const [leafMesh, setLeafMesh] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
@@ -105,6 +108,26 @@ export default function Scene({
     [onReady]
   )
 
+  // Extract the leaf InstancedMesh here (in a callback, not an effect) so mutations
+  // happen before the value enters React state — satisfies react-hooks/immutability.
+  const handleCabaneLoaded = useCallback((group) => {
+    setCabane(group)
+    if (!group) {
+      setLeafMesh(null)
+      return
+    }
+    let found = null
+    group.traverse((obj) => {
+      if (!found && obj.isInstancedMesh && obj.name === 'leaf') found = obj
+    })
+    if (found) {
+      // Restore prototype raycast (was disabled in buildInstancedMesh for first-person perf).
+      // Safe here: pointer events only fire on mouse move, not every frame.
+      delete found.raycast
+    }
+    setLeafMesh(found ?? null)
+  }, [])
+
   return (
     <Canvas
       camera={{
@@ -118,60 +141,82 @@ export default function Scene({
       <StatsCollector onStats={onStats} />
       <AudioManager />
 
+      {/* DEBUG: dark background for leaf hover visibility — remove before ship */}
+      <color attach="background" args={['#0d1a2b']} />
+      {/* ─────────────────────────────────────────────────────────────────────── */}
+
       <Environment preset="apartment" />
       <ambientLight intensity={1} />
       <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
 
       <Floor />
 
-      <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={setCabane} />
+      {/* Selection wraps all scene content so <Select> inside TreeLeaves can reach
+          the shared SelectionContext consumed by the Outline effect below. */}
+      <Selection>
+        <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={handleCabaneLoaded} />
 
-      <Suspense fallback={null}>
-        <AnimatedCharacter
-          url="/models/marie-animated.glb"
-          clip={marieClip}
-          position={[hutPosition[0] - 2.4, FLOOR_Y, hutPosition[2] - 8.5]}
-          rotation={[0, Math.PI * 0.2, 0]}
-          scale={9}
+        <TreeLeaves leafMesh={leafMesh} />
+
+        <Suspense fallback={null}>
+          <AnimatedCharacter
+            url="/models/marie-animated.glb"
+            clip={marieClip}
+            position={[hutPosition[0] - 2.4, FLOOR_Y, hutPosition[2] - 8.5]}
+            rotation={[0, Math.PI * 0.2, 0]}
+            scale={9}
+          />
+          <AnimatedCharacter
+            url="/models/thomas-animated.glb"
+            clip={thomasClip}
+            position={[hutPosition[0] - 1.1, FLOOR_Y, hutPosition[2] - 8.5]}
+            rotation={[0, Math.PI * 1.2, 0]}
+            scale={9}
+          />
+        </Suspense>
+
+        {/* Interaction points in front of each NPC — positions may need tuning once in scene */}
+        <InteractionPoint
+          position={[hutPosition[0] - 2.4, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+          active={(playerMode || postIntro) && !interactionLocked}
+          onInteract={() => onNpcInteract?.('marie')}
+          onHoverChange={onMarieHover}
         />
-        <AnimatedCharacter
-          url="/models/thomas-animated.glb"
-          clip={thomasClip}
-          position={[hutPosition[0] - 1.1, FLOOR_Y, hutPosition[2] - 8.5]}
-          rotation={[0, Math.PI * 1.2, 0]}
-          scale={9}
+        <InteractionPoint
+          position={[hutPosition[0] - 1.1, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+          active={(playerMode || postIntro) && !interactionLocked}
+          onInteract={() => onNpcInteract?.('thomas')}
+          onHoverChange={onThomasHover}
         />
-      </Suspense>
 
-      {/* Interaction points in front of each NPC — positions may need tuning once in scene */}
-      <InteractionPoint
-        position={[hutPosition[0] - 2.4, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
-        active={(playerMode || postIntro) && !interactionLocked}
-        onInteract={() => onNpcInteract?.('marie')}
-        onHoverChange={onMarieHover}
-      />
-      <InteractionPoint
-        position={[hutPosition[0] - 1.1, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
-        active={(playerMode || postIntro) && !interactionLocked}
-        onInteract={() => onNpcInteract?.('thomas')}
-        onHoverChange={onThomasHover}
-      />
+        <ClickableDoor
+          cabane={cabane}
+          active={introWaitingAtDoor}
+          onDoorClick={() => onIntroEvent?.('door:clicked')}
+        />
 
-      <ClickableDoor
-        cabane={cabane}
-        active={introWaitingAtDoor}
-        onDoorClick={() => onIntroEvent?.('door:clicked')}
-      />
+        {debugCollisions && <CollisionDebug cabane={cabane} />}
 
-      {debugCollisions && <CollisionDebug cabane={cabane} />}
+        <SlidingDoors
+          cabane={cabane}
+          firstPersonMode={firstPersonMode}
+          controlsRef={controlsRef}
+          debug={debugDoors}
+          forceOpen={introDoorOpen}
+        />
 
-      <SlidingDoors
-        cabane={cabane}
-        firstPersonMode={firstPersonMode}
-        controlsRef={controlsRef}
-        debug={debugDoors}
-        forceOpen={introDoorOpen}
-      />
+        {/* multisampling=0 disables MSAA on the postprocessing buffer — biggest perf win.
+            autoClear=false preserves the main renderer's output underneath. */}
+        <EffectComposer autoClear={false} multisampling={0}>
+          <Outline
+            blur
+            edgeStrength={5}
+            width={500}
+            visibleEdgeColor={0xffffff}
+            hiddenEdgeColor={0xffffff}
+          />
+        </EffectComposer>
+      </Selection>
 
       {introActive ? (
         <IntroCamera

@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 
 export function StatsCollector({ onStats }) {
@@ -6,7 +6,23 @@ export function StatsCollector({ onStats }) {
   const frames = useRef(0)
   const lastAt = useRef(0)
 
+  // EffectComposer calls renderer.render() multiple times per frame. With
+  // autoReset=true (default), each call resets info.render — so we'd only see
+  // the last pass. Disable it and reset manually so all passes accumulate.
+  useEffect(() => {
+    gl.info.autoReset = false
+    return () => {
+      gl.info.autoReset = true
+    }
+  }, [gl])
+
   useFrame(() => {
+    // Read totals accumulated by ALL render passes of the previous frame,
+    // then reset so the current frame starts fresh.
+    const calls = gl.info.render.calls
+    const triangles = gl.info.render.triangles
+    gl.info.reset()
+
     const now = performance.now()
 
     if (lastAt.current === 0) {
@@ -22,14 +38,13 @@ export function StatsCollector({ onStats }) {
       const frameMs = elapsed / frames.current
       frames.current = 0
       lastAt.current = now
-      const info = gl.info
       onStats({
         fps,
         frameMs,
-        calls: info.render.calls,
-        triangles: info.render.triangles,
-        geometries: info.memory.geometries,
-        textures: info.memory.textures,
+        calls,
+        triangles,
+        geometries: gl.info.memory.geometries,
+        textures: gl.info.memory.textures,
       })
     }
   })
