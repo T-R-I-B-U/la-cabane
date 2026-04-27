@@ -1,4 +1,8 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
+import { Crosshair } from './app/Crosshair'
+import { IntroLoader } from './app/IntroLoader'
+import { NameInput } from './app/NameInput'
+import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
 import { getPlatformSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
@@ -6,82 +10,7 @@ import Subtitles from './core/audio/Subtitles'
 import { playDialogue as _playDialogue, stopDialogue } from './utils/audioStore'
 import './App.css'
 
-const MARIE_CLIPS = [
-  'Armature|mixamo.com|Layer0',
-  'marie-sitting-idle',
-  'marie-standiing-idle',
-  'marie-standingup',
-]
-
-const THOMAS_CLIPS = ['thomas-back', 'thomas-front', 'thomas-turn']
-
-function NameInput({ onSubmit }) {
-  const [name, setName] = useState('')
-  return (
-    <div className="name-input-overlay">
-      <div className="name-input-card">
-        <p className="name-input-label">Comment t'appelles-tu ?</p>
-        <input
-          className="name-input-field"
-          type="text"
-          aria-label="Ton prénom"
-          placeholder="Ton prénom…"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && name.trim() && onSubmit(name.trim())}
-          autoFocus
-        />
-        <button
-          type="button"
-          className="name-input-submit camera-toggle"
-          onClick={() => name.trim() && onSubmit(name.trim())}
-        >
-          Continuer
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function DevSection({ title, children }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div className="dev-section">
-      <button
-        type="button"
-        className="dev-section-header"
-        aria-expanded={open}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <span className="dev-section-arrow" aria-hidden="true">
-          {open ? '▾' : '▸'}
-        </span>
-        {title}
-      </button>
-      {open && <div className="dev-section-body">{children}</div>}
-    </div>
-  )
-}
-
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
-
-function CharacterAnimationControls({ title, activeClip, clips, onSelect }) {
-  return (
-    <DevSection title={title}>
-      {clips.map((clip) => (
-        <button
-          key={clip}
-          type="button"
-          className={`camera-toggle${activeClip === clip ? ' camera-toggle--active' : ''}`}
-          aria-pressed={activeClip === clip}
-          onClick={() => onSelect(clip)}
-        >
-          {clip}
-        </button>
-      ))}
-    </DevSection>
-  )
-}
 
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
@@ -265,12 +194,7 @@ export default function App() {
     <main className="viewer-page">
       <Subtitles />
 
-      {(playerMode || postIntro) && !showNameInput && (
-        <div className={`crosshair${npcHovered ? ' crosshair--active' : ''}`} aria-hidden="true">
-          <div className="crosshair-ring" />
-          <div className="crosshair-dot" />
-        </div>
-      )}
+      <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={npcHovered} />
 
       <Scene
         onStats={setStats}
@@ -299,147 +223,42 @@ export default function App() {
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
 
       {showUI && !introPending && !introActive && !postIntro && (
-        <aside className="viewer-controls" aria-live="polite">
-          <h1 className="controls-title">La Cabane</h1>
-
-          <div className="controls-divider" />
-
-          {status === 'loading' && <p className="controls-status">Construction de la scène…</p>}
-          {status === 'error' && <p className="controls-error">{info}</p>}
-          {status === 'ok' && info && (
-            <>
-              <p className="controls-stat">
-                <span className="dot dot--mesh" />
-                {info.meshes} mesh{info.meshes !== 1 ? 'es' : ''}
-              </p>
-              <p className="controls-stat">
-                <span className="dot dot--pivot" />
-                {info.pivots} pivot{info.pivots !== 1 ? 's' : ''} manquants
-              </p>
-            </>
-          )}
-
-          <div className="controls-divider" />
-
-          <button
-            type="button"
-            className="camera-toggle"
-            onClick={launchIntro}
-            disabled={!sceneReady || introPending || introActive}
-          >
-            <span className="camera-toggle-icon" aria-hidden="true">
-              ▶
-            </span>
-            {!sceneReady
-              ? 'Scène en chargement…'
-              : introActive
-                ? 'Intro en cours…'
-                : introPending
-                  ? 'En attente…'
-                  : "Lancer l'histoire"}
-          </button>
-
-          <div className="controls-divider" />
-
-          <button
-            type="button"
-            className={`camera-toggle${playerMode ? ' camera-toggle--active' : ''}`}
-            aria-pressed={playerMode}
-            onClick={() => {
-              setPlayerMode((p) => !p)
-              setUserMovementLocked(false)
-              setPostIntro(false)
-            }}
-          >
-            <span className="camera-toggle-icon" aria-hidden="true">
-              {playerMode ? '🎮' : '🔭'}
-            </span>
-            {playerMode ? 'Mode joueur' : 'Mode orbite'}
-          </button>
-
-          <button
-            type="button"
-            className="camera-toggle"
-            disabled={!sceneReady}
-            onClick={goToPlatform}
-          >
-            Vue plateforme
-          </button>
-
-          {playerMode && (
-            <>
-              <button
-                type="button"
-                className={`camera-toggle${userMovementLocked ? '' : ' camera-toggle--active'}`}
-                aria-pressed={!userMovementLocked}
-                onClick={() => setUserMovementLocked((l) => !l)}
-              >
-                {userMovementLocked ? 'Déplacement désactivé' : 'Déplacement actif'}
-              </button>
-              <p className="controls-hint">
-                Clic pour capturer · WASD pour avancer · ESC pour quitter
-              </p>
-            </>
-          )}
-
-          {import.meta.env.DEV && (
-            <>
-              <div className="controls-divider" />
-              <CharacterAnimationControls
-                title="Marie"
-                activeClip={marieClip}
-                clips={MARIE_CLIPS}
-                onSelect={setMarieClip}
-              />
-              <CharacterAnimationControls
-                title="Thomas"
-                activeClip={thomasClip}
-                clips={THOMAS_CLIPS}
-                onSelect={setThomasClip}
-              />
-              <DevSection title="Scène">
-                <button
-                  type="button"
-                  className={`camera-toggle${debugDoors ? ' camera-toggle--active' : ''}`}
-                  aria-pressed={debugDoors}
-                  onClick={() => setDebugDoors((p) => !p)}
-                >
-                  <span className="camera-toggle-icon" aria-hidden="true">
-                    {debugDoors ? '🟢' : '⚫'}
-                  </span>
-                  Debug portes
-                </button>
-                <button
-                  type="button"
-                  className={`camera-toggle${debugCollisions ? ' camera-toggle--active' : ''}`}
-                  aria-pressed={debugCollisions}
-                  onClick={() => setDebugCollisions((p) => !p)}
-                >
-                  <span className="camera-toggle-icon" aria-hidden="true">
-                    {debugCollisions ? '🟢' : '⚫'}
-                  </span>
-                  Debug collisions
-                </button>
-              </DevSection>
-            </>
-          )}
-        </aside>
+        <ViewerControls
+          status={status}
+          info={info}
+          sceneReady={sceneReady}
+          introPending={introPending}
+          introActive={introActive}
+          playerMode={playerMode}
+          userMovementLocked={userMovementLocked}
+          marieClip={marieClip}
+          thomasClip={thomasClip}
+          debugDoors={debugDoors}
+          debugCollisions={debugCollisions}
+          onLaunchIntro={launchIntro}
+          onTogglePlayerMode={() => {
+            setPlayerMode((current) => !current)
+            setUserMovementLocked(false)
+            setPostIntro(false)
+          }}
+          onGoToPlatform={goToPlatform}
+          onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
+          onSelectMarieClip={setMarieClip}
+          onSelectThomasClip={setThomasClip}
+          onToggleDebugDoors={() => setDebugDoors((current) => !current)}
+          onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+        />
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
       {introPending && (
-        <div
-          className={`intro-loader${loaderFading ? ' intro-loader--fading' : ''}`}
-          role="button"
-          tabIndex={loaderFading ? -1 : 0}
-          aria-label="Commencer l'introduction"
-          onClick={!loaderFading ? handleLoaderClick : undefined}
+        <IntroLoader
+          fading={loaderFading}
+          onClick={handleLoaderClick}
           onKeyDown={handleLoaderKeyDown}
-          onAnimationEnd={loaderFading ? dismissLoader : undefined}
-        >
-          <p className="intro-loader-hint">Cliquer pour commencer</p>
-        </div>
+          onAnimationEnd={dismissLoader}
+        />
       )}
     </main>
   )
