@@ -1,16 +1,24 @@
-import { useState, useEffect, useRef } from 'react'
-import { Select } from '@react-three/postprocessing'
+import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import outlineVert from '../materials/leafOutline.vert.glsl'
+import outlineFrag from '../materials/leafOutline.frag.glsl'
 
-// Reused across pointer events to avoid per-event allocations
 const _instanceMatrix = new THREE.Matrix4()
+const _worldMatrix = new THREE.Matrix4()
+const _pos = new THREE.Vector3()
+const _quat = new THREE.Quaternion()
+const _scl = new THREE.Vector3()
 
-// Outlines only the specific hovered instance, not the full 32K mesh.
-// Strategy: a single invisible proxy <mesh> mirrors the hovered instance's world
-// transform; only the proxy enters <Select>, so Outline never touches the InstancedMesh.
+// Module-level singleton — ShaderMaterial created once, never disposed
+const _outlineMaterial = new THREE.ShaderMaterial({
+  vertexShader: outlineVert,
+  fragmentShader: outlineFrag,
+  side: THREE.BackSide,
+})
+
 export function TreeLeaves({ leafMesh }) {
-  const [isHovered, setIsHovered] = useState(false)
   const proxyRef = useRef(null)
+
   useEffect(() => {
     if (!leafMesh) return
     return () => {
@@ -22,12 +30,14 @@ export function TreeLeaves({ leafMesh }) {
 
   function syncProxy(id) {
     if (!proxyRef.current) return
-    // World transform = InstancedMesh.matrixWorld × instance local matrix
     leafMesh.getMatrixAt(id, _instanceMatrix)
-    proxyRef.current.matrix.multiplyMatrices(leafMesh.matrixWorld, _instanceMatrix)
-    // matrixAutoUpdate=false → Three.js won't overwrite .matrix from pos/quat/scale
+    // Instance world matrix = InstancedMesh.matrixWorld × instance local matrix
+    _worldMatrix.multiplyMatrices(leafMesh.matrixWorld, _instanceMatrix)
+    // Decompose, scale 1.1× so back faces extend past leaf edges, recompose
+    _worldMatrix.decompose(_pos, _quat, _scl)
+    _scl.multiplyScalar(1.1)
+    proxyRef.current.matrix.compose(_pos, _quat, _scl)
     proxyRef.current.matrixAutoUpdate = false
-    // Force world matrix recompute on next render
     proxyRef.current.matrixWorldNeedsUpdate = true
   }
 
@@ -39,28 +49,25 @@ export function TreeLeaves({ leafMesh }) {
           e.stopPropagation()
           const id = e.instanceId
           if (id === undefined) return
-          // Sync proxy before setIsHovered so position is correct when it becomes visible
           syncProxy(id)
-          setIsHovered(true)
+          // Direct mutation — no useState, no re-render
+          if (proxyRef.current) proxyRef.current.visible = true
           document.body.style.cursor = 'pointer'
         }}
         onPointerOut={() => {
-          setIsHovered(false)
+          if (proxyRef.current) proxyRef.current.visible = false
           document.body.style.cursor = 'default'
         }}
       />
 
-      {/* Proxy always mounted to avoid mount latency on first hover.
-          Invisible until hover so it never renders at identity position. */}
-      <Select enabled={isHovered}>
-        <mesh
-          ref={proxyRef}
-          geometry={leafMesh.geometry}
-          material={leafMesh.material}
-          visible={isHovered}
-          matrixAutoUpdate={false}
-        />
-      </Select>
+      {/* Proxy always mounted — visible=false means 0 draw calls, 0 triangles counted */}
+      <mesh
+        ref={proxyRef}
+        geometry={leafMesh.geometry}
+        material={_outlineMaterial}
+        visible={false}
+        matrixAutoUpdate={false}
+      />
     </>
   )
 }

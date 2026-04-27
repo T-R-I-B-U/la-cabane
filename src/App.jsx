@@ -107,6 +107,7 @@ export default function App() {
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
+  const [postprocessingEnabled, setPostprocessingEnabled] = useState(true)
   const ignoreNextPointerUnlockRef = useRef(false)
   const sceneReady = status === 'ok'
 
@@ -294,6 +295,7 @@ export default function App() {
         onNpcHover={setNpcHovered}
         playerSpawn={playerSpawn}
         playerSpawnKey={playerSpawnKey}
+        postprocessingEnabled={postprocessingEnabled}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
@@ -381,6 +383,18 @@ export default function App() {
               </p>
             </>
           )}
+
+          <button
+            type="button"
+            className={`camera-toggle${postprocessingEnabled ? ' camera-toggle--active' : ''}`}
+            aria-pressed={postprocessingEnabled}
+            onClick={() => setPostprocessingEnabled((p) => !p)}
+          >
+            <span className="camera-toggle-icon" aria-hidden="true">
+              {postprocessingEnabled ? '✨' : '⚫'}
+            </span>
+            Post-processing
+          </button>
 
           {import.meta.env.DEV && (
             <>
