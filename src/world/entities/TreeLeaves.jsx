@@ -2,11 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Select } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-// ── DEBUG: leaf hover visibility — delete this block before ship ──────────────
-const DEBUG_LEAF_COLOR = true
-const DEBUG_LEAF_COLOR_VALUE = 0x1a4d1a // dark green
-// ─────────────────────────────────────────────────────────────────────────────
-
 // Reused across pointer events to avoid per-event allocations
 const _instanceMatrix = new THREE.Matrix4()
 
@@ -16,18 +11,6 @@ const _instanceMatrix = new THREE.Matrix4()
 export function TreeLeaves({ leafMesh }) {
   const [isHovered, setIsHovered] = useState(false)
   const proxyRef = useRef(null)
-  const originalColor = useRef(null)
-
-  // DEBUG: override leaf material color for hover visibility — remove with block above
-  useEffect(() => {
-    if (!DEBUG_LEAF_COLOR || !leafMesh?.material) return
-    originalColor.current = leafMesh.material.color.getHex()
-    leafMesh.material.color.setHex(DEBUG_LEAF_COLOR_VALUE)
-    return () => {
-      if (originalColor.current !== null) leafMesh.material.color.setHex(originalColor.current)
-    }
-  }, [leafMesh])
-
   useEffect(() => {
     if (!leafMesh) return
     return () => {
