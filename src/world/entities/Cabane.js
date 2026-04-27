@@ -70,13 +70,13 @@ function registerTextureKey(key, url) {
 function registerAvailableTextures() {
   if (availableTextures.size > 0) return
 
-  for (const [path, url] of Object.entries(textureModules)) {
+  for (const [path] of Object.entries(textureModules)) {
     const fileName = path.split('/').at(-1)
     const ext = TEXTURE_EXTENSIONS.find((entry) => fileName.toLowerCase().endsWith(entry))
     if (!ext) continue
 
-    // Files in public/ are served at root — strip the /public prefix from the URL.
-    const resolvedUrl = url.replace(/^\/public/, '')
+    // Build the URL directly — import.meta.glob returns /public/…?url which is unusable.
+    const resolvedUrl = `${TEXTURE_BASE_PATH}${fileName}`
     const key = fileName.slice(0, -ext.length).toLowerCase()
     registerTextureKey(key, resolvedUrl)
     registerTextureKey(key.normalize('NFC'), resolvedUrl)
