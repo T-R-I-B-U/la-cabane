@@ -33,6 +33,11 @@ function _clearFadeTimeout(id) {
   store.fadeTimeouts.delete(id)
 }
 
+function _warnAudio(message) {
+  if (!import.meta.env.DEV) return
+  console.warn(`[Audio] ${message}`)
+}
+
 function _runPreviousOnEnded(previousOnEnded, context) {
   if (typeof previousOnEnded === 'function') previousOnEnded.call(context)
 }
@@ -117,7 +122,8 @@ function _loadSubtitlesThenRegister(trackCfg) {
     .then((txt) => {
       registered.cfg.subtitles = _parseSRT(txt)
     })
-    .catch(() => {
+    .catch((error) => {
+      _warnAudio(`Cannot load subtitles "${srt}" for "${trackCfg.id}": ${error}`)
       registered.cfg.subtitles = []
     })
     .finally(() => {
@@ -137,7 +143,8 @@ function _loadSubtitles(trackCfg, registered) {
     .then((txt) => {
       registered.cfg.subtitles = _parseSRT(txt)
     })
-    .catch(() => {
+    .catch((error) => {
+      _warnAudio(`Cannot load subtitles "${srt}" for "${trackCfg.id}": ${error}`)
       registered.cfg.subtitles = []
     })
 }
