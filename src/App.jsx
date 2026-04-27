@@ -106,6 +106,7 @@ export default function App() {
   const [introMovementLocked, setIntroMovementLocked] = useState(false)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
+  const [userMovementLocked, setUserMovementLocked] = useState(false)
   const ignoreNextPointerUnlockRef = useRef(false)
   const sceneReady = status === 'ok'
 
@@ -226,6 +227,7 @@ export default function App() {
     setPostIntro(false)
     setPlayerSpawn(getPlatformSpawn())
     setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(true)
     setPlayerMode(true)
   }
 
@@ -283,7 +285,7 @@ export default function App() {
         introShouldAdvance={introShouldAdvance}
         postIntro={postIntro}
         postIntroLocked={!showNameInput}
-        movementLocked={introMovementLocked}
+        movementLocked={introMovementLocked || userMovementLocked}
         interactionLocked={dialogueActive || introMovementLocked || showNameInput}
         onIntroEvent={handleIntroEvent}
         marieClip={marieClip}
@@ -345,6 +347,7 @@ export default function App() {
             aria-pressed={playerMode}
             onClick={() => {
               setPlayerMode((p) => !p)
+              setUserMovementLocked(false)
               setPostIntro(false)
             }}
           >
@@ -354,10 +357,29 @@ export default function App() {
             {playerMode ? 'Mode joueur' : 'Mode orbite'}
           </button>
 
+          <button
+            type="button"
+            className="camera-toggle"
+            disabled={!sceneReady}
+            onClick={goToPlatform}
+          >
+            Vue plateforme
+          </button>
+
           {playerMode && (
-            <p className="controls-hint">
-              Clic pour capturer · WASD pour avancer · ESC pour quitter
-            </p>
+            <>
+              <button
+                type="button"
+                className={`camera-toggle${userMovementLocked ? '' : ' camera-toggle--active'}`}
+                aria-pressed={!userMovementLocked}
+                onClick={() => setUserMovementLocked((l) => !l)}
+              >
+                {userMovementLocked ? 'Déplacement désactivé' : 'Déplacement actif'}
+              </button>
+              <p className="controls-hint">
+                Clic pour capturer · WASD pour avancer · ESC pour quitter
+              </p>
+            </>
           )}
 
           {import.meta.env.DEV && (
@@ -375,16 +397,6 @@ export default function App() {
                 clips={THOMAS_CLIPS}
                 onSelect={setThomasClip}
               />
-              <DevSection title="Caméra">
-                <button
-                  type="button"
-                  className="camera-toggle"
-                  disabled={!sceneReady}
-                  onClick={goToPlatform}
-                >
-                  Vue plateforme
-                </button>
-              </DevSection>
               <DevSection title="Scène">
                 <button
                   type="button"
