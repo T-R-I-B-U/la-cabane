@@ -3,13 +3,19 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { buildCabane } from '../world/entities/Cabane.js'
 
 function addDebugMarkers(root, parent) {
-  const geo      = new THREE.SphereGeometry(0.08, 6, 6)
+  const geo = new THREE.SphereGeometry(0.08, 6, 6)
   const matPivot = new THREE.MeshBasicMaterial({ color: 0x8899aa })
   const wp = new THREE.Vector3()
 
   root.traverse((obj) => {
     if (!obj.userData.cabaneNode) return
-    const hasMesh = (() => { let f = false; obj.traverse(c => { if (c.isMesh) f = true }); return f })()
+    const hasMesh = (() => {
+      let f = false
+      obj.traverse((c) => {
+        if (c.isMesh) f = true
+      })
+      return f
+    })()
     if (hasMesh) return
     obj.getWorldPosition(wp)
     const m = new THREE.Mesh(geo, matPivot)
@@ -21,9 +27,9 @@ function addDebugMarkers(root, parent) {
 export class CabaneEngine {
   constructor(container, { onStats = () => {}, onReady = () => {}, onError = () => {} } = {}) {
     this.container = container
-    this.onStats   = onStats
-    this.onReady   = onReady
-    this.onError   = onError
+    this.onStats = onStats
+    this.onReady = onReady
+    this.onError = onError
 
     // ── Scene ───────────────────────────────────────────────────────────
     this.scene = new THREE.Scene()
@@ -46,9 +52,9 @@ export class CabaneEngine {
     sun.castShadow = true
     sun.shadow.mapSize.set(1024, 1024)
     sun.shadow.camera.near = 0.1
-    sun.shadow.camera.far  = 80
+    sun.shadow.camera.far = 80
     sun.shadow.camera.left = sun.shadow.camera.bottom = -20
-    sun.shadow.camera.right = sun.shadow.camera.top   =  20
+    sun.shadow.camera.right = sun.shadow.camera.top = 20
     this.scene.add(sun)
 
     // ── Renderer ────────────────────────────────────────────────────────
@@ -57,7 +63,7 @@ export class CabaneEngine {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type    = THREE.PCFSoftShadowMap
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap
     container.appendChild(this.renderer.domElement)
 
     // ── Camera ──────────────────────────────────────────────────────────
@@ -65,7 +71,7 @@ export class CabaneEngine {
       50,
       container.clientWidth / container.clientHeight,
       0.01,
-      500,
+      500
     )
     this.camera.position.set(20, 15, 30)
 
@@ -73,36 +79,36 @@ export class CabaneEngine {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement)
     this.controls.enableDamping = true
     this.controls.dampingFactor = 0.08
-    this.controls.enableZoom    = true
-    this.controls.zoomSpeed     = 1.2
-    this.controls.minDistance   = 0.5
-    this.controls.maxDistance   = 200
+    this.controls.enableZoom = true
+    this.controls.zoomSpeed = 1.2
+    this.controls.minDistance = 0.5
+    this.controls.maxDistance = 200
     this.controls.target.set(0, 5, 0)
 
     // ── Stats state ─────────────────────────────────────────────────────
-    this._clock       = new THREE.Clock()
-    this._frames      = 0
+    this._clock = new THREE.Clock()
+    this._frames = 0
     this._lastStatsAt = performance.now()
-    this._fps         = 0
-    this._cpu         = 0
+    this._fps = 0
+    this._cpu = 0
 
     // ── Resize ──────────────────────────────────────────────────────────
     this._boundResize = this._onResize.bind(this)
     window.addEventListener('resize', this._boundResize)
 
     // ── Click-to-focus ──────────────────────────────────────────────────
-    this._raycaster     = new THREE.Raycaster()
-    this._pointer       = new THREE.Vector2()
+    this._raycaster = new THREE.Raycaster()
+    this._pointer = new THREE.Vector2()
     this._pointerDownAt = null
 
     this._boundPointerDown = this._onPointerDown.bind(this)
-    this._boundPointerUp   = this._onPointerUp.bind(this)
+    this._boundPointerUp = this._onPointerUp.bind(this)
     this.renderer.domElement.addEventListener('pointerdown', this._boundPointerDown)
-    this.renderer.domElement.addEventListener('pointerup',   this._boundPointerUp)
+    this.renderer.domElement.addEventListener('pointerup', this._boundPointerUp)
 
     // ── Render loop ─────────────────────────────────────────────────────
     this._animate = this._animate.bind(this)
-    this._raf     = requestAnimationFrame(this._animate)
+    this._raf = requestAnimationFrame(this._animate)
 
     this._compressed = false
 
@@ -125,8 +131,8 @@ export class CabaneEngine {
 
     const rect = this.renderer.domElement.getBoundingClientRect()
     this._pointer.set(
-      ((e.clientX - rect.left)  / rect.width)  * 2 - 1,
-      -((e.clientY - rect.top) / rect.height) * 2 + 1,
+      ((e.clientX - rect.left) / rect.width) * 2 - 1,
+      -((e.clientY - rect.top) / rect.height) * 2 + 1
     )
 
     this._raycaster.setFromCamera(this._pointer, this.camera)
@@ -147,8 +153,8 @@ export class CabaneEngine {
     // Clear previous cabane + debug markers without touching lights/grid.
     this._sceneRoot.clear()
 
-    const basePath    = this._compressed ? '/models/compressed/'    : '/models/'
-    const texturePath = this._compressed ? '/textures/compressed/'  : '/textures/'
+    const basePath = this._compressed ? '/models/compressed/' : '/models/'
+    const texturePath = this._compressed ? '/textures/compressed/' : '/textures/'
 
     try {
       const cabane = await buildCabane({ jsonData, basePath, texturePath })
@@ -160,20 +166,16 @@ export class CabaneEngine {
       cabane.traverse((obj) => {
         if (obj === cabane) return
         if (obj.isMesh) meshes++
-        else            pivots++
+        else pivots++
       })
 
       const box = new THREE.Box3().setFromObject(cabane)
       if (!box.isEmpty()) {
         const center = box.getCenter(new THREE.Vector3())
-        const size   = box.getSize(new THREE.Vector3())
-        const dist   = Math.max(size.x, size.y, size.z) * 1.5
+        const size = box.getSize(new THREE.Vector3())
+        const dist = Math.max(size.x, size.y, size.z) * 1.5
         this.controls.target.copy(center)
-        this.camera.position.set(
-          center.x + dist * 0.55,
-          center.y + dist * 0.35,
-          center.z + dist,
-        )
+        this.camera.position.set(center.x + dist * 0.55, center.y + dist * 0.35, center.z + dist)
         this.controls.update()
       }
 
@@ -203,22 +205,22 @@ export class CabaneEngine {
     this._cpu = performance.now() - start
 
     this._frames += 1
-    const now     = performance.now()
+    const now = performance.now()
     const elapsed = now - this._lastStatsAt
 
     if (elapsed >= 350) {
-      this._fps         = Math.round((this._frames * 1000) / elapsed)
-      this._frames      = 0
+      this._fps = Math.round((this._frames * 1000) / elapsed)
+      this._frames = 0
       this._lastStatsAt = now
 
       const info = this.renderer.info
       this.onStats({
-        fps:       this._fps,
-        cpu:       this._cpu,
-        calls:     info.render.calls,
+        fps: this._fps,
+        cpu: this._cpu,
+        calls: info.render.calls,
         triangles: info.render.triangles,
         geometries: info.memory.geometries,
-        textures:  info.memory.textures,
+        textures: info.memory.textures,
       })
     }
   }
@@ -239,7 +241,7 @@ export class CabaneEngine {
     cancelAnimationFrame(this._raf)
     window.removeEventListener('resize', this._boundResize)
     this.renderer.domElement.removeEventListener('pointerdown', this._boundPointerDown)
-    this.renderer.domElement.removeEventListener('pointerup',   this._boundPointerUp)
+    this.renderer.domElement.removeEventListener('pointerup', this._boundPointerUp)
     this.controls.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
