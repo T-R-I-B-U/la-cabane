@@ -4,17 +4,17 @@ export function DevSection({ title, children }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="dev-section">
+    <div className={`dev-section${open ? ' dev-section--open' : ''}`}>
       <button
         type="button"
         className="dev-section-header"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
       >
+        <span className="dev-section-title">{title}</span>
         <span className="dev-section-arrow" aria-hidden="true">
-          {open ? '▾' : '▸'}
+          {open ? 'Masquer' : 'Afficher'}
         </span>
-        {title}
       </button>
       {open && <div className="dev-section-body">{children}</div>}
     </div>

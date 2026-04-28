@@ -6,7 +6,7 @@ import { useIntroFlow } from './app/useIntroFlow'
 import { useNpcDialogue } from './app/useNpcDialogue'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
-import { getPlatformSpawn } from './core/SceneConfig'
+import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import './App.css'
@@ -88,6 +88,21 @@ export default function App() {
     setPlayerMode(true)
   }
 
+  function togglePlayerView() {
+    setPostIntro(false)
+
+    if (playerMode) {
+      setPlayerMode(false)
+      setUserMovementLocked(false)
+      return
+    }
+
+    setPlayerSpawn(getPlayerSpawn(info?.hutPosition))
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setPlayerMode(true)
+  }
+
   return (
     <main className="viewer-page">
       <Subtitles />
@@ -146,11 +161,7 @@ export default function App() {
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
           onLaunchIntro={launchIntro}
-          onTogglePlayerMode={() => {
-            setPlayerMode((current) => !current)
-            setUserMovementLocked(false)
-            setPostIntro(false)
-          }}
+          onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           onSelectMarieClip={setMarieClip}
