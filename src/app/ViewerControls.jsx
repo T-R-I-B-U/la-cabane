@@ -35,6 +35,7 @@ export function ViewerControls({
   debugDoors,
   debugCollisions,
   shaderEnabled,
+  shaderRadius,
   onLaunchIntro,
   onTogglePlayerMode,
   onGoToPlatform,
@@ -42,6 +43,7 @@ export function ViewerControls({
   onSelectMarieClip,
   onSelectThomasClip,
   onToggleShader,
+  onShaderRadiusChange,
   onToggleDebugDoors,
   onToggleDebugCollisions,
 }) {
@@ -145,6 +147,20 @@ export function ViewerControls({
             clips={THOMAS_CLIPS}
             onSelect={onSelectThomasClip}
           />
+          <DevSection title="Aquarelle">
+            <label className="controls-slider-row">
+              <span>Rayon</span>
+              <input
+                type="range"
+                min="0"
+                max="5"
+                step="1"
+                value={shaderRadius}
+                onChange={(e) => onShaderRadiusChange(Number.parseInt(e.target.value, 10))}
+              />
+              <span className="controls-slider-value">{shaderRadius}</span>
+            </label>
+          </DevSection>
           <DevSection title="Scène">
             <button
               type="button"

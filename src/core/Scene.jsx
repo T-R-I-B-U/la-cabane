@@ -21,6 +21,7 @@ export default function Scene({
   characters,
   interactions,
   shaderEnabled,
+  shaderRadius,
 }) {
   const { onStats, onReady, onError } = sceneState
   const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey, movementLocked } = player
@@ -113,7 +114,7 @@ export default function Scene({
         hutPosition={hutPosition}
       />
 
-      <WatercolorPass enabled={shaderEnabled} />
+      <WatercolorPass enabled={shaderEnabled} radius={shaderRadius} />
     </Canvas>
   )
 }
