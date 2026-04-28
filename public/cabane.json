@@ -3,7 +3,7 @@
     "name": "ground-hut",
     "type": "Mesh",
     "position": [
-      -2.3517,
+      -27.7223,
       0,
       -7.8536
     ],
@@ -22,7 +22,7 @@
     "name": "leaf",
     "type": "InstancedMesh",
     "position": [
-      -0.9579,
+      -26.3285,
       20.8444,
       -40.0231
     ],
@@ -41,7 +41,7 @@
     "name": "trunk",
     "type": "Mesh",
     "position": [
-      -2.3517,
+      -27.7223,
       -0.5431,
       -7.8536
     ],
@@ -60,28 +60,9 @@
     "name": "hut01",
     "type": "Object3D",
     "position": [
-      -5.0549,
+      -30.4256,
       2.3616,
       -6.265
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "door03",
-    "type": "Object3D",
-    "position": [
-      18.8657,
-      1.0371,
-      -7.8536
     ],
     "rotation": [
       0,
@@ -98,7 +79,7 @@
     "name": "counter01",
     "type": "Mesh",
     "position": [
-      -9.5557,
+      -34.9263,
       0,
       -13.9305
     ],
@@ -117,7 +98,7 @@
     "name": "growingfruit",
     "type": "Mesh",
     "position": [
-      -7.695,
+      -33.0656,
       0.7255,
       -10.1968
     ],
@@ -136,7 +117,7 @@
     "name": "stairs01",
     "type": "Object3D",
     "position": [
-      1.3771,
+      -23.9935,
       0.0104,
       -4.174
     ],
@@ -155,7 +136,7 @@
     "name": "workbench01",
     "type": "Object3D",
     "position": [
-      -2.2646,
+      -27.6352,
       5.5143,
       -15.7539
     ],
@@ -174,7 +155,7 @@
     "name": "platform-hut",
     "type": "Mesh",
     "position": [
-      -2.3517,
+      -27.7223,
       4.7198,
       -7.8536
     ],
@@ -193,7 +174,7 @@
     "name": "railling-hut",
     "type": "Object3D",
     "position": [
-      -2.3517,
+      -27.7223,
       4.7562,
       -7.8536
     ],
@@ -212,7 +193,7 @@
     "name": "railling",
     "type": "Object3D",
     "position": [
-      -2.3517,
+      -27.7223,
       22.8757,
       -7.8536
     ],
@@ -231,28 +212,9 @@
     "name": "platform",
     "type": "Mesh",
     "position": [
-      -2.3517,
+      -27.7223,
       22.8757,
       -7.9542
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "greenhouse",
-    "type": "Mesh",
-    "position": [
-      22.0652,
-      0,
-      -7.8536
     ],
     "rotation": [
       0,
@@ -269,7 +231,7 @@
     "name": "nest",
     "type": "Object3D",
     "position": [
-      -16.0435,
+      -41.4141,
       11.5203,
       22.5886
     ],
@@ -277,6 +239,25 @@
       0,
       -0.4394,
       0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "greenhouse",
+    "type": "Object3D",
+    "position": [
+      4.303,
+      0.7381,
+      -7.4687
+    ],
+    "rotation": [
+      -3.1416,
+      0.0191,
+      -3.1416
     ],
     "scale": [
       1,
