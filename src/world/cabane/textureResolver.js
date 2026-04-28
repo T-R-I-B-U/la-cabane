@@ -107,6 +107,9 @@ function loadTexture(url, colorSpace) {
     const promise = textureLoader.loadAsync(url).then((texture) => {
       texture.flipY = false
       if (colorSpace) texture.colorSpace = colorSpace
+      texture.generateMipmaps = false
+      texture.minFilter = THREE.LinearFilter
+      texture.magFilter = THREE.LinearFilter
       return texture
     })
     textureCache.set(url, promise)
