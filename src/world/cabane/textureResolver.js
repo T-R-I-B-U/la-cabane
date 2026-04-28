@@ -22,7 +22,25 @@ const availableTextures = new Map()
 
 const MESH_TEXTURE_ALIASES = {
   'platform-details': 'railling',
+  'tour fenêtre': 'tour_fenêtre',
+  'tour-fenetre': 'tour_fenêtre',
+  'glass': 'glass',
+  'cross-window': 'cross-window',
+  'hut-verre': 'hut-verre',
+  'fenêtre': 'glass',
+  'fenetre': 'glass',
+  'fenêtre.1': 'cross-window',
+  'fenetre-1': 'cross-window',
 }
+
+const FORCE_TEXTURE_OVERRIDE_MESHES = new Set([
+  'tour fenêtre',
+  'glass',
+  'cross-window',
+  'hut-verre',
+  'fenêtre',
+  'fenêtre.1',
+])
 
 function textureNameCandidates(name) {
   const baseName = name.replace(/[_-]\d+$/, '')
@@ -102,13 +120,43 @@ function forEachMaterial(material, callback) {
   else if (material) callback(material)
 }
 
+function resolveTextureAlias(name) {
+  if (!name) return null
+
+  const lowered = name.toLowerCase().trim()
+  const normalized = normalizeAssetName(name)
+  const trimmedNumericSuffix = lowered.replace(/[._-]\d+$/, '')
+  const normalizedTrimmedNumericSuffix = normalizeAssetName(trimmedNumericSuffix)
+  const candidates = [
+    name,
+    name.normalize('NFC'),
+    name.normalize('NFD'),
+    lowered,
+    normalized,
+    trimmedNumericSuffix,
+    normalizedTrimmedNumericSuffix,
+  ]
+
+  for (const candidate of candidates) {
+    if (candidate && MESH_TEXTURE_ALIASES[candidate]) return MESH_TEXTURE_ALIASES[candidate]
+  }
+
+  return null
+}
+
+function resetMaterialTint(material) {
+  if (!material?.color) return
+  material.color.set(0xffffff)
+}
+
 function getTextureNames(object3d, obj, fallbackName) {
-  const directAlias = MESH_TEXTURE_ALIASES[obj.name]
+  const directAlias = resolveTextureAlias(obj.name)
   const ancestorAlias = !directAlias
     ? (() => {
         let current = obj.parent
         while (current && current !== object3d) {
-          if (MESH_TEXTURE_ALIASES[current.name]) return MESH_TEXTURE_ALIASES[current.name]
+          const alias = resolveTextureAlias(current.name)
+          if (alias) return alias
           current = current.parent
         }
         return null
@@ -131,18 +179,20 @@ export async function applyAutoTextures(object3d, fallbackName) {
   object3d.traverse((obj) => {
     if (!obj.isMesh || !obj.material) return
 
-    const textureNames = getTextureNames(object3d, obj, fallbackName)
+    const forcedAlias = resolveTextureAlias(obj.name)
+    const textureNames = forcedAlias ? [forcedAlias] : getTextureNames(object3d, obj, fallbackName)
     forEachMaterial(obj.material, (material) => {
       material.side = THREE.DoubleSide
       tasks.push(
         Promise.all(
           TEXTURE_SLOTS.map(async ({ suffix, materialKey, colorSpace }) => {
-            if (material[materialKey]) return
+            if (material[materialKey] && !FORCE_TEXTURE_OVERRIDE_MESHES.has(obj.name)) return
 
             const url = findTextureUrl(textureNames, suffix)
             if (!url) return
 
             material[materialKey] = await loadTexture(url, colorSpace)
+            resetMaterialTint(material)
             material.needsUpdate = true
           })
         )

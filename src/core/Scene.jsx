@@ -61,7 +61,7 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
 
       <SceneLighting />
 
-      <Floor mainFloorRef={setMainFloorCollider} />
+      <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
 
       <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={setCabane} />
 

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useAnimations, useGLTF } from '@react-three/drei'
 import { LoopRepeat } from 'three'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
+import { applyAutoTextures } from '../cabane/textureResolver'
 
 const NO_RAYCAST = () => {}
 
@@ -14,7 +15,7 @@ function pickDefaultClip(actions, names, defaultClip) {
   return names[0] ?? null
 }
 
-export function AnimatedCharacter({ url, clip, ...props }) {
+export function AnimatedCharacter({ url, clip, textureName, ...props }) {
   const group = useRef()
   const { scene, animations } = useGLTF(url)
   const clonedScene = useMemo(() => clone(scene), [scene])
@@ -28,6 +29,11 @@ export function AnimatedCharacter({ url, clip, ...props }) {
       obj.userData.isCharacter = true
     })
   }, [clonedScene])
+
+  useEffect(() => {
+    if (!textureName) return
+    applyAutoTextures(clonedScene, textureName)
+  }, [clonedScene, textureName])
 
   useEffect(() => {
     const nextClip = pickDefaultClip(actions, names, clip)

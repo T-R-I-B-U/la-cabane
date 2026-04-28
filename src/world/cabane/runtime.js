@@ -1,3 +1,5 @@
+import * as THREE from 'three'
+
 export function applyTransform(object3d, node) {
   const [px, py, pz] = node.position
   const [rx, ry, rz] = node.rotation
