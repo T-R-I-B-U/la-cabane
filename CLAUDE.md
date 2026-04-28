@@ -19,24 +19,27 @@ Two developers working collaboratively.
 
 ## Folder structure
 
-Current state — folders exist but most are still empty (scaffolded).
-
 ```
 public/
-  models/       → .gltf/.glb files (Cinema 4D exports)
+  models/           → .gltf/.glb files (Cinema 4D exports)
+    compressed/     → Draco-compressed variants
   textures/
   audio/
+  subtitles/        → .srt files for dialogue tracks
 
 src/
-  assets/       → static assets imported by Vite (SVG, images)
-  core/         → R3F scene setup, controls, loaders, diagnostics
+  assets/           → static assets imported by Vite (SVG, images)
+  app/              → intro state machine, NPC dialogue, UI-level hooks and components
+  core/             → R3F canvas setup, player controls, loaders, diagnostics
+    audio/          → AudioManager, Subtitles component, audioConfig.json
+    scene/          → scene sub-components (lighting, characters, interactions, controls)
   world/
-    entities/   → one module/component per 3D object or scene behavior
-    materials/  → reusable materials / shaders
-  utils/        → shared stateless helpers
+    cabane/         → scene graph pipeline: nodeBuilder, instancing, textureResolver, runtime
+    entities/       → one module/component per 3D object or scene behavior
+    interactions/   → shared interaction hooks
+    materials/      → reusable materials / shaders
+  utils/            → shared stateless helpers (audioStore, etc.)
 ```
-
-> `public/draco/` will be added when Draco-compressed .glb files are introduced.
 
 ## Behavioral guidelines
 
@@ -95,7 +98,8 @@ Transform vague tasks into verifiable goals:
   without explicitly flagging it and explaining why
 - Commits suggested by Claude must be in English, following the conventional
   commits format defined in AGENTS.md
-- Always explain generated code — every non-obvious block needs a comment
+- Only comment the non-obvious WHY — a hidden constraint, a subtle invariant, a workaround.
+  Don't describe what the code does; well-named identifiers already do that.
 - Never rewrite an existing file entirely — show a diff or a targeted edit instead
 - If an architectural decision needs to be made, present options rather than
   imposing a choice

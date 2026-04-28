@@ -10,15 +10,7 @@ Apply these rules unless an explicit user instruction overrides them.
 - Build: Vite (`vite.config.js`)
 - Tests: currently not configured
 
-## 2) External Rules Audit
-Checked for editor/assistant-specific rules:
-- `.cursor/rules/`: not found
-- `.cursorrules`: not found
-- `.github/copilot-instructions.md`: not found
-
-If these files are added later, merge their constraints here immediately.
-
-## 3) Branch and Commit Workflow
+## 2) Branch and Commit Workflow
 Never commit directly to `main`. Use feature branches and PRs.
 
 ### Branch naming
@@ -119,12 +111,17 @@ npx vitest run src/path/to/file.test.js -t "specific test name"
 
 ## 5) Folder Ownership and Architecture
 Keep code within existing structure:
-- `src/core/`: React Three Fiber canvas setup, loaders, controls, diagnostics
+- `src/app/`: intro state machine, NPC dialogue, UI-level hooks and components
+- `src/core/`: R3F canvas setup, player controls, loaders, diagnostics
+- `src/core/audio/`: AudioManager component, Subtitles, audioConfig.json
+- `src/core/scene/`: scene sub-components (lighting, characters, interactions, controls)
+- `src/world/cabane/`: scene graph pipeline — nodeBuilder, instancing, textureResolver, runtime
 - `src/world/entities/`: one module/component per 3D object or scene behavior
+- `src/world/interactions/`: shared interaction hooks
 - `src/world/materials/`: reusable materials/shaders
-- `src/utils/`: shared helpers/utilities
-- `public/models`, `public/textures`, `public/audio`: static assets
-- `public/draco`: Draco decoder files if compressed GLB assets are introduced
+- `src/utils/`: shared helpers/utilities (audioStore, etc.)
+- `public/models/`: .gltf/.glb assets; `public/models/compressed/` for Draco variants
+- `public/textures/`, `public/audio/`, `public/subtitles/`: static assets by type
 
 Do not create new top-level folders without explicit rationale.
 
