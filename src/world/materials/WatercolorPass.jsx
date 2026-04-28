@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
-import { BlendFunction, EffectComposer, EffectPass, RenderPass } from 'postprocessing'
+import { EffectComposer, EffectPass, RenderPass } from 'postprocessing'
 import { KuwaharaEffect } from './KuwaharaEffect'
 
-export function WatercolorPass({ enabled = false, radius = 3 }) {
+export function WatercolorPass({ radius = 3 }) {
   const { camera, gl, scene, setDpr, size } = useThree()
   const composerRef = useRef(null)
   const kuwaharaRef = useRef(null)
@@ -13,7 +13,6 @@ export function WatercolorPass({ enabled = false, radius = 3 }) {
     const kuwahara = new KuwaharaEffect()
     composer.addPass(new RenderPass(scene, camera))
     composer.addPass(new EffectPass(camera, kuwahara))
-
     composerRef.current = composer
     kuwaharaRef.current = kuwahara
 
@@ -25,23 +24,19 @@ export function WatercolorPass({ enabled = false, radius = 3 }) {
   }, [camera, gl, scene])
 
   useEffect(() => {
-    if (!kuwaharaRef.current) return
-    kuwaharaRef.current.radius = radius
+    if (kuwaharaRef.current) kuwaharaRef.current.radius = radius
   }, [radius])
 
   useEffect(() => {
-    if (!kuwaharaRef.current) return
-    kuwaharaRef.current.blendMode.blendFunction = enabled
-      ? BlendFunction.NORMAL
-      : BlendFunction.SKIP
-  }, [enabled])
-
-  useEffect(() => {
     if (!composerRef.current) return
-    const pixelRatio = enabled ? 1 : Math.min(window.devicePixelRatio, 2)
-    setDpr(pixelRatio)
+    setDpr(1)
     composerRef.current.setSize(size.width, size.height)
-  }, [enabled, setDpr, size.height, size.width])
+  }, [setDpr, size.height, size.width])
+
+  // Restore DPR on unmount
+  useEffect(() => {
+    return () => setDpr(Math.min(window.devicePixelRatio, 2))
+  }, [setDpr])
 
   useFrame((_, delta) => {
     composerRef.current?.render(delta)

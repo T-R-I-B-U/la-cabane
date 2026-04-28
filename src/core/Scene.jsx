@@ -114,7 +114,7 @@ export default function Scene({
         hutPosition={hutPosition}
       />
 
-      <WatercolorPass enabled={shaderEnabled} radius={shaderRadius} />
+      {shaderEnabled && <WatercolorPass radius={shaderRadius} />}
     </Canvas>
   )
 }
