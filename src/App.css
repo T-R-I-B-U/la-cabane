@@ -14,13 +14,9 @@
 .viewer-controls {
   position: absolute;
   z-index: 6;
-  border: 1px solid rgba(226, 232, 240, 0.22);
-  background:
-    linear-gradient(145deg, rgba(12, 18, 24, 0.86), rgba(19, 31, 41, 0.76)), rgba(12, 18, 24, 0.82);
-  backdrop-filter: blur(18px) saturate(1.2);
-  box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(109, 139, 154, 0.34);
+  background: #101b24;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
   color: #e6f0f7;
 }
 
@@ -116,12 +112,12 @@
   min-width: 0;
   padding: 9px 10px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #162631;
+  border: 1px solid rgba(109, 139, 154, 0.18);
 }
 
 .pm-row--emphasis {
-  background: rgba(34, 221, 136, 0.08);
+  background: #143027;
 }
 
 .pm-label {
@@ -179,8 +175,8 @@
 .controls-hero,
 .controls-section {
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.055);
-  border: 1px solid rgba(255, 255, 255, 0.075);
+  background: #162631;
+  border: 1px solid rgba(109, 139, 154, 0.18);
 }
 
 .controls-hero {
@@ -241,7 +237,7 @@
 .controls-scene-summary span {
   padding: 7px 8px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.07);
+  background: #1d3340;
   color: #d9e7ef;
   font-size: 0.68rem;
   font-variant-numeric: tabular-nums;
@@ -258,8 +254,8 @@
   min-height: 34px;
   padding: 8px 10px;
   border-radius: 11px;
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: rgba(255, 255, 255, 0.065);
+  border: 1px solid rgba(109, 139, 154, 0.22);
+  background: #1a2d38;
   color: #e6f0f7;
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 0.76rem;
@@ -273,8 +269,8 @@
 }
 
 .camera-toggle:hover {
-  background: rgba(255, 255, 255, 0.105);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: #203744;
+  border-color: rgba(132, 170, 188, 0.34);
 }
 
 .camera-toggle:disabled {
@@ -283,14 +279,13 @@
 }
 
 .camera-toggle--primary {
-  background: linear-gradient(135deg, rgba(34, 221, 136, 0.28), rgba(74, 144, 226, 0.18));
-  border-color: rgba(34, 221, 136, 0.26);
+  background: #173b30;
+  border-color: rgba(34, 221, 136, 0.32);
 }
 
 .camera-toggle--active {
-  background: rgba(34, 221, 136, 0.16);
+  background: #173b30;
   border-color: rgba(34, 221, 136, 0.38);
-  box-shadow: inset 0 0 0 1px rgba(34, 221, 136, 0.05);
   color: #f8fbfd;
 }
 
@@ -303,8 +298,8 @@
 }
 
 .camera-toggle--active:hover {
-  background: rgba(34, 221, 136, 0.21);
-  border-color: transparent;
+  background: #1a4738;
+  border-color: rgba(34, 221, 136, 0.46);
 }
 
 .camera-toggle-icon {
@@ -312,7 +307,7 @@
   flex-shrink: 0;
   padding: 2px 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: #223847;
   color: #9ec6d6;
   font-family: 'IBM Plex Mono', 'Courier New', monospace;
   font-size: 0.55rem;
@@ -335,8 +330,8 @@
   flex-direction: column;
   gap: 6px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.065);
+  background: #14232d;
+  border: 1px solid rgba(109, 139, 154, 0.18);
   overflow: hidden;
 }
 
@@ -362,11 +357,11 @@
 
 .dev-section-header:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  background: #1b303c;
 }
 
 .dev-section--open .dev-section-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.065);
+  border-bottom: 1px solid rgba(109, 139, 154, 0.18);
 }
 
 .dev-section-arrow {
