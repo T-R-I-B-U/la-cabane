@@ -10,6 +10,7 @@ const _worldMatrix = new THREE.Matrix4()
 const _pos = new THREE.Vector3()
 const _quat = new THREE.Quaternion()
 const _scl = new THREE.Vector3()
+const _color = new THREE.Color()
 // Scratch objects for animation — reused each frame to avoid GC pressure
 const _offset = new THREE.Matrix4()
 const _final = new THREE.Matrix4()
@@ -17,6 +18,9 @@ const _euler = new THREE.Euler()
 
 const PROFILE_COUNT = 20
 const ANIM_SEED = 42
+const TINT_SEED = 137
+const TINT_MIN = 0.45 // darkest leaves — never fully black
+const TINT_MAX = 1.0 // brightest leaves — full base color
 // Feuilles au-delà de cette distance (world units) ne s'animent pas
 const LOD_DISTANCE_SQ = 10 * 10
 
@@ -86,6 +90,19 @@ export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover }) {
       pos[i * 3 + 2] = m.elements[14]
     }
     return pos
+  }, [leafMesh])
+
+  useEffect(() => {
+    if (!leafMesh) return
+    const rand = mulberry32(TINT_SEED)
+    for (let i = 0; i < leafMesh.count; i++) {
+      const g = TINT_MIN + rand() * (TINT_MAX - TINT_MIN)
+      leafMesh.setColorAt(i, _color.setRGB(g, g, g))
+    }
+    if (leafMesh.instanceColor) {
+      // eslint-disable-next-line react-hooks/immutability
+      leafMesh.instanceColor.needsUpdate = true
+    }
   }, [leafMesh])
 
   /* eslint-disable react-hooks/immutability */
