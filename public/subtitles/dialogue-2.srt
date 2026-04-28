@@ -1,0 +1,27 @@
+1
+00:00:00,000 --> 00:00:04,000
+Parfait ! Je vais pouvoir commencer la visite, j'espère que tu as hâte toi aussi.
+
+2
+00:00:04,000 --> 00:00:08,200
+La Cabane c'est un espace de vie partagé au service du savoir commun.
+
+3
+00:00:08,200 --> 00:00:12,400
+Ici tout le monde peut apprendre et faire apprendre, échanger, partager et recevoir.
+
+4
+00:00:12,400 --> 00:00:16,600
+C'est un modèle novateur qui brise la transmission descendante du savoir.
+
+5
+00:00:16,600 --> 00:00:20,800
+Ici peu importe l'âge, le métier, les origines, nous avons tous quelque chose à apprendre.
+
+6
+00:00:20,800 --> 00:00:25,000
+J'ai entendu dire que tu as beaucoup hésité à venir, je comprends que cela peut sembler intimidant.
+
+7
+00:00:25,000 --> 00:00:29,400
+Commençons par l'accueil.

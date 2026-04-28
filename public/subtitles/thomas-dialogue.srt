@@ -1,0 +1,7 @@
+1
+00:00:00,000 --> 00:00:03,600
+Salut ! Moi c'est Thomas.
+
+2
+00:00:03,600 --> 00:00:06,600
+Je suis là pour te présenter les ateliers disponibles.

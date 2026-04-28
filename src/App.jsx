@@ -1,172 +1,186 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
-import { CabaneEngine } from './core/CabaneEngine.js'
-import { PerfMonitor } from './core/PerfMonitor.jsx'
+import { useState, useCallback, useEffect } from 'react'
+import { Crosshair } from './app/Crosshair'
+import { IntroLoader } from './app/IntroLoader'
+import { NameInput } from './app/NameInput'
+import { useIntroFlow } from './app/useIntroFlow'
+import { useNpcDialogue } from './app/useNpcDialogue'
+import { ViewerControls } from './app/ViewerControls'
+import Scene from './core/Scene'
+import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
+import { PerfMonitor } from './core/PerfMonitor'
+import Subtitles from './core/audio/Subtitles'
 import './App.css'
 
+const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
+
 export default function App() {
-  const containerRef = useRef(null)
-  const engineRef    = useRef(null)
-
-  const [stats,      setStats]      = useState({ fps: 0, cpu: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 })
-  const [status,     setStatus]     = useState('loading')
-  const [info,       setInfo]       = useState(null)
-
-  const [jsonText,    setJsonText]    = useState('')
-  const [jsonError,   setJsonError]   = useState(null)
-  const [overriding,  setOverriding]  = useState(false)
-  const [dragging,    setDragging]    = useState(false)
-  const [compressed,  setCompressed]  = useState(false)
+  const [stats, setStats] = useState(STATS_INIT)
+  const [status, setStatus] = useState('loading')
+  const [info, setInfo] = useState(null)
+  const [playerMode, setPlayerMode] = useState(false)
+  const [debugDoors, setDebugDoors] = useState(false)
+  const [debugCollisions, setDebugCollisions] = useState(false)
+  const [showUI, setShowUI] = useState(true)
+  const [playerSpawn, setPlayerSpawn] = useState(null)
+  const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
+  const [userMovementLocked, setUserMovementLocked] = useState(false)
+  const sceneReady = status === 'ok'
+  const {
+    dialogueActive,
+    introActive,
+    introDoorOpen,
+    introMovementLocked,
+    introPending,
+    introShouldAdvance,
+    introWaitingAtDoor,
+    loaderFading,
+    postIntro,
+    showNameInput,
+    dismissLoader,
+    handleIntroEvent,
+    handleLoaderClick,
+    handleLoaderKeyDown,
+    handleNameSubmit,
+    launchIntro,
+    playDialogue,
+    setPostIntro,
+  } = useIntroFlow({ sceneReady })
+  const interactionLocked = dialogueActive || introMovementLocked || showNameInput
+  const {
+    handleNpcInteract,
+    marieClip,
+    npcHovered,
+    setMarieClip,
+    setNpcHovered,
+    setThomasClip,
+    thomasClip,
+  } = useNpcDialogue({
+    playDialogue,
+    interactionLocked,
+  })
 
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const onKeyDown = (event) => {
+      if (event.code !== 'F1') return
 
-    const engine = new CabaneEngine(container, {
-      onStats: setStats,
-      onReady: (data) => { setInfo(data); setStatus('ok') },
-      onError: (msg)  => { setInfo(msg);  setStatus('error') },
-    })
-    engineRef.current = engine
-    engine.setFloorY(0.8)
-
-    return () => {
-      engine.dispose()
-      engineRef.current = null
+      event.preventDefault()
+      setShowUI((current) => !current)
     }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  const applyJson = useCallback((text) => {
-    try {
-      const data = JSON.parse(text)
-      setJsonError(null)
-      setOverriding(true)
-      setStatus('loading')
-      engineRef.current?.reload(data)
-    } catch {
-      setJsonError('JSON invalide')
+  const onReady = useCallback((data) => {
+    setInfo(data)
+    setStatus('ok')
+  }, [])
+  const onError = useCallback((msg) => {
+    setInfo(msg)
+    setStatus('error')
+  }, [])
+
+  function goToPlatform() {
+    setPostIntro(false)
+    setPlayerSpawn(getPlatformSpawn(info?.platformPosition))
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(true)
+    setPlayerMode(true)
+  }
+
+  function togglePlayerView() {
+    setPostIntro(false)
+
+    if (playerMode) {
+      setPlayerMode(false)
+      setUserMovementLocked(false)
+      return
     }
-  }, [])
 
-  const resetJson = useCallback(() => {
-    setJsonText('')
-    setJsonError(null)
-    setOverriding(false)
-    setStatus('loading')
-    engineRef.current?.reload(null)
-  }, [])
-
-  const onPaste = useCallback((e) => {
-    const text = e.clipboardData.getData('text')
-    setJsonText(text)
-    applyJson(text)
-    e.preventDefault()
-  }, [applyJson])
-
-  const onDragOver = useCallback((e) => {
-    e.preventDefault()
-    setDragging(true)
-  }, [])
-
-  const onDragLeave = useCallback(() => setDragging(false), [])
-
-  const onDrop = useCallback((e) => {
-    e.preventDefault()
-    setDragging(false)
-    const file = e.dataTransfer.files[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const text = ev.target.result
-      setJsonText(text)
-      applyJson(text)
-    }
-    reader.readAsText(file)
-  }, [applyJson])
+    setPlayerSpawn(getPlayerSpawn(info?.hutPosition))
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setPlayerMode(true)
+  }
 
   return (
     <main className="viewer-page">
-      <div ref={containerRef} className="viewer-canvas" />
+      <Subtitles />
 
-      <PerfMonitor stats={stats} />
+      <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={npcHovered} />
 
-      <aside className="viewer-controls" aria-live="polite">
-        <h1 className="controls-title">La Cabane</h1>
+      <Scene
+        sceneState={{
+          onStats: setStats,
+          onReady,
+          onError,
+        }}
+        player={{
+          mode: playerMode,
+          spawn: playerSpawn,
+          spawnKey: playerSpawnKey,
+          movementLocked: introMovementLocked || userMovementLocked,
+        }}
+        debug={{
+          doors: debugDoors,
+          collisions: debugCollisions,
+        }}
+        intro={{
+          active: introActive,
+          doorOpen: introDoorOpen,
+          waitingAtDoor: introWaitingAtDoor,
+          shouldAdvance: introShouldAdvance,
+          postIntro,
+          postIntroLocked: !showNameInput,
+          interactionLocked,
+          onEvent: handleIntroEvent,
+        }}
+        characters={{
+          marieClip,
+          thomasClip,
+        }}
+        interactions={{
+          onNpcInteract: handleNpcInteract,
+          onNpcHover: setNpcHovered,
+        }}
+      />
 
-        {status === 'loading' && (
-          <p className="controls-status">Construction de la scène…</p>
-        )}
+      {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
 
-        {status === 'error' && (
-          <p className="controls-error">{info}</p>
-        )}
+      {showUI && !introPending && !introActive && !postIntro && (
+        <ViewerControls
+          status={status}
+          info={info}
+          sceneReady={sceneReady}
+          introPending={introPending}
+          introActive={introActive}
+          playerMode={playerMode}
+          userMovementLocked={userMovementLocked}
+          marieClip={marieClip}
+          thomasClip={thomasClip}
+          debugDoors={debugDoors}
+          debugCollisions={debugCollisions}
+          onLaunchIntro={launchIntro}
+          onTogglePlayerMode={togglePlayerView}
+          onGoToPlatform={goToPlatform}
+          onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
+          onSelectMarieClip={setMarieClip}
+          onSelectThomasClip={setThomasClip}
+          onToggleDebugDoors={() => setDebugDoors((current) => !current)}
+          onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+        />
+      )}
 
-        {status === 'ok' && info && (
-          <>
-            <p className="controls-stat">
-              <span className="dot dot--mesh" />
-              {info.meshes} mesh{info.meshes !== 1 ? 'es' : ''} chargé{info.meshes !== 1 ? 's' : ''}
-            </p>
-            <p className="controls-stat">
-              <span className="dot dot--pivot" />
-              {info.pivots} pivot{info.pivots !== 1 ? 's' : ''}
-            </p>
-          </>
-        )}
+      {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
-        {/* ── Mode assets ── */}
-        <div className="asset-mode">
-          <span className="asset-mode-label">Assets</span>
-          <button
-            className={`asset-toggle${compressed ? ' asset-toggle--on' : ''}`}
-            onClick={() => {
-              const next = !compressed
-              setCompressed(next)
-              engineRef.current?.setCompressed(next)
-            }}
-          >
-            <span className="asset-toggle-track">
-              <span className="asset-toggle-thumb" />
-            </span>
-            <span className="asset-toggle-label">{compressed ? 'compressés' : 'normaux'}</span>
-          </button>
-        </div>
-
-        {/* ── JSON override ── */}
-        <div className="json-section">
-          <div className="json-header">
-            <span className="json-label">
-              JSON{overriding && <span className="json-badge">override</span>}
-            </span>
-            {overriding && (
-              <button className="json-reset" onClick={resetJson}>Réinitialiser</button>
-            )}
-          </div>
-
-          <div
-            className={`json-dropzone${dragging ? ' json-dropzone--over' : ''}`}
-            onDragOver={onDragOver}
-            onDragLeave={onDragLeave}
-            onDrop={onDrop}
-          >
-            <textarea
-              className="json-textarea"
-              placeholder="Coller un JSON ou déposer un fichier .json ici…"
-              value={jsonText}
-              onChange={(e) => setJsonText(e.target.value)}
-              onPaste={onPaste}
-              spellCheck={false}
-            />
-          </div>
-
-          {jsonError && <p className="json-error">{jsonError}</p>}
-
-          {jsonText && !overriding && !jsonError && (
-            <button className="json-apply" onClick={() => applyJson(jsonText)}>
-              Appliquer
-            </button>
-          )}
-        </div>
-      </aside>
+      {introPending && (
+        <IntroLoader
+          fading={loaderFading}
+          onClick={handleLoaderClick}
+          onKeyDown={handleLoaderKeyDown}
+          onAnimationEnd={dismissLoader}
+        />
+      )}
     </main>
   )
 }

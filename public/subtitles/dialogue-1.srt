@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:03,600
+Ohhh mais bienvenue à toi ! Bienvenue dans la Cabane !
+
+2
+00:00:03,600 --> 00:00:07,400
+Tu es nouveau toi ici, je suis bien heureux de te recevoir !
+
+3
+00:00:07,400 --> 00:00:11,200
+J'ai hâte de te présenter le concept de La Cabane et son fonctionnement.
+
+4
+00:00:11,200 --> 00:00:15,200
+Ne sois pas timide, présente toi rapidement.

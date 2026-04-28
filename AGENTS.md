@@ -4,22 +4,14 @@ Repository playbook for human and AI coding agents.
 Apply these rules unless an explicit user instruction overrides them.
 
 ## 1) Project Context
-- Stack: React 19, Vite 8, Three.js, `vite-plugin-glsl`
+- Stack: React 19, Vite 7, Three.js, React Three Fiber, Drei, `vite-plugin-glsl`
 - Language: JavaScript + JSX (ES modules)
 - Linting: ESLint flat config (`eslint.config.js`)
 - Build: Vite (`vite.config.js`)
 - Tests: currently not configured
 
-## 2) External Rules Audit
-Checked for editor/assistant-specific rules:
-- `.cursor/rules/`: not found
-- `.cursorrules`: not found
-- `.github/copilot-instructions.md`: not found
-
-If these files are added later, merge their constraints here immediately.
-
-## 3) Branch and Commit Workflow
-Never commit directly to `main`. Use feature branches and PRs.
+## 2) Branch and Commit Workflow
+Never commit directly to `main` or `develop`. Use feature branches and PRs.
 
 ### Branch naming
 Use `<type>/<short-description>`.
@@ -51,7 +43,12 @@ Rules:
 - include body for non-trivial changes
 
 ## 4) Commands (Build/Lint/Test)
-Run from repo root: `/Users/pierrelouisrousseaux/Developer/Gobelins/threejs`.
+
+### First-time setup (run once after cloning)
+```bash
+make setup
+```
+Configures git to use `.githooks/pre-push`, which runs lint and format checks automatically before every push.
 
 ### Install
 ```bash
@@ -83,6 +80,22 @@ npm run lint
 npx eslint src/App.jsx
 ```
 
+### Format all source files
+```bash
+npm run format
+```
+
+### Check formatting
+```bash
+npm run format:check
+```
+
+### Run all pre-push checks manually
+```bash
+make check
+```
+Runs lint + format check. Same checks as the pre-push hook.
+
 ### Tests (current status + single-test guidance)
 Current state:
 - no `npm test` script in `package.json`
@@ -98,11 +111,17 @@ npx vitest run src/path/to/file.test.js -t "specific test name"
 
 ## 5) Folder Ownership and Architecture
 Keep code within existing structure:
-- `src/core/`: engine lifecycle (scene, camera, renderer, loop, loader)
-- `src/world/entities/`: one module/class per 3D object
+- `src/app/`: intro state machine, NPC dialogue, UI-level hooks and components
+- `src/core/`: R3F canvas setup, player controls, loaders, diagnostics
+- `src/core/audio/`: AudioManager component, Subtitles, audioConfig.json
+- `src/core/scene/`: scene sub-components (lighting, characters, interactions, controls)
+- `src/world/cabane/`: scene graph pipeline — nodeBuilder, instancing, textureResolver, runtime
+- `src/world/entities/`: one module/component per 3D object or scene behavior
+- `src/world/interactions/`: shared interaction hooks
 - `src/world/materials/`: reusable materials/shaders
-- `src/utils/`: shared helpers/utilities
-- `public/models`, `public/textures`, `public/audio`, `public/draco`: static assets
+- `src/utils/`: shared helpers/utilities (audioStore, etc.)
+- `public/models/`: .gltf/.glb assets; `public/models/compressed/` for Draco variants
+- `public/textures/`, `public/audio/`, `public/subtitles/`: static assets by type
 
 Do not create new top-level folders without explicit rationale.
 
@@ -146,9 +165,10 @@ Do not create new top-level folders without explicit rationale.
 - avoid redundant comments for obvious code
 
 ### React / Three.js Separation
-- keep engine concerns in `core/`
-- keep scene content orchestration in `world/`
-- avoid mixing React UI state logic with low-level Three.js lifecycle code
+- keep DOM overlay state and controls in React UI components
+- keep R3F canvas setup, scene controls, loaders, and diagnostics in `core/`
+- keep project-specific 3D content and entity behavior in `world/`
+- avoid putting DOM UI concerns inside low-level Three.js/R3F scene code
 - clean up listeners/resources on teardown
 
 ## 7) Pull Request Quality Bar
