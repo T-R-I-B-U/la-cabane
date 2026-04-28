@@ -6,6 +6,17 @@
   height: 100dvh;
   overflow: hidden;
   font-family: 'Inter', system-ui, sans-serif;
+  cursor: none;
+}
+
+.viewer-page * {
+  cursor: none;
+}
+
+/* Restore cursor before the 3D experience starts */
+.viewer-page--cursor-visible,
+.viewer-page--cursor-visible * {
+  cursor: auto !important;
 }
 
 /* ── Scene Debug panel — top left ────────────────────────────────── */
@@ -323,6 +334,85 @@
   color: #0f1f2b;
   letter-spacing: 0.05em;
   user-select: none;
+}
+
+/* ── Savoir panel ────────────────────────────────────────────────── */
+
+.savoir-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 20, 28, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.savoir-card {
+  position: relative;
+  width: min(420px, calc(100vw - 32px));
+  padding: 28px 32px 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 48px rgba(10, 20, 28, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.savoir-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #6a8899;
+  padding: 4px 6px;
+  line-height: 1;
+}
+
+.savoir-close:hover {
+  color: #0f1f2b;
+}
+
+.savoir-category {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #4a7088;
+}
+
+.savoir-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #0f1f2b;
+  line-height: 1.3;
+}
+
+.savoir-text {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #2a4455;
+  line-height: 1.6;
+}
+
+.savoir-contact {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  color: #6a8899;
+}
+
+.savoir-contact-label {
+  font-weight: 600;
+  color: #4a7088;
 }
 
 /* ── Name input interaction ──────────────────────────────────────── */

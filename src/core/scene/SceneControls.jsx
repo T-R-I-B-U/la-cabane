@@ -10,7 +10,8 @@ export function SceneControls({
   playerMode,
   playerSpawn,
   playerSpawnKey,
-  movementLocked,
+  canMove,
+  canRotate,
   postIntro,
   postIntroLocked,
   controlsRef,
@@ -26,7 +27,8 @@ export function SceneControls({
     return (
       <PlayerControls
         key={playerSpawnKey}
-        canMove={!movementLocked}
+        canMove={canMove}
+        canRotate={canRotate}
         spawnAt={playerSpawn}
         collisionObjects={collisionObjects}
       />
@@ -35,7 +37,7 @@ export function SceneControls({
 
   if (postIntro) {
     return postIntroLocked ? (
-      <PlayerControls canMove={!movementLocked} collisionObjects={collisionObjects} />
+      <PlayerControls canMove={canMove} canRotate={canRotate} collisionObjects={collisionObjects} />
     ) : null
   }
 

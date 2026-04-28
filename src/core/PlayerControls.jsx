@@ -21,7 +21,7 @@ function isBlockingHit(h) {
   return true
 }
 
-export function PlayerControls({ canMove = true, spawnAt, collisionObjects = [] }) {
+export function PlayerControls({ canMove = true, canRotate = true, spawnAt, collisionObjects = [] }) {
   const { camera } = useThree()
   const spawnRef = useRef(spawnAt)
   const keys = useRef({})
@@ -119,5 +119,5 @@ export function PlayerControls({ canMove = true, spawnAt, collisionObjects = [] 
     }
   })
 
-  return <PointerLockControls />
+  return <PointerLockControls enabled={canRotate} />
 }

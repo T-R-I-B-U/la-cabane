@@ -147,7 +147,6 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
       hoveredRef.current = false
       mouseMovedRef.current = false
       setDoorHover(false)
-      document.body.style.cursor = 'default'
     }
   }, [active, gl, doorMeshes, onDoorClickRef, setDoorHover])
 
@@ -162,8 +161,6 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
       hoveredRef.current = isHovered
       setDoorHover(isHovered)
     }
-
-    document.body.style.cursor = isHovered ? 'pointer' : 'default'
   })
 
   return null

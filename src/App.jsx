@@ -2,8 +2,10 @@ import { useState, useCallback, useEffect } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
 import { NameInput } from './app/NameInput'
+import { SavoirPanel } from './app/SavoirPanel'
 import { useIntroFlow } from './app/useIntroFlow'
 import { useNpcDialogue } from './app/useNpcDialogue'
+import { useSavoirAssignment } from './app/useSavoirAssignment'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
 import { getPlatformSpawn } from './core/SceneConfig'
@@ -45,7 +47,31 @@ export default function App() {
     playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-  const interactionLocked = dialogueActive || introMovementLocked || showNameInput
+  const { selected: selectedSavoir, assignAndOpen, close: closeSavoirInternal } = useSavoirAssignment()
+  
+  // Force exit pointer lock when a savoir opens to show the mouse immediately
+  useEffect(() => {
+    if (selectedSavoir && document.pointerLockElement) {
+      document.exitPointerLock()
+    }
+  }, [selectedSavoir])
+
+  const handleCloseSavoir = () => {
+    closeSavoirInternal()
+    const canvas = document.querySelector('canvas')
+    if (canvas) canvas.requestPointerLock()
+  }
+
+  const [pointerIsLocked, setPointerIsLocked] = useState(false)
+  useEffect(() => {
+    const onChange = () => setPointerIsLocked(!!document.pointerLockElement)
+    document.addEventListener('pointerlockchange', onChange)
+    return () => document.removeEventListener('pointerlockchange', onChange)
+  }, [])
+
+  const interactionLocked =
+    dialogueActive || introMovementLocked || showNameInput || selectedSavoir !== null || (!pointerIsLocked && playerMode)
+
   const {
     handleNpcInteract,
     marieClip,
@@ -86,13 +112,21 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setPlayerMode(true)
+    
+    // Request lock immediately on click
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
   }
 
+  const cursorVisible = !introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked)
+
   return (
-    <main className="viewer-page">
+    <main className={`viewer-page${cursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
       <Subtitles />
 
-      <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={npcHovered} />
+      <Crosshair visible={(playerMode || postIntro) && !showNameInput && !selectedSavoir && !userMovementLocked} active={npcHovered} />
 
       <Scene
         sceneState={{
@@ -104,7 +138,10 @@ export default function App() {
           mode: playerMode,
           spawn: playerSpawn,
           spawnKey: playerSpawnKey,
-          movementLocked: introMovementLocked || userMovementLocked,
+          canMove: !interactionLocked && !userMovementLocked,
+          canRotate: !interactionLocked,
+          postIntro,
+          postIntroLocked: interactionLocked,
         }}
         debug={{
           doors: debugDoors,
@@ -127,6 +164,7 @@ export default function App() {
         interactions={{
           onNpcInteract: handleNpcInteract,
           onNpcHover: setNpcHovered,
+          onLeafClick: assignAndOpen,
         }}
       />
 
@@ -161,6 +199,8 @@ export default function App() {
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
+
+      {selectedSavoir && <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />}
 
       {introPending && (
         <IntroLoader

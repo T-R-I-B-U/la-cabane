@@ -11,7 +11,7 @@ const _pos = new THREE.Vector3()
 const _quat = new THREE.Quaternion()
 const _scl = new THREE.Vector3()
 
-export function TreeLeaves({ leafMesh }) {
+export function TreeLeaves({ leafMesh, onLeafClick }) {
   const proxyRef = useRef(null)
   const { gl } = useThree()
 
@@ -127,11 +127,14 @@ export function TreeLeaves({ leafMesh }) {
           if (id === undefined) return
           syncProxy(id)
           if (proxyRef.current) proxyRef.current.visible = true
-          document.body.style.cursor = 'pointer'
         }}
         onPointerOut={() => {
           if (proxyRef.current) proxyRef.current.visible = false
-          document.body.style.cursor = 'default'
+        }}
+        onClick={(e) => {
+          e.stopPropagation()
+          if (e.instanceId === undefined || !onLeafClick) return
+          onLeafClick(e.instanceId)
         }}
       />
 
