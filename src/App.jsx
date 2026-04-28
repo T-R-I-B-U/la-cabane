@@ -20,6 +20,7 @@ export default function App() {
   const [playerMode, setPlayerMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
+  const [shaderEnabled, setShaderEnabled] = useState(false)
   const [showUI, setShowUI] = useState(true)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
@@ -143,6 +144,7 @@ export default function App() {
           onNpcInteract: handleNpcInteract,
           onNpcHover: setNpcHovered,
         }}
+        shaderEnabled={shaderEnabled}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
@@ -166,6 +168,8 @@ export default function App() {
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           onSelectMarieClip={setMarieClip}
           onSelectThomasClip={setThomasClip}
+          shaderEnabled={shaderEnabled}
+          onToggleShader={() => setShaderEnabled((current) => !current)}
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
         />

@@ -34,12 +34,14 @@ export function ViewerControls({
   thomasClip,
   debugDoors,
   debugCollisions,
+  shaderEnabled,
   onLaunchIntro,
   onTogglePlayerMode,
   onGoToPlatform,
   onToggleUserMovement,
   onSelectMarieClip,
   onSelectThomasClip,
+  onToggleShader,
   onToggleDebugDoors,
   onToggleDebugCollisions,
 }) {
@@ -77,6 +79,17 @@ export function ViewerControls({
             PLAY
           </span>
           {introLabel}
+        </button>
+        <button
+          type="button"
+          className={`camera-toggle${shaderEnabled ? ' camera-toggle--active' : ''}`}
+          aria-pressed={shaderEnabled}
+          onClick={onToggleShader}
+        >
+          <span className="camera-toggle-icon" aria-hidden="true">
+            {shaderEnabled ? 'ON' : 'OFF'}
+          </span>
+          Rendu aquarelle
         </button>
       </PanelSection>
 
