@@ -11,7 +11,7 @@ Apply these rules unless an explicit user instruction overrides them.
 - Tests: currently not configured
 
 ## 2) Branch and Commit Workflow
-Never commit directly to `main`. Use feature branches and PRs.
+Never commit directly to `main` or `develop`. Use feature branches and PRs.
 
 ### Branch naming
 Use `<type>/<short-description>`.

@@ -6,7 +6,7 @@ Context file for Claude (Anthropic). Read this at the start of every session.
 
 ## Project
 
-ECNI — interactive WebGL experience, Gobelins school project.
+La Cabane — interactive WebGL experience, Gobelins school project.
 Two developers working collaboratively.
 
 ## Tech stack
@@ -104,7 +104,7 @@ Transform vague tasks into verifiable goals:
 - If an architectural decision needs to be made, present options rather than
   imposing a choice
 - Flag clearly when a suggestion deviates from the established architecture
-- **Always run `npm run lint` and `npx prettier --check "src/**/*.{js,jsx,css,json}"` before pushing.**
+- **Always run `npm run lint` and `npm run format:check` before pushing.**
   Fix every error and formatting issue before the push goes out — neither lint errors
   nor prettier warnings may land in a PR
 
