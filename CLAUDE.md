@@ -6,7 +6,7 @@ Context file for Claude (Anthropic). Read this at the start of every session.
 
 ## Project
 
-ECNI — interactive WebGL experience, Gobelins school project. Jury on June 3rd.
+ECNI — interactive WebGL experience, Gobelins school project.
 Two developers working collaboratively.
 
 ## Tech stack

@@ -63,7 +63,6 @@ public/
   models/       → .gltf/.glb files exported from Cinema 4D (loaded via GLTFLoader)
   textures/     → textures (loaded via TextureLoader)
   audio/        → ambience tracks and sound effects (loaded via AudioLoader)
-  draco/        → Draco decoder (added when compressed .glb files are introduced)
 
 src/
   core/         → React Three Fiber scene setup, loaders, controls, debug helpers

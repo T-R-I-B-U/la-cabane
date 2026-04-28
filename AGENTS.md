@@ -51,7 +51,12 @@ Rules:
 - include body for non-trivial changes
 
 ## 4) Commands (Build/Lint/Test)
-Run from repo root: `/Users/pierrelouisrousseaux/Developer/Gobelins/la-cabane`.
+
+### First-time setup (run once after cloning)
+```bash
+make setup
+```
+Configures git to use `.githooks/pre-push`, which runs lint and format checks automatically before every push.
 
 ### Install
 ```bash
@@ -92,6 +97,12 @@ npm run format
 ```bash
 npm run format:check
 ```
+
+### Run all pre-push checks manually
+```bash
+make check
+```
+Runs lint + format check. Same checks as the pre-push hook.
 
 ### Tests (current status + single-test guidance)
 Current state:
