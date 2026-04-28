@@ -48,6 +48,7 @@ export default function App() {
     setPostIntro,
   } = useIntroFlow({ sceneReady })
   const { selected: selectedSavoir, assignAndOpen, close: closeSavoirInternal } = useSavoirAssignment()
+  const [leafHovered, setLeafHovered] = useState(false)
   
   // Force exit pointer lock when a savoir opens to show the mouse immediately
   useEffect(() => {
@@ -126,7 +127,7 @@ export default function App() {
     <main className={`viewer-page${cursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
       <Subtitles />
 
-      <Crosshair visible={(playerMode || postIntro) && !showNameInput && !selectedSavoir && !userMovementLocked} active={npcHovered} />
+      <Crosshair visible={(playerMode || postIntro) && !showNameInput && !selectedSavoir} active={npcHovered || leafHovered} />
 
       <Scene
         sceneState={{
@@ -165,6 +166,7 @@ export default function App() {
           onNpcInteract: handleNpcInteract,
           onNpcHover: setNpcHovered,
           onLeafClick: assignAndOpen,
+          onLeafHover: setLeafHovered,
         }}
       />
 

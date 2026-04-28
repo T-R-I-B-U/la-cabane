@@ -28,7 +28,7 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
     onEvent: onIntroEvent,
   } = intro
   const { marieClip, thomasClip } = characters
-  const { onNpcInteract, onNpcHover, onLeafClick } = interactions
+  const { onNpcInteract, onNpcHover, onLeafClick, onLeafHover } = interactions
 
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -91,7 +91,7 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
 
       <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={handleCabaneLoaded} />
 
-      <TreeLeaves leafMesh={leafMesh} onLeafClick={onLeafClick} />
+      <TreeLeaves leafMesh={leafMesh} onLeafClick={onLeafClick} onLeafHover={onLeafHover} />
 
       <SceneCharacters hutPosition={hutPosition} marieClip={marieClip} thomasClip={thomasClip} />
 
