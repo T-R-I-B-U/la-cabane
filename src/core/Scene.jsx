@@ -24,7 +24,13 @@ export default function Scene({
   shaderRadius,
 }) {
   const { onStats, onReady, onError } = sceneState
-  const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey, movementLocked } = player
+  const {
+    mode: playerMode,
+    flyMode,
+    spawn: playerSpawn,
+    spawnKey: playerSpawnKey,
+    movementLocked,
+  } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
   const {
     active: introActive,
@@ -102,14 +108,15 @@ export default function Scene({
         forceOpen={introDoorOpen}
       />
 
-      <SceneControls
-        collisionObjects={collisionObjects}
-        introActive={introActive}
-        introShouldAdvance={introShouldAdvance}
-        onIntroEvent={onIntroEvent}
-        playerMode={playerMode}
-        playerSpawn={playerSpawn}
-        playerSpawnKey={playerSpawnKey}
+        <SceneControls
+          collisionObjects={collisionObjects}
+          introActive={introActive}
+          introShouldAdvance={introShouldAdvance}
+          onIntroEvent={onIntroEvent}
+          playerMode={playerMode}
+          flyMode={flyMode}
+          playerSpawn={playerSpawn}
+          playerSpawnKey={playerSpawnKey}
         movementLocked={movementLocked}
         postIntro={postIntro}
         postIntroLocked={postIntroLocked}
