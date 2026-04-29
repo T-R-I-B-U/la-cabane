@@ -29,6 +29,7 @@ export function ViewerControls({
   introPending,
   introActive,
   playerMode,
+  flyMode,
   userMovementLocked,
   marieClip,
   thomasClip,
@@ -40,6 +41,7 @@ export function ViewerControls({
   onLaunchIntro,
   onTogglePlayerMode,
   onGoToPlatform,
+  onToggleFlyMode,
   onToggleUserMovement,
   onSelectMarieClip,
   onSelectThomasClip,
@@ -139,6 +141,20 @@ export function ViewerControls({
         {playerMode && (
           <button
             type="button"
+            className={`camera-toggle${flyMode ? ' camera-toggle--active' : ''}`}
+            aria-pressed={flyMode}
+            onClick={onToggleFlyMode}
+          >
+            <span className="camera-toggle-icon" aria-hidden="true">
+              {flyMode ? 'FLY' : 'WALK'}
+            </span>
+            {flyMode ? 'Mode fly actif' : 'Activer le mode fly'}
+          </button>
+        )}
+
+        {playerMode && (
+          <button
+            type="button"
             className={`camera-toggle${userMovementLocked ? '' : ' camera-toggle--active'}`}
             aria-pressed={!userMovementLocked}
             onClick={onToggleUserMovement}
@@ -148,7 +164,11 @@ export function ViewerControls({
         )}
 
         {playerMode && (
-          <p className="controls-hint">Clic pour capturer · WASD pour avancer · ESC pour quitter</p>
+          <p className="controls-hint">
+            {flyMode
+              ? 'Clic pour capturer · WASD pour bouger · Espace/Maj pour monter ou descendre'
+              : 'Clic pour capturer · WASD pour avancer · ESC pour quitter'}
+          </p>
         )}
       </PanelSection>
 

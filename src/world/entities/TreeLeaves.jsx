@@ -38,7 +38,13 @@ function mulberry32(seed) {
   }
 }
 
-export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, leafMaterialMode = 'standard' }) {
+export function TreeLeaves({
+  leafMesh,
+  active = true,
+  onLeafClick,
+  onLeafHover,
+  leafMaterialMode = 'standard',
+}) {
   const proxyRef = useRef(null)
   const inRangeRef = useRef(null)
   const { gl } = useThree()
@@ -267,7 +273,10 @@ export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, 
       })
       if (oldMat.normalScale) newMat.normalScale.copy(oldMat.normalScale)
       leafMesh.material = newMat
-    } else if (leafMaterialMode !== 'physical' && leafMesh.material.type === 'MeshPhysicalMaterial') {
+    } else if (
+      leafMaterialMode !== 'physical' &&
+      leafMesh.material.type === 'MeshPhysicalMaterial'
+    ) {
       leafMesh.material = originalProps.material
     }
 
@@ -317,7 +326,8 @@ export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, 
       originalProps.material.alphaMap = originalProps.alphaMap
       originalProps.material.transparent = originalProps.transparent
       originalProps.material.alphaTest = originalProps.alphaTest
-      if (originalProps.material.emissive) originalProps.material.emissive.copy(originalProps.emissive)
+      if (originalProps.material.emissive)
+        originalProps.material.emissive.copy(originalProps.emissive)
       originalProps.material.emissiveIntensity = originalProps.emissiveIntensity
       originalProps.material.needsUpdate = true
     }
@@ -358,7 +368,12 @@ export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, 
         }}
         onPointerDown={(e) => {
           e.stopPropagation()
-          if (!active || e.instanceId === undefined || !inRangeRef.current?.[e.instanceId] || !onLeafClick)
+          if (
+            !active ||
+            e.instanceId === undefined ||
+            !inRangeRef.current?.[e.instanceId] ||
+            !onLeafClick
+          )
             return
           document.body.style.cursor = 'default'
           onLeafClick(e.instanceId)

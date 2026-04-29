@@ -26,7 +26,13 @@ export default function Scene({
   shaderRadius,
 }) {
   const { onStats, onReady, onError } = sceneState
-  const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey } = player
+  const {
+    mode: playerMode,
+    flyMode,
+    spawn: playerSpawn,
+    spawnKey: playerSpawnKey,
+    movementLocked,
+  } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
   const {
     active: introActive,
@@ -48,7 +54,6 @@ export default function Scene({
     onJournalStart,
     onJournalOpen,
   } = interactions
-
 
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -152,10 +157,10 @@ export default function Scene({
         introShouldAdvance={introShouldAdvance}
         onIntroEvent={onIntroEvent}
         playerMode={playerMode}
+        flyMode={flyMode}
         playerSpawn={playerSpawn}
         playerSpawnKey={playerSpawnKey}
-        canMove={player.canMove}
-        canRotate={player.canRotate}
+        movementLocked={movementLocked}
         postIntro={postIntro}
         postIntroLocked={postIntroLocked}
         controlsRef={controlsRef}

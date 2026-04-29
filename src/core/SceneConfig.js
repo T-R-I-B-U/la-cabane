@@ -6,7 +6,7 @@ export const FLOOR_Y = 0.04
 // Fallback used before cabane.json has loaded.
 export const DEFAULT_HUT_POS = [-5.0111, 2.3616, 0.9556]
 
-export const PLAYER_HEIGHT = 1.4
+export const PLAYER_HEIGHT = 1.05
 
 // Fallback until cabane.json has loaded and the real platform world position is known.
 export const PLATFORM_POS = [-2.3079, 23.1922, 20.21005]

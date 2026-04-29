@@ -9,6 +9,10 @@ const MOVE_SPEED = 5.4
 const DESCEND_SMOOTHING = 0.3
 const ASCEND_SMOOTHING = 0.2
 const MAX_FRAME_DELTA = 0.05
+const MAX_SNAP_DOWN_DIST = 0.9
+const FALL_GRAVITY = 20
+const MAX_FALL_SPEED = 12
+const FLY_SPEED = 4.8
 const UP = new THREE.Vector3(0, 1, 0)
 const DOWN = new THREE.Vector3(0, -1, 0)
 
@@ -23,7 +27,7 @@ function isBlockingHit(h) {
 
 export function PlayerControls({
   canMove = true,
-  canRotate = true,
+  flyMode = false,
   spawnAt,
   collisionObjects = [],
 }) {
@@ -32,10 +36,12 @@ export function PlayerControls({
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster())
+  const verticalVelocity = useRef(0)
 
   // Teleport camera once on mount — key prop on the parent re-triggers this effect.
   useEffect(() => {
     if (spawnRef.current) camera.position.copy(spawnRef.current)
+    verticalVelocity.current = 0
   }, [camera])
 
   useEffect(() => {
@@ -57,28 +63,44 @@ export function PlayerControls({
     const { camera } = state
     const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
 
-    // --- Floor / stair following ---
-    // Cast a ray straight down from just above the player's head.
-    // The first walkable surface hit determines the target floor height.
-    const fOrigin = camera.position.clone()
-    fOrigin.y += 0.5
-    floorRay.current.set(fOrigin, DOWN)
-    const fHits = floorRay.current.intersectObjects(collisionObjects, true)
-    const walkable = fHits.find((h) => h.object.userData.isFloor || h.object.userData.isStair)
-    const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
-    const targetCamY = targetFloorY + PLAYER_HEIGHT
+    if (!flyMode) {
+      // --- Floor / stair following ---
+      // Cast a ray straight down from just above the player's head.
+      // The first walkable surface hit determines the target floor height.
+      const fOrigin = camera.position.clone()
+      fOrigin.y += 0.5
+      floorRay.current.set(fOrigin, DOWN)
+      const fHits = floorRay.current.intersectObjects(collisionObjects, true)
+      const walkable = fHits.find((h) => h.object.userData.isFloor || h.object.userData.isStair)
+      const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
+      const targetCamY = targetFloorY + PLAYER_HEIGHT
 
-    const dy = targetCamY - camera.position.y
-    if (dy < 0) {
-      // Descending — snap quickly so player doesn't float above steps
-      const descendAlpha = 1 - Math.pow(1 - DESCEND_SMOOTHING, frameDelta * 60)
-      camera.position.y += dy * descendAlpha
-    } else if (dy < 0.6) {
-      // Ascending — smooth lerp, limited to realistic step height
-      const ascendAlpha = 1 - Math.pow(1 - ASCEND_SMOOTHING, frameDelta * 60)
-      camera.position.y += dy * ascendAlpha
+      const dy = targetCamY - camera.position.y
+      if (dy < 0 && Math.abs(dy) <= MAX_SNAP_DOWN_DIST) {
+        // Descending — snap quickly so player doesn't float above steps
+        const descendAlpha = 1 - Math.pow(1 - DESCEND_SMOOTHING, frameDelta * 60)
+        camera.position.y += dy * descendAlpha
+        verticalVelocity.current = 0
+      } else if (dy < 0.6) {
+        // Ascending — smooth lerp, limited to realistic step height
+        const ascendAlpha = 1 - Math.pow(1 - ASCEND_SMOOTHING, frameDelta * 60)
+        camera.position.y += dy * ascendAlpha
+        verticalVelocity.current = 0
+      } else if (dy < 0) {
+        verticalVelocity.current = Math.max(
+          verticalVelocity.current - FALL_GRAVITY * frameDelta,
+          -MAX_FALL_SPEED
+        )
+        camera.position.y = Math.max(
+          camera.position.y + verticalVelocity.current * frameDelta,
+          targetCamY
+        )
+        if (camera.position.y <= targetCamY) verticalVelocity.current = 0
+      }
+      // dy >= 0.6 means a wall is above — don't teleport upward
+    } else {
+      verticalVelocity.current = 0
     }
-    // dy >= 0.6 means a wall is above — don't teleport upward
 
     if (!canMove) return
 
@@ -98,6 +120,14 @@ export function PlayerControls({
     if (k['KeyS']) wish.addScaledVector(forward, -moveStep)
     if (k['KeyA']) wish.addScaledVector(right, -moveStep)
     if (k['KeyD']) wish.addScaledVector(right, moveStep)
+
+    if (flyMode) {
+      const verticalStep = FLY_SPEED * frameDelta
+      if (k['Space']) wish.y += verticalStep
+      if (k['ShiftLeft'] || k['ShiftRight']) wish.y -= verticalStep
+      camera.position.add(wish)
+      return
+    }
 
     // Ray heights are relative to current camera Y so they stay correct on stairs
     const footY = camera.position.y - PLAYER_HEIGHT
@@ -124,5 +154,5 @@ export function PlayerControls({
     }
   })
 
-  return <PointerLockControls enabled={canRotate} />
+  return <PointerLockControls />
 }

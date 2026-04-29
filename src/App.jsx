@@ -21,6 +21,7 @@ export default function App() {
   const [status, setStatus] = useState('loading')
   const [info, setInfo] = useState(null)
   const [playerMode, setPlayerMode] = useState(false)
+  const [flyMode, setFlyMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
@@ -62,12 +63,10 @@ export default function App() {
   // Open panel only after pointer lock actually releases — same timing guarantee
   // as the journal (which waits for its 3D animation to complete before showing the overlay).
   useEffect(() => {
-    if (!savoirActive) {
-      setSavoirOpen(false)
-      return
-    }
+    if (!savoirActive) return
+
     if (!document.pointerLockElement) {
-      setSavoirOpen(true)
+      requestAnimationFrame(() => setSavoirOpen(true))
       return
     }
     const onRelease = () => {
@@ -76,7 +75,6 @@ export default function App() {
     document.addEventListener('pointerlockchange', onRelease)
     return () => document.removeEventListener('pointerlockchange', onRelease)
   }, [savoirActive])
-
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
@@ -98,13 +96,13 @@ export default function App() {
     playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-
   const [leafHovered, setLeafHovered] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard') // 'standard', 'physical', 'emissive'
 
   const handleCloseSavoir = () => {
     closeSavoirInternal()
     setSavoirActive(false)
+    setSavoirOpen(false)
   }
 
   const interactionLocked =
@@ -114,7 +112,6 @@ export default function App() {
     selectedSavoir !== null ||
     savoirActive ||
     journalActive
-
   const {
     handleNpcInteract,
     marieClip,
@@ -155,6 +152,7 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setPlayerMode(true)
+    setFlyMode(false)
 
     // Request lock immediately on click
     setTimeout(() => {
@@ -171,6 +169,7 @@ export default function App() {
 
     if (playerMode) {
       setPlayerMode(false)
+      setFlyMode(false)
       setUserMovementLocked(false)
       return
     }
@@ -179,6 +178,7 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(false)
     setPlayerMode(true)
+    setFlyMode(false)
   }
 
   return (
@@ -204,12 +204,10 @@ export default function App() {
         }}
         player={{
           mode: playerMode,
+          flyMode,
           spawn: playerSpawn,
           spawnKey: playerSpawnKey,
-          canMove: !interactionLocked && !userMovementLocked,
-          canRotate: !interactionLocked,
-          postIntro,
-          postIntroLocked: interactionLocked,
+          movementLocked: interactionLocked || userMovementLocked,
         }}
         debug={{
           doors: debugDoors,
@@ -253,6 +251,7 @@ export default function App() {
           introPending={introPending}
           introActive={introActive}
           playerMode={playerMode}
+          flyMode={flyMode}
           userMovementLocked={userMovementLocked}
           marieClip={marieClip}
           thomasClip={thomasClip}
@@ -262,6 +261,7 @@ export default function App() {
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}
+          onToggleFlyMode={() => setFlyMode((current) => !current)}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           onSelectMarieClip={setMarieClip}
           onSelectThomasClip={setThomasClip}
@@ -272,6 +272,17 @@ export default function App() {
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
           onLeafMaterialChange={setLeafMaterialMode}
+        />
+      )}
+
+      {journalOpen && journalBounds && (
+        <JournalOverlay
+          leftBounds={journalBounds.left}
+          rightBounds={journalBounds.right}
+          onClose={() => {
+            setJournalOpen(false)
+            setJournalActive(false)
+          }}
         />
       )}
 

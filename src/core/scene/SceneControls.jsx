@@ -8,10 +8,10 @@ export function SceneControls({
   introShouldAdvance,
   onIntroEvent,
   playerMode,
+  flyMode,
   playerSpawn,
   playerSpawnKey,
-  canMove,
-  canRotate,
+  movementLocked,
   postIntro,
   postIntroLocked,
   controlsRef,
@@ -27,8 +27,8 @@ export function SceneControls({
     return (
       <PlayerControls
         key={playerSpawnKey}
-        canMove={canMove}
-        canRotate={canRotate}
+        canMove={!movementLocked}
+        flyMode={flyMode}
         spawnAt={playerSpawn}
         collisionObjects={collisionObjects}
       />
@@ -37,18 +37,19 @@ export function SceneControls({
 
   if (postIntro) {
     return postIntroLocked ? (
-      <PlayerControls canMove={canMove} canRotate={canRotate} collisionObjects={collisionObjects} />
+      <PlayerControls canMove={!movementLocked} collisionObjects={collisionObjects} />
     ) : null
   }
 
   return (
     <OrbitControls
       ref={controlsRef}
-      enableDamping
-      dampingFactor={0.08}
-      minDistance={0.5}
-      maxDistance={200}
       target={hutPosition}
+      enablePan={false}
+      enableDamping
+      minDistance={10}
+      maxDistance={80}
+      maxPolarAngle={Math.PI / 2.1}
     />
   )
 }
