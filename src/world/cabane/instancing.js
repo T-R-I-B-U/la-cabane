@@ -4,15 +4,21 @@ import { disposeObject3D } from '../../core/disposeObject3D'
 import { modelBaseName } from './assetNaming'
 import { applyTransform, cloneMaterialWithTextures, warnMissingAsset } from './runtime'
 
-export async function buildInstancedMesh(node, basePath) {
+function getModelCandidates(baseName, modelBasePaths) {
+  return modelBasePaths.flatMap((basePath) => [`${basePath}${baseName}.glb`, `${basePath}${baseName}.gltf`])
+}
+
+function getInstanceCandidates(baseName, modelBasePaths) {
+  return modelBasePaths.map((basePath) => `${basePath}${baseName}.bin`)
+}
+
+export async function buildInstancedMesh(node, { modelBasePaths }) {
   const baseName = modelBaseName(node.name)
 
   let template = null
-  const templatePaths = []
+  const templatePaths = getModelCandidates(baseName, modelBasePaths)
   const loadErrors = []
-  for (const ext of ['.glb', '.gltf']) {
-    const modelPath = `${basePath}${baseName}${ext}`
-    templatePaths.push(modelPath)
+  for (const modelPath of templatePaths) {
     try {
       template = await loadModel(modelPath)
       break
@@ -30,19 +36,28 @@ export async function buildInstancedMesh(node, basePath) {
 
   let count = 0
   let floats = null
-  const instancePath = `${basePath}${baseName}.bin`
-  try {
-    const response = await fetch(instancePath)
-    if (response.ok) {
+  const instancePaths = getInstanceCandidates(baseName, modelBasePaths)
+  let loadedInstancePath = null
+  for (const instancePath of instancePaths) {
+    try {
+      const response = await fetch(instancePath)
+      if (!response.ok) continue
+
       const buffer = await response.arrayBuffer()
       count = new DataView(buffer).getUint32(0, true)
       floats = new Float32Array(buffer, 4, count * 16)
-    } else {
-      warnMissingAsset(`No instance matrix file found for "${node.name}" (${instancePath})`)
+      loadedInstancePath = instancePath
+      break
+    } catch (error) {
+      warnMissingAsset(
+        `Cannot load instance matrix file for "${node.name}" (${instancePath}): ${error}`
+      )
     }
-  } catch (error) {
+  }
+
+  if (!loadedInstancePath) {
     warnMissingAsset(
-      `Cannot load instance matrix file for "${node.name}" (${instancePath}): ${error}`
+      `No instance matrix file found for "${node.name}" (${instancePaths.join(', ')})`
     )
   }
 

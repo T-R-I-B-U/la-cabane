@@ -3,8 +3,35 @@ import { useAnimations, useGLTF } from '@react-three/drei'
 import { LoopRepeat } from 'three'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { applyAutoTextures } from '../cabane/textureResolver'
+import { disposeObject3D } from '../../core/disposeObject3D'
 
 const NO_RAYCAST = () => {}
+
+function cloneSingleMaterial(material) {
+  const clone = material.clone()
+
+  for (const [key, value] of Object.entries(clone)) {
+    if (value?.isTexture) clone[key] = value.clone()
+  }
+
+  return clone
+}
+
+function cloneMaterial(material) {
+  return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
+}
+
+function cloneCharacterScene(scene) {
+  const clonedScene = clone(scene)
+
+  clonedScene.traverse((obj) => {
+    if (!obj.isMesh) return
+    obj.geometry = obj.geometry.clone()
+    obj.material = cloneMaterial(obj.material)
+  })
+
+  return clonedScene
+}
 
 function pickDefaultClip(actions, names, defaultClip) {
   if (defaultClip && actions[defaultClip]) return defaultClip
@@ -15,10 +42,10 @@ function pickDefaultClip(actions, names, defaultClip) {
   return names[0] ?? null
 }
 
-export function AnimatedCharacter({ url, clip, textureName, ...props }) {
+export function AnimatedCharacter({ url, clip, textureName, textureBasePaths, ...props }) {
   const group = useRef()
   const { scene, animations } = useGLTF(url)
-  const clonedScene = useMemo(() => clone(scene), [scene])
+  const clonedScene = useMemo(() => cloneCharacterScene(scene), [scene])
   const { actions, names } = useAnimations(animations, group)
 
   useEffect(() => {
@@ -28,12 +55,16 @@ export function AnimatedCharacter({ url, clip, textureName, ...props }) {
       obj.frustumCulled = true
       obj.userData.isCharacter = true
     })
+
+    return () => {
+      disposeObject3D(clonedScene)
+    }
   }, [clonedScene])
 
   useEffect(() => {
     if (!textureName) return
-    applyAutoTextures(clonedScene, textureName)
-  }, [clonedScene, textureName])
+    applyAutoTextures(clonedScene, textureName, textureBasePaths)
+  }, [clonedScene, textureName, textureBasePaths])
 
   useEffect(() => {
     const nextClip = pickDefaultClip(actions, names, clip)

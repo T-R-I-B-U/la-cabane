@@ -167,7 +167,7 @@ function attachNestColliders(nestObject) {
  * Missing models become empty pivots — the hierarchy still places correctly.
  */
 export async function buildCabane({
-  basePath = '/models/',
+  performanceMode = false,
   jsonPath = '/cabane.json',
   jsonData = null,
 } = {}) {
@@ -180,10 +180,14 @@ export async function buildCabane({
 
   const root = new THREE.Group()
   root.name = 'cabane'
+  const modelBasePaths = performanceMode ? ['/models/compressed/', '/models/'] : ['/models/']
+  const textureBasePaths = performanceMode ? ['/textures/compressed/', '/textures/'] : ['/textures/']
 
   const nodes = Array.isArray(data) ? data : [data]
   root.userData.hutPosition = findNodePosition(nodes, 'hut01')
-  const built = await Promise.all(nodes.map((node) => buildNode(node, basePath)))
+  const built = await Promise.all(
+    nodes.map((node) => buildNode(node, { modelBasePaths, textureBasePaths }))
+  )
   for (const obj of built) {
     if (obj) root.add(obj)
   }
