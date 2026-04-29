@@ -113,6 +113,7 @@ export default function Scene({
 
       <TreeLeaves
         leafMesh={leafMesh}
+        active={(playerMode || postIntro) && !interactionLocked}
         onLeafClick={onLeafClick}
         onLeafHover={onLeafHover}
         leafMaterialMode={leafMaterialMode}

@@ -32,6 +32,15 @@ export default function App() {
   const [journalOpen, setJournalOpen] = useState(false)
   const [journalBounds, setJournalBounds] = useState(null)
   const [journalActive, setJournalActive] = useState(false)
+  const [savoirActive, setSavoirActive] = useState(false)
+  const [savoirOpen, setSavoirOpen] = useState(false)
+
+  const {
+    selected: selectedSavoir,
+    assignAndOpen,
+    close: closeSavoirInternal,
+  } = useSavoirAssignment()
+
   const onJournalStart = useCallback(() => {
     setJournalActive(true)
     document.exitPointerLock()
@@ -40,6 +49,34 @@ export default function App() {
     setJournalBounds(bounds)
     setJournalOpen(true)
   }, [])
+
+  const handleLeafClick = useCallback(
+    (id) => {
+      setSavoirActive(true)
+      document.exitPointerLock()
+      assignAndOpen(id)
+    },
+    [assignAndOpen]
+  )
+
+  // Open panel only after pointer lock actually releases — same timing guarantee
+  // as the journal (which waits for its 3D animation to complete before showing the overlay).
+  useEffect(() => {
+    if (!savoirActive) {
+      setSavoirOpen(false)
+      return
+    }
+    if (!document.pointerLockElement) {
+      setSavoirOpen(true)
+      return
+    }
+    const onRelease = () => {
+      if (!document.pointerLockElement) setSavoirOpen(true)
+    }
+    document.addEventListener('pointerlockchange', onRelease)
+    return () => document.removeEventListener('pointerlockchange', onRelease)
+  }, [savoirActive])
+
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
@@ -61,41 +98,22 @@ export default function App() {
     playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-  const {
-    selected: selectedSavoir,
-    assignAndOpen,
-    close: closeSavoirInternal,
-  } = useSavoirAssignment()
+
   const [leafHovered, setLeafHovered] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard') // 'standard', 'physical', 'emissive'
 
-  // Force exit pointer lock when a savoir opens to show the mouse immediately
-  useEffect(() => {
-    if (selectedSavoir && document.pointerLockElement) {
-      document.exitPointerLock()
-    }
-  }, [selectedSavoir])
-
   const handleCloseSavoir = () => {
     closeSavoirInternal()
-    const canvas = document.querySelector('canvas')
-    if (canvas) canvas.requestPointerLock()
+    setSavoirActive(false)
   }
-
-  const [pointerIsLocked, setPointerIsLocked] = useState(false)
-  useEffect(() => {
-    const onChange = () => setPointerIsLocked(!!document.pointerLockElement)
-    document.addEventListener('pointerlockchange', onChange)
-    return () => document.removeEventListener('pointerlockchange', onChange)
-  }, [])
 
   const interactionLocked =
     dialogueActive ||
     introMovementLocked ||
     showNameInput ||
     selectedSavoir !== null ||
-    journalActive ||
-    (!pointerIsLocked && playerMode)
+    savoirActive ||
+    journalActive
 
   const {
     handleNpcInteract,
@@ -168,7 +186,13 @@ export default function App() {
       <Subtitles />
 
       <Crosshair
-        visible={(playerMode || postIntro) && !showNameInput && !selectedSavoir}
+        visible={
+          (playerMode || postIntro) &&
+          !showNameInput &&
+          !selectedSavoir &&
+          !savoirActive &&
+          !journalActive
+        }
         active={npcHovered || leafHovered}
       />
 
@@ -209,7 +233,7 @@ export default function App() {
         interactions={{
           onNpcInteract: handleNpcInteract,
           onNpcHover: setNpcHovered,
-          onLeafClick: assignAndOpen,
+          onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
           journalOpen,
           onJournalStart,
@@ -288,7 +312,9 @@ export default function App() {
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
-      {selectedSavoir && <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />}
+      {savoirOpen && selectedSavoir && (
+        <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />
+      )}
 
       {introPending && (
         <IntroLoader

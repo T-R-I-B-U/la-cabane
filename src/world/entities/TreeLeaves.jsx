@@ -38,7 +38,7 @@ function mulberry32(seed) {
   }
 }
 
-export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover, leafMaterialMode = 'standard' }) {
+export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, leafMaterialMode = 'standard' }) {
   const proxyRef = useRef(null)
   const inRangeRef = useRef(null)
   const { gl } = useThree()
@@ -110,6 +110,16 @@ export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover, leafMaterialMod
     }
     return pos
   }, [leafMesh])
+
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = 'default'
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!active) document.body.style.cursor = 'default'
+  }, [active])
 
   useEffect(() => {
     if (!leafMesh) return
@@ -330,20 +340,24 @@ export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover, leafMaterialMod
         object={leafMesh}
         onPointerMove={(e) => {
           e.stopPropagation()
+          if (!active) return
           const id = e.instanceId
           if (id === undefined || !inRangeRef.current?.[id]) return
           syncProxy(id)
           if (proxyRef.current) proxyRef.current.visible = true
+          document.body.style.cursor = 'pointer'
           onLeafHover?.(true)
         }}
         onPointerOut={() => {
           if (proxyRef.current) proxyRef.current.visible = false
+          document.body.style.cursor = 'default'
           onLeafHover?.(false)
         }}
-        onClick={(e) => {
+        onPointerDown={(e) => {
           e.stopPropagation()
-          if (e.instanceId === undefined || !inRangeRef.current?.[e.instanceId] || !onLeafClick)
+          if (!active || e.instanceId === undefined || !inRangeRef.current?.[e.instanceId] || !onLeafClick)
             return
+          document.body.style.cursor = 'default'
           onLeafClick(e.instanceId)
         }}
       />
