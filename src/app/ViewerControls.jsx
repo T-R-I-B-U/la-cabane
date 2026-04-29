@@ -26,6 +26,7 @@ export function ViewerControls({
   status,
   info,
   sceneReady,
+  performanceMode,
   introPending,
   introActive,
   playerMode,
@@ -37,6 +38,7 @@ export function ViewerControls({
   debugCollisions,
   shaderEnabled,
   shaderRadius,
+  onTogglePerformanceMode,
   onLaunchIntro,
   onTogglePlayerMode,
   onGoToPlatform,
@@ -182,6 +184,17 @@ export function ViewerControls({
             </label>
           </DevSection>
           <DevSection title="Scène">
+            <button
+              type="button"
+              className={`camera-toggle${performanceMode ? ' camera-toggle--active' : ''}`}
+              aria-pressed={performanceMode}
+              onClick={onTogglePerformanceMode}
+            >
+              <span className="camera-toggle-icon" aria-hidden="true">
+                {performanceMode ? 'PERF' : 'STD'}
+              </span>
+              {performanceMode ? 'Mode performance actif' : 'Activer le mode performance'}
+            </button>
             <button
               type="button"
               className={`camera-toggle${debugDoors ? ' camera-toggle--active' : ''}`}

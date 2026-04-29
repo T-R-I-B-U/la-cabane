@@ -18,6 +18,7 @@ export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [status, setStatus] = useState('loading')
   const [info, setInfo] = useState(null)
+  const [performanceMode, setPerformanceMode] = useState(false)
   const [playerMode, setPlayerMode] = useState(false)
   const [flyMode, setFlyMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
@@ -128,6 +129,7 @@ export default function App() {
       <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={npcHovered} />
 
       <Scene
+        performanceMode={performanceMode}
         sceneState={{
           onStats: setStats,
           onReady,
@@ -176,6 +178,7 @@ export default function App() {
           status={status}
           info={info}
           sceneReady={sceneReady}
+          performanceMode={performanceMode}
           introPending={introPending}
           introActive={introActive}
           playerMode={playerMode}
@@ -185,6 +188,7 @@ export default function App() {
           thomasClip={thomasClip}
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
+          onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}

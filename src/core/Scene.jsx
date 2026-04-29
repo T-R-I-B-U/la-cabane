@@ -14,6 +14,7 @@ import { SceneInteractions } from './scene/SceneInteractions'
 import { SceneLighting } from './scene/SceneLighting'
 
 export default function Scene({
+  performanceMode,
   sceneState,
   player,
   debug,
@@ -79,9 +80,19 @@ export default function Scene({
 
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
 
-      <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={setCabane} />
+      <CabaneMap
+        performanceMode={performanceMode}
+        onReady={handleReady}
+        onError={onError}
+        onCabaneLoaded={setCabane}
+      />
 
-      <SceneCharacters hutPosition={hutPosition} marieClip={marieClip} thomasClip={thomasClip} />
+      <SceneCharacters
+        performanceMode={performanceMode}
+        hutPosition={hutPosition}
+        marieClip={marieClip}
+        thomasClip={thomasClip}
+      />
 
       <SceneInteractions
         cabane={cabane}
