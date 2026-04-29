@@ -37,7 +37,7 @@ export default function Scene({
     onEvent: onIntroEvent,
   } = intro
   const { marieClip, thomasClip } = characters
-  const { onNpcInteract, onNpcHover } = interactions
+  const { onNpcInteract, onNpcHover, journalOpen, onJournalStart, onJournalOpen } = interactions
 
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
@@ -87,6 +87,9 @@ export default function Scene({
         onIntroEvent={onIntroEvent}
         onNpcInteract={onNpcInteract}
         onNpcHover={onNpcHover}
+        journalOpen={journalOpen}
+        onJournalStart={onJournalStart}
+        onJournalOpen={onJournalOpen}
       />
 
       {debugCollisions && <CollisionDebug cabane={cabane} />}
