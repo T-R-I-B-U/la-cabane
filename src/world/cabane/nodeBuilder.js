@@ -13,6 +13,7 @@ export async function buildNode(node, basePath) {
   let object3d
   const baseName = modelBaseName(node.name)
   const modelPaths = []
+  const loadErrors = []
   for (const ext of ['.glb', '.gltf']) {
     const modelPath = `${basePath}${baseName}${ext}`
     modelPaths.push(modelPath)
@@ -21,13 +22,16 @@ export async function buildNode(node, basePath) {
       await applyAutoTextures(object3d, baseName)
       object3d.name = node.name
       break
-    } catch {
+    } catch (error) {
+      loadErrors.push(`${modelPath}: ${error.message ?? error}`)
       // Try next extension.
     }
   }
 
   if (!object3d) {
-    warnMissingAsset(`No model found for "${node.name}" (${modelPaths.join(', ')})`)
+    warnMissingAsset(
+      `No model found for "${node.name}" (${modelPaths.join(', ')}). ${loadErrors.join(' | ')}`
+    )
     object3d = new THREE.Group()
     object3d.name = node.name
   }
@@ -36,6 +40,7 @@ export async function buildNode(node, basePath) {
 
   const firstChild = object3d.children[0]
   if (firstChild) {
+    firstChild.updateMatrix()
     const [px, py, pz] = node.position
     const [rx, ry, rz] = node.rotation
     const [sx, sy, sz] = node.scale

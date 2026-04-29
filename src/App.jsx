@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
+import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
 import { SavoirPanel } from './app/SavoirPanel'
 import { useIntroFlow } from './app/useIntroFlow'
@@ -8,7 +9,7 @@ import { useNpcDialogue } from './app/useNpcDialogue'
 import { useSavoirAssignment } from './app/useSavoirAssignment'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
-import { getPlatformSpawn } from './core/SceneConfig'
+import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import './App.css'
@@ -22,10 +23,23 @@ export default function App() {
   const [playerMode, setPlayerMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
+  const [shaderEnabled, setShaderEnabled] = useState(false)
+  const [shaderRadius, setShaderRadius] = useState(3)
   const [showUI, setShowUI] = useState(true)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
+  const [journalOpen, setJournalOpen] = useState(false)
+  const [journalBounds, setJournalBounds] = useState(null)
+  const [journalActive, setJournalActive] = useState(false)
+  const onJournalStart = useCallback(() => {
+    setJournalActive(true)
+    document.exitPointerLock()
+  }, [])
+  const onJournalOpen = useCallback((bounds) => {
+    setJournalBounds(bounds)
+    setJournalOpen(true)
+  }, [])
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
@@ -80,6 +94,7 @@ export default function App() {
     introMovementLocked ||
     showNameInput ||
     selectedSavoir !== null ||
+    journalActive ||
     (!pointerIsLocked && playerMode)
 
   const {
@@ -133,6 +148,21 @@ export default function App() {
   const cursorVisible =
     !introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked)
 
+  function togglePlayerView() {
+    setPostIntro(false)
+
+    if (playerMode) {
+      setPlayerMode(false)
+      setUserMovementLocked(false)
+      return
+    }
+
+    setPlayerSpawn(getPlayerSpawn(info?.hutPosition))
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setPlayerMode(true)
+  }
+
   return (
     <main className={`viewer-page${cursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
       <Subtitles />
@@ -181,7 +211,12 @@ export default function App() {
           onNpcHover: setNpcHovered,
           onLeafClick: assignAndOpen,
           onLeafHover: setLeafHovered,
+          journalOpen,
+          onJournalStart,
+          onJournalOpen,
         }}
+        shaderEnabled={shaderEnabled}
+        shaderRadius={shaderRadius}
       />
 
       {showUI && (
@@ -226,17 +261,28 @@ export default function App() {
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
           onLaunchIntro={launchIntro}
-          onTogglePlayerMode={() => {
-            setPlayerMode((current) => !current)
-            setUserMovementLocked(false)
-            setPostIntro(false)
-          }}
+          onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           onSelectMarieClip={setMarieClip}
           onSelectThomasClip={setThomasClip}
+          shaderEnabled={shaderEnabled}
+          shaderRadius={shaderRadius}
+          onToggleShader={() => setShaderEnabled((current) => !current)}
+          onShaderRadiusChange={setShaderRadius}
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+        />
+      )}
+
+      {journalOpen && journalBounds && (
+        <JournalOverlay
+          leftBounds={journalBounds.left}
+          rightBounds={journalBounds.right}
+          onClose={() => {
+            setJournalOpen(false)
+            setJournalActive(false)
+          }}
         />
       )}
 

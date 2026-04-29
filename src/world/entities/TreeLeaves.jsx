@@ -12,6 +12,8 @@ const _pos = new THREE.Vector3()
 const _quat = new THREE.Quaternion()
 const _scl = new THREE.Vector3()
 const _color = new THREE.Color()
+const _inverseMatrix = new THREE.Matrix4()
+const _localCam = new THREE.Vector3()
 // Scratch objects for animation — reused each frame to avoid GC pressure
 const _offset = new THREE.Matrix4()
 const _final = new THREE.Matrix4()
@@ -126,12 +128,17 @@ export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover, leafMaterialMod
   useFrame((state) => {
     if (!leafMesh || !baseMatrices || !profileIndex || !basePositions) return
     if (!inRangeRef.current) inRangeRef.current = new Uint8Array(leafMesh.count)
+
+    // Transform camera to local space for LOD distance check
+    _inverseMatrix.copy(leafMesh.matrixWorld).invert()
+    _localCam.copy(state.camera.position).applyMatrix4(_inverseMatrix)
+
     const t = state.clock.elapsedTime
-    const cam = state.camera.position
     for (let i = 0; i < leafMesh.count; i++) {
-      const dx = basePositions[i * 3] - cam.x
-      const dy = basePositions[i * 3 + 1] - cam.y
-      const dz = basePositions[i * 3 + 2] - cam.z
+      const dx = basePositions[i * 3] - _localCam.x
+      const dy = basePositions[i * 3 + 1] - _localCam.y
+      const dz = basePositions[i * 3 + 2] - _localCam.z
+
       if (dx * dx + dy * dy + dz * dz > LOD_DISTANCE_SQ) {
         inRangeRef.current[i] = 0
         leafMesh.setMatrixAt(i, baseMatrices[i])

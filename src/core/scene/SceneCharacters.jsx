@@ -8,15 +8,17 @@ export function SceneCharacters({ hutPosition, marieClip, thomasClip }) {
       <AnimatedCharacter
         url="/models/marie-animated.glb"
         clip={marieClip}
-        position={[hutPosition[0] - 2.4, FLOOR_Y, hutPosition[2] - 8.5]}
-        rotation={[0, Math.PI * 0.2, 0]}
+        textureName="marie"
+        position={[hutPosition[0] + 1.4, FLOOR_Y, hutPosition[2] - 9.1]}
+        rotation={[0, Math.PI * 0.08, 0]}
         scale={9}
       />
       <AnimatedCharacter
         url="/models/thomas-animated.glb"
         clip={thomasClip}
-        position={[hutPosition[0] - 1.1, FLOOR_Y, hutPosition[2] - 8.5]}
-        rotation={[0, Math.PI * 1.2, 0]}
+        textureName="thomas"
+        position={[hutPosition[0] + 2.7, FLOOR_Y, hutPosition[2] - 9.1]}
+        rotation={[0, Math.PI * 1.04, 0]}
         scale={9}
       />
     </Suspense>

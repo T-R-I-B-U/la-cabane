@@ -1,8 +1,8 @@
 const N = new Intl.NumberFormat('fr-FR')
 
-function Row({ label, value, unit }) {
+function Row({ label, value, unit, emphasis = false }) {
   return (
-    <div className="pm-row">
+    <div className={`pm-row${emphasis ? ' pm-row--emphasis' : ''}`}>
       <dt className="pm-label">{label}</dt>
       <dd className="pm-value">
         {value}
@@ -27,26 +27,28 @@ function Section({ title, children }) {
  * @param {'loading'|'ok'|'error'} status
  */
 export function PerfMonitor({ stats, scene, status }) {
-  const fpsColor =
-    stats.fps === 0
-      ? '#8899aa'
-      : stats.fps >= 55
-        ? '#22dd88'
-        : stats.fps >= 30
-          ? '#f5a623'
-          : '#e0443a'
+  const fpsTone =
+    stats.fps === 0 ? 'idle' : stats.fps >= 55 ? 'good' : stats.fps >= 30 ? 'warn' : 'bad'
+  const statusLabel = status === 'loading' ? 'loading' : status === 'error' ? 'error' : 'ready'
 
   return (
     <aside className="perf-monitor">
       <header className="pm-header">
-        <span className="pm-title">Scene Debug</span>
+        <div>
+          <span className="pm-kicker">Performance</span>
+          <h2 className="pm-title">Scene Monitor</h2>
+        </div>
         <span className="pm-status" data-status={status}>
-          {status === 'loading' ? 'chargement…' : status === 'error' ? 'erreur' : 'ok'}
+          {statusLabel}
         </span>
       </header>
 
       <Section title="Rendu">
-        <Row label="FPS" value={<span style={{ color: fpsColor }}>{stats.fps}</span>} />
+        <Row
+          label="FPS"
+          value={<span className={`pm-fps pm-fps--${fpsTone}`}>{stats.fps}</span>}
+          emphasis
+        />
         <Row label="Frame" value={stats.frameMs.toFixed(2)} unit="ms" />
         <Row label="Draw calls" value={N.format(stats.calls)} />
         <Row label="Triangles" value={N.format(stats.triangles)} />

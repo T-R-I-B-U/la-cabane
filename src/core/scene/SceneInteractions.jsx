@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { InteractionPoint } from '../../world/entities/InteractionPoint'
+import { JournalBook } from '../../world/entities/JournalBook'
 import { FLOOR_Y } from '../SceneConfig'
 
 export function SceneInteractions({
@@ -13,6 +14,9 @@ export function SceneInteractions({
   onIntroEvent,
   onNpcInteract,
   onNpcHover,
+  journalOpen,
+  onJournalStart,
+  onJournalOpen,
 }) {
   const npcHoveredMap = useRef({ marie: false, thomas: false })
 
@@ -31,13 +35,13 @@ export function SceneInteractions({
   return (
     <>
       <InteractionPoint
-        position={[hutPosition[0] - 2.4, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+        position={[hutPosition[0] + 1.4, FLOOR_Y + 0.9, hutPosition[2] - 8.1]}
         active={interactionsActive}
         onInteract={() => onNpcInteract?.('marie')}
         onHoverChange={onMarieHover}
       />
       <InteractionPoint
-        position={[hutPosition[0] - 1.1, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+        position={[hutPosition[0] + 2.7, FLOOR_Y + 0.9, hutPosition[2] - 8.1]}
         active={interactionsActive}
         onInteract={() => onNpcInteract?.('thomas')}
         onHoverChange={onThomasHover}
@@ -47,6 +51,14 @@ export function SceneInteractions({
         cabane={cabane}
         active={introWaitingAtDoor}
         onDoorClick={() => onIntroEvent?.('door:clicked')}
+      />
+
+      <JournalBook
+        position={[-33.8, 0.83, -10.5]}
+        active={interactionsActive}
+        open={journalOpen}
+        onStart={onJournalStart}
+        onOpen={onJournalOpen}
       />
     </>
   )

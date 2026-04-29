@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
+import { WatercolorPass } from '../world/materials/WatercolorPass'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { TreeLeaves } from '../world/entities/TreeLeaves'
 import { CollisionDebug } from './CollisionDebug'
@@ -21,9 +22,11 @@ export default function Scene({
   characters,
   leafMaterialMode,
   interactions,
+  shaderEnabled,
+  shaderRadius,
 }) {
   const { onStats, onReady, onError } = sceneState
-  const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey, movementLocked } = player
+  const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
   const {
     active: introActive,
@@ -36,7 +39,16 @@ export default function Scene({
     onEvent: onIntroEvent,
   } = intro
   const { marieClip, thomasClip } = characters
-  const { onNpcInteract, onNpcHover, onLeafClick, onLeafHover } = interactions
+  const {
+    onNpcInteract,
+    onNpcHover,
+    onLeafClick,
+    onLeafHover,
+    journalOpen,
+    onJournalStart,
+    onJournalOpen,
+  } = interactions
+
 
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -95,7 +107,7 @@ export default function Scene({
 
       <SceneLighting />
 
-      <Floor mainFloorRef={setMainFloorCollider} />
+      <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
 
       <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={handleCabaneLoaded} />
 
@@ -118,6 +130,9 @@ export default function Scene({
         onIntroEvent={onIntroEvent}
         onNpcInteract={onNpcInteract}
         onNpcHover={onNpcHover}
+        journalOpen={journalOpen}
+        onJournalStart={onJournalStart}
+        onJournalOpen={onJournalOpen}
       />
 
       {debugCollisions && <CollisionDebug cabane={cabane} />}
@@ -145,6 +160,8 @@ export default function Scene({
         controlsRef={controlsRef}
         hutPosition={hutPosition}
       />
+
+      {shaderEnabled && <WatercolorPass radius={shaderRadius} />}
     </Canvas>
   )
 }

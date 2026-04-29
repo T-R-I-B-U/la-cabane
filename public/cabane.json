@@ -3,9 +3,9 @@
     "name": "ground-hut",
     "type": "Mesh",
     "position": [
-      -2.3079,
+      -25.1375,
       0,
-      -0.633
+      -5.7553
     ],
     "rotation": [
       0,
@@ -22,9 +22,9 @@
     "name": "leaf",
     "type": "InstancedMesh",
     "position": [
-      -0.9141,
+      -23.7436,
       20.8444,
-      -32.8025
+      -37.9248
     ],
     "rotation": [
       0,
@@ -41,9 +41,9 @@
     "name": "trunk",
     "type": "Mesh",
     "position": [
-      -2.3079,
+      -25.1375,
       -0.5431,
-      -0.633
+      -5.7553
     ],
     "rotation": [
       0,
@@ -60,47 +60,9 @@
     "name": "hut01",
     "type": "Object3D",
     "position": [
-      -5.0111,
+      -27.8407,
       2.3616,
-      0.9556
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "greenhouse",
-    "type": "Object3D",
-    "position": [
-      -1.4724,
-      0.6222,
-      -0.633
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "door03",
-    "type": "Object3D",
-    "position": [
-      18.9095,
-      1.0371,
-      -0.633
+      -4.1667
     ],
     "rotation": [
       0,
@@ -117,66 +79,9 @@
     "name": "counter01",
     "type": "Mesh",
     "position": [
-      -9.5119,
+      -32.3414,
       0,
-      -6.7099
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "window04",
-    "type": "Object3D",
-    "position": [
-      -12.8668,
-      11.7081,
-      25.637
-    ],
-    "rotation": [
-      0,
-      0,
-      1.4661
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "window05",
-    "type": "Object3D",
-    "position": [
-      -0.4056,
-      11.6552,
-      25.637
-    ],
-    "rotation": [
-      0,
-      0,
-      -1.4661
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "nest",
-    "type": "Object3D",
-    "position": [
-      -3.7605,
-      12.8392,
-      23.0298
+      -11.8322
     ],
     "rotation": [
       0,
@@ -193,9 +98,9 @@
     "name": "growingfruit",
     "type": "Mesh",
     "position": [
-      -7.6511,
+      -30.4807,
       0.7255,
-      -2.9763
+      -8.0985
     ],
     "rotation": [
       0,
@@ -212,13 +117,13 @@
     "name": "stairs01",
     "type": "Object3D",
     "position": [
-      -2.3079,
-      0,
-      -0.633
+      -21.4086,
+      0.0104,
+      -2.0757
     ],
     "rotation": [
       0,
-      0,
+      -0.4294,
       0
     ],
     "scale": [
@@ -231,9 +136,9 @@
     "name": "workbench01",
     "type": "Object3D",
     "position": [
-      -2.2208,
+      -25.0504,
       5.5143,
-      -8.5333
+      -13.6556
     ],
     "rotation": [
       0,
@@ -250,9 +155,9 @@
     "name": "platform-hut",
     "type": "Mesh",
     "position": [
-      -2.3079,
+      -25.1375,
       4.7198,
-      -0.633
+      -5.7553
     ],
     "rotation": [
       -3.1416,
@@ -269,9 +174,9 @@
     "name": "railling-hut",
     "type": "Object3D",
     "position": [
-      -2.3079,
+      -25.1375,
       4.7562,
-      -0.633
+      -5.7553
     ],
     "rotation": [
       0,
@@ -288,9 +193,9 @@
     "name": "railling",
     "type": "Object3D",
     "position": [
-      -2.3079,
+      -25.1375,
       22.8757,
-      -0.633
+      -5.7553
     ],
     "rotation": [
       0,
@@ -307,14 +212,52 @@
     "name": "platform",
     "type": "Mesh",
     "position": [
-      -2.3079,
+      -25.1375,
       22.8757,
-      -0.633
+      -5.8559
     ],
     "rotation": [
       0,
       0,
       0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "nest",
+    "type": "Object3D",
+    "position": [
+      -35.3433,
+      13.6616,
+      23.4666
+    ],
+    "rotation": [
+      0,
+      -0.4107,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "greenhouse",
+    "type": "Object3D",
+    "position": [
+      0.1631,
+      0.85,
+      -5.7553
+    ],
+    "rotation": [
+      -3.1416,
+      0,
+      -3.1416
     ],
     "scale": [
       1,

@@ -9,8 +9,7 @@ const COLOR_IDLE = new THREE.Color(0xffffff)
 const COLOR_HOVER = new THREE.Color(0xffdd55)
 
 // Interaction hotspot placed in front of an NPC.
-// Billboard facing the camera. Only visible when the player is within SHOW_DIST.
-// Uses a center-screen raycast (pointer-lock crosshair) to detect hover.
+// Kept invisible in the scene, but still raycastable for center-screen interaction.
 // Fires onInteract on canvas click while hovered, onHoverChange when hover state changes.
 export function InteractionPoint({ position, active, onInteract, onHoverChange }) {
   const { camera } = useThree()
@@ -82,7 +81,7 @@ export function InteractionPoint({ position, active, onInteract, onHoverChange }
         color={COLOR_IDLE}
         side={THREE.DoubleSide}
         transparent
-        opacity={0.9}
+        opacity={0}
         depthTest={false}
       />
     </mesh>

@@ -10,6 +10,18 @@ const MARIE_CLIPS = [
 
 const THOMAS_CLIPS = ['thomas-back', 'thomas-front', 'thomas-turn']
 
+function PanelSection({ title, eyebrow, children }) {
+  return (
+    <section className="controls-section" aria-label={title}>
+      <div className="controls-section-header">
+        {eyebrow && <span className="controls-eyebrow">{eyebrow}</span>}
+        <h2 className="controls-section-title">{title}</h2>
+      </div>
+      {children}
+    </section>
+  )
+}
+
 export function ViewerControls({
   status,
   info,
@@ -22,81 +34,90 @@ export function ViewerControls({
   thomasClip,
   debugDoors,
   debugCollisions,
+  shaderEnabled,
+  shaderRadius,
   onLaunchIntro,
   onTogglePlayerMode,
   onGoToPlatform,
   onToggleUserMovement,
   onSelectMarieClip,
   onSelectThomasClip,
+  onToggleShader,
+  onShaderRadiusChange,
   onToggleDebugDoors,
   onToggleDebugCollisions,
 }) {
+  const introLabel = !sceneReady
+    ? 'Scène en chargement...'
+    : introActive
+      ? 'Intro en cours...'
+      : introPending
+        ? 'En attente...'
+        : "Lancer l'histoire"
+
   return (
     <aside className="viewer-controls" aria-live="polite">
-      <h1 className="controls-title">La Cabane</h1>
+      <header className="controls-hero">
+        <span className="controls-eyebrow">Expérience</span>
+        <h1 className="controls-title">La Cabane</h1>
+        {status === 'loading' && <p className="controls-status">Construction de la scène...</p>}
+        {status === 'error' && <p className="controls-error">{info}</p>}
+        {status === 'ok' && info && (
+          <div className="controls-scene-summary" aria-label="Scene summary">
+            <span>{info.meshes} meshes</span>
+            <span>{info.pivots} pivots vides</span>
+          </div>
+        )}
+      </header>
 
-      <div className="controls-divider" />
+      <PanelSection title="Histoire" eyebrow="Flow">
+        <button
+          type="button"
+          className="camera-toggle camera-toggle--primary"
+          onClick={onLaunchIntro}
+          disabled={!sceneReady || introPending || introActive}
+        >
+          <span className="camera-toggle-icon" aria-hidden="true">
+            PLAY
+          </span>
+          {introLabel}
+        </button>
+        <button
+          type="button"
+          className={`camera-toggle${shaderEnabled ? ' camera-toggle--active' : ''}`}
+          aria-pressed={shaderEnabled}
+          onClick={onToggleShader}
+        >
+          <span className="camera-toggle-icon" aria-hidden="true">
+            {shaderEnabled ? 'ON' : 'OFF'}
+          </span>
+          Rendu aquarelle
+        </button>
+      </PanelSection>
 
-      {status === 'loading' && <p className="controls-status">Construction de la scène…</p>}
-      {status === 'error' && <p className="controls-error">{info}</p>}
-      {status === 'ok' && info && (
-        <>
-          <p className="controls-stat">
-            <span className="dot dot--mesh" />
-            {info.meshes} mesh{info.meshes !== 1 ? 'es' : ''}
-          </p>
-          <p className="controls-stat">
-            <span className="dot dot--pivot" />
-            {info.pivots} pivot{info.pivots !== 1 ? 's' : ''} manquants
-          </p>
-        </>
-      )}
+      <PanelSection title="Navigation" eyebrow="Camera">
+        <button
+          type="button"
+          className={`camera-toggle${playerMode ? ' camera-toggle--active' : ''}`}
+          aria-pressed={playerMode}
+          onClick={onTogglePlayerMode}
+        >
+          <span className="camera-toggle-icon" aria-hidden="true">
+            {playerMode ? 'FPS' : 'ORB'}
+          </span>
+          {playerMode ? 'Vue libre' : 'Vue joueur'}
+        </button>
 
-      <div className="controls-divider" />
+        <button
+          type="button"
+          className="camera-toggle"
+          disabled={!sceneReady}
+          onClick={onGoToPlatform}
+        >
+          Vue plateforme
+        </button>
 
-      <button
-        type="button"
-        className="camera-toggle"
-        onClick={onLaunchIntro}
-        disabled={!sceneReady || introPending || introActive}
-      >
-        <span className="camera-toggle-icon" aria-hidden="true">
-          ▶
-        </span>
-        {!sceneReady
-          ? 'Scène en chargement…'
-          : introActive
-            ? 'Intro en cours…'
-            : introPending
-              ? 'En attente…'
-              : "Lancer l'histoire"}
-      </button>
-
-      <div className="controls-divider" />
-
-      <button
-        type="button"
-        className={`camera-toggle${playerMode ? ' camera-toggle--active' : ''}`}
-        aria-pressed={playerMode}
-        onClick={onTogglePlayerMode}
-      >
-        <span className="camera-toggle-icon" aria-hidden="true">
-          {playerMode ? '🎮' : '🔭'}
-        </span>
-        {playerMode ? 'Mode joueur' : 'Mode orbite'}
-      </button>
-
-      <button
-        type="button"
-        className="camera-toggle"
-        disabled={!sceneReady}
-        onClick={onGoToPlatform}
-      >
-        Vue plateforme
-      </button>
-
-      {playerMode && (
-        <>
+        {playerMode && (
           <button
             type="button"
             className={`camera-toggle${userMovementLocked ? '' : ' camera-toggle--active'}`}
@@ -105,13 +126,15 @@ export function ViewerControls({
           >
             {userMovementLocked ? 'Déplacement désactivé' : 'Déplacement actif'}
           </button>
+        )}
+
+        {playerMode && (
           <p className="controls-hint">Clic pour capturer · WASD pour avancer · ESC pour quitter</p>
-        </>
-      )}
+        )}
+      </PanelSection>
 
       {import.meta.env.DEV && (
-        <>
-          <div className="controls-divider" />
+        <PanelSection title="Devtools" eyebrow="Runtime">
           <CharacterAnimationControls
             title="Marie"
             activeClip={marieClip}
@@ -124,6 +147,20 @@ export function ViewerControls({
             clips={THOMAS_CLIPS}
             onSelect={onSelectThomasClip}
           />
+          <DevSection title="Aquarelle">
+            <label className="controls-slider-row">
+              <span>Rayon</span>
+              <input
+                type="range"
+                min="0"
+                max="5"
+                step="1"
+                value={shaderRadius}
+                onChange={(e) => onShaderRadiusChange(Number.parseInt(e.target.value, 10))}
+              />
+              <span className="controls-slider-value">{shaderRadius}</span>
+            </label>
+          </DevSection>
           <DevSection title="Scène">
             <button
               type="button"
@@ -132,7 +169,7 @@ export function ViewerControls({
               onClick={onToggleDebugDoors}
             >
               <span className="camera-toggle-icon" aria-hidden="true">
-                {debugDoors ? '🟢' : '⚫'}
+                {debugDoors ? 'ON' : 'OFF'}
               </span>
               Debug portes
             </button>
@@ -143,12 +180,12 @@ export function ViewerControls({
               onClick={onToggleDebugCollisions}
             >
               <span className="camera-toggle-icon" aria-hidden="true">
-                {debugCollisions ? '🟢' : '⚫'}
+                {debugCollisions ? 'ON' : 'OFF'}
               </span>
               Debug collisions
             </button>
           </DevSection>
-        </>
+        </PanelSection>
       )}
     </aside>
   )
