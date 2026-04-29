@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { FLOOR_Y, PLAYER_HEIGHT } from '../../core/SceneConfig'
 
 function easeInOut(t) {
   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
@@ -32,9 +33,9 @@ const WAYPOINTS = [
     event: 'door:open',
   },
   {
-    position: new THREE.Vector3(-30.9486, 1.4459, -4.6344),
-    target: new THREE.Vector3(-28.9187, 1.2514, -6.8089),
-    duration: 1.15,
+    position: new THREE.Vector3(-30.9486, FLOOR_Y + PLAYER_HEIGHT, -4.6344),
+    target: new THREE.Vector3(-28.9187, FLOOR_Y + PLAYER_HEIGHT, -6.8089),
+    duration: 2.5,
     event: 'inside',
   },
 ]
