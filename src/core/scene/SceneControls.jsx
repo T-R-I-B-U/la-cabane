@@ -8,6 +8,7 @@ export function SceneControls({
   introShouldAdvance,
   onIntroEvent,
   playerMode,
+  flyMode,
   playerSpawn,
   playerSpawnKey,
   movementLocked,
@@ -27,6 +28,7 @@ export function SceneControls({
       <PlayerControls
         key={playerSpawnKey}
         canMove={!movementLocked}
+        flyMode={flyMode}
         spawnAt={playerSpawn}
         collisionObjects={collisionObjects}
       />
@@ -35,7 +37,11 @@ export function SceneControls({
 
   if (postIntro) {
     return postIntroLocked ? (
-      <PlayerControls canMove={!movementLocked} collisionObjects={collisionObjects} />
+      <PlayerControls
+        canMove={!movementLocked}
+        flyMode={flyMode}
+        collisionObjects={collisionObjects}
+      />
     ) : null
   }
 

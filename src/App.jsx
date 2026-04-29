@@ -19,6 +19,7 @@ export default function App() {
   const [status, setStatus] = useState('loading')
   const [info, setInfo] = useState(null)
   const [playerMode, setPlayerMode] = useState(false)
+  const [flyMode, setFlyMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
@@ -100,6 +101,7 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setPlayerMode(true)
+    setFlyMode(false)
   }
 
   function togglePlayerView() {
@@ -107,6 +109,7 @@ export default function App() {
 
     if (playerMode) {
       setPlayerMode(false)
+      setFlyMode(false)
       setUserMovementLocked(false)
       return
     }
@@ -115,6 +118,7 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(false)
     setPlayerMode(true)
+    setFlyMode(false)
   }
 
   return (
@@ -131,6 +135,7 @@ export default function App() {
         }}
         player={{
           mode: playerMode,
+          flyMode,
           spawn: playerSpawn,
           spawnKey: playerSpawnKey,
           movementLocked: introMovementLocked || userMovementLocked || journalActive,
@@ -174,6 +179,7 @@ export default function App() {
           introPending={introPending}
           introActive={introActive}
           playerMode={playerMode}
+          flyMode={flyMode}
           userMovementLocked={userMovementLocked}
           marieClip={marieClip}
           thomasClip={thomasClip}
@@ -182,6 +188,7 @@ export default function App() {
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}
+          onToggleFlyMode={() => setFlyMode((current) => !current)}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           onSelectMarieClip={setMarieClip}
           onSelectThomasClip={setThomasClip}
