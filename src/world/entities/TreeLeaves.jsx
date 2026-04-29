@@ -50,6 +50,7 @@ export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, 
   const originalProps = useMemo(() => {
     if (!leafMesh) return null
     return {
+      material: leafMesh.material,
       alphaMap: leafMesh.material.alphaMap,
       transparent: leafMesh.material.transparent,
       alphaTest: leafMesh.material.alphaTest,
@@ -266,6 +267,8 @@ export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, 
       })
       if (oldMat.normalScale) newMat.normalScale.copy(oldMat.normalScale)
       leafMesh.material = newMat
+    } else if (leafMaterialMode !== 'physical' && leafMesh.material.type === 'MeshPhysicalMaterial') {
+      leafMesh.material = originalProps.material
     }
 
     const mat = leafMesh.material
@@ -309,14 +312,14 @@ export function TreeLeaves({ leafMesh, active = true, onLeafClick, onLeafHover, 
 
     return () => {
       leafMesh.raycast = originalRaycast
-      mat.side = originalProps.side
-      mat.alphaMap = originalProps.alphaMap
-      mat.transparent = originalProps.transparent
-      mat.alphaTest = originalProps.alphaTest
-      if (mat.emissive) mat.emissive.copy(originalProps.emissive)
-      mat.emissiveIntensity = originalProps.emissiveIntensity
-      mat.transmission = 0
-      mat.needsUpdate = true
+      leafMesh.material = originalProps.material
+      originalProps.material.side = originalProps.side
+      originalProps.material.alphaMap = originalProps.alphaMap
+      originalProps.material.transparent = originalProps.transparent
+      originalProps.material.alphaTest = originalProps.alphaTest
+      if (originalProps.material.emissive) originalProps.material.emissive.copy(originalProps.emissive)
+      originalProps.material.emissiveIntensity = originalProps.emissiveIntensity
+      originalProps.material.needsUpdate = true
     }
   }, [leafMesh, alphaMap, leafMaterialMode, originalProps])
 
