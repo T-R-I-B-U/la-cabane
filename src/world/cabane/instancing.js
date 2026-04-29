@@ -5,7 +5,10 @@ import { modelBaseName } from './assetNaming'
 import { applyTransform, cloneMaterialWithTextures, warnMissingAsset } from './runtime'
 
 function getModelCandidates(baseName, modelBasePaths) {
-  return modelBasePaths.flatMap((basePath) => [`${basePath}${baseName}.glb`, `${basePath}${baseName}.gltf`])
+  return modelBasePaths.flatMap((basePath) => [
+    `${basePath}${baseName}.glb`,
+    `${basePath}${baseName}.gltf`,
+  ])
 }
 
 function getInstanceCandidates(baseName, modelBasePaths) {

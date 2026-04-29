@@ -181,7 +181,9 @@ export async function buildCabane({
   const root = new THREE.Group()
   root.name = 'cabane'
   const modelBasePaths = performanceMode ? ['/models/compressed/', '/models/'] : ['/models/']
-  const textureBasePaths = performanceMode ? ['/textures/compressed/', '/textures/'] : ['/textures/']
+  const textureBasePaths = performanceMode
+    ? ['/textures/compressed/', '/textures/']
+    : ['/textures/']
 
   const nodes = Array.isArray(data) ? data : [data]
   root.userData.hutPosition = findNodePosition(nodes, 'hut01')

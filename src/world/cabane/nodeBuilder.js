@@ -6,7 +6,10 @@ import { modelBaseName } from './assetNaming'
 import { applyTransform, warnMissingAsset } from './runtime'
 
 function getModelCandidates(baseName, modelBasePaths) {
-  return modelBasePaths.flatMap((basePath) => [`${basePath}${baseName}.glb`, `${basePath}${baseName}.gltf`])
+  return modelBasePaths.flatMap((basePath) => [
+    `${basePath}${baseName}.glb`,
+    `${basePath}${baseName}.gltf`,
+  ])
 }
 
 export async function buildNode(node, { modelBasePaths, textureBasePaths }) {
