@@ -1,14 +1,4 @@
-import { CharacterAnimationControls } from './CharacterAnimationControls'
 import { DevSection } from './DevSection'
-
-const MARIE_CLIPS = [
-  'Armature|mixamo.com|Layer0',
-  'marie-sitting-idle',
-  'marie-standiing-idle',
-  'marie-standingup',
-]
-
-const THOMAS_CLIPS = ['thomas-back', 'thomas-front', 'thomas-turn']
 
 function PanelSection({ title, eyebrow, children }) {
   return (
@@ -32,8 +22,6 @@ export function ViewerControls({
   playerMode,
   flyMode,
   userMovementLocked,
-  marieClip,
-  thomasClip,
   debugDoors,
   debugCollisions,
   shaderEnabled,
@@ -44,8 +32,6 @@ export function ViewerControls({
   onGoToPlatform,
   onToggleFlyMode,
   onToggleUserMovement,
-  onSelectMarieClip,
-  onSelectThomasClip,
   onToggleShader,
   onShaderRadiusChange,
   onToggleDebugDoors,
@@ -157,18 +143,6 @@ export function ViewerControls({
 
       {import.meta.env.DEV && (
         <PanelSection title="Devtools" eyebrow="Runtime">
-          <CharacterAnimationControls
-            title="Marie"
-            activeClip={marieClip}
-            clips={MARIE_CLIPS}
-            onSelect={onSelectMarieClip}
-          />
-          <CharacterAnimationControls
-            title="Thomas"
-            activeClip={thomasClip}
-            clips={THOMAS_CLIPS}
-            onSelect={onSelectThomasClip}
-          />
           <DevSection title="Aquarelle">
             <label className="controls-slider-row">
               <span>Rayon</span>

@@ -19,7 +19,6 @@ export default function Scene({
   player,
   debug,
   intro,
-  characters,
   interactions,
   shaderEnabled,
   shaderRadius,
@@ -43,8 +42,7 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const { marieClip, thomasClip } = characters
-  const { onNpcInteract, onNpcHover, journalOpen, onJournalStart, onJournalOpen } = interactions
+  const { journalOpen, onJournalStart, onJournalOpen } = interactions
 
   const [cabane, setCabane] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
@@ -87,23 +85,15 @@ export default function Scene({
         onCabaneLoaded={setCabane}
       />
 
-      <SceneCharacters
-        performanceMode={performanceMode}
-        hutPosition={hutPosition}
-        marieClip={marieClip}
-        thomasClip={thomasClip}
-      />
+      <SceneCharacters performanceMode={performanceMode} hutPosition={hutPosition} />
 
       <SceneInteractions
         cabane={cabane}
-        hutPosition={hutPosition}
         playerMode={playerMode}
         postIntro={postIntro}
         interactionLocked={interactionLocked}
         introWaitingAtDoor={introWaitingAtDoor}
         onIntroEvent={onIntroEvent}
-        onNpcInteract={onNpcInteract}
-        onNpcHover={onNpcHover}
         journalOpen={journalOpen}
         onJournalStart={onJournalStart}
         onJournalOpen={onJournalOpen}
