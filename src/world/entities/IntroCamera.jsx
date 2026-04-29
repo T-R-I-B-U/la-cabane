@@ -108,7 +108,8 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
       stepRef.current += 1
       progressRef.current = 0
       delayRef.current = 0
-      if (to.event) onEvent?.(to.event)
+      if (to.event)
+        onEvent?.(to.event, { position: to.position.clone(), target: to.target.clone() })
       return
     }
 
@@ -124,7 +125,8 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
       progressRef.current = 0
       delayRef.current = 0
 
-      if (to.event) onEvent?.(to.event)
+      if (to.event)
+        onEvent?.(to.event, { position: to.position.clone(), target: to.target.clone() })
 
       if (to.waitForInput) {
         waitingRef.current = true

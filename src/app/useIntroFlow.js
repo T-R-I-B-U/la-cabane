@@ -12,6 +12,8 @@ export function useIntroFlow({ sceneReady }) {
   const [loaderFading, setLoaderFading] = useState(false)
   const [dialogueActive, setDialogueActive] = useState(false)
   const [introMovementLocked, setIntroMovementLocked] = useState(false)
+  const [introSpawn, setIntroSpawn] = useState(null)
+  const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
 
   const playDialogue = useCallback((id, { onDone } = {}) => {
@@ -34,6 +36,8 @@ export function useIntroFlow({ sceneReady }) {
     setIntroShouldAdvance(false)
     setDialogueActive(false)
     setIntroMovementLocked(false)
+    setIntroSpawn(null)
+    setPlayerName('')
     ignoreNextPointerUnlockRef.current = false
     stopDialogue()
   }, [])
@@ -81,7 +85,7 @@ export function useIntroFlow({ sceneReady }) {
   }, [showNameInput])
 
   const handleIntroEvent = useCallback(
-    (event) => {
+    (event, payload) => {
       if (event === 'wait:door') setIntroWaitingAtDoor(true)
 
       if (event === 'door:clicked') {
@@ -92,6 +96,7 @@ export function useIntroFlow({ sceneReady }) {
       if (event === 'door:open') setIntroDoorOpen(true)
 
       if (event === 'inside') {
+        if (payload) setIntroSpawn(payload)
         setIntroDoorOpen(false)
         setIntroShouldAdvance(false)
         setIntroActive(false)
@@ -105,13 +110,17 @@ export function useIntroFlow({ sceneReady }) {
     [playDialogue]
   )
 
-  const handleNameSubmit = useCallback(() => {
-    setShowNameInput(false)
-    setIntroMovementLocked(true)
-    playDialogue('dialogue2', {
-      onDone: () => setIntroMovementLocked(false),
-    })
-  }, [playDialogue])
+  const handleNameSubmit = useCallback(
+    (name) => {
+      setPlayerName(name)
+      setShowNameInput(false)
+      setIntroMovementLocked(true)
+      playDialogue('dialogue2', {
+        onDone: () => setIntroMovementLocked(false),
+      })
+    },
+    [playDialogue]
+  )
 
   const launchIntro = useCallback(() => {
     if (!sceneReady) return
@@ -152,10 +161,12 @@ export function useIntroFlow({ sceneReady }) {
     introActive,
     introDoorOpen,
     introMovementLocked,
+    introSpawn,
     introPending,
     introShouldAdvance,
     introWaitingAtDoor,
     loaderFading,
+    playerName,
     postIntro,
     showNameInput,
     dismissLoader,

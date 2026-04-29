@@ -23,6 +23,7 @@ export default function Scene({
   interactions,
   shaderEnabled,
   shaderRadius,
+  onCameraChange,
 }) {
   const { onStats, onReady, onError } = sceneState
   const {
@@ -38,6 +39,7 @@ export default function Scene({
     doorOpen: introDoorOpen,
     waitingAtDoor: introWaitingAtDoor,
     shouldAdvance: introShouldAdvance,
+    spawn: introSpawn,
     postIntro,
     postIntroLocked,
     interactionLocked,
@@ -114,6 +116,7 @@ export default function Scene({
         collisionObjects={collisionObjects}
         introActive={introActive}
         introShouldAdvance={introShouldAdvance}
+        introSpawn={introSpawn}
         onIntroEvent={onIntroEvent}
         playerMode={playerMode}
         flyMode={flyMode}
@@ -124,6 +127,7 @@ export default function Scene({
         postIntroLocked={postIntroLocked}
         controlsRef={controlsRef}
         hutPosition={hutPosition}
+        onCameraChange={onCameraChange}
       />
 
       {shaderEnabled && <WatercolorPass radius={shaderRadius} />}
