@@ -108,15 +108,15 @@ export default function Scene({
         forceOpen={introDoorOpen}
       />
 
-        <SceneControls
-          collisionObjects={collisionObjects}
-          introActive={introActive}
-          introShouldAdvance={introShouldAdvance}
-          onIntroEvent={onIntroEvent}
-          playerMode={playerMode}
-          flyMode={flyMode}
-          playerSpawn={playerSpawn}
-          playerSpawnKey={playerSpawnKey}
+      <SceneControls
+        collisionObjects={collisionObjects}
+        introActive={introActive}
+        introShouldAdvance={introShouldAdvance}
+        onIntroEvent={onIntroEvent}
+        playerMode={playerMode}
+        flyMode={flyMode}
+        playerSpawn={playerSpawn}
+        playerSpawnKey={playerSpawnKey}
         movementLocked={movementLocked}
         postIntro={postIntro}
         postIntroLocked={postIntroLocked}

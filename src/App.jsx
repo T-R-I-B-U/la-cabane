@@ -178,18 +178,18 @@ export default function App() {
           sceneReady={sceneReady}
           introPending={introPending}
           introActive={introActive}
-           playerMode={playerMode}
-           flyMode={flyMode}
-           userMovementLocked={userMovementLocked}
+          playerMode={playerMode}
+          flyMode={flyMode}
+          userMovementLocked={userMovementLocked}
           marieClip={marieClip}
           thomasClip={thomasClip}
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
-           onGoToPlatform={goToPlatform}
-           onToggleFlyMode={() => setFlyMode((current) => !current)}
-           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
+          onGoToPlatform={goToPlatform}
+          onToggleFlyMode={() => setFlyMode((current) => !current)}
+          onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           onSelectMarieClip={setMarieClip}
           onSelectThomasClip={setThomasClip}
           shaderEnabled={shaderEnabled}

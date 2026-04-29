@@ -25,7 +25,12 @@ function isBlockingHit(h) {
   return true
 }
 
-export function PlayerControls({ canMove = true, flyMode = false, spawnAt, collisionObjects = [] }) {
+export function PlayerControls({
+  canMove = true,
+  flyMode = false,
+  spawnAt,
+  collisionObjects = [],
+}) {
   const { camera } = useThree()
   const spawnRef = useRef(spawnAt)
   const keys = useRef({})
@@ -86,7 +91,10 @@ export function PlayerControls({ canMove = true, flyMode = false, spawnAt, colli
           verticalVelocity.current - FALL_GRAVITY * frameDelta,
           -MAX_FALL_SPEED
         )
-        camera.position.y = Math.max(camera.position.y + verticalVelocity.current * frameDelta, targetCamY)
+        camera.position.y = Math.max(
+          camera.position.y + verticalVelocity.current * frameDelta,
+          targetCamY
+        )
         if (camera.position.y <= targetCamY) verticalVelocity.current = 0
       }
       // dy >= 0.6 means a wall is above — don't teleport upward
