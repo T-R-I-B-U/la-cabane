@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
+import { WatercolorPass } from '../world/materials/WatercolorPass'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { CollisionDebug } from './CollisionDebug'
 import { Floor } from './Floor'
@@ -12,7 +13,16 @@ import { SceneControls } from './scene/SceneControls'
 import { SceneInteractions } from './scene/SceneInteractions'
 import { SceneLighting } from './scene/SceneLighting'
 
-export default function Scene({ sceneState, player, debug, intro, characters, interactions }) {
+export default function Scene({
+  sceneState,
+  player,
+  debug,
+  intro,
+  characters,
+  interactions,
+  shaderEnabled,
+  shaderRadius,
+}) {
   const { onStats, onReady, onError } = sceneState
   const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey, movementLocked } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
@@ -103,6 +113,8 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
         controlsRef={controlsRef}
         hutPosition={hutPosition}
       />
+
+      {shaderEnabled && <WatercolorPass radius={shaderRadius} />}
     </Canvas>
   )
 }

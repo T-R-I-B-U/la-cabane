@@ -31,13 +31,13 @@ export function SceneInteractions({
   return (
     <>
       <InteractionPoint
-        position={[hutPosition[0] - 2.4, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+        position={[hutPosition[0] + 1.4, FLOOR_Y + 0.9, hutPosition[2] - 8.1]}
         active={interactionsActive}
         onInteract={() => onNpcInteract?.('marie')}
         onHoverChange={onMarieHover}
       />
       <InteractionPoint
-        position={[hutPosition[0] - 1.1, FLOOR_Y + 0.9, hutPosition[2] - 7.5]}
+        position={[hutPosition[0] + 2.7, FLOOR_Y + 0.9, hutPosition[2] - 8.1]}
         active={interactionsActive}
         onInteract={() => onNpcInteract?.('thomas')}
         onHoverChange={onThomasHover}
