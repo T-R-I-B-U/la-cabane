@@ -1,13 +1,16 @@
 import { hdriFiles } from 'virtual:hdri-options'
 
 function filenameFromPath(path) {
-  return path.split('/').pop()?.replace(/\.(hdr|exr)$/i, '') ?? path
+  return (
+    path
+      .split('/')
+      .pop()
+      ?.replace(/\.(hdr|exr)$/i, '') ?? path
+  )
 }
 
 function labelFromFilename(filename) {
-  return filename
-    .replace(/[-_]+/g, ' ')
-    .replace(/\b\w/g, (letter) => letter.toUpperCase())
+  return filename.replace(/[-_]+/g, ' ').replace(/\b\w/g, (letter) => letter.toUpperCase())
 }
 
 export const HDRI_OPTIONS = hdriFiles.map((path) => {
