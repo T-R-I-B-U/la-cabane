@@ -46,7 +46,7 @@
 
 .perf-monitor {
   position: absolute;
-  top: 65px;
+  top: 14px;
   left: 14px;
   width: min(240px, calc(100vw - 28px));
   padding: 10px 12px 12px;

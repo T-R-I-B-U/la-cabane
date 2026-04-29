@@ -36,6 +36,7 @@ export function ViewerControls({
   debugCollisions,
   shaderEnabled,
   shaderRadius,
+  leafMaterialMode,
   onLaunchIntro,
   onTogglePlayerMode,
   onGoToPlatform,
@@ -46,6 +47,7 @@ export function ViewerControls({
   onShaderRadiusChange,
   onToggleDebugDoors,
   onToggleDebugCollisions,
+  onLeafMaterialChange,
 }) {
   const introLabel = !sceneReady
     ? 'Scène en chargement...'
@@ -93,6 +95,23 @@ export function ViewerControls({
           </span>
           Rendu aquarelle
         </button>
+      </PanelSection>
+
+      <PanelSection title="Feuilles" eyebrow="Matière">
+        {['standard', 'physical', 'emissive'].map((mode) => (
+          <button
+            key={mode}
+            type="button"
+            className={`camera-toggle${leafMaterialMode === mode ? ' camera-toggle--active' : ''}`}
+            aria-pressed={leafMaterialMode === mode}
+            onClick={() => onLeafMaterialChange(mode)}
+          >
+            <span className="camera-toggle-icon" aria-hidden="true">
+              {leafMaterialMode === mode ? 'ON' : 'OFF'}
+            </span>
+            {mode.charAt(0).toUpperCase() + mode.slice(1)}
+          </button>
+        ))}
       </PanelSection>
 
       <PanelSection title="Navigation" eyebrow="Camera">

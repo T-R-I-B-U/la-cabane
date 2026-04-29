@@ -243,32 +243,6 @@ export default function App() {
         shaderRadius={shaderRadius}
       />
 
-      {showUI && (
-        <div className="top-left-controls">
-          <button
-            type="button"
-            className={`transparency-toggle${leafMaterialMode === 'standard' ? ' transparency-toggle--active' : ''}`}
-            onClick={() => setLeafMaterialMode('standard')}
-          >
-            Standard
-          </button>
-          <button
-            type="button"
-            className={`transparency-toggle${leafMaterialMode === 'physical' ? ' transparency-toggle--active' : ''}`}
-            onClick={() => setLeafMaterialMode('physical')}
-          >
-            Physical
-          </button>
-          <button
-            type="button"
-            className={`transparency-toggle${leafMaterialMode === 'emissive' ? ' transparency-toggle--active' : ''}`}
-            onClick={() => setLeafMaterialMode('emissive')}
-          >
-            Emissive
-          </button>
-        </div>
-      )}
-
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
 
       {showUI && !introPending && !introActive && !postIntro && (
@@ -284,6 +258,7 @@ export default function App() {
           thomasClip={thomasClip}
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
+          leafMaterialMode={leafMaterialMode}
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}
@@ -296,6 +271,7 @@ export default function App() {
           onShaderRadiusChange={setShaderRadius}
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+          onLeafMaterialChange={setLeafMaterialMode}
         />
       )}
 
