@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
+import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
 import { useIntroFlow } from './app/useIntroFlow'
 import { useNpcDialogue } from './app/useNpcDialogue'
@@ -26,6 +27,17 @@ export default function App() {
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
+  const [journalOpen, setJournalOpen] = useState(false)
+  const [journalBounds, setJournalBounds] = useState(null)
+  const [journalActive, setJournalActive] = useState(false)
+  const onJournalStart = useCallback(() => {
+    setJournalActive(true)
+    document.exitPointerLock()
+  }, [])
+  const onJournalOpen = useCallback((bounds) => {
+    setJournalBounds(bounds)
+    setJournalOpen(true)
+  }, [])
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
@@ -47,7 +59,7 @@ export default function App() {
     playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-  const interactionLocked = dialogueActive || introMovementLocked || showNameInput
+  const interactionLocked = dialogueActive || introMovementLocked || showNameInput || journalActive
   const {
     handleNpcInteract,
     marieClip,
@@ -121,7 +133,7 @@ export default function App() {
           mode: playerMode,
           spawn: playerSpawn,
           spawnKey: playerSpawnKey,
-          movementLocked: introMovementLocked || userMovementLocked,
+          movementLocked: introMovementLocked || userMovementLocked || journalActive,
         }}
         debug={{
           doors: debugDoors,
@@ -144,6 +156,9 @@ export default function App() {
         interactions={{
           onNpcInteract: handleNpcInteract,
           onNpcHover: setNpcHovered,
+          journalOpen,
+          onJournalStart,
+          onJournalOpen,
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
@@ -176,6 +191,17 @@ export default function App() {
           onShaderRadiusChange={setShaderRadius}
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+        />
+      )}
+
+      {journalOpen && journalBounds && (
+        <JournalOverlay
+          leftBounds={journalBounds.left}
+          rightBounds={journalBounds.right}
+          onClose={() => {
+            setJournalOpen(false)
+            setJournalActive(false)
+          }}
         />
       )}
 
