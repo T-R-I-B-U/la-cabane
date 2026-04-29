@@ -42,6 +42,13 @@ const FORCE_TEXTURE_OVERRIDE_MESHES = new Set([
   'fenêtre.1',
 ])
 
+const TEXTURE_TRANSFORMS = {
+  nest_foot: {
+    center: [0.5, 0.5],
+    rotation: Math.PI / 2,
+  },
+}
+
 function textureNameCandidates(name) {
   const baseName = name.replace(/[_-]\d+$/, '')
   const trimmed = baseName.toLowerCase().trim()
@@ -152,6 +159,15 @@ function resetMaterialTint(material) {
   material.color.set(0xffffff)
 }
 
+function applyTextureTransform(texture, textureNames) {
+  const transformName = textureNames.find((name) => TEXTURE_TRANSFORMS[name])
+  if (!transformName) return
+
+  const transform = TEXTURE_TRANSFORMS[transformName]
+  if (transform.center) texture.center.set(transform.center[0], transform.center[1])
+  if (typeof transform.rotation === 'number') texture.rotation = transform.rotation
+}
+
 function getTextureNames(object3d, obj, fallbackName) {
   const directAlias = resolveTextureAlias(obj.name)
   const ancestorAlias = !directAlias
@@ -194,7 +210,9 @@ export async function applyAutoTextures(object3d, fallbackName) {
             const url = findTextureUrl(textureNames, suffix)
             if (!url) return
 
-            material[materialKey] = await loadTexture(url, colorSpace)
+            const texture = await loadTexture(url, colorSpace)
+            applyTextureTransform(texture, textureNames)
+            material[materialKey] = texture
             resetMaterialTint(material)
             material.needsUpdate = true
           })
