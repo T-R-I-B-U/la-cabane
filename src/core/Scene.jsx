@@ -13,7 +13,15 @@ import { SceneControls } from './scene/SceneControls'
 import { SceneInteractions } from './scene/SceneInteractions'
 import { SceneLighting } from './scene/SceneLighting'
 
-export default function Scene({ sceneState, player, debug, intro, characters, interactions }) {
+export default function Scene({
+  sceneState,
+  player,
+  debug,
+  intro,
+  characters,
+  leafMaterialMode,
+  interactions,
+}) {
   const { onStats, onReady, onError } = sceneState
   const { mode: playerMode, spawn: playerSpawn, spawnKey: playerSpawnKey, movementLocked } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
@@ -91,7 +99,12 @@ export default function Scene({ sceneState, player, debug, intro, characters, in
 
       <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={handleCabaneLoaded} />
 
-      <TreeLeaves leafMesh={leafMesh} onLeafClick={onLeafClick} onLeafHover={onLeafHover} />
+      <TreeLeaves
+        leafMesh={leafMesh}
+        onLeafClick={onLeafClick}
+        onLeafHover={onLeafHover}
+        leafMaterialMode={leafMaterialMode}
+      />
 
       <SceneCharacters hutPosition={hutPosition} marieClip={marieClip} thomasClip={thomasClip} />
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useMemo } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
+import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { createConditionalEdgesGeometry } from '../../utils/ConditionalEdgesGeometry'
 import conditionalLineVertShader from '../materials/conditionalLine.vert.glsl'
@@ -22,7 +23,7 @@ const TINT_SEED = 137
 const TINT_MIN = 0.45 // darkest leaves — never fully black
 const TINT_MAX = 1.0 // brightest leaves — full base color
 // Feuilles au-delà de cette distance (world units) ne s'animent pas
-const LOD_DISTANCE_SQ = 10 * 10
+const LOD_DISTANCE_SQ = 12 * 12
 
 // Mulberry32 PRNG — fast, seedable, no dependency
 function mulberry32(seed) {
@@ -35,10 +36,26 @@ function mulberry32(seed) {
   }
 }
 
-export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover }) {
+export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover, leafMaterialMode = 'standard' }) {
   const proxyRef = useRef(null)
   const inRangeRef = useRef(null)
   const { gl } = useThree()
+
+  // Load alpha map for leaves
+  const alphaMap = useTexture('/textures/detailedleaf-alphamap.png')
+
+  // Cache original material values to restore them on unmount or mode change
+  const originalProps = useMemo(() => {
+    if (!leafMesh) return null
+    return {
+      alphaMap: leafMesh.material.alphaMap,
+      transparent: leafMesh.material.transparent,
+      alphaTest: leafMesh.material.alphaTest,
+      side: leafMesh.material.side,
+      emissive: leafMesh.material.emissive?.clone() || new THREE.Color(0, 0, 0),
+      emissiveIntensity: leafMesh.material.emissiveIntensity || 0,
+    }
+  }, [leafMesh])
 
   // Cache des matrices de base — source de vérité immuable
   const baseMatrices = useMemo(() => {
@@ -207,22 +224,84 @@ export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover }) {
   }, [gl, _outlineMaterial])
 
   useEffect(() => {
-    if (!leafMesh) return
+    if (!leafMesh || !alphaMap || !originalProps) return
     const originalRaycast = leafMesh.raycast
 
-    // Ensure raycasting hits from both sides if the material doesn't already allow it
-    // Sometimes thin models are hard to hover from behind.
-    // If leaf material uses FrontSide, backfaces won't be picked up by raycaster.
-    const origSide = leafMesh.material.side
-    // eslint-disable-next-line react-hooks/immutability
-    leafMesh.material.side = THREE.DoubleSide
+    /* eslint-disable react-hooks/immutability */
+    alphaMap.flipY = false
+    alphaMap.colorSpace = THREE.LinearSRGBColorSpace
+    alphaMap.needsUpdate = true
+
+    // Force conversion to MeshPhysicalMaterial if needed
+    if (leafMaterialMode === 'physical' && leafMesh.material.type !== 'MeshPhysicalMaterial') {
+      const oldMat = leafMesh.material
+      const newMat = new THREE.MeshPhysicalMaterial({
+        color: oldMat.color,
+        map: oldMat.map,
+        normalMap: oldMat.normalMap,
+        roughnessMap: oldMat.roughnessMap,
+        metalnessMap: oldMat.metalnessMap,
+        roughness: oldMat.roughness,
+        metalness: oldMat.metalness,
+        side: oldMat.side,
+        emissive: oldMat.emissive,
+        emissiveIntensity: oldMat.emissiveIntensity,
+      })
+      if (oldMat.normalScale) newMat.normalScale.copy(oldMat.normalScale)
+      leafMesh.material = newMat
+    }
+
+    const mat = leafMesh.material
+
+    if (leafMaterialMode === 'physical') {
+      // Option 1: Physical Translucency
+      mat.transparent = true
+      mat.opacity = 1.0
+      mat.alphaMap = null
+      mat.alphaTest = 0
+      if ('transmission' in mat) {
+        mat.transmission = 0.5
+        mat.thickness = 1.0
+        mat.ior = 1.45
+      }
+      mat.roughness = 0.3
+      mat.side = THREE.DoubleSide
+    } else if (leafMaterialMode === 'emissive') {
+      // Option 3: Emissive simulation
+      mat.transparent = false
+      mat.opacity = 1
+      mat.alphaMap = null
+      mat.alphaTest = 0
+      mat.emissive.setHex(0x446633)
+      mat.emissiveIntensity = 1.0
+      mat.side = THREE.DoubleSide
+    } else {
+      // Option Default: Standard material, no transparency, no emissive, no transmission
+      mat.transparent = false
+      mat.opacity = 1
+      mat.alphaMap = null
+      mat.alphaTest = 0
+      mat.emissive.setHex(0x000000)
+      mat.emissiveIntensity = 0
+      mat.transmission = 0
+      mat.side = THREE.DoubleSide
+    }
+
+    mat.needsUpdate = true
+    /* eslint-enable react-hooks/immutability */
 
     return () => {
       leafMesh.raycast = originalRaycast
-
-      leafMesh.material.side = origSide
+      mat.side = originalProps.side
+      mat.alphaMap = originalProps.alphaMap
+      mat.transparent = originalProps.transparent
+      mat.alphaTest = originalProps.alphaTest
+      if (mat.emissive) mat.emissive.copy(originalProps.emissive)
+      mat.emissiveIntensity = originalProps.emissiveIntensity
+      mat.transmission = 0
+      mat.needsUpdate = true
     }
-  }, [leafMesh])
+  }, [leafMesh, alphaMap, leafMaterialMode, originalProps])
 
   if (!leafMesh || !edgesGeometry) return null
 
@@ -256,7 +335,8 @@ export function TreeLeaves({ leafMesh, onLeafClick, onLeafHover }) {
         }}
         onClick={(e) => {
           e.stopPropagation()
-          if (e.instanceId === undefined || !inRangeRef.current?.[e.instanceId] || !onLeafClick) return
+          if (e.instanceId === undefined || !inRangeRef.current?.[e.instanceId] || !onLeafClick)
+            return
           onLeafClick(e.instanceId)
         }}
       />

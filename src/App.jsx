@@ -47,9 +47,14 @@ export default function App() {
     playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-  const { selected: selectedSavoir, assignAndOpen, close: closeSavoirInternal } = useSavoirAssignment()
+  const {
+    selected: selectedSavoir,
+    assignAndOpen,
+    close: closeSavoirInternal,
+  } = useSavoirAssignment()
   const [leafHovered, setLeafHovered] = useState(false)
-  
+  const [leafMaterialMode, setLeafMaterialMode] = useState('standard') // 'standard', 'physical', 'emissive'
+
   // Force exit pointer lock when a savoir opens to show the mouse immediately
   useEffect(() => {
     if (selectedSavoir && document.pointerLockElement) {
@@ -71,7 +76,11 @@ export default function App() {
   }, [])
 
   const interactionLocked =
-    dialogueActive || introMovementLocked || showNameInput || selectedSavoir !== null || (!pointerIsLocked && playerMode)
+    dialogueActive ||
+    introMovementLocked ||
+    showNameInput ||
+    selectedSavoir !== null ||
+    (!pointerIsLocked && playerMode)
 
   const {
     handleNpcInteract,
@@ -113,7 +122,7 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setPlayerMode(true)
-    
+
     // Request lock immediately on click
     setTimeout(() => {
       const canvas = document.querySelector('canvas')
@@ -121,13 +130,17 @@ export default function App() {
     }, 10)
   }
 
-  const cursorVisible = !introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked)
+  const cursorVisible =
+    !introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked)
 
   return (
     <main className={`viewer-page${cursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
       <Subtitles />
 
-      <Crosshair visible={(playerMode || postIntro) && !showNameInput && !selectedSavoir} active={npcHovered || leafHovered} />
+      <Crosshair
+        visible={(playerMode || postIntro) && !showNameInput && !selectedSavoir}
+        active={npcHovered || leafHovered}
+      />
 
       <Scene
         sceneState={{
@@ -162,6 +175,7 @@ export default function App() {
           marieClip,
           thomasClip,
         }}
+        leafMaterialMode={leafMaterialMode}
         interactions={{
           onNpcInteract: handleNpcInteract,
           onNpcHover: setNpcHovered,
@@ -169,6 +183,32 @@ export default function App() {
           onLeafHover: setLeafHovered,
         }}
       />
+
+      {showUI && (
+        <div className="top-left-controls">
+          <button
+            type="button"
+            className={`transparency-toggle${leafMaterialMode === 'standard' ? ' transparency-toggle--active' : ''}`}
+            onClick={() => setLeafMaterialMode('standard')}
+          >
+            Standard
+          </button>
+          <button
+            type="button"
+            className={`transparency-toggle${leafMaterialMode === 'physical' ? ' transparency-toggle--active' : ''}`}
+            onClick={() => setLeafMaterialMode('physical')}
+          >
+            Physical
+          </button>
+          <button
+            type="button"
+            className={`transparency-toggle${leafMaterialMode === 'emissive' ? ' transparency-toggle--active' : ''}`}
+            onClick={() => setLeafMaterialMode('emissive')}
+          >
+            Emissive
+          </button>
+        </div>
+      )}
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
 

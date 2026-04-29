@@ -23,7 +23,7 @@
 
 .perf-monitor {
   position: absolute;
-  top: 14px;
+  top: 65px;
   left: 14px;
   width: min(240px, calc(100vw - 28px));
   padding: 10px 12px 12px;
@@ -117,6 +117,52 @@
 .pm-unit {
   font-size: 0.6rem;
   color: #5a7a8a;
+}
+
+/* ── Top-left UI controls ────────────────────────────────────────── */
+
+.top-left-controls {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+}
+
+.transparency-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(14, 20, 26, 0.88);
+  backdrop-filter: blur(6px);
+  color: #c8d8e4;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.transparency-toggle:hover {
+  background: rgba(25, 35, 45, 0.95);
+  color: #ffffff;
+}
+
+.transparency-toggle--active {
+  background: rgba(34, 221, 136, 0.18);
+  border-color: rgba(34, 221, 136, 0.4);
+  color: #22dd88;
+}
+
+.transparency-toggle--active:hover {
+  background: rgba(34, 221, 136, 0.25);
 }
 
 /* ── Info panel — top right ──────────────────────────────────────── */
