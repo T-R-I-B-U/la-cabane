@@ -63,6 +63,7 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+  const [showCameraEditor, setShowCameraEditor] = useState(false)
   const [liveCam, setLiveCam] = useState(null)
   const [capturedWaypoints, setCapturedWaypoints] = useState(
     Array.from({ length: 5 }, () => ({ position: null, target: null }))
@@ -77,10 +78,13 @@ export default function App() {
   const interactionLocked = dialogueActive || introMovementLocked || showNameInput || journalActive
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.code !== 'F1') return
-
-      event.preventDefault()
-      setShowUI((current) => !current)
+      if (event.code === 'F1') {
+        event.preventDefault()
+        setShowUI((current) => !current)
+      } else if (event.code === 'F2') {
+        event.preventDefault()
+        setShowCameraEditor((current) => !current)
+      }
     }
 
     window.addEventListener('keydown', onKeyDown)
@@ -169,7 +173,7 @@ export default function App() {
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
 
-      {import.meta.env.DEV && showUI && !introActive && !playerMode && !postIntro && (
+      {import.meta.env.DEV && showCameraEditor && !introActive && !playerMode && !postIntro && (
         <IntroCameraPanel
           live={liveCam}
           onCapture={handleWaypointCapture}
