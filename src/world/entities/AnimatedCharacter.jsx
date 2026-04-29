@@ -157,7 +157,7 @@ export function AnimatedCharacter({
       const durationSeconds = step.duration ?? action.getClip().duration
       timeoutIds.push(
         window.setTimeout(() => {
-        scheduleStep((index + 1) % animationSequence.length)
+          scheduleStep((index + 1) % animationSequence.length)
         }, durationSeconds * 1000)
       )
     }
