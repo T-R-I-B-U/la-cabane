@@ -6,6 +6,7 @@ import { NameInput } from './app/NameInput'
 import { useIntroFlow } from './app/useIntroFlow'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
+import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
@@ -24,6 +25,7 @@ export default function App() {
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
   const [shaderRadius, setShaderRadius] = useState(3)
+  const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [showUI, setShowUI] = useState(true)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
@@ -71,7 +73,6 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
-
   const onReady = useCallback((data) => {
     setInfo(data)
     setStatus('ok')
@@ -115,6 +116,7 @@ export default function App() {
 
       <Scene
         performanceMode={performanceMode}
+        activeHdriId={activeHdriId}
         sceneState={{
           onStats: setStats,
           onReady,
@@ -165,6 +167,10 @@ export default function App() {
           userMovementLocked={userMovementLocked}
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
+          hdriOptions={HDRI_OPTIONS}
+          noHdriId={NO_HDRI_ID}
+          activeHdriId={activeHdriId}
+          onHdriChange={setActiveHdriId}
           onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
