@@ -24,8 +24,12 @@ export function ViewerControls({
   userMovementLocked,
   debugDoors,
   debugCollisions,
+  hdriOptions,
+  noHdriId,
+  activeHdriId,
   shaderEnabled,
   shaderRadius,
+  onHdriChange,
   onTogglePerformanceMode,
   onLaunchIntro,
   onTogglePlayerMode,
@@ -83,6 +87,44 @@ export function ViewerControls({
           </span>
           Rendu aquarelle
         </button>
+      </PanelSection>
+
+      <PanelSection title="Ambiance" eyebrow="HDRI">
+        <button
+          type="button"
+          className={`camera-toggle camera-toggle--compact${activeHdriId === noHdriId ? ' camera-toggle--active' : ''}`}
+          aria-pressed={activeHdriId === noHdriId}
+          onClick={() => onHdriChange(noHdriId)}
+        >
+          <span>Lumieres originales</span>
+          <span className="camera-toggle-icon" aria-hidden="true">
+            {activeHdriId === noHdriId ? 'ON' : 'OFF'}
+          </span>
+        </button>
+        {hdriOptions.length > 0 ? (
+          <div className="hdri-button-grid" role="list" aria-label="Choix de HDRI">
+            {hdriOptions.map((option) => {
+              const active = option.id === activeHdriId
+
+              return (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`camera-toggle camera-toggle--compact${active ? ' camera-toggle--active' : ''}`}
+                  aria-pressed={active}
+                  onClick={() => onHdriChange(option.id)}
+                >
+                  <span>{option.label}</span>
+                  <span className="camera-toggle-icon" aria-hidden="true">
+                    {active ? 'ON' : 'HDR'}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        ) : (
+          <p className="controls-hint">Ajoutez des fichiers .hdr ou .exr dans public/hdri.</p>
+        )}
       </PanelSection>
 
       <PanelSection title="Navigation" eyebrow="Camera">

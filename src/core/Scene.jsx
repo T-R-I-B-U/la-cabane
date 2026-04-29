@@ -15,6 +15,7 @@ import { SceneLighting } from './scene/SceneLighting'
 
 export default function Scene({
   performanceMode,
+  activeHdriId,
   sceneState,
   player,
   debug,
@@ -74,7 +75,7 @@ export default function Scene({
       <StatsCollector onStats={onStats} />
       <AudioManager />
 
-      <SceneLighting />
+      <SceneLighting activeHdriId={activeHdriId} />
 
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
 
