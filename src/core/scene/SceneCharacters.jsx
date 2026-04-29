@@ -3,6 +3,24 @@ import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 import { FLOOR_Y } from '../SceneConfig'
 
 const compressedModelModules = import.meta.glob('/public/models/compressed/*.{glb,gltf}')
+const ZOE_ANIMATION_SEQUENCE = [
+  { clip: 'zoe-idle', duration: 5 },
+  { clip: 'zoe-pointing' },
+  { clip: 'zoe-idle', duration: 5 },
+  { clip: 'zoe-pointing', reverse: true },
+]
+const MARIE_ANIMATION_SEQUENCE = [
+  { clip: 'marie-sitting-idle', duration: 5 },
+  { clip: 'marie-standingup' },
+  { clip: 'marie-standiing-idle', duration: 5 },
+  { clip: 'marie-standingup', reverse: true },
+]
+const THOMAS_ANIMATION_SEQUENCE = [
+  { clip: 'thomas-back', duration: 5 },
+  { clip: 'thomas-turn' },
+  { clip: 'thomas-front', duration: 5 },
+  { clip: 'thomas-turn', reverse: true },
+]
 
 function resolveCharacterUrl(fileName, performanceMode) {
   const compressedKey = `/public/models/compressed/${fileName}`
@@ -13,7 +31,8 @@ function resolveCharacterUrl(fileName, performanceMode) {
   return `/models/${fileName}`
 }
 
-export function SceneCharacters({ performanceMode, hutPosition, marieClip, thomasClip }) {
+export function SceneCharacters({ performanceMode, hutPosition }) {
+  const zoeUrl = resolveCharacterUrl('zoe-animated.glb', performanceMode)
   const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
   const textureBasePaths = performanceMode
@@ -23,9 +42,19 @@ export function SceneCharacters({ performanceMode, hutPosition, marieClip, thoma
   return (
     <Suspense fallback={null}>
       <AnimatedCharacter
+        key={zoeUrl}
+        url={zoeUrl}
+        animationSequence={ZOE_ANIMATION_SEQUENCE}
+        textureName="zoe"
+        textureBasePaths={textureBasePaths}
+        position={[hutPosition[0] + 0.1, FLOOR_Y, hutPosition[2] - 9.1]}
+        rotation={[0, Math.PI * 0.08, 0]}
+        scale={9}
+      />
+      <AnimatedCharacter
         key={marieUrl}
         url={marieUrl}
-        clip={marieClip}
+        animationSequence={MARIE_ANIMATION_SEQUENCE}
         textureName="marie"
         textureBasePaths={textureBasePaths}
         position={[hutPosition[0] + 1.4, FLOOR_Y, hutPosition[2] - 9.1]}
@@ -35,7 +64,7 @@ export function SceneCharacters({ performanceMode, hutPosition, marieClip, thoma
       <AnimatedCharacter
         key={thomasUrl}
         url={thomasUrl}
-        clip={thomasClip}
+        animationSequence={THOMAS_ANIMATION_SEQUENCE}
         textureName="thomas"
         textureBasePaths={textureBasePaths}
         position={[hutPosition[0] + 2.7, FLOOR_Y, hutPosition[2] - 9.1]}

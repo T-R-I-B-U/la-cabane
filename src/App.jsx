@@ -4,7 +4,6 @@ import { IntroLoader } from './app/IntroLoader'
 import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
 import { useIntroFlow } from './app/useIntroFlow'
-import { useNpcDialogue } from './app/useNpcDialogue'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
 import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
@@ -58,23 +57,9 @@ export default function App() {
     handleLoaderKeyDown,
     handleNameSubmit,
     launchIntro,
-    playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
   const interactionLocked = dialogueActive || introMovementLocked || showNameInput || journalActive
-  const {
-    handleNpcInteract,
-    marieClip,
-    npcHovered,
-    setMarieClip,
-    setNpcHovered,
-    setThomasClip,
-    thomasClip,
-  } = useNpcDialogue({
-    playDialogue,
-    interactionLocked,
-  })
-
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code !== 'F1') return
@@ -126,7 +111,7 @@ export default function App() {
     <main className="viewer-page">
       <Subtitles />
 
-      <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={npcHovered} />
+      <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={false} />
 
       <Scene
         performanceMode={performanceMode}
@@ -156,13 +141,7 @@ export default function App() {
           interactionLocked,
           onEvent: handleIntroEvent,
         }}
-        characters={{
-          marieClip,
-          thomasClip,
-        }}
         interactions={{
-          onNpcInteract: handleNpcInteract,
-          onNpcHover: setNpcHovered,
           journalOpen,
           onJournalStart,
           onJournalOpen,
@@ -184,8 +163,6 @@ export default function App() {
           playerMode={playerMode}
           flyMode={flyMode}
           userMovementLocked={userMovementLocked}
-          marieClip={marieClip}
-          thomasClip={thomasClip}
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
           onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
@@ -194,8 +171,6 @@ export default function App() {
           onGoToPlatform={goToPlatform}
           onToggleFlyMode={() => setFlyMode((current) => !current)}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
-          onSelectMarieClip={setMarieClip}
-          onSelectThomasClip={setThomasClip}
           shaderEnabled={shaderEnabled}
           shaderRadius={shaderRadius}
           onToggleShader={() => setShaderEnabled((current) => !current)}
