@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
 import { WatercolorPass } from '../world/materials/WatercolorPass'
+import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { TreeLeaves } from '../world/entities/TreeLeaves'
 import { CollisionDebug } from './CollisionDebug'
@@ -105,6 +106,8 @@ export default function Scene({
       <SceneLighting activeHdriId={activeHdriId} />
 
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
+
+      <BackgroundPlanes hutPosition={hutPosition} />
 
       <CabaneMap
         performanceMode={performanceMode}
