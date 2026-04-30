@@ -53,11 +53,12 @@ export function SceneControls({
     <>
       <OrbitControls
         ref={controlsRef}
-        enableDamping
-        dampingFactor={0.08}
-        minDistance={0.5}
-        maxDistance={200}
         target={hutPosition}
+        enablePan={false}
+        enableDamping
+        minDistance={10}
+        maxDistance={80}
+        maxPolarAngle={Math.PI / 2.1}
       />
       {onCameraChange && <CameraTracker controlsRef={controlsRef} onChange={onCameraChange} />}
     </>

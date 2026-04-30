@@ -47,6 +47,7 @@ function pickDefaultClip(actions, names, defaultClip) {
 
 export function AnimatedCharacter({
   url,
+  animationUrl,
   clip,
   animationSequence,
   textureName,
@@ -55,7 +56,8 @@ export function AnimatedCharacter({
 }) {
   const group = useRef()
   const activeActionRef = useRef(null)
-  const { scene, animations } = useGLTF(url)
+  const { scene } = useGLTF(url)
+  const { animations } = useGLTF(animationUrl ?? url)
   const clonedScene = useMemo(() => cloneCharacterScene(scene), [scene])
   const { actions, names } = useAnimations(animations, group)
 

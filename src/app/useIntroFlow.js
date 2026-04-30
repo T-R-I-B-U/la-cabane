@@ -69,15 +69,6 @@ export function useIntroFlow({ sceneReady }) {
   }, [postIntro, exitIntro])
 
   useEffect(() => {
-    const hideCursor = introActive && !introWaitingAtDoor
-    document.body.style.cursor = hideCursor ? 'none' : ''
-
-    return () => {
-      document.body.style.cursor = ''
-    }
-  }, [introActive, introWaitingAtDoor])
-
-  useEffect(() => {
     if (!showNameInput || !document.pointerLockElement) return
 
     ignoreNextPointerUnlockRef.current = true

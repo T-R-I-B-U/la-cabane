@@ -7,6 +7,7 @@ export function SceneLighting({ activeHdriId }) {
   const skyTexture = useTexture('/textures/sky.png')
   const activeHdri = getHdriOption(activeHdriId)
   const backgroundTexture = useMemo(() => {
+    if (!skyTexture) return null
     const texture = skyTexture.clone()
     texture.colorSpace = THREE.SRGBColorSpace
     return texture
@@ -14,14 +15,14 @@ export function SceneLighting({ activeHdriId }) {
 
   return (
     <>
-      <primitive attach="background" object={backgroundTexture} />
+      {backgroundTexture && <primitive attach="background" object={backgroundTexture} />}
       {activeHdri?.file ? (
         <Environment files={activeHdri.file} environmentIntensity={activeHdri.intensity} />
       ) : (
         <Environment preset={activeHdri.preset} />
       )}
       <ambientLight intensity={1} />
-      <directionalLight position={[10, 20, 10]} intensity={1.5} castShadow />
+      <directionalLight position={[10, 70, 10]} intensity={1.5} castShadow />
     </>
   )
 }

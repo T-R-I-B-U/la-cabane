@@ -1,9 +1,23 @@
-import { DoubleSide } from 'three'
+import { useMemo } from 'react'
+import { useTexture } from '@react-three/drei'
+import { DoubleSide, RepeatWrapping, SRGBColorSpace } from 'three'
 import { FLOOR_Y } from './SceneConfig'
 
 const GROUND_SIZE = 400
 
 export function Floor({ mainFloorRef, hutPosition }) {
+  const grassTexture = useTexture('/textures/grass.png')
+  const tiledGrassTexture = useMemo(() => {
+    if (!grassTexture) return null
+    const texture = grassTexture.clone()
+    texture.colorSpace = SRGBColorSpace
+    texture.wrapS = RepeatWrapping
+    texture.wrapT = RepeatWrapping
+    texture.repeat.set(96, 96)
+    texture.needsUpdate = true
+    return texture
+  }, [grassTexture])
+
   return (
     <>
       <mesh
@@ -23,7 +37,13 @@ export function Floor({ mainFloorRef, hutPosition }) {
         raycast={() => {}}
       >
         <planeGeometry args={[GROUND_SIZE, GROUND_SIZE]} />
-        <meshStandardMaterial color="#d6d1c2" roughness={0.96} metalness={0} side={DoubleSide} />
+        <meshStandardMaterial
+          color="#ffffff"
+          map={tiledGrassTexture}
+          roughness={0.96}
+          metalness={0}
+          side={DoubleSide}
+        />
       </mesh>
     </>
   )
