@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
-import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
 import { SavoirPanel } from './app/SavoirPanel'
 import { useIntroFlow } from './app/useIntroFlow'
@@ -32,8 +31,6 @@ export default function App() {
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
-  const [journalOpen, setJournalOpen] = useState(false)
-  const [journalBounds, setJournalBounds] = useState(null)
   const [journalActive, setJournalActive] = useState(false)
   const [savoirActive, setSavoirActive] = useState(false)
   const [savoirOpen, setSavoirOpen] = useState(false)
@@ -44,15 +41,6 @@ export default function App() {
     close: closeSavoirInternal,
   } = useSavoirAssignment()
 
-  const onJournalStart = useCallback(() => {
-    setJournalActive(true)
-    document.exitPointerLock()
-  }, [])
-  const onJournalOpen = useCallback((bounds) => {
-    setJournalBounds(bounds)
-    setJournalOpen(true)
-  }, [])
-
   const handleLeafClick = useCallback(
     (id) => {
       setSavoirActive(true)
@@ -62,8 +50,7 @@ export default function App() {
     [assignAndOpen]
   )
 
-  // Open panel only after pointer lock actually releases — same timing guarantee
-  // as the journal (which waits for its 3D animation to complete before showing the overlay).
+  // Open panel only after pointer lock actually releases.
   useEffect(() => {
     if (!savoirActive) return
 
@@ -216,9 +203,8 @@ export default function App() {
         interactions={{
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
-          journalOpen,
-          onJournalStart,
-          onJournalOpen,
+          onJournalStart: () => setJournalActive(true),
+          onJournalEnd: () => setJournalActive(false),
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
@@ -257,17 +243,6 @@ export default function App() {
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
           onLeafMaterialChange={setLeafMaterialMode}
-        />
-      )}
-
-      {journalOpen && journalBounds && (
-        <JournalOverlay
-          leftBounds={journalBounds.left}
-          rightBounds={journalBounds.right}
-          onClose={() => {
-            setJournalOpen(false)
-            setJournalActive(false)
-          }}
         />
       )}
 

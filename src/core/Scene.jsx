@@ -46,7 +46,7 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const { onLeafClick, onLeafHover, journalOpen, onJournalStart, onJournalOpen } = interactions
+  const { onLeafClick, onLeafHover, onJournalStart, onJournalEnd } = interactions
 
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -133,9 +133,8 @@ export default function Scene({
         interactionLocked={interactionLocked}
         introWaitingAtDoor={introWaitingAtDoor}
         onIntroEvent={onIntroEvent}
-        journalOpen={journalOpen}
         onJournalStart={onJournalStart}
-        onJournalOpen={onJournalOpen}
+        onJournalEnd={onJournalEnd}
       />
 
       {debugCollisions && <CollisionDebug cabane={cabane} />}
