@@ -57,7 +57,7 @@ export function SceneCharacters({ performanceMode, hutPosition }) {
         key={marieUrl}
         url={marieUrl}
         animationSequence={MARIE_ANIMATION_SEQUENCE}
-        textureName="marie"
+        textureName="marie-animated"
         textureBasePaths={textureBasePaths}
         position={[hutPosition[0] + 1.4, FLOOR_Y, hutPosition[2] - 9.1]}
         rotation={[0, Math.PI * 0.08, 0]}
