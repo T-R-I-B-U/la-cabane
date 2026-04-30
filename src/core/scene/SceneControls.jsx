@@ -16,6 +16,7 @@ export function SceneControls({
   movementLocked,
   postIntro,
   postIntroLocked,
+  pointerControlsRef,
   controlsRef,
   hutPosition,
   onCameraChange,
@@ -34,6 +35,7 @@ export function SceneControls({
         flyMode={flyMode}
         spawnAt={playerSpawn}
         collisionObjects={collisionObjects}
+        controlsRef={pointerControlsRef}
       />
     )
   }
@@ -45,6 +47,7 @@ export function SceneControls({
         flyMode={flyMode}
         spawnAt={introSpawn?.position}
         collisionObjects={collisionObjects}
+        controlsRef={pointerControlsRef}
       />
     ) : null
   }

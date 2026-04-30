@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { applyAutoTextures } from '../cabane/textureResolver'
 
 const MODEL_URL = '/models/book01.gltf'
 const MAX_INTERACT_DIST = 3.5
@@ -18,7 +19,27 @@ const CAMERA_TOP_DIRECTION = new THREE.Vector3(0, 0.98, 0.2).normalize()
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
-export function JournalBook({ position, active, onInteractionStart, onInteractionEnd }) {
+function cloneSingleMaterial(material) {
+  const clone = material.clone()
+
+  for (const [key, value] of Object.entries(clone)) {
+    if (value?.isTexture) clone[key] = value.clone()
+  }
+
+  return clone
+}
+
+function cloneMaterial(material) {
+  return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
+}
+
+export function JournalBook({
+  position,
+  active,
+  onInteractionStart,
+  onInteractionEnd,
+  onInteractionCancel,
+}) {
   const { camera } = useThree()
   const { scene } = useGLTF(MODEL_URL)
 
@@ -47,6 +68,8 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
 
     clone.traverse((object) => {
       if (!object.isMesh) return
+      object.geometry = object.geometry.clone()
+      object.material = cloneMaterial(object.material)
       object.castShadow = true
       object.receiveShadow = true
     })
@@ -56,6 +79,14 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
 
     return { left: leftObject, right: rightObject }
   }, [scene])
+
+  useEffect(() => {
+    Promise.all([applyAutoTextures(left, 'book01'), applyAutoTextures(right, 'book01')]).catch(
+      (error) => {
+        console.error('JournalBook: failed to apply book textures', error)
+      }
+    )
+  }, [left, right])
 
   useEffect(() => {
     return () => {
@@ -74,26 +105,48 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
     elapsedRef.current = 0
   }
 
+  const requestClose = useEffectEvent(() => {
+    const state = stateRef.current
+    if (state === 'CLOSED' || state === 'CAMERA_RETURNING') return
+
+    onInteractionCancel?.()
+
+    if (state === 'CAMERA_MOVING' || state === 'OPENING') {
+      startCameraReturn()
+      return
+    }
+
+    if (state === 'OPEN' || state === 'CLOSING') {
+      restoreCameraAfterCloseRef.current = true
+      stateRef.current = 'CLOSING'
+      elapsedRef.current = 0
+    }
+  })
+
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code !== 'Escape') return
 
       const state = stateRef.current
-      if (state === 'CAMERA_MOVING' || state === 'OPENING') {
-        startCameraReturn()
-        return
-      }
+      if (state === 'CLOSED') return
 
-      if (state === 'OPEN' || state === 'CLOSING') {
-        restoreCameraAfterCloseRef.current = true
-        stateRef.current = 'CLOSING'
-        elapsedRef.current = 0
-      }
+      event.preventDefault()
+      event.stopPropagation()
+      requestClose()
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  })
+  }, [])
+
+  useEffect(() => {
+    const onPointerLockChange = () => {
+      if (!document.pointerLockElement) requestClose()
+    }
+
+    document.addEventListener('pointerlockchange', onPointerLockChange)
+    return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
+  }, [])
 
   const handlePointerDown = () => {
     if (!active || !inRangeRef.current) return
@@ -113,7 +166,6 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
       cameraInitQuatRef.current.copy(camera.quaternion)
       cameraTargetQuatRef.current.setFromRotationMatrix(lookAtMatrix)
 
-      document.exitPointerLock()
       onInteractionStart?.()
       restoreCameraAfterCloseRef.current = false
       stateRef.current = 'CAMERA_MOVING'
