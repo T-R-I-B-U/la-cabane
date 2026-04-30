@@ -1,0 +1,9 @@
+[
+  {
+    "id": "c01",
+    "fruitId": "fruit_01",
+    "name": "Prénom Nom",
+    "role": "Rôle exemple",
+    "email": "contact@exemple.fr"
+  }
+]

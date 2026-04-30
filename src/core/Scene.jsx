@@ -5,6 +5,7 @@ import { WatercolorPass } from '../world/materials/WatercolorPass'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { TreeLeaves } from '../world/entities/TreeLeaves'
 import { GrowingFruit } from '../world/entities/GrowingFruit'
+import { Fruit } from '../world/entities/Fruit'
 import { CollisionDebug } from './CollisionDebug'
 import { Floor } from './Floor'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -46,7 +47,15 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const { onLeafClick, onLeafHover, journalOpen, onJournalStart, onJournalOpen } = interactions
+  const {
+    onLeafClick,
+    onLeafHover,
+    onFruitClick,
+    onFruitHover,
+    journalOpen,
+    onJournalStart,
+    onJournalOpen,
+  } = interactions
 
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -123,6 +132,14 @@ export default function Scene({
       />
 
       <GrowingFruit />
+
+      <Fruit
+        fruitId="fruit_01"
+        position={[-23, 25.5, -9]}
+        active={(playerMode || postIntro) && !interactionLocked}
+        onFruitClick={onFruitClick}
+        onFruitHover={onFruitHover}
+      />
 
       <SceneCharacters performanceMode={performanceMode} hutPosition={hutPosition} />
 

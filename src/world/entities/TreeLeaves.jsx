@@ -2,9 +2,12 @@ import { useEffect, useRef, useMemo } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { createConditionalEdgesGeometry } from '../../utils/ConditionalEdgesGeometry'
-import conditionalLineVertShader from '../materials/conditionalLine.vert.glsl'
-import conditionalLineFragShader from '../materials/conditionalLine.frag.glsl'
+import {
+  createOutlineGeometry,
+  createOutlineMaterial,
+  useOutlineResolution,
+} from '../materials/outlineEffect'
+import { useHoverEffect } from '../interactions/useHoverEffect'
 
 const _instanceMatrix = new THREE.Matrix4()
 const _worldMatrix = new THREE.Matrix4()
@@ -118,15 +121,11 @@ export function TreeLeaves({
     return pos
   }, [leafMesh])
 
-  useEffect(() => {
-    return () => {
-      document.body.style.cursor = 'default'
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!active) document.body.style.cursor = 'default'
-  }, [active])
+  const { onPointerOver: hoverOver, onPointerOut: hoverOut } = useHoverEffect({
+    active,
+    onHover: () => onLeafHover?.(true),
+    onOut: () => onLeafHover?.(false),
+  })
 
   useEffect(() => {
     if (!leafMesh) return
@@ -179,73 +178,12 @@ export function TreeLeaves({
 
   const edgesGeometry = useMemo(() => {
     if (!leafMesh) return null
-    // Threshold angle determines which internal edges are pre-filtered out (e.g. 40 degrees)
-    const baseGeo = createConditionalEdgesGeometry(leafMesh.geometry, 40)
-    // Create an instanced geometry to simulate thickness by drawing the line multiple times
-    const instancedGeo = new THREE.InstancedBufferGeometry()
-    instancedGeo.copy(baseGeo)
-
-    // Generate offsets and opacities for a glow effect
-    const radius = 3 // px radius for glow
-    const offsets = []
-    const opacities = []
-
-    for (let x = -radius; x <= radius; x++) {
-      for (let y = -radius; y <= radius; y++) {
-        const dist = Math.sqrt(x * x + y * y)
-        if (dist <= radius) {
-          offsets.push(x, y)
-          // Stronger opacity in the center, decaying towards the edges
-          const op = Math.max(0, 1.0 - dist / radius)
-          // Use a power for a softer falloff
-          opacities.push(Math.pow(op, 1.5) * 0.4) // reduce max opacity because they add up
-        }
-      }
-    }
-
-    instancedGeo.setAttribute(
-      'instanceOffset',
-      new THREE.InstancedBufferAttribute(new Float32Array(offsets), 2)
-    )
-    instancedGeo.setAttribute(
-      'instanceOpacity',
-      new THREE.InstancedBufferAttribute(new Float32Array(opacities), 1)
-    )
-    instancedGeo.instanceCount = offsets.length / 2
-
-    return instancedGeo
+    return createOutlineGeometry(leafMesh.geometry, 40, 3)
   }, [leafMesh])
 
-  const _outlineMaterial = useMemo(() => {
-    return new THREE.ShaderMaterial({
-      vertexShader: conditionalLineVertShader,
-      fragmentShader: conditionalLineFragShader,
-      uniforms: {
-        diffuse: { value: new THREE.Color(0xffffff) },
-        opacity: { value: 1.0 },
-        resolution: { value: new THREE.Vector2() },
-      },
-      transparent: true,
-      depthTest: false,
-      blending: THREE.AdditiveBlending,
-    })
-  }, [])
+  const _outlineMaterial = useMemo(() => createOutlineMaterial(), [])
 
-  // Keep resolution uniform updated so the thickness is consistent in pixel scale
-  useEffect(() => {
-    const updateResolution = () => {
-      const canvas = gl.domElement
-      // Use pixel ratio to maintain consistent real pixel thickness
-      const pixelRatio = gl.getPixelRatio()
-      _outlineMaterial.uniforms.resolution.value.set(
-        canvas.clientWidth * pixelRatio,
-        canvas.clientHeight * pixelRatio
-      )
-    }
-    updateResolution()
-    window.addEventListener('resize', updateResolution)
-    return () => window.removeEventListener('resize', updateResolution)
-  }, [gl, _outlineMaterial])
+  useOutlineResolution(gl, _outlineMaterial)
 
   useEffect(() => {
     if (!leafMesh || !alphaMap || !originalProps) return
@@ -352,19 +290,16 @@ export function TreeLeaves({
       <primitive
         object={leafMesh}
         onPointerMove={(e) => {
-          e.stopPropagation()
           if (!active) return
           const id = e.instanceId
           if (id === undefined || !inRangeRef.current?.[id]) return
           syncProxy(id)
           if (proxyRef.current) proxyRef.current.visible = true
-          document.body.style.cursor = 'pointer'
-          onLeafHover?.(true)
+          hoverOver(e)
         }}
-        onPointerOut={() => {
+        onPointerOut={(e) => {
           if (proxyRef.current) proxyRef.current.visible = false
-          document.body.style.cursor = 'default'
-          onLeafHover?.(false)
+          hoverOut(e)
         }}
         onPointerDown={(e) => {
           e.stopPropagation()

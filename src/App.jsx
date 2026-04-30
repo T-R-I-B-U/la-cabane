@@ -4,8 +4,10 @@ import { IntroLoader } from './app/IntroLoader'
 import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
 import { SavoirPanel } from './app/SavoirPanel'
+import { ContactPanel } from './app/ContactPanel'
 import { useIntroFlow } from './app/useIntroFlow'
 import { useSavoirAssignment } from './app/useSavoirAssignment'
+import { useContactAssignment } from './app/useContactAssignment'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
@@ -37,12 +39,20 @@ export default function App() {
   const [journalActive, setJournalActive] = useState(false)
   const [savoirActive, setSavoirActive] = useState(false)
   const [savoirOpen, setSavoirOpen] = useState(false)
+  const [contactActive, setContactActive] = useState(false)
+  const [contactOpen, setContactOpen] = useState(false)
+  const [fruitHovered, setFruitHovered] = useState(false)
 
   const {
     selected: selectedSavoir,
     assignAndOpen,
     close: closeSavoirInternal,
   } = useSavoirAssignment()
+  const {
+    selected: selectedContact,
+    openContact,
+    close: closeContactInternal,
+  } = useContactAssignment()
 
   const onJournalStart = useCallback(() => {
     setJournalActive(true)
@@ -62,6 +72,19 @@ export default function App() {
     [assignAndOpen]
   )
 
+  const handleFruitClick = useCallback(
+    (fruitId) => {
+      setContactActive(true)
+      document.exitPointerLock()
+      openContact(fruitId)
+    },
+    [openContact]
+  )
+
+  const handleFruitHover = useCallback((hovered) => {
+    setFruitHovered(hovered)
+  }, [])
+
   // Open panel only after pointer lock actually releases — same timing guarantee
   // as the journal (which waits for its 3D animation to complete before showing the overlay).
   useEffect(() => {
@@ -77,6 +100,19 @@ export default function App() {
     document.addEventListener('pointerlockchange', onRelease)
     return () => document.removeEventListener('pointerlockchange', onRelease)
   }, [savoirActive])
+
+  useEffect(() => {
+    if (!contactActive) return
+    if (!document.pointerLockElement) {
+      requestAnimationFrame(() => setContactOpen(true))
+      return
+    }
+    const onRelease = () => {
+      if (!document.pointerLockElement) setContactOpen(true)
+    }
+    document.addEventListener('pointerlockchange', onRelease)
+    return () => document.removeEventListener('pointerlockchange', onRelease)
+  }, [contactActive])
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
@@ -106,12 +142,20 @@ export default function App() {
     setSavoirOpen(false)
   }
 
+  const handleCloseContact = () => {
+    closeContactInternal()
+    setContactActive(false)
+    setContactOpen(false)
+  }
+
   const interactionLocked =
     dialogueActive ||
     introMovementLocked ||
     showNameInput ||
     selectedSavoir !== null ||
     savoirActive ||
+    selectedContact !== null ||
+    contactActive ||
     journalActive
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -178,9 +222,11 @@ export default function App() {
           !showNameInput &&
           !selectedSavoir &&
           !savoirActive &&
+          !selectedContact &&
+          !contactActive &&
           !journalActive
         }
-        active={leafHovered}
+        active={leafHovered || fruitHovered}
       />
 
       <Scene
@@ -216,6 +262,8 @@ export default function App() {
         interactions={{
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
+          onFruitClick: handleFruitClick,
+          onFruitHover: handleFruitHover,
           journalOpen,
           onJournalStart,
           onJournalOpen,
@@ -275,6 +323,10 @@ export default function App() {
 
       {savoirOpen && selectedSavoir && (
         <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />
+      )}
+
+      {contactOpen && selectedContact && (
+        <ContactPanel contact={selectedContact.contact} onClose={handleCloseContact} />
       )}
 
       {introPending && (
