@@ -30,6 +30,7 @@ export function PlayerControls({
   flyMode = false,
   spawnAt,
   collisionObjects = [],
+  controlsRef,
 }) {
   const { camera } = useThree()
   const spawnRef = useRef(spawnAt)
@@ -60,6 +61,8 @@ export function PlayerControls({
   }, [])
 
   useFrame((state, delta) => {
+    if (!canMove) return
+
     const { camera } = state
     const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
 
@@ -101,8 +104,6 @@ export function PlayerControls({
     } else {
       verticalVelocity.current = 0
     }
-
-    if (!canMove) return
 
     const k = keys.current
     if (!k['KeyW'] && !k['KeyS'] && !k['KeyA'] && !k['KeyD']) return
@@ -154,5 +155,5 @@ export function PlayerControls({
     }
   })
 
-  return <PointerLockControls />
+  return <PointerLockControls ref={controlsRef} />
 }

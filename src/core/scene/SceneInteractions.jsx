@@ -8,9 +8,9 @@ export function SceneInteractions({
   interactionLocked,
   introWaitingAtDoor,
   onIntroEvent,
-  journalOpen,
   onJournalStart,
-  onJournalOpen,
+  onJournalEnd,
+  onJournalCancel,
 }) {
   const interactionsActive = (playerMode || postIntro) && !interactionLocked
 
@@ -25,9 +25,9 @@ export function SceneInteractions({
       <JournalBook
         position={[-33.8, 0.83, -10.5]}
         active={interactionsActive}
-        open={journalOpen}
-        onStart={onJournalStart}
-        onOpen={onJournalOpen}
+        onInteractionStart={onJournalStart}
+        onInteractionEnd={onJournalEnd}
+        onInteractionCancel={onJournalCancel}
       />
     </>
   )
