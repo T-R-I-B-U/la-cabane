@@ -3,7 +3,9 @@ import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
 import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
+import { SavoirPanel } from './app/SavoirPanel'
 import { useIntroFlow } from './app/useIntroFlow'
+import { useSavoirAssignment } from './app/useSavoirAssignment'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
@@ -33,6 +35,15 @@ export default function App() {
   const [journalOpen, setJournalOpen] = useState(false)
   const [journalBounds, setJournalBounds] = useState(null)
   const [journalActive, setJournalActive] = useState(false)
+  const [savoirActive, setSavoirActive] = useState(false)
+  const [savoirOpen, setSavoirOpen] = useState(false)
+
+  const {
+    selected: selectedSavoir,
+    assignAndOpen,
+    close: closeSavoirInternal,
+  } = useSavoirAssignment()
+
   const onJournalStart = useCallback(() => {
     setJournalActive(true)
     document.exitPointerLock()
@@ -41,6 +52,31 @@ export default function App() {
     setJournalBounds(bounds)
     setJournalOpen(true)
   }, [])
+
+  const handleLeafClick = useCallback(
+    (id) => {
+      setSavoirActive(true)
+      document.exitPointerLock()
+      assignAndOpen(id)
+    },
+    [assignAndOpen]
+  )
+
+  // Open panel only after pointer lock actually releases — same timing guarantee
+  // as the journal (which waits for its 3D animation to complete before showing the overlay).
+  useEffect(() => {
+    if (!savoirActive) return
+
+    if (!document.pointerLockElement) {
+      requestAnimationFrame(() => setSavoirOpen(true))
+      return
+    }
+    const onRelease = () => {
+      if (!document.pointerLockElement) setSavoirOpen(true)
+    }
+    document.addEventListener('pointerlockchange', onRelease)
+    return () => document.removeEventListener('pointerlockchange', onRelease)
+  }, [savoirActive])
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
@@ -61,7 +97,22 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-  const interactionLocked = dialogueActive || introMovementLocked || showNameInput || journalActive
+  const [leafHovered, setLeafHovered] = useState(false)
+  const [leafMaterialMode, setLeafMaterialMode] = useState('standard') // 'standard', 'physical', 'emissive'
+
+  const handleCloseSavoir = () => {
+    closeSavoirInternal()
+    setSavoirActive(false)
+    setSavoirOpen(false)
+  }
+
+  const interactionLocked =
+    dialogueActive ||
+    introMovementLocked ||
+    showNameInput ||
+    selectedSavoir !== null ||
+    savoirActive ||
+    journalActive
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code !== 'F1') return
@@ -89,7 +140,16 @@ export default function App() {
     setUserMovementLocked(true)
     setPlayerMode(true)
     setFlyMode(false)
+
+    // Request lock immediately on click
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
   }
+
+  const cursorVisible =
+    !introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked)
 
   function togglePlayerView() {
     setPostIntro(false)
@@ -109,10 +169,19 @@ export default function App() {
   }
 
   return (
-    <main className="viewer-page">
+    <main className={`viewer-page${cursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
       <Subtitles />
 
-      <Crosshair visible={(playerMode || postIntro) && !showNameInput} active={false} />
+      <Crosshair
+        visible={
+          (playerMode || postIntro) &&
+          !showNameInput &&
+          !selectedSavoir &&
+          !savoirActive &&
+          !journalActive
+        }
+        active={leafHovered}
+      />
 
       <Scene
         performanceMode={performanceMode}
@@ -127,7 +196,7 @@ export default function App() {
           flyMode,
           spawn: playerSpawn,
           spawnKey: playerSpawnKey,
-          movementLocked: introMovementLocked || userMovementLocked || journalActive,
+          movementLocked: interactionLocked || userMovementLocked,
         }}
         debug={{
           doors: debugDoors,
@@ -143,7 +212,10 @@ export default function App() {
           interactionLocked,
           onEvent: handleIntroEvent,
         }}
+        leafMaterialMode={leafMaterialMode}
         interactions={{
+          onLeafClick: handleLeafClick,
+          onLeafHover: setLeafHovered,
           journalOpen,
           onJournalStart,
           onJournalOpen,
@@ -167,6 +239,7 @@ export default function App() {
           userMovementLocked={userMovementLocked}
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
+          leafMaterialMode={leafMaterialMode}
           hdriOptions={HDRI_OPTIONS}
           noHdriId={NO_HDRI_ID}
           activeHdriId={activeHdriId}
@@ -183,6 +256,7 @@ export default function App() {
           onShaderRadiusChange={setShaderRadius}
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+          onLeafMaterialChange={setLeafMaterialMode}
         />
       )}
 
@@ -198,6 +272,10 @@ export default function App() {
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
+
+      {savoirOpen && selectedSavoir && (
+        <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />
+      )}
 
       {introPending && (
         <IntroLoader

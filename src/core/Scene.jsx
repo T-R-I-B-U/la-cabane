@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
 import { WatercolorPass } from '../world/materials/WatercolorPass'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
+import { TreeLeaves } from '../world/entities/TreeLeaves'
 import { CollisionDebug } from './CollisionDebug'
 import { Floor } from './Floor'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -20,6 +21,7 @@ export default function Scene({
   player,
   debug,
   intro,
+  leafMaterialMode,
   interactions,
   shaderEnabled,
   shaderRadius,
@@ -43,9 +45,10 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const { journalOpen, onJournalStart, onJournalOpen } = interactions
+  const { onLeafClick, onLeafHover, journalOpen, onJournalStart, onJournalOpen } = interactions
 
   const [cabane, setCabane] = useState(null)
+  const [leafMesh, setLeafMesh] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
   const controlsRef = useRef()
@@ -61,6 +64,30 @@ export default function Scene({
     },
     [onReady]
   )
+
+  // Extract the leaf InstancedMesh here (in a callback, not an effect) so mutations
+  // happen before the value enters React state — satisfies react-hooks/immutability.
+  const handleCabaneLoaded = useCallback((group) => {
+    setCabane(group)
+    if (!group) {
+      setLeafMesh(null)
+      return
+    }
+    let found = null
+    group.traverse((obj) => {
+      if (!found && obj.isInstancedMesh && obj.name === 'leaf') found = obj
+    })
+    if (found) {
+      // Restore prototype raycast (was disabled in buildInstancedMesh for first-person perf).
+      // Safe here: pointer events only fire on mouse move, not every frame.
+      delete found.raycast
+      // Remove from cabane group so TreeLeaves is the sole owner of this mesh.
+      // Without this, the mesh is drawn twice: once inside the cabane group and
+      // once via <primitive object={leafMesh} /> in TreeLeaves.
+      found.parent?.remove(found)
+    }
+    setLeafMesh(found ?? null)
+  }, [])
 
   return (
     <Canvas
@@ -83,7 +110,15 @@ export default function Scene({
         performanceMode={performanceMode}
         onReady={handleReady}
         onError={onError}
-        onCabaneLoaded={setCabane}
+        onCabaneLoaded={handleCabaneLoaded}
+      />
+
+      <TreeLeaves
+        leafMesh={leafMesh}
+        active={(playerMode || postIntro) && !interactionLocked}
+        onLeafClick={onLeafClick}
+        onLeafHover={onLeafHover}
+        leafMaterialMode={leafMaterialMode}
       />
 
       <SceneCharacters performanceMode={performanceMode} hutPosition={hutPosition} />
