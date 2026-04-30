@@ -1,9 +1,8 @@
 import * as THREE from 'three'
 import { normalizeAssetName } from './assetNaming'
 
-const TEXTURE_BASE_PATH = '/textures/'
 const TEXTURE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp']
-const textureModules = import.meta.glob('/public/textures/*.{png,jpg,jpeg,webp}')
+const textureModules = import.meta.glob('/public/textures/**/*.{png,jpg,jpeg,webp}')
 const TEXTURE_SLOTS = [
   { suffix: 'color', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
   { suffix: 'basecolor', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
@@ -70,7 +69,11 @@ function textureNameCandidates(name) {
 
 function registerTextureKey(key, url) {
   if (!key) return
-  if (!availableTextures.has(key)) availableTextures.set(key, url)
+
+  if (!availableTextures.has(key)) availableTextures.set(key, [])
+
+  const urls = availableTextures.get(key)
+  if (!urls.includes(url)) urls.push(url)
 }
 
 function registerAvailableTextures() {
@@ -81,7 +84,7 @@ function registerAvailableTextures() {
     const ext = TEXTURE_EXTENSIONS.find((entry) => fileName.toLowerCase().endsWith(entry))
     if (!ext) continue
 
-    const resolvedUrl = `${TEXTURE_BASE_PATH}${fileName}`
+    const resolvedUrl = path.replace('/public', '')
     const key = fileName.slice(0, -ext.length).toLowerCase()
     registerTextureKey(key, resolvedUrl)
     registerTextureKey(key.normalize('NFC'), resolvedUrl)
@@ -90,19 +93,27 @@ function registerAvailableTextures() {
   }
 }
 
-function findTextureUrl(names, suffix) {
+function findTextureUrl(names, suffix, textureBasePaths) {
   registerAvailableTextures()
+
+  const normalizedBasePaths = textureBasePaths.map((basePath) => basePath.replace(/\/$/, ''))
 
   for (const name of names) {
     for (const candidate of textureNameCandidates(name)) {
       const key = `${candidate}-${suffix}`.toLowerCase()
-      const url =
-        availableTextures.get(key) ||
-        availableTextures.get(key.normalize('NFC')) ||
-        availableTextures.get(key.normalize('NFD')) ||
-        availableTextures.get(normalizeAssetName(key))
+      const urls = [
+        ...(availableTextures.get(key) ?? []),
+        ...(availableTextures.get(key.normalize('NFC')) ?? []),
+        ...(availableTextures.get(key.normalize('NFD')) ?? []),
+        ...(availableTextures.get(normalizeAssetName(key)) ?? []),
+      ]
 
-      if (url) return url
+      const uniqueUrls = [...new Set(urls)]
+
+      for (const basePath of normalizedBasePaths) {
+        const url = uniqueUrls.find((entry) => entry.startsWith(basePath))
+        if (url) return url
+      }
     }
   }
 
@@ -128,6 +139,12 @@ function loadTexture(url, colorSpace) {
 function forEachMaterial(material, callback) {
   if (Array.isArray(material)) material.forEach(callback)
   else if (material) callback(material)
+}
+
+function cloneTexture(texture) {
+  const clone = texture.clone()
+  clone.needsUpdate = true
+  return clone
 }
 
 function resolveTextureAlias(name) {
@@ -192,7 +209,7 @@ function getTextureNames(object3d, obj, fallbackName) {
   return fallbackName && fallbackName !== obj.name ? [obj.name, fallbackName] : [obj.name]
 }
 
-export async function applyAutoTextures(object3d, fallbackName) {
+export async function applyAutoTextures(object3d, fallbackName, textureBasePaths = ['/textures/']) {
   const tasks = []
 
   object3d.traverse((obj) => {
@@ -207,10 +224,11 @@ export async function applyAutoTextures(object3d, fallbackName) {
           TEXTURE_SLOTS.map(async ({ suffix, materialKey, colorSpace }) => {
             if (material[materialKey] && !FORCE_TEXTURE_OVERRIDE_MESHES.has(obj.name)) return
 
-            const url = findTextureUrl(textureNames, suffix)
+            const url = findTextureUrl(textureNames, suffix, textureBasePaths)
             if (!url) return
 
-            const texture = await loadTexture(url, colorSpace)
+            const sourceTexture = await loadTexture(url, colorSpace)
+            const texture = cloneTexture(sourceTexture)
             applyTextureTransform(texture, textureNames)
             material[materialKey] = texture
             resetMaterialTint(material)
@@ -225,5 +243,9 @@ export async function applyAutoTextures(object3d, fallbackName) {
 }
 
 export function clearTextureCache() {
+  for (const texturePromise of textureCache.values()) {
+    texturePromise.then((texture) => texture.dispose())
+  }
+
   textureCache.clear()
 }

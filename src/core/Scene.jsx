@@ -15,11 +15,12 @@ import { SceneInteractions } from './scene/SceneInteractions'
 import { SceneLighting } from './scene/SceneLighting'
 
 export default function Scene({
+  performanceMode,
+  activeHdriId,
   sceneState,
   player,
   debug,
   intro,
-  characters,
   leafMaterialMode,
   interactions,
   shaderEnabled,
@@ -44,10 +45,7 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const { marieClip, thomasClip } = characters
   const {
-    onNpcInteract,
-    onNpcHover,
     onLeafClick,
     onLeafHover,
     journalOpen,
@@ -110,11 +108,16 @@ export default function Scene({
       <StatsCollector onStats={onStats} />
       <AudioManager />
 
-      <SceneLighting />
+      <SceneLighting activeHdriId={activeHdriId} />
 
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
 
-      <CabaneMap onReady={handleReady} onError={onError} onCabaneLoaded={handleCabaneLoaded} />
+      <CabaneMap
+        performanceMode={performanceMode}
+        onReady={handleReady}
+        onError={onError}
+        onCabaneLoaded={handleCabaneLoaded}
+      />
 
       <TreeLeaves
         leafMesh={leafMesh}
@@ -124,18 +127,15 @@ export default function Scene({
         leafMaterialMode={leafMaterialMode}
       />
 
-      <SceneCharacters hutPosition={hutPosition} marieClip={marieClip} thomasClip={thomasClip} />
+      <SceneCharacters performanceMode={performanceMode} hutPosition={hutPosition} />
 
       <SceneInteractions
         cabane={cabane}
-        hutPosition={hutPosition}
         playerMode={playerMode}
         postIntro={postIntro}
         interactionLocked={interactionLocked}
         introWaitingAtDoor={introWaitingAtDoor}
         onIntroEvent={onIntroEvent}
-        onNpcInteract={onNpcInteract}
-        onNpcHover={onNpcHover}
         journalOpen={journalOpen}
         onJournalStart={onJournalStart}
         onJournalOpen={onJournalOpen}

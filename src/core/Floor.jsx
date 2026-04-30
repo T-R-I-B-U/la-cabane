@@ -18,7 +18,7 @@ export function Floor({ mainFloorRef, hutPosition }) {
 
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[hutPosition[0], FLOOR_Y - 0.01, hutPosition[2]]}
+        position={[hutPosition[0], -0.02, hutPosition[2]]}
         receiveShadow
         raycast={() => {}}
       >

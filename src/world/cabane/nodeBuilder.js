@@ -5,21 +5,26 @@ import { buildInstancedMesh } from './instancing'
 import { modelBaseName } from './assetNaming'
 import { applyTransform, warnMissingAsset } from './runtime'
 
-export async function buildNode(node, basePath) {
+function getModelCandidates(baseName, modelBasePaths) {
+  return modelBasePaths.flatMap((basePath) => [
+    `${basePath}${baseName}.glb`,
+    `${basePath}${baseName}.gltf`,
+  ])
+}
+
+export async function buildNode(node, { modelBasePaths, textureBasePaths }) {
   if (node.type === 'InstancedMesh') {
-    return buildInstancedMesh(node, basePath)
+    return buildInstancedMesh(node, { modelBasePaths })
   }
 
   let object3d
   const baseName = modelBaseName(node.name)
-  const modelPaths = []
+  const modelPaths = getModelCandidates(baseName, modelBasePaths)
   const loadErrors = []
-  for (const ext of ['.glb', '.gltf']) {
-    const modelPath = `${basePath}${baseName}${ext}`
-    modelPaths.push(modelPath)
+  for (const modelPath of modelPaths) {
     try {
       object3d = await loadModel(modelPath)
-      await applyAutoTextures(object3d, baseName)
+      await applyAutoTextures(object3d, baseName, textureBasePaths)
       object3d.name = node.name
       break
     } catch (error) {
@@ -57,7 +62,9 @@ export async function buildNode(node, basePath) {
   }
 
   if (node.children?.length > 0) {
-    const children = await Promise.all(node.children.map((child) => buildNode(child, basePath)))
+    const children = await Promise.all(
+      node.children.map((child) => buildNode(child, { modelBasePaths, textureBasePaths }))
+    )
     for (const child of children) {
       if (child) object3d.add(child)
     }

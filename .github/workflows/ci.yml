@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: false
 
       - uses: actions/setup-node@v4
         with:
@@ -27,7 +29,17 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
+      - name: Cache LFS data
+        uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: ${{ runner.os }}-lfs-${{ hashFiles('.gitattributes') }}
+          restore-keys: |
+            ${{ runner.os }}-lfs-
+
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - uses: actions/setup-node@v4
         with:

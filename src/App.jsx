@@ -5,10 +5,10 @@ import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
 import { SavoirPanel } from './app/SavoirPanel'
 import { useIntroFlow } from './app/useIntroFlow'
-import { useNpcDialogue } from './app/useNpcDialogue'
 import { useSavoirAssignment } from './app/useSavoirAssignment'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
+import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
@@ -20,12 +20,14 @@ export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [status, setStatus] = useState('loading')
   const [info, setInfo] = useState(null)
+  const [performanceMode, setPerformanceMode] = useState(false)
   const [playerMode, setPlayerMode] = useState(false)
   const [flyMode, setFlyMode] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
   const [shaderRadius, setShaderRadius] = useState(3)
+  const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [showUI, setShowUI] = useState(true)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
@@ -93,7 +95,6 @@ export default function App() {
     handleLoaderKeyDown,
     handleNameSubmit,
     launchIntro,
-    playDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
   const [leafHovered, setLeafHovered] = useState(false)
@@ -112,19 +113,6 @@ export default function App() {
     selectedSavoir !== null ||
     savoirActive ||
     journalActive
-  const {
-    handleNpcInteract,
-    marieClip,
-    npcHovered,
-    setMarieClip,
-    setNpcHovered,
-    setThomasClip,
-    thomasClip,
-  } = useNpcDialogue({
-    playDialogue,
-    interactionLocked,
-  })
-
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code !== 'F1') return
@@ -136,7 +124,6 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
-
   const onReady = useCallback((data) => {
     setInfo(data)
     setStatus('ok')
@@ -193,10 +180,12 @@ export default function App() {
           !savoirActive &&
           !journalActive
         }
-        active={npcHovered || leafHovered}
+        active={leafHovered}
       />
 
       <Scene
+        performanceMode={performanceMode}
+        activeHdriId={activeHdriId}
         sceneState={{
           onStats: setStats,
           onReady,
@@ -223,14 +212,8 @@ export default function App() {
           interactionLocked,
           onEvent: handleIntroEvent,
         }}
-        characters={{
-          marieClip,
-          thomasClip,
-        }}
         leafMaterialMode={leafMaterialMode}
         interactions={{
-          onNpcInteract: handleNpcInteract,
-          onNpcHover: setNpcHovered,
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
           journalOpen,
@@ -248,23 +231,25 @@ export default function App() {
           status={status}
           info={info}
           sceneReady={sceneReady}
+          performanceMode={performanceMode}
           introPending={introPending}
           introActive={introActive}
           playerMode={playerMode}
           flyMode={flyMode}
           userMovementLocked={userMovementLocked}
-          marieClip={marieClip}
-          thomasClip={thomasClip}
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
           leafMaterialMode={leafMaterialMode}
+          hdriOptions={HDRI_OPTIONS}
+          noHdriId={NO_HDRI_ID}
+          activeHdriId={activeHdriId}
+          onHdriChange={setActiveHdriId}
+          onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}
           onToggleFlyMode={() => setFlyMode((current) => !current)}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
-          onSelectMarieClip={setMarieClip}
-          onSelectThomasClip={setThomasClip}
           shaderEnabled={shaderEnabled}
           shaderRadius={shaderRadius}
           onToggleShader={() => setShaderEnabled((current) => !current)}
@@ -272,17 +257,6 @@ export default function App() {
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
           onLeafMaterialChange={setLeafMaterialMode}
-        />
-      )}
-
-      {journalOpen && journalBounds && (
-        <JournalOverlay
-          leftBounds={journalBounds.left}
-          rightBounds={journalBounds.right}
-          onClose={() => {
-            setJournalOpen(false)
-            setJournalActive(false)
-          }}
         />
       )}
 
