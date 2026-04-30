@@ -32,7 +32,8 @@ function resolveCharacterUrl(fileName, performanceMode) {
 }
 
 export function SceneCharacters({ performanceMode, hutPosition }) {
-  const zoeUrl = resolveCharacterUrl('zoe-animated.glb', performanceMode)
+  // Zoe's compressed GLB is stale after the latest model edit, so keep the source GLB for now.
+  const zoeUrl = resolveCharacterUrl('zoe-animated.glb', false)
   const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
   const textureBasePaths = performanceMode
@@ -44,8 +45,9 @@ export function SceneCharacters({ performanceMode, hutPosition }) {
       <AnimatedCharacter
         key={zoeUrl}
         url={zoeUrl}
+        animationUrl="/models/compressed/zoe-animated.glb"
         animationSequence={ZOE_ANIMATION_SEQUENCE}
-        textureName="zoe"
+        textureName="zoe-animated"
         textureBasePaths={textureBasePaths}
         position={[hutPosition[0] + 0.1, FLOOR_Y, hutPosition[2] - 9.1]}
         rotation={[0, Math.PI * 0.08, 0]}
