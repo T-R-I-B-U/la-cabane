@@ -34,7 +34,8 @@ function resolveCharacterUrl(fileName, performanceMode) {
 export function SceneCharacters({ performanceMode, hutPosition }) {
   // Zoe's compressed GLB is stale after the latest model edit, so keep the source GLB for now.
   const zoeUrl = resolveCharacterUrl('zoe-animated.glb', false)
-  const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
+  // marie-animated.glb has no uncompressed source in public/models/ — always use compressed
+  const marieUrl = resolveCharacterUrl('marie-animated.glb', true)
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
   const textureBasePaths = performanceMode
     ? ['/textures/compressed/', '/textures/']

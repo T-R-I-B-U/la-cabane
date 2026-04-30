@@ -4,6 +4,7 @@ import AudioManager from './audio/AudioManager'
 import { WatercolorPass } from '../world/materials/WatercolorPass'
 import { SlidingDoors } from '../world/entities/SlidingDoors'
 import { TreeLeaves } from '../world/entities/TreeLeaves'
+import { GrowingFruit } from '../world/entities/GrowingFruit'
 import { CollisionDebug } from './CollisionDebug'
 import { Floor } from './Floor'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -120,6 +121,8 @@ export default function Scene({
         onLeafHover={onLeafHover}
         leafMaterialMode={leafMaterialMode}
       />
+
+      <GrowingFruit />
 
       <SceneCharacters performanceMode={performanceMode} hutPosition={hutPosition} />
 
