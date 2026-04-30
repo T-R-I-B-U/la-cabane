@@ -1,15 +1,9 @@
-import { useHelper, Environment, useTexture } from '@react-three/drei'
-import { useRef, useMemo } from 'react'
-import { DirectionalLightHelper } from 'three'
+import { Environment, useTexture } from '@react-three/drei'
+import { useMemo } from 'react'
 import * as THREE from 'three'
 import { getHdriOption } from './hdriOptions'
 
 export function SceneLighting({ activeHdriId }) {
-  const directionalLightRef = useRef()
-
-  // Helper debug : affiche la direction et la portée de la lumière dans la scène.
-  useHelper(directionalLightRef, DirectionalLightHelper, 2, 'yellow')
-
   const skyTexture = useTexture('/textures/sky.png')
   const activeHdri = getHdriOption(activeHdriId)
   const backgroundTexture = useMemo(() => {
@@ -28,12 +22,7 @@ export function SceneLighting({ activeHdriId }) {
         <Environment preset={activeHdri.preset} />
       )}
       <ambientLight intensity={1} />
-      <directionalLight
-        ref={directionalLightRef}
-        position={[10, 70, 10]}
-        intensity={1.5}
-        castShadow
-      />
+      <directionalLight position={[10, 70, 10]} intensity={1.5} castShadow />
     </>
   )
 }
