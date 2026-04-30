@@ -10,6 +10,7 @@ export function SceneInteractions({
   onIntroEvent,
   onJournalStart,
   onJournalEnd,
+  journalVisible = true,
 }) {
   const interactionsActive = (playerMode || postIntro) && !interactionLocked
 
@@ -21,12 +22,14 @@ export function SceneInteractions({
         onDoorClick={() => onIntroEvent?.('door:clicked')}
       />
 
-      <JournalBook
-        position={[-33.8, 0.83, -10.5]}
-        active={interactionsActive}
-        onInteractionStart={onJournalStart}
-        onInteractionEnd={onJournalEnd}
-      />
+      {journalVisible && (
+        <JournalBook
+          position={[-33.8, 0.83, -10.5]}
+          active={interactionsActive}
+          onInteractionStart={onJournalStart}
+          onInteractionEnd={onJournalEnd}
+        />
+      )}
     </>
   )
 }
