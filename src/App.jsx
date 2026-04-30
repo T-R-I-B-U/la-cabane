@@ -245,7 +245,7 @@ export default function App() {
           !contactActive &&
           !journalActive
         }
-          active={interactionsEnabled && (leafHovered || fruitHovered)}
+        active={interactionsEnabled && (leafHovered || fruitHovered)}
       />
 
       <Scene
