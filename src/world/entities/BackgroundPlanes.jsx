@@ -47,7 +47,11 @@ export function BackgroundPlanes({ hutPosition }) {
   const planeConfigs = useMemo(() => {
     return PLANES.map((plane) => ({
       ...plane,
-      basePosition: [hutPosition[0] + plane.offset[0], plane.offset[1], hutPosition[2] + plane.offset[2]],
+      basePosition: [
+        hutPosition[0] + plane.offset[0],
+        plane.offset[1],
+        hutPosition[2] + plane.offset[2],
+      ],
     }))
   }, [hutPosition])
 
