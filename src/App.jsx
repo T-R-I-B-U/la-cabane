@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
 import JournalOverlay from './app/JournalOverlay'
@@ -41,7 +41,10 @@ export default function App() {
   const [savoirOpen, setSavoirOpen] = useState(false)
   const [contactActive, setContactActive] = useState(false)
   const [contactOpen, setContactOpen] = useState(false)
+  const [leafHovered, setLeafHovered] = useState(false)
   const [fruitHovered, setFruitHovered] = useState(false)
+  const [interactionsEnabled, setInteractionsEnabled] = useState(false)
+  const pointerControlsRef = useRef(null)
 
   const {
     selected: selectedSavoir,
@@ -83,6 +86,16 @@ export default function App() {
 
   const handleFruitHover = useCallback((hovered) => {
     setFruitHovered(hovered)
+  }, [])
+
+  const handleToggleInteractionsEnabled = useCallback(() => {
+    setInteractionsEnabled((current) => {
+      if (current) {
+        setLeafHovered(false)
+        setFruitHovered(false)
+      }
+      return !current
+    })
   }, [])
 
   // Open panel only after pointer lock actually releases — same timing guarantee
@@ -133,20 +146,26 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-  const [leafHovered, setLeafHovered] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard') // 'standard', 'physical', 'emissive'
 
-  const handleCloseSavoir = () => {
+  const requestScenePointerLock = useCallback(() => {
+    if (!(playerMode || postIntro)) return
+    pointerControlsRef.current?.lock()
+  }, [playerMode, postIntro])
+
+  const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
     setSavoirActive(false)
     setSavoirOpen(false)
-  }
+    requestScenePointerLock()
+  }, [closeSavoirInternal, requestScenePointerLock])
 
-  const handleCloseContact = () => {
+  const handleCloseContact = useCallback(() => {
     closeContactInternal()
     setContactActive(false)
     setContactOpen(false)
-  }
+    requestScenePointerLock()
+  }, [closeContactInternal, requestScenePointerLock])
 
   const interactionLocked =
     dialogueActive ||
@@ -226,7 +245,7 @@ export default function App() {
           !contactActive &&
           !journalActive
         }
-        active={leafHovered || fruitHovered}
+          active={interactionsEnabled && (leafHovered || fruitHovered)}
       />
 
       <Scene
@@ -259,6 +278,8 @@ export default function App() {
           onEvent: handleIntroEvent,
         }}
         leafMaterialMode={leafMaterialMode}
+        interactionsEnabled={interactionsEnabled}
+        pointerControlsRef={pointerControlsRef}
         interactions={{
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
@@ -288,6 +309,7 @@ export default function App() {
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
           leafMaterialMode={leafMaterialMode}
+          interactionsEnabled={interactionsEnabled}
           hdriOptions={HDRI_OPTIONS}
           noHdriId={NO_HDRI_ID}
           activeHdriId={activeHdriId}
@@ -304,6 +326,7 @@ export default function App() {
           onShaderRadiusChange={setShaderRadius}
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+          onToggleInteractionsEnabled={handleToggleInteractionsEnabled}
           onLeafMaterialChange={setLeafMaterialMode}
         />
       )}

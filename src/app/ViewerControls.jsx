@@ -24,6 +24,7 @@ export function ViewerControls({
   userMovementLocked,
   debugDoors,
   debugCollisions,
+  interactionsEnabled,
   hdriOptions,
   noHdriId,
   activeHdriId,
@@ -41,6 +42,7 @@ export function ViewerControls({
   onShaderRadiusChange,
   onToggleDebugDoors,
   onToggleDebugCollisions,
+  onToggleInteractionsEnabled,
   onLeafMaterialChange,
 }) {
   const introLabel = !sceneReady
@@ -92,6 +94,18 @@ export function ViewerControls({
       </PanelSection>
 
       <PanelSection title="Feuilles" eyebrow="Matière">
+        <button
+          type="button"
+          className={`camera-toggle${interactionsEnabled ? ' camera-toggle--active' : ''}`}
+          aria-pressed={interactionsEnabled}
+          onClick={onToggleInteractionsEnabled}
+        >
+          <span className="camera-toggle-icon" aria-hidden="true">
+            {interactionsEnabled ? 'ON' : 'OFF'}
+          </span>
+          Interactions feuilles/fruits
+        </button>
+
         {['standard', 'physical', 'emissive'].map((mode) => (
           <button
             key={mode}

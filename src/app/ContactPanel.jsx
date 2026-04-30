@@ -1,7 +1,15 @@
 export function ContactPanel({ contact, onClose }) {
   return (
-    <div className="contact-overlay">
-      <div className="contact-card">
+    <div
+      className="contact-overlay"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="contact-card"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button type="button" className="contact-close" onClick={onClose} aria-label="Fermer">
           ✕
         </button>

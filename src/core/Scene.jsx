@@ -24,6 +24,8 @@ export default function Scene({
   debug,
   intro,
   leafMaterialMode,
+  interactionsEnabled,
+  pointerControlsRef,
   interactions,
   shaderEnabled,
   shaderRadius,
@@ -63,6 +65,8 @@ export default function Scene({
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
+  const sceneInteractionsActive =
+    (playerMode || postIntro) && !interactionLocked && interactionsEnabled
   const collisionObjects = useMemo(
     () => [cabane, mainFloorCollider].filter(Boolean),
     [cabane, mainFloorCollider]
@@ -125,7 +129,7 @@ export default function Scene({
 
       <TreeLeaves
         leafMesh={leafMesh}
-        active={(playerMode || postIntro) && !interactionLocked}
+        active={sceneInteractionsActive}
         onLeafClick={onLeafClick}
         onLeafHover={onLeafHover}
         leafMaterialMode={leafMaterialMode}
@@ -136,7 +140,7 @@ export default function Scene({
       <Fruit
         fruitId="fruit_01"
         position={[-23, 25.5, -9]}
-        active={(playerMode || postIntro) && !interactionLocked}
+        active={sceneInteractionsActive}
         onFruitClick={onFruitClick}
         onFruitHover={onFruitHover}
       />
@@ -177,6 +181,7 @@ export default function Scene({
         movementLocked={movementLocked}
         postIntro={postIntro}
         postIntroLocked={postIntroLocked}
+        pointerControlsRef={pointerControlsRef}
         controlsRef={controlsRef}
         hutPosition={hutPosition}
       />

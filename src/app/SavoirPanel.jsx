@@ -1,7 +1,15 @@
 export function SavoirPanel({ savoir, onClose }) {
   return (
-    <div className="savoir-overlay">
-      <div className="savoir-card">
+    <div
+      className="savoir-overlay"
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div
+        className="savoir-card"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button type="button" className="savoir-close" onClick={onClose} aria-label="Fermer">
           ✕
         </button>

@@ -14,6 +14,7 @@ export function SceneControls({
   movementLocked,
   postIntro,
   postIntroLocked,
+  pointerControlsRef,
   controlsRef,
   hutPosition,
 }) {
@@ -31,13 +32,18 @@ export function SceneControls({
         flyMode={flyMode}
         spawnAt={playerSpawn}
         collisionObjects={collisionObjects}
+        controlsRef={pointerControlsRef}
       />
     )
   }
 
   if (postIntro) {
     return postIntroLocked ? (
-      <PlayerControls canMove={!movementLocked} collisionObjects={collisionObjects} />
+      <PlayerControls
+        canMove={!movementLocked}
+        collisionObjects={collisionObjects}
+        controlsRef={pointerControlsRef}
+      />
     ) : null
   }
 
