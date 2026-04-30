@@ -45,13 +45,7 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const {
-    onLeafClick,
-    onLeafHover,
-    journalOpen,
-    onJournalStart,
-    onJournalOpen,
-  } = interactions
+  const { onLeafClick, onLeafHover, journalOpen, onJournalStart, onJournalOpen } = interactions
 
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
