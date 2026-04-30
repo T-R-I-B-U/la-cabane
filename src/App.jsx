@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
 import { NameInput } from './app/NameInput'
@@ -35,6 +35,7 @@ export default function App() {
   const [journalActive, setJournalActive] = useState(false)
   const [savoirActive, setSavoirActive] = useState(false)
   const [savoirOpen, setSavoirOpen] = useState(false)
+  const pointerControlsRef = useRef(null)
 
   const {
     selected: selectedSavoir,
@@ -106,6 +107,11 @@ export default function App() {
     setSavoirActive(false)
     setSavoirOpen(false)
   }
+
+  const requestScenePointerLock = useCallback(() => {
+    if (!(playerMode || postIntro)) return
+    pointerControlsRef.current?.lock()
+  }, [playerMode, postIntro])
 
   const interactionLocked =
     dialogueActive ||
@@ -218,11 +224,16 @@ export default function App() {
           onEvent: handleIntroEvent,
         }}
         leafMaterialMode={leafMaterialMode}
+        pointerControlsRef={pointerControlsRef}
         interactions={{
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
           onJournalStart: () => setJournalActive(true),
-          onJournalEnd: () => setJournalActive(false),
+          onJournalCancel: () => requestScenePointerLock(),
+          onJournalEnd: () => {
+            setJournalActive(false)
+            requestScenePointerLock()
+          },
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}

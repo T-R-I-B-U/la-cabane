@@ -10,6 +10,7 @@ export function SceneInteractions({
   onIntroEvent,
   onJournalStart,
   onJournalEnd,
+  onJournalCancel,
 }) {
   const interactionsActive = (playerMode || postIntro) && !interactionLocked
 
@@ -26,6 +27,7 @@ export function SceneInteractions({
         active={interactionsActive}
         onInteractionStart={onJournalStart}
         onInteractionEnd={onJournalEnd}
+        onInteractionCancel={onJournalCancel}
       />
     </>
   )

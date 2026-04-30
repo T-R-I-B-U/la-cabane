@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
@@ -33,7 +33,13 @@ function cloneMaterial(material) {
   return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
 }
 
-export function JournalBook({ position, active, onInteractionStart, onInteractionEnd }) {
+export function JournalBook({
+  position,
+  active,
+  onInteractionStart,
+  onInteractionEnd,
+  onInteractionCancel,
+}) {
   const { camera } = useThree()
   const { scene } = useGLTF(MODEL_URL)
 
@@ -99,26 +105,48 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
     elapsedRef.current = 0
   }
 
+  const requestClose = useEffectEvent(() => {
+    const state = stateRef.current
+    if (state === 'CLOSED' || state === 'CAMERA_RETURNING') return
+
+    onInteractionCancel?.()
+
+    if (state === 'CAMERA_MOVING' || state === 'OPENING') {
+      startCameraReturn()
+      return
+    }
+
+    if (state === 'OPEN' || state === 'CLOSING') {
+      restoreCameraAfterCloseRef.current = true
+      stateRef.current = 'CLOSING'
+      elapsedRef.current = 0
+    }
+  })
+
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code !== 'Escape') return
 
       const state = stateRef.current
-      if (state === 'CAMERA_MOVING' || state === 'OPENING') {
-        startCameraReturn()
-        return
-      }
+      if (state === 'CLOSED') return
 
-      if (state === 'OPEN' || state === 'CLOSING') {
-        restoreCameraAfterCloseRef.current = true
-        stateRef.current = 'CLOSING'
-        elapsedRef.current = 0
-      }
+      event.preventDefault()
+      event.stopPropagation()
+      requestClose()
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  })
+  }, [])
+
+  useEffect(() => {
+    const onPointerLockChange = () => {
+      if (!document.pointerLockElement) requestClose()
+    }
+
+    document.addEventListener('pointerlockchange', onPointerLockChange)
+    return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
+  }, [])
 
   const handlePointerDown = () => {
     if (!active || !inRangeRef.current) return
@@ -138,7 +166,6 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
       cameraInitQuatRef.current.copy(camera.quaternion)
       cameraTargetQuatRef.current.setFromRotationMatrix(lookAtMatrix)
 
-      document.exitPointerLock()
       onInteractionStart?.()
       restoreCameraAfterCloseRef.current = false
       stateRef.current = 'CAMERA_MOVING'
