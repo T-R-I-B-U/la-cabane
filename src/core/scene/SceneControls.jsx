@@ -1,11 +1,13 @@
 import { OrbitControls } from '@react-three/drei'
 import IntroCamera from '../../world/entities/IntroCamera'
+import { CameraTracker } from '../IntroCameraDebug'
 import { PlayerControls } from '../PlayerControls'
 
 export function SceneControls({
   collisionObjects,
   introActive,
   introShouldAdvance,
+  introSpawn,
   onIntroEvent,
   playerMode,
   flyMode,
@@ -16,6 +18,7 @@ export function SceneControls({
   postIntroLocked,
   controlsRef,
   hutPosition,
+  onCameraChange,
 }) {
   if (introActive) {
     return (
@@ -37,19 +40,27 @@ export function SceneControls({
 
   if (postIntro) {
     return postIntroLocked ? (
-      <PlayerControls canMove={!movementLocked} collisionObjects={collisionObjects} />
+      <PlayerControls
+        canMove={!movementLocked}
+        flyMode={flyMode}
+        spawnAt={introSpawn?.position}
+        collisionObjects={collisionObjects}
+      />
     ) : null
   }
 
   return (
-    <OrbitControls
-      ref={controlsRef}
-      target={hutPosition}
-      enablePan={false}
-      enableDamping
-      minDistance={10}
-      maxDistance={80}
-      maxPolarAngle={Math.PI / 2.1}
-    />
+    <>
+      <OrbitControls
+        ref={controlsRef}
+        target={hutPosition}
+        enablePan={false}
+        enableDamping
+        minDistance={10}
+        maxDistance={80}
+        maxPolarAngle={Math.PI / 2.1}
+      />
+      {onCameraChange && <CameraTracker controlsRef={controlsRef} onChange={onCameraChange} />}
+    </>
   )
 }

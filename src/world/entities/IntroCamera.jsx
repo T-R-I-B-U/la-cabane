@@ -1,53 +1,41 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { FLOOR_Y, PLAYER_HEIGHT } from '../../core/SceneConfig'
 
 function easeInOut(t) {
   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
 }
 
-const HUT = new THREE.Vector3(-5.0111, 2.3616, 0.9556)
-const FINAL_POSITION = new THREE.Vector3(-9.6, 1.4437, -0.55)
-const INSIDE_LOOK_AT = FINAL_POSITION.clone()
-  .add(
-    HUT.clone()
-      .sub(FINAL_POSITION)
-      .setY(0)
-      .normalize()
-      .applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(72))
-      .multiplyScalar(6)
-  )
-  .setY(1.8)
-
 const WAYPOINTS = [
   {
-    position: new THREE.Vector3(-81.2843, 28.5625, -16.8399),
-    target: HUT.clone(),
+    position: new THREE.Vector3(-106.4403, 35.0643, -22.7203),
+    target: new THREE.Vector3(-25.2521, 10.0431, 0.3204),
     duration: 0,
     delay: 2,
   },
   {
-    position: new THREE.Vector3(-34.3023, 10.5207, -5.8784),
-    target: HUT.clone(),
+    position: new THREE.Vector3(-65.9822, 16.7074, -13.0125),
+    target: new THREE.Vector3(-27.2472, 2.4304, -1.2414),
     duration: 3.5,
   },
   {
-    position: new THREE.Vector3(-20.864, 1.3988, -0.9681),
-    target: HUT.clone(),
+    position: new THREE.Vector3(-47.788, 3.1494, -8.2744),
+    target: new THREE.Vector3(-28.3895, 2.1819, -0.4626),
     duration: 2.5,
     event: 'wait:door',
     waitForInput: true,
   },
   {
-    position: new THREE.Vector3(-11.0133, 1.4437, -0.9188),
-    target: HUT.clone(),
+    position: new THREE.Vector3(-41.0068, 1.3798, -5.4954),
+    target: new THREE.Vector3(-27.8642, 0.744, -4.5197),
     duration: 2.0,
     event: 'door:open',
   },
   {
-    position: FINAL_POSITION.clone(),
-    target: INSIDE_LOOK_AT.clone(),
-    duration: 1.15,
+    position: new THREE.Vector3(-30.9486, FLOOR_Y + PLAYER_HEIGHT, -4.6344),
+    target: new THREE.Vector3(-28.9187, FLOOR_Y + PLAYER_HEIGHT, -6.8089),
+    duration: 2.5,
     event: 'inside',
   },
 ]
@@ -108,7 +96,8 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
       stepRef.current += 1
       progressRef.current = 0
       delayRef.current = 0
-      if (to.event) onEvent?.(to.event)
+      if (to.event)
+        onEvent?.(to.event, { position: to.position.clone(), target: to.target.clone() })
       return
     }
 
@@ -124,7 +113,8 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
       progressRef.current = 0
       delayRef.current = 0
 
-      if (to.event) onEvent?.(to.event)
+      if (to.event)
+        onEvent?.(to.event, { position: to.position.clone(), target: to.target.clone() })
 
       if (to.waitForInput) {
         waitingRef.current = true
