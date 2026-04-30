@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { applyAutoTextures } from '../cabane/textureResolver'
 
 const MODEL_URL = '/models/book01.gltf'
 const MAX_INTERACT_DIST = 3.5
@@ -17,6 +18,20 @@ const LEFT_CLOSED_X = -0.06768058240413666
 const CAMERA_TOP_DIRECTION = new THREE.Vector3(0, 0.98, 0.2).normalize()
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
+
+function cloneSingleMaterial(material) {
+  const clone = material.clone()
+
+  for (const [key, value] of Object.entries(clone)) {
+    if (value?.isTexture) clone[key] = value.clone()
+  }
+
+  return clone
+}
+
+function cloneMaterial(material) {
+  return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
+}
 
 export function JournalBook({ position, active, onInteractionStart, onInteractionEnd }) {
   const { camera } = useThree()
@@ -47,6 +62,8 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
 
     clone.traverse((object) => {
       if (!object.isMesh) return
+      object.geometry = object.geometry.clone()
+      object.material = cloneMaterial(object.material)
       object.castShadow = true
       object.receiveShadow = true
     })
@@ -56,6 +73,14 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
 
     return { left: leftObject, right: rightObject }
   }, [scene])
+
+  useEffect(() => {
+    Promise.all([applyAutoTextures(left, 'book01'), applyAutoTextures(right, 'book01')]).catch(
+      (error) => {
+        console.error('JournalBook: failed to apply book textures', error)
+      }
+    )
+  }, [left, right])
 
   useEffect(() => {
     return () => {
