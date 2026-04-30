@@ -157,11 +157,7 @@ export function JournalBook({ position, active, onInteractionStart, onInteractio
     if (state === 'CAMERA_MOVING') {
       const t = ease(Math.min(elapsed / DUR_CAMERA, 1))
       camera.position.lerpVectors(cameraInitPosRef.current, cameraTargetPosRef.current, t)
-      camera.quaternion.slerpQuaternions(
-        cameraInitQuatRef.current,
-        cameraTargetQuatRef.current,
-        t
-      )
+      camera.quaternion.slerpQuaternions(cameraInitQuatRef.current, cameraTargetQuatRef.current, t)
 
       if (elapsed >= DUR_CAMERA) {
         camera.position.copy(cameraTargetPosRef.current)
