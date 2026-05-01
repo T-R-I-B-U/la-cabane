@@ -283,5 +283,100 @@
       1,
       1
     ]
+  },
+  {
+    "name": "juiceglass",
+    "type": "Object3D",
+    "position": [
+      40.9642,
+      0.8816,
+      -13.0461
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "juiceglass",
+    "type": "Object3D",
+    "position": [
+      40.7948,
+      0.8816,
+      -13.4381
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "workbench02",
+    "type": "Object3D",
+    "position": [
+      40.4086,
+      0.4111,
+      -13.259
+    ],
+    "rotation": [
+      0,
+      1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "workbench03",
+    "type": "Object3D",
+    "position": [
+      -36.0827,
+      10.6204,
+      22.6702
+    ],
+    "rotation": [
+      0,
+      1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "juicemachine",
+    "type": "Object3D",
+    "position": [
+      38.3806,
+      0.4492,
+      -11.5233
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
   }
 ]
