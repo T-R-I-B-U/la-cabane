@@ -10,6 +10,8 @@ const NEST_FLOOR_THICKNESS = 0.08
 const NEST_FLOOR_FRONT_PADDING = 0.2
 const NEST_FRONT_WALL_OFFSET = 0.2
 const NEST_ENTRY_FLOOR_PADDING = 0.25
+const RAILING_COLLIDER_HEIGHT = 1.4
+const RAILING_COLLIDER_THICKNESS = 0.35
 
 function getLocalBounds(parent, object3d) {
   const bounds = new THREE.Box3()
@@ -48,6 +50,65 @@ function createCollider(size, position, userData) {
   mesh.position.set(position[0], position[1], position[2])
   mesh.userData = { ...userData }
   return mesh
+}
+
+function createRailingSegmentCollider(start, end) {
+  const delta = new THREE.Vector3().subVectors(end, start)
+  const length = Math.hypot(delta.x, delta.z)
+  if (length <= 0.05) return null
+
+  const collider = createCollider(
+    [RAILING_COLLIDER_THICKNESS, RAILING_COLLIDER_HEIGHT, length],
+    [
+      (start.x + end.x) * 0.5,
+      RAILING_COLLIDER_HEIGHT * 0.5,
+      (start.z + end.z) * 0.5,
+    ],
+    { isRailingCollider: true }
+  )
+
+  collider.rotation.y = Math.atan2(delta.x, delta.z)
+  return collider
+}
+
+function attachRailingColliders(railingObject) {
+  if (!railingObject || railingObject.getObjectByName(`${railingObject.name}-colliders`)) return
+
+  const posts = railingObject.children.filter((child) => /^railling \d+$/i.test(child.name))
+  if (posts.length < 2) return
+  const postIds = posts.map((post) => Number(post.name.match(/\d+/)?.[0]))
+  const segmentLengths = []
+  for (let index = 0; index < posts.length - 1; index += 1) {
+    if (postIds[index + 1] !== postIds[index] + 1) continue
+    segmentLengths.push(posts[index].position.distanceTo(posts[index + 1].position))
+  }
+  const averageSegmentLength =
+    segmentLengths.reduce((total, length) => total + length, 0) / segmentLengths.length
+  const maxSegmentLength = averageSegmentLength * 1.75
+
+  const colliders = new THREE.Group()
+  colliders.name = `${railingObject.name}-colliders`
+
+  for (let index = 0; index < posts.length - 1; index += 1) {
+    if (postIds[index + 1] !== postIds[index] + 1) continue
+    const collider = createRailingSegmentCollider(posts[index].position, posts[index + 1].position)
+    if (collider) {
+      collider.name = `${railingObject.name}-collider-${index}`
+      colliders.add(collider)
+    }
+  }
+
+  const loopLength = posts.at(-1).position.distanceTo(posts[0].position)
+  const closesLoop = posts.length > 2 && loopLength <= maxSegmentLength
+  if (closesLoop) {
+    const collider = createRailingSegmentCollider(posts.at(-1).position, posts[0].position)
+    if (collider) {
+      collider.name = `${railingObject.name}-collider-loop`
+      colliders.add(collider)
+    }
+  }
+
+  if (colliders.children.length > 0) railingObject.add(colliders)
 }
 
 function attachNestColliders(nestObject) {
@@ -195,13 +256,15 @@ export async function buildCabane({
   }
 
   attachNestColliders(root.getObjectByName('nest'))
+  attachRailingColliders(root.getObjectByName('railling'))
+  attachRailingColliders(root.getObjectByName('railling-hut'))
 
   root.traverse((obj) => {
     if (!obj.isMesh) return
     // Stair steps — walkable ramps instead of vertical walls.
     if (/^stairs-marche/i.test(obj.name)) obj.userData.isStair = true
-    // Platform walkable surface — floor raycaster must recognise it.
-    if (obj.name === 'platform') obj.userData.isFloor = true
+    // Platform walkable surfaces — floor raycaster must recognise them.
+    if (obj.name === 'platform' || obj.name === 'platform-hut') obj.userData.isFloor = true
   })
 
   return root
