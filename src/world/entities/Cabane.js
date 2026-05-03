@@ -59,11 +59,7 @@ function createRailingSegmentCollider(start, end) {
 
   const collider = createCollider(
     [RAILING_COLLIDER_THICKNESS, RAILING_COLLIDER_HEIGHT, length],
-    [
-      (start.x + end.x) * 0.5,
-      RAILING_COLLIDER_HEIGHT * 0.5,
-      (start.z + end.z) * 0.5,
-    ],
+    [(start.x + end.x) * 0.5, RAILING_COLLIDER_HEIGHT * 0.5, (start.z + end.z) * 0.5],
     { isRailingCollider: true }
   )
 
