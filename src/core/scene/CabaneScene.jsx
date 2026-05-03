@@ -8,7 +8,7 @@ import { CollisionDebug } from '../CollisionDebug'
 import { TriggerZone } from '../../world/interactions/TriggerZone'
 import { setZone } from '../../utils/gameManagerStore'
 import {
-  useVisibilityZone,
+  useVisibilityZones,
   applyVisibilityZone,
   getZoneComponents,
 } from '../../utils/visibilityZoneStore'
@@ -43,8 +43,8 @@ export function CabaneScene({
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
-  const visibilityZone = useVisibilityZone()
-  const { characters, leaves, journal } = getZoneComponents(visibilityZone)
+  const visibilityZones = useVisibilityZones()
+  const { characters, leaves, journal } = getZoneComponents(visibilityZones)
 
   useEffect(() => {
     if (!cabane) return
@@ -53,8 +53,8 @@ export function CabaneScene({
   }, [cabane, onCollisionReady])
 
   useEffect(() => {
-    applyVisibilityZone(cabane, visibilityZone)
-  }, [cabane, visibilityZone])
+    applyVisibilityZone(cabane, visibilityZones)
+  }, [cabane, visibilityZones])
 
   const handleReady = useCallback(
     (data) => {

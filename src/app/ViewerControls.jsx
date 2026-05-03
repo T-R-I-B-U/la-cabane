@@ -1,8 +1,7 @@
 import { DevSection } from './DevSection'
-import { useActiveZone, setZone } from '../utils/gameManagerStore'
 import {
-  useVisibilityZone,
-  setVisibilityZone,
+  useVisibilityZones,
+  toggleVisibilityZone,
   VISIBILITY_ZONES,
 } from '../utils/visibilityZoneStore'
 
@@ -49,8 +48,7 @@ export function ViewerControls({
   onToggleDebugCollisions,
   onLeafMaterialChange,
 }) {
-  const activeZone = useActiveZone()
-  const visibilityZone = useVisibilityZone()
+  const visibilityZones = useVisibilityZones()
 
   const introLabel = !sceneReady
     ? 'Scène en chargement...'
@@ -227,37 +225,24 @@ export function ViewerControls({
               <span className="controls-slider-value">{shaderRadius}</span>
             </label>
           </DevSection>
-          <DevSection title="Load zones">
-            {['cabane', 'arbre'].map((zone) => (
-              <button
-                key={zone}
-                type="button"
-                className={`camera-toggle${activeZone === zone ? ' camera-toggle--active' : ''}`}
-                aria-pressed={activeZone === zone}
-                onClick={() => setZone(zone)}
-              >
-                <span className="camera-toggle-icon" aria-hidden="true">
-                  {activeZone === zone ? 'ON' : 'OFF'}
-                </span>
-                {zone.charAt(0).toUpperCase() + zone.slice(1)}
-              </button>
-            ))}
-          </DevSection>
           <DevSection title="Visibilité">
-            {VISIBILITY_ZONES.map((zone) => (
-              <button
-                key={zone}
-                type="button"
-                className={`camera-toggle${visibilityZone === zone ? ' camera-toggle--active' : ''}`}
-                aria-pressed={visibilityZone === zone}
-                onClick={() => setVisibilityZone(zone)}
-              >
-                <span className="camera-toggle-icon" aria-hidden="true">
-                  {visibilityZone === zone ? 'ON' : 'OFF'}
-                </span>
-                {zone}
-              </button>
-            ))}
+            {VISIBILITY_ZONES.map((zone) => {
+              const active = visibilityZones.includes(zone)
+              return (
+                <button
+                  key={zone}
+                  type="button"
+                  className={`camera-toggle${active ? ' camera-toggle--active' : ''}`}
+                  aria-pressed={active}
+                  onClick={() => toggleVisibilityZone(zone)}
+                >
+                  <span className="camera-toggle-icon" aria-hidden="true">
+                    {active ? 'ON' : 'OFF'}
+                  </span>
+                  {zone}
+                </button>
+              )
+            })}
           </DevSection>
           <DevSection title="Scène">
             <button

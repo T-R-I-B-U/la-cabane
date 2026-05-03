@@ -1,39 +1,13 @@
 import { useSyncExternalStore } from 'react'
+import zoneMap from '../world/cabane/zoneMap.json'
 
-// Which top-level cabane.json nodes are visible per zone.
 // null = show all nodes.
-const NODE_WHITELIST = {
-  all: null,
-  'all-fake': [
-    'ground-hut',
-    'leaf',
-    'trunk',
-    'hut01',
-    'stairs01',
-    'platform-hut',
-    'railling-hut',
-    'railling',
-    'platform',
-    'greenhouse',
-    'nest',
-  ],
-  nid: ['nest'],
-  cabane: ['ground-hut', 'hut01', 'counter01', 'trunk', 'leaf', 'stairs01', 'railling'],
-  serre: ['greenhouse'],
-  arbre: ['trunk', 'leaf', 'platform', 'platform-hut', 'railling-hut', 'railling'],
-}
+const NODE_WHITELIST = zoneMap.zones
 
 // Sub-nodes (mesh or group, matched by name) to force-hide inside visible parent nodes.
 // Discovery: document.querySelector('canvas').__r3f.scene
 //   .getObjectByName('platform-hut')?.traverse(o => console.log(o.name, o.type))
-const HIDDEN_NODES = {
-  all: [],
-  'all-fake': [],
-  nid: [],
-  cabane: [],
-  serre: [],
-  arbre: ['platforme-hut.gltf'],
-}
+const HIDDEN_NODES = zoneMap.hidden
 
 // Which React-managed features render per zone.
 export const ZONE_COMPONENTS = {
@@ -47,7 +21,7 @@ export const ZONE_COMPONENTS = {
 
 export const VISIBILITY_ZONES = Object.keys(NODE_WHITELIST)
 
-let _zone = 'all'
+let _zonesSnapshot = ['all']
 const _subs = new Set()
 
 function subscribe(fn) {
@@ -55,22 +29,29 @@ function subscribe(fn) {
   return () => _subs.delete(fn)
 }
 
-export function getVisibilityZone() {
-  return _zone
+export function getVisibilityZones() {
+  return _zonesSnapshot
 }
 
-export function setVisibilityZone(zone) {
-  if (_zone === zone) return
-  _zone = zone
+export function toggleVisibilityZone(zone) {
+  const next = new Set(_zonesSnapshot)
+  if (next.has(zone)) next.delete(zone)
+  else next.add(zone)
+  _zonesSnapshot = [...next]
   _subs.forEach((fn) => fn())
 }
 
-export function useVisibilityZone() {
-  return useSyncExternalStore(subscribe, getVisibilityZone)
+export function useVisibilityZones() {
+  return useSyncExternalStore(subscribe, getVisibilityZones)
 }
 
-export function getZoneComponents(zone) {
-  return ZONE_COMPONENTS[zone] ?? ZONE_COMPONENTS.all
+export function getZoneComponents(zones) {
+  if (!zones.length) return { characters: false, leaves: false, journal: false }
+  return {
+    characters: zones.some((z) => ZONE_COMPONENTS[z]?.characters ?? false),
+    leaves: zones.some((z) => ZONE_COMPONENTS[z]?.leaves ?? false),
+    journal: zones.some((z) => ZONE_COMPONENTS[z]?.journal ?? false),
+  }
 }
 
 function disableRaycast(mesh) {
@@ -84,14 +65,24 @@ function enableRaycast(mesh) {
 
 /**
  * Apply zone visibility to a cabane THREE.Group:
- * 1. Toggle direct children by NODE_WHITELIST
+ * 1. Toggle direct children by merged NODE_WHITELIST across active zones
  * 2. Disable raycasting on hidden meshes — Three.js checks mesh.visible, not parent.visible
- * 3. Force-hide specific sub-meshes listed in HIDDEN_MESHES
+ * 3. Force-hide specific sub-meshes listed in HIDDEN_NODES
  */
-export function applyVisibilityZone(cabaneGroup, zone) {
+export function applyVisibilityZone(cabaneGroup, zones) {
   if (!cabaneGroup) return
 
-  const whitelist = NODE_WHITELIST[zone] ?? null
+  let showAll = false
+  const merged = []
+  for (const zone of zones) {
+    const wl = NODE_WHITELIST[zone] ?? null
+    if (wl === null) { showAll = true; break }
+    for (const node of wl) {
+      if (!merged.includes(node)) merged.push(node)
+    }
+  }
+  const whitelist = showAll ? null : merged
+
   cabaneGroup.children.forEach((child) => {
     const show = whitelist === null || whitelist.includes(child.name)
     child.visible = show
@@ -102,7 +93,7 @@ export function applyVisibilityZone(cabaneGroup, zone) {
     })
   })
 
-  const hidden = HIDDEN_NODES[zone] ?? []
+  const hidden = zones.flatMap((z) => HIDDEN_NODES[z] ?? [])
   if (hidden.length > 0) {
     cabaneGroup.traverse((obj) => {
       if (!hidden.includes(obj.name)) return
