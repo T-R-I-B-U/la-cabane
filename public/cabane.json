@@ -79,9 +79,9 @@
     "name": "growingfruit",
     "type": "Mesh",
     "position": [
-      -12.9687,
-      0.7255,
-      -7.7019
+      -15.0032,
+      0.7183,
+      -8.4425
     ],
     "rotation": [
       0,
@@ -383,13 +383,13 @@
     "name": "counter01",
     "type": "Mesh",
     "position": [
-      -14.8294,
+      -14.8482,
       0,
-      -11.4356
+      -10.4623
     ],
     "rotation": [
       0,
-      0,
+      0.3297,
       0
     ],
     "scale": [
@@ -428,6 +428,44 @@
     "rotation": [
       0,
       -0.7234,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Object3D",
+    "position": [
+      32.8189,
+      1.5645,
+      -5.6124
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "welcome01",
+    "type": "Mesh",
+    "position": [
+      -14.6193,
+      4.515,
+      -10.23
+    ],
+    "rotation": [
+      0,
+      0,
       0
     ],
     "scale": [
