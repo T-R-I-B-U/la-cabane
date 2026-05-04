@@ -139,15 +139,6 @@ export function JournalBook({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
-  useEffect(() => {
-    const onPointerLockChange = () => {
-      if (!document.pointerLockElement) requestClose()
-    }
-
-    document.addEventListener('pointerlockchange', onPointerLockChange)
-    return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
-  }, [])
-
   const handlePointerDown = () => {
     if (!active || !inRangeRef.current) return
 
@@ -171,11 +162,6 @@ export function JournalBook({
       stateRef.current = 'CAMERA_MOVING'
       elapsedRef.current = 0
       return
-    }
-
-    if (stateRef.current === 'OPEN') {
-      stateRef.current = 'CLOSING'
-      elapsedRef.current = 0
     }
   }
 
