@@ -2,7 +2,7 @@ import { useEffect, useRef, useMemo } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { createConditionalEdgesGeometry } from '../../utils/ConditionalEdgesGeometry'
+import { createConditionalEdgesGeometry } from '../../utils'
 import conditionalLineVertShader from '../materials/conditionalLine.vert.glsl'
 import conditionalLineFragShader from '../materials/conditionalLine.frag.glsl'
 

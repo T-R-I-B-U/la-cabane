@@ -1,9 +1,5 @@
 import { DevSection } from './DevSection'
-import {
-  useVisibilityZones,
-  toggleVisibilityZone,
-  VISIBILITY_ZONES,
-} from '../utils/visibilityZoneStore'
+import { useVisibilityZones, toggleVisibilityZone, VISIBILITY_ZONES } from '../utils'
 
 function PanelSection({ title, eyebrow, children }) {
   return (

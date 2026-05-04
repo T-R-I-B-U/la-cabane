@@ -1,17 +1,21 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { Crosshair } from './app/Crosshair'
-import { IntroLoader } from './app/IntroLoader'
-import { NameInput } from './app/NameInput'
-import { SavoirPanel } from './app/SavoirPanel'
-import { useIntroFlow } from './app/useIntroFlow'
-import { useSavoirAssignment } from './app/useSavoirAssignment'
-import { ViewerControls } from './app/ViewerControls'
+import {
+  Crosshair,
+  GameManager,
+  IntroLoader,
+  NameInput,
+  SavoirPanel,
+  ViewerControls,
+  useIntroFlow,
+  useSavoirAssignment,
+} from './app/index'
 import Scene from './core/Scene'
 import IntroCameraPanel from './core/IntroCameraPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
+import { GAME_STEPS, unlockAndPlay, setVisibilityZones } from './utils'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
@@ -187,8 +191,47 @@ export default function App() {
     setFlyMode(false)
   }
 
+  const explorationReady = postIntro && !showNameInput && !dialogueActive && !introMovementLocked
+
+  // Appelé par GameManager à chaque transition d'étape.
+  // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
+  // sans que GameManager ait à les connaître directement.
+  const handleGameStepChange = useCallback((step) => {
+    switch (step) {
+      case GAME_STEPS.INIT:
+        // Scène prête, mais pas encore de geste utilisateur.
+        // On affiche la zone cabane de base — le joueur voit la scène derrière l'IntroLoader.
+        // setVisibilityZones(['cabane']) ← décommenter si tu veux limiter la visibilité initiale
+        break
+
+      case GAME_STEPS.INTRO:
+        // Premier geste utilisateur (clic IntroLoader) → AudioContext débloqué.
+        // La caméra d'intro pilote la scène, on garde la même visibilité qu'en INIT.
+        unlockAndPlay()
+        // setVisibilityZones(['cabane']) ← si tu veux restreindre pendant l'intro
+        break
+
+      case GAME_STEPS.EXPLORATION:
+        // Dialogue2 terminé, joueur libre — on ouvre toutes les zones visibles.
+        setVisibilityZones(['all'])
+        // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
+        break
+
+      default:
+        break
+    }
+  }, [])
+
   return (
     <main className={`viewer-page${cursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
+      <GameManager
+        sceneReady={sceneReady}
+        introPending={introPending}
+        introActive={introActive}
+        postIntro={postIntro}
+        explorationReady={explorationReady}
+        onStepChange={handleGameStepChange}
+      />
       <Subtitles />
 
       <Crosshair

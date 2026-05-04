@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { subscribeSubtitles } from '../../utils/audioStore'
+import { subscribeSubtitles } from '../../utils'
 
 const WRAP = {
   position: 'fixed',

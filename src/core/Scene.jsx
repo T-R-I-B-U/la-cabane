@@ -10,7 +10,7 @@ import { SceneControls } from './scene/SceneControls'
 import { SceneLighting } from './scene/SceneLighting'
 import { CabaneScene } from './scene/CabaneScene'
 import { ArbreScene } from './scene/ArbreScene'
-import { useActiveZone } from '../utils/gameManagerStore'
+import { useActiveZone } from '../utils'
 
 export default function Scene({
   performanceMode,

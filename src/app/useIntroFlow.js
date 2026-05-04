@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { playDialogue as playStoreDialogue, stopDialogue } from '../utils/audioStore'
+import { playDialogue as playStoreDialogue, stopDialogue } from '../utils'
 
 export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)

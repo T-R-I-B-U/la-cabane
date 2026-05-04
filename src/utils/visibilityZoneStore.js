@@ -41,6 +41,13 @@ export function toggleVisibilityZone(zone) {
   _subs.forEach((fn) => fn())
 }
 
+// Remplace l'ensemble des zones actives d'un coup.
+// Utile pour piloter la visibilité depuis le GameManager (via onStepChange).
+export function setVisibilityZones(zones) {
+  _zonesSnapshot = zones
+  _subs.forEach((fn) => fn())
+}
+
 export function useVisibilityZones() {
   return useSyncExternalStore(subscribe, getVisibilityZones)
 }

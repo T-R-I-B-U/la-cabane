@@ -6,12 +6,7 @@ import { SceneInteractions } from './SceneInteractions'
 import { SlidingDoors } from '../../world/entities/SlidingDoors'
 import { CollisionDebug } from '../CollisionDebug'
 import { TriggerZone } from '../../world/interactions/TriggerZone'
-import { setZone } from '../../utils/gameManagerStore'
-import {
-  useVisibilityZones,
-  applyVisibilityZone,
-  getZoneComponents,
-} from '../../utils/visibilityZoneStore'
+import { setZone, useVisibilityZones, applyVisibilityZone, getZoneComponents } from '../../utils'
 import { DEFAULT_HUT_POS, PLATFORM_POS } from '../SceneConfig'
 
 // Radius around the tree platform that triggers the arbre zone.
