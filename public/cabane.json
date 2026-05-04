@@ -76,31 +76,12 @@
     ]
   },
   {
-    "name": "counter01",
-    "type": "Mesh",
-    "position": [
-      -14.8294,
-      0,
-      -11.4356
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "growingfruit",
     "type": "Mesh",
     "position": [
-      -12.9687,
-      0.7255,
-      -7.7019
+      -15.0032,
+      0.7183,
+      -8.4425
     ],
     "rotation": [
       0,
@@ -342,16 +323,73 @@
     ]
   },
   {
-    "name": "stairs02",
-    "type": "Object3D",
+    "name": "platform",
+    "type": "Mesh",
     "position": [
-      4.8348,
-      -0.0156,
-      -0.9166
+      -7.6254,
+      21.0884,
+      -5.2885
     ],
     "rotation": [
       0,
-      -0.7234,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "ladder",
+    "type": "Object3D",
+    "position": [
+      -4.1025,
+      0.1893,
+      -2.8149
+    ],
+    "rotation": [
+      3.0473,
+      -0.9666,
+      3.0703
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "railling",
+    "type": "Object3D",
+    "position": [
+      -7.6854,
+      21.1327,
+      -5.2758
+    ],
+    "rotation": [
+      -3.1416,
+      -0.0131,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "counter01",
+    "type": "Mesh",
+    "position": [
+      -14.8482,
+      0,
+      -10.4623
+    ],
+    "rotation": [
+      0,
+      0.3297,
       0
     ],
     "scale": [
@@ -380,12 +418,31 @@
     ]
   },
   {
-    "name": "platform",
-    "type": "Mesh",
+    "name": "stairs02",
+    "type": "Object3D",
     "position": [
-      -7.6254,
-      21.0884,
-      -5.2885
+      4.8348,
+      -0.0156,
+      -0.9166
+    ],
+    "rotation": [
+      0,
+      -0.7234,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Object3D",
+    "position": [
+      32.8189,
+      1.5645,
+      -5.6124
     ],
     "rotation": [
       0,
@@ -399,35 +456,16 @@
     ]
   },
   {
-    "name": "ladder",
-    "type": "Object3D",
+    "name": "welcome01",
+    "type": "Mesh",
     "position": [
-      -10.4047,
-      0.1893,
-      -7.4756
-    ],
-    "rotation": [
-      0.0326,
-      0.9895,
-      -0.0241
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "railling",
-    "type": "Object3D",
-    "position": [
-      -7.6854,
-      21.1327,
-      -5.2758
+      -14.6193,
+      4.515,
+      -10.23
     ],
     "rotation": [
       0,
-      -0.0961,
+      0,
       0
     ],
     "scale": [
