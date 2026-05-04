@@ -2,6 +2,8 @@ import { useState, useRef, useMemo, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
 import { WatercolorPass } from '../world/materials/WatercolorPass'
+import { GrowingFruit } from '../world/entities/GrowingFruit'
+import { Fruit } from '../world/entities/Fruit'
 import { Floor } from './Floor'
 import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -120,13 +122,19 @@ export default function Scene({
 
       {zone === 'arbre' && (
         <Suspense fallback={null}>
-          <ArbreScene
-            interactionsActive={sceneInteractionsActive}
-            onFruitClick={onFruitClick}
-            onFruitHover={onFruitHover}
-          />
+          <ArbreScene />
         </Suspense>
       )}
+
+      <GrowingFruit />
+
+      <Fruit
+        fruitId="fruit_01"
+        position={[-23, 25.5, -9]}
+        active={sceneInteractionsActive}
+        onFruitClick={onFruitClick}
+        onFruitHover={onFruitHover}
+      />
 
       <SceneControls
         collisionObjects={collisionObjects}
