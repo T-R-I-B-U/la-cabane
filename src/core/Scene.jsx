@@ -1,19 +1,16 @@
-import { useState, useRef, useCallback, useMemo } from 'react'
+import { useState, useRef, useMemo, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
 import { WatercolorPass } from '../world/materials/WatercolorPass'
-import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
-import { SlidingDoors } from '../world/entities/SlidingDoors'
-import { TreeLeaves } from '../world/entities/TreeLeaves'
-import { CollisionDebug } from './CollisionDebug'
 import { Floor } from './Floor'
+import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { DEFAULT_HUT_POS } from './SceneConfig'
 import { StatsCollector } from './StatsCollector'
-import { CabaneMap } from './scene/CabaneMap'
-import { SceneCharacters } from './scene/SceneCharacters'
 import { SceneControls } from './scene/SceneControls'
-import { SceneInteractions } from './scene/SceneInteractions'
 import { SceneLighting } from './scene/SceneLighting'
+import { CabaneScene } from './scene/CabaneScene'
+import { ArbreScene } from './scene/ArbreScene'
+import { useActiveZone } from '../utils/gameManagerStore'
 
 export default function Scene({
   performanceMode,
@@ -51,47 +48,16 @@ export default function Scene({
   } = intro
   const { onLeafClick, onLeafHover, onJournalStart, onJournalEnd, onJournalCancel } = interactions
 
-  const [cabane, setCabane] = useState(null)
-  const [leafMesh, setLeafMesh] = useState(null)
-  const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
+  const zone = useActiveZone()
+  const [sceneColliders, setSceneColliders] = useState([])
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
+  const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
   const collisionObjects = useMemo(
-    () => [cabane, mainFloorCollider].filter(Boolean),
-    [cabane, mainFloorCollider]
+    () => [...sceneColliders, mainFloorCollider].filter(Boolean),
+    [sceneColliders, mainFloorCollider]
   )
-  const handleReady = useCallback(
-    (data) => {
-      if (Array.isArray(data.hutPosition)) setHutPosition(data.hutPosition)
-      onReady(data)
-    },
-    [onReady]
-  )
-
-  // Extract the leaf InstancedMesh here (in a callback, not an effect) so mutations
-  // happen before the value enters React state — satisfies react-hooks/immutability.
-  const handleCabaneLoaded = useCallback((group) => {
-    setCabane(group)
-    if (!group) {
-      setLeafMesh(null)
-      return
-    }
-    let found = null
-    group.traverse((obj) => {
-      if (!found && obj.isInstancedMesh && obj.name === 'leaf') found = obj
-    })
-    if (found) {
-      // Restore prototype raycast (was disabled in buildInstancedMesh for first-person perf).
-      // Safe here: pointer events only fire on mouse move, not every frame.
-      delete found.raycast
-      // Remove from cabane group so TreeLeaves is the sole owner of this mesh.
-      // Without this, the mesh is drawn twice: once inside the cabane group and
-      // once via <primitive object={leafMesh} /> in TreeLeaves.
-      found.parent?.remove(found)
-    }
-    setLeafMesh(found ?? null)
-  }, [])
 
   return (
     <Canvas
@@ -109,47 +75,42 @@ export default function Scene({
       <SceneLighting activeHdriId={activeHdriId} />
 
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
-
       <BackgroundPlanes hutPosition={hutPosition} />
 
-      <CabaneMap
-        performanceMode={performanceMode}
-        onReady={handleReady}
-        onError={onError}
-        onCabaneLoaded={handleCabaneLoaded}
-      />
+      {zone === 'cabane' && (
+        <Suspense fallback={null}>
+          <CabaneScene
+            performanceMode={performanceMode}
+            onError={onError}
+            onSceneReady={onReady}
+            leafMaterialMode={leafMaterialMode}
+            onLeafClick={onLeafClick}
+            onLeafHover={onLeafHover}
+            onJournalStart={onJournalStart}
+            onJournalEnd={onJournalEnd}
+            onJournalCancel={onJournalCancel}
+            onIntroEvent={onIntroEvent}
+            introWaitingAtDoor={introWaitingAtDoor}
+            playerMode={playerMode}
+            postIntro={postIntro}
+            postIntroLocked={postIntroLocked}
+            interactionLocked={interactionLocked}
+            debugDoors={debugDoors}
+            debugCollisions={debugCollisions}
+            forceOpenDoor={introDoorOpen}
+            controlsRef={controlsRef}
+            firstPersonMode={firstPersonMode}
+            onCollisionReady={setSceneColliders}
+            onHutPositionReady={setHutPosition}
+          />
+        </Suspense>
+      )}
 
-      <TreeLeaves
-        leafMesh={leafMesh}
-        active={(playerMode || postIntro) && !interactionLocked}
-        onLeafClick={onLeafClick}
-        onLeafHover={onLeafHover}
-        leafMaterialMode={leafMaterialMode}
-      />
-
-      <SceneCharacters performanceMode={performanceMode} hutPosition={hutPosition} />
-
-      <SceneInteractions
-        cabane={cabane}
-        playerMode={playerMode}
-        postIntro={postIntro}
-        interactionLocked={interactionLocked}
-        introWaitingAtDoor={introWaitingAtDoor}
-        onIntroEvent={onIntroEvent}
-        onJournalStart={onJournalStart}
-        onJournalEnd={onJournalEnd}
-        onJournalCancel={onJournalCancel}
-      />
-
-      {debugCollisions && <CollisionDebug cabane={cabane} />}
-
-      <SlidingDoors
-        cabane={cabane}
-        firstPersonMode={firstPersonMode}
-        controlsRef={controlsRef}
-        debug={debugDoors}
-        forceOpen={introDoorOpen}
-      />
+      {zone === 'arbre' && (
+        <Suspense fallback={null}>
+          <ArbreScene onCollisionReady={setSceneColliders} />
+        </Suspense>
+      )}
 
       <SceneControls
         collisionObjects={collisionObjects}
