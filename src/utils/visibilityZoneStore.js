@@ -76,7 +76,10 @@ export function applyVisibilityZone(cabaneGroup, zones) {
   const merged = []
   for (const zone of zones) {
     const wl = NODE_WHITELIST[zone] ?? null
-    if (wl === null) { showAll = true; break }
+    if (wl === null) {
+      showAll = true
+      break
+    }
     for (const node of wl) {
       if (!merged.includes(node)) merged.push(node)
     }

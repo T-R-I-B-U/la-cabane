@@ -14,10 +14,7 @@
       "greenhouse",
       "nest"
     ],
-    "nid": [
-      "nest",
-      "stairs01"
-    ],
+    "nid": ["nest", "stairs01"],
     "cabane": [
       "ground-hut",
       "hut01",
@@ -31,21 +28,8 @@
       "workbench01",
       "stool"
     ],
-    "serre": [
-      "greenhouse",
-      "growingfruit",
-      "juicemachine",
-      "juiceglass"
-    ],
-    "arbre": [
-      "trunk",
-      "leaf",
-      "platform",
-      "railling-hut",
-      "railling",
-      "ladder",
-      "stairs02"
-    ]
+    "serre": ["greenhouse", "growingfruit", "juicemachine", "juiceglass"],
+    "arbre": ["trunk", "leaf", "platform", "railling-hut", "railling", "ladder", "stairs02"]
   },
   "hidden": {
     "all": [],
