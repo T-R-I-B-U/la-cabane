@@ -4,6 +4,7 @@ const LABELS = [
   'Vue extérieure (départ)',
   'Approche porte',
   'Devant la porte',
+  "Porte s'ouvre",
   'Intérieur (arrivée)',
 ]
 

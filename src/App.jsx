@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
-import JournalOverlay from './app/JournalOverlay'
 import { NameInput } from './app/NameInput'
 import { SavoirPanel } from './app/SavoirPanel'
 import { ContactPanel } from './app/ContactPanel'
@@ -10,6 +9,7 @@ import { useSavoirAssignment } from './app/useSavoirAssignment'
 import { useContactAssignment } from './app/useContactAssignment'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
+import IntroCameraPanel from './core/IntroCameraPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
@@ -34,8 +34,6 @@ export default function App() {
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
-  const [journalOpen, setJournalOpen] = useState(false)
-  const [journalBounds, setJournalBounds] = useState(null)
   const [journalActive, setJournalActive] = useState(false)
   const [savoirActive, setSavoirActive] = useState(false)
   const [savoirOpen, setSavoirOpen] = useState(false)
@@ -45,6 +43,7 @@ export default function App() {
   const [fruitHovered, setFruitHovered] = useState(false)
   const [interactionsEnabled, setInteractionsEnabled] = useState(false)
   const pointerControlsRef = useRef(null)
+  const journalActiveRef = useRef(false)
 
   const {
     selected: selectedSavoir,
@@ -56,15 +55,6 @@ export default function App() {
     openContact,
     close: closeContactInternal,
   } = useContactAssignment()
-
-  const onJournalStart = useCallback(() => {
-    setJournalActive(true)
-    document.exitPointerLock()
-  }, [])
-  const onJournalOpen = useCallback((bounds) => {
-    setJournalBounds(bounds)
-    setJournalOpen(true)
-  }, [])
 
   const handleLeafClick = useCallback(
     (id) => {
@@ -98,8 +88,7 @@ export default function App() {
     })
   }, [])
 
-  // Open panel only after pointer lock actually releases — same timing guarantee
-  // as the journal (which waits for its 3D animation to complete before showing the overlay).
+  // Open panel only after pointer lock actually releases.
   useEffect(() => {
     if (!savoirActive) return
 
@@ -126,12 +115,14 @@ export default function App() {
     document.addEventListener('pointerlockchange', onRelease)
     return () => document.removeEventListener('pointerlockchange', onRelease)
   }, [contactActive])
+
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
     introActive,
     introDoorOpen,
     introMovementLocked,
+    introSpawn,
     introPending,
     introShouldAdvance,
     introWaitingAtDoor,
@@ -146,7 +137,19 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
-  const [leafMaterialMode, setLeafMaterialMode] = useState('standard') // 'standard', 'physical', 'emissive'
+  const [showCameraEditor, setShowCameraEditor] = useState(false)
+  const [liveCam, setLiveCam] = useState(null)
+  const [capturedWaypoints, setCapturedWaypoints] = useState(
+    Array.from({ length: 5 }, () => ({ position: null, target: null }))
+  )
+  const handleWaypointCapture = useCallback((i, live) => {
+    setCapturedWaypoints((prev) => {
+      const next = [...prev]
+      next[i] = { position: live.position, target: live.target }
+      return next
+    })
+  }, [])
+  const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestScenePointerLock = useCallback(() => {
     if (!(playerMode || postIntro)) return
@@ -176,17 +179,30 @@ export default function App() {
     selectedContact !== null ||
     contactActive ||
     journalActive
+
+  useEffect(() => {
+    const blockPointerLock = (e) => {
+      if (journalActiveRef.current) e.stopImmediatePropagation()
+    }
+    document.addEventListener('click', blockPointerLock, { capture: true })
+    return () => document.removeEventListener('click', blockPointerLock, { capture: true })
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.code !== 'F1') return
-
-      event.preventDefault()
-      setShowUI((current) => !current)
+      if (event.code === 'F1') {
+        event.preventDefault()
+        setShowUI((current) => !current)
+      } else if (event.code === 'F2') {
+        event.preventDefault()
+        setShowCameraEditor((current) => !current)
+      }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
+
   const onReady = useCallback((data) => {
     setInfo(data)
     setStatus('ok')
@@ -272,6 +288,7 @@ export default function App() {
           doorOpen: introDoorOpen,
           waitingAtDoor: introWaitingAtDoor,
           shouldAdvance: introShouldAdvance,
+          spawn: introSpawn,
           postIntro,
           postIntroLocked: !showNameInput,
           interactionLocked,
@@ -285,15 +302,32 @@ export default function App() {
           onLeafHover: setLeafHovered,
           onFruitClick: handleFruitClick,
           onFruitHover: handleFruitHover,
-          journalOpen,
-          onJournalStart,
-          onJournalOpen,
+          onJournalStart: () => {
+            journalActiveRef.current = true
+            setJournalActive(true)
+            document.exitPointerLock()
+          },
+          onJournalCancel: () => requestScenePointerLock(),
+          onJournalEnd: () => {
+            journalActiveRef.current = false
+            setJournalActive(false)
+            requestScenePointerLock()
+          },
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
+        onCameraChange={import.meta.env.DEV ? setLiveCam : undefined}
       />
 
       {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
+
+      {import.meta.env.DEV && showCameraEditor && !introActive && !playerMode && !postIntro && (
+        <IntroCameraPanel
+          live={liveCam}
+          onCapture={handleWaypointCapture}
+          waypoints={capturedWaypoints}
+        />
+      )}
 
       {showUI && !introPending && !introActive && !postIntro && (
         <ViewerControls
@@ -328,17 +362,6 @@ export default function App() {
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
           onToggleInteractionsEnabled={handleToggleInteractionsEnabled}
           onLeafMaterialChange={setLeafMaterialMode}
-        />
-      )}
-
-      {journalOpen && journalBounds && (
-        <JournalOverlay
-          leftBounds={journalBounds.left}
-          rightBounds={journalBounds.right}
-          onClose={() => {
-            setJournalOpen(false)
-            setJournalActive(false)
-          }}
         />
       )}
 

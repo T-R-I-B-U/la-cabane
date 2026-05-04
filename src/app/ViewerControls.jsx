@@ -1,4 +1,9 @@
 import { DevSection } from './DevSection'
+import {
+  useVisibilityZones,
+  toggleVisibilityZone,
+  VISIBILITY_ZONES,
+} from '../utils/visibilityZoneStore'
 
 function PanelSection({ title, eyebrow, children }) {
   return (
@@ -45,6 +50,8 @@ export function ViewerControls({
   onToggleInteractionsEnabled,
   onLeafMaterialChange,
 }) {
+  const visibilityZones = useVisibilityZones()
+
   const introLabel = !sceneReady
     ? 'Scène en chargement...'
     : introActive
@@ -231,6 +238,25 @@ export function ViewerControls({
               />
               <span className="controls-slider-value">{shaderRadius}</span>
             </label>
+          </DevSection>
+          <DevSection title="Visibilité">
+            {VISIBILITY_ZONES.map((zone) => {
+              const active = visibilityZones.includes(zone)
+              return (
+                <button
+                  key={zone}
+                  type="button"
+                  className={`camera-toggle${active ? ' camera-toggle--active' : ''}`}
+                  aria-pressed={active}
+                  onClick={() => toggleVisibilityZone(zone)}
+                >
+                  <span className="camera-toggle-icon" aria-hidden="true">
+                    {active ? 'ON' : 'OFF'}
+                  </span>
+                  {zone}
+                </button>
+              )
+            })}
           </DevSection>
           <DevSection title="Scène">
             <button
