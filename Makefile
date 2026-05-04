@@ -1,11 +1,14 @@
-.PHONY: prettier check setup
+.PHONY: prettier eslint check setup
 
 prettier:
 	npx prettier --write "src/**/*.{js,jsx,ts,tsx,css,json}"
 
+eslint:
+	npx eslint .
+
 check:
-	npm run lint
-	npm run format:check
+	make eslint
+	make prettier
 
 setup:
 	git config core.hooksPath .githooks
