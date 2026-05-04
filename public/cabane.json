@@ -114,25 +114,6 @@
     ]
   },
   {
-    "name": "railling-hut",
-    "type": "Object3D",
-    "position": [
-      -7.6254,
-      2.9068,
-      -5.3587
-    ],
-    "rotation": [
-      0,
-      -0.6661,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "stool",
     "type": "Object3D",
     "position": [
@@ -304,44 +285,6 @@
     ]
   },
   {
-    "name": "platform-hut",
-    "type": "Mesh",
-    "position": [
-      -7.6254,
-      0,
-      -5.3587
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "platform",
-    "type": "Mesh",
-    "position": [
-      -7.6254,
-      21.0884,
-      -5.2885
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "ladder",
     "type": "Object3D",
     "position": [
@@ -353,25 +296,6 @@
       3.0473,
       -0.9666,
       3.0703
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "railling",
-    "type": "Object3D",
-    "position": [
-      -7.6854,
-      21.1327,
-      -5.2758
-    ],
-    "rotation": [
-      -3.1416,
-      -0.0131,
-      -3.1416
     ],
     "scale": [
       1,
@@ -466,6 +390,82 @@
     "rotation": [
       0,
       0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "railling",
+    "type": "Object3D",
+    "position": [
+      -7.6854,
+      21.1327,
+      -5.2758
+    ],
+    "rotation": [
+      -3.1416,
+      -0.0131,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform",
+    "type": "Mesh",
+    "position": [
+      -7.6254,
+      21.0884,
+      -5.2885
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform-hut",
+    "type": "Mesh",
+    "position": [
+      -7.6254,
+      0,
+      -5.3587
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "railling-hut",
+    "type": "Object3D",
+    "position": [
+      -7.6254,
+      2.9068,
+      -5.3587
+    ],
+    "rotation": [
+      0,
+      -1.0603,
       0
     ],
     "scale": [
