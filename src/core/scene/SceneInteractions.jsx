@@ -15,6 +15,7 @@ export function SceneInteractions({
   onJournalStart,
   onJournalEnd,
   onJournalCancel,
+  journalVisible = true,
 }) {
   const interactionsActive = (playerMode || postIntro) && !interactionLocked
   const bookPosition = useMemo(() => {
@@ -35,7 +36,7 @@ export function SceneInteractions({
         onDoorClick={() => onIntroEvent?.('door:clicked')}
       />
 
-      {bookPosition && (
+      {journalVisible && bookPosition && (
         <JournalBook
           position={bookPosition}
           active={interactionsActive}

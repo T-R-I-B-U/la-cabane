@@ -1,0 +1,42 @@
+{
+  "zones": {
+    "all": null,
+    "all-fake": [
+      "ground-hut",
+      "leaf",
+      "trunk",
+      "hut01",
+      "stairs01",
+      "platform-hut",
+      "railling-hut",
+      "railling",
+      "platform",
+      "greenhouse",
+      "nest"
+    ],
+    "nid": ["nest", "stairs01"],
+    "cabane": [
+      "ground-hut",
+      "hut01",
+      "counter01",
+      "trunk",
+      "leaf",
+      "stairs01",
+      "platform",
+      "platform-hut",
+      "railling",
+      "workbench01",
+      "stool"
+    ],
+    "serre": ["greenhouse", "growingfruit", "juicemachine", "juiceglass"],
+    "arbre": ["trunk", "leaf", "platform", "railling-hut", "railling", "ladder", "stairs02"]
+  },
+  "hidden": {
+    "all": [],
+    "all-fake": [],
+    "nid": [],
+    "cabane": [],
+    "serre": [],
+    "arbre": ["platforme-hut.gltf"]
+  }
+}
