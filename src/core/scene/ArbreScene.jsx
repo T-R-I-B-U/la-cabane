@@ -1,5 +1,5 @@
 import { TriggerZone } from '../../world/interactions/TriggerZone'
-import { setZone } from '../../utils/gameManagerStore'
+import { setZone } from '../../utils'
 import { PLATFORM_POS } from '../SceneConfig'
 
 // Radius at which the player is considered to have left the tree and returned to ground.
