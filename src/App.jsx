@@ -36,6 +36,7 @@ export default function App() {
   const [savoirActive, setSavoirActive] = useState(false)
   const [savoirOpen, setSavoirOpen] = useState(false)
   const pointerControlsRef = useRef(null)
+  const journalActiveRef = useRef(false)
 
   const {
     selected: selectedSavoir,
@@ -120,6 +121,14 @@ export default function App() {
     selectedSavoir !== null ||
     savoirActive ||
     journalActive
+  useEffect(() => {
+    const blockPointerLock = (e) => {
+      if (journalActiveRef.current) e.stopImmediatePropagation()
+    }
+    document.addEventListener('click', blockPointerLock, { capture: true })
+    return () => document.removeEventListener('click', blockPointerLock, { capture: true })
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
@@ -228,9 +237,14 @@ export default function App() {
         interactions={{
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
-          onJournalStart: () => setJournalActive(true),
+          onJournalStart: () => {
+            journalActiveRef.current = true
+            setJournalActive(true)
+            document.exitPointerLock()
+          },
           onJournalCancel: () => requestScenePointerLock(),
           onJournalEnd: () => {
+            journalActiveRef.current = false
             setJournalActive(false)
             requestScenePointerLock()
           },
