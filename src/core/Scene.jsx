@@ -2,6 +2,8 @@ import { useState, useRef, useMemo, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
 import { WatercolorPass } from '../world/materials/WatercolorPass'
+import { GrowingFruit } from '../world/entities/GrowingFruit'
+import { Fruit } from '../world/entities/Fruit'
 import { Floor } from './Floor'
 import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -20,6 +22,7 @@ export default function Scene({
   debug,
   intro,
   leafMaterialMode,
+  interactionsEnabled,
   pointerControlsRef,
   interactions,
   shaderEnabled,
@@ -46,7 +49,15 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const { onLeafClick, onLeafHover, onJournalStart, onJournalEnd, onJournalCancel } = interactions
+  const {
+    onLeafClick,
+    onLeafHover,
+    onFruitClick,
+    onFruitHover,
+    onJournalStart,
+    onJournalEnd,
+    onJournalCancel,
+  } = interactions
 
   const zone = useActiveZone()
   const [sceneColliders, setSceneColliders] = useState([])
@@ -54,6 +65,8 @@ export default function Scene({
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
+  const sceneInteractionsActive =
+    (playerMode || postIntro) && !interactionLocked && interactionsEnabled
   const collisionObjects = useMemo(
     () => [...sceneColliders, mainFloorCollider].filter(Boolean),
     [sceneColliders, mainFloorCollider]
@@ -84,6 +97,7 @@ export default function Scene({
             onError={onError}
             onSceneReady={onReady}
             leafMaterialMode={leafMaterialMode}
+            interactionsEnabled={interactionsEnabled}
             onLeafClick={onLeafClick}
             onLeafHover={onLeafHover}
             onJournalStart={onJournalStart}
@@ -108,9 +122,19 @@ export default function Scene({
 
       {zone === 'arbre' && (
         <Suspense fallback={null}>
-          <ArbreScene onCollisionReady={setSceneColliders} />
+          <ArbreScene />
         </Suspense>
       )}
+
+      <GrowingFruit />
+
+      <Fruit
+        fruitId="fruit_01"
+        position={[-23, 25.5, -9]}
+        active={sceneInteractionsActive}
+        onFruitClick={onFruitClick}
+        onFruitHover={onFruitHover}
+      />
 
       <SceneControls
         collisionObjects={collisionObjects}

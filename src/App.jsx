@@ -3,8 +3,10 @@ import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
 import { NameInput } from './app/NameInput'
 import { SavoirPanel } from './app/SavoirPanel'
+import { ContactPanel } from './app/ContactPanel'
 import { useIntroFlow } from './app/useIntroFlow'
 import { useSavoirAssignment } from './app/useSavoirAssignment'
+import { useContactAssignment } from './app/useContactAssignment'
 import { ViewerControls } from './app/ViewerControls'
 import Scene from './core/Scene'
 import IntroCameraPanel from './core/IntroCameraPanel'
@@ -35,6 +37,11 @@ export default function App() {
   const [journalActive, setJournalActive] = useState(false)
   const [savoirActive, setSavoirActive] = useState(false)
   const [savoirOpen, setSavoirOpen] = useState(false)
+  const [contactActive, setContactActive] = useState(false)
+  const [contactOpen, setContactOpen] = useState(false)
+  const [leafHovered, setLeafHovered] = useState(false)
+  const [fruitHovered, setFruitHovered] = useState(false)
+  const [interactionsEnabled, setInteractionsEnabled] = useState(false)
   const pointerControlsRef = useRef(null)
   const journalActiveRef = useRef(false)
 
@@ -43,6 +50,11 @@ export default function App() {
     assignAndOpen,
     close: closeSavoirInternal,
   } = useSavoirAssignment()
+  const {
+    selected: selectedContact,
+    openContact,
+    close: closeContactInternal,
+  } = useContactAssignment()
 
   const handleLeafClick = useCallback(
     (id) => {
@@ -52,6 +64,29 @@ export default function App() {
     },
     [assignAndOpen]
   )
+
+  const handleFruitClick = useCallback(
+    (fruitId) => {
+      setContactActive(true)
+      document.exitPointerLock()
+      openContact(fruitId)
+    },
+    [openContact]
+  )
+
+  const handleFruitHover = useCallback((hovered) => {
+    setFruitHovered(hovered)
+  }, [])
+
+  const handleToggleInteractionsEnabled = useCallback(() => {
+    setInteractionsEnabled((current) => {
+      if (current) {
+        setLeafHovered(false)
+        setFruitHovered(false)
+      }
+      return !current
+    })
+  }, [])
 
   // Open panel only after pointer lock actually releases.
   useEffect(() => {
@@ -67,6 +102,20 @@ export default function App() {
     document.addEventListener('pointerlockchange', onRelease)
     return () => document.removeEventListener('pointerlockchange', onRelease)
   }, [savoirActive])
+
+  useEffect(() => {
+    if (!contactActive) return
+    if (!document.pointerLockElement) {
+      requestAnimationFrame(() => setContactOpen(true))
+      return
+    }
+    const onRelease = () => {
+      if (!document.pointerLockElement) setContactOpen(true)
+    }
+    document.addEventListener('pointerlockchange', onRelease)
+    return () => document.removeEventListener('pointerlockchange', onRelease)
+  }, [contactActive])
+
   const sceneReady = status === 'ok'
   const {
     dialogueActive,
@@ -100,19 +149,26 @@ export default function App() {
       return next
     })
   }, [])
-  const [leafHovered, setLeafHovered] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
-
-  const handleCloseSavoir = () => {
-    closeSavoirInternal()
-    setSavoirActive(false)
-    setSavoirOpen(false)
-  }
 
   const requestScenePointerLock = useCallback(() => {
     if (!(playerMode || postIntro)) return
     pointerControlsRef.current?.lock()
   }, [playerMode, postIntro])
+
+  const handleCloseSavoir = useCallback(() => {
+    closeSavoirInternal()
+    setSavoirActive(false)
+    setSavoirOpen(false)
+    requestScenePointerLock()
+  }, [closeSavoirInternal, requestScenePointerLock])
+
+  const handleCloseContact = useCallback(() => {
+    closeContactInternal()
+    setContactActive(false)
+    setContactOpen(false)
+    requestScenePointerLock()
+  }, [closeContactInternal, requestScenePointerLock])
 
   const interactionLocked =
     dialogueActive ||
@@ -120,7 +176,10 @@ export default function App() {
     showNameInput ||
     selectedSavoir !== null ||
     savoirActive ||
+    selectedContact !== null ||
+    contactActive ||
     journalActive
+
   useEffect(() => {
     const blockPointerLock = (e) => {
       if (journalActiveRef.current) e.stopImmediatePropagation()
@@ -143,6 +202,7 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
+
   const onReady = useCallback((data) => {
     setInfo(data)
     setStatus('ok')
@@ -197,9 +257,11 @@ export default function App() {
           !showNameInput &&
           !selectedSavoir &&
           !savoirActive &&
+          !selectedContact &&
+          !contactActive &&
           !journalActive
         }
-        active={leafHovered}
+        active={interactionsEnabled && (leafHovered || fruitHovered)}
       />
 
       <Scene
@@ -233,10 +295,13 @@ export default function App() {
           onEvent: handleIntroEvent,
         }}
         leafMaterialMode={leafMaterialMode}
+        interactionsEnabled={interactionsEnabled}
         pointerControlsRef={pointerControlsRef}
         interactions={{
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
+          onFruitClick: handleFruitClick,
+          onFruitHover: handleFruitHover,
           onJournalStart: () => {
             journalActiveRef.current = true
             setJournalActive(true)
@@ -278,6 +343,7 @@ export default function App() {
           debugDoors={debugDoors}
           debugCollisions={debugCollisions}
           leafMaterialMode={leafMaterialMode}
+          interactionsEnabled={interactionsEnabled}
           hdriOptions={HDRI_OPTIONS}
           noHdriId={NO_HDRI_ID}
           activeHdriId={activeHdriId}
@@ -294,6 +360,7 @@ export default function App() {
           onShaderRadiusChange={setShaderRadius}
           onToggleDebugDoors={() => setDebugDoors((current) => !current)}
           onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+          onToggleInteractionsEnabled={handleToggleInteractionsEnabled}
           onLeafMaterialChange={setLeafMaterialMode}
         />
       )}
@@ -302,6 +369,10 @@ export default function App() {
 
       {savoirOpen && selectedSavoir && (
         <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />
+      )}
+
+      {contactOpen && selectedContact && (
+        <ContactPanel contact={selectedContact.contact} onClose={handleCloseContact} />
       )}
 
       {introPending && (

@@ -6,8 +6,6 @@ import { PLATFORM_POS } from '../SceneConfig'
 const CABANE_TRIGGER_RADIUS = 10
 
 /**
- * Stub — replace with actual tree-top assets once they exist.
- * Add collision objects via onCollisionReady when the scene has geometry.
  */
 export function ArbreScene() {
   return (

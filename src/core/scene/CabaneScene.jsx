@@ -23,6 +23,7 @@ export function CabaneScene({
   onError,
   onSceneReady,
   leafMaterialMode,
+  interactionsEnabled,
   onLeafClick,
   onLeafHover,
   onJournalStart,
@@ -87,7 +88,7 @@ export function CabaneScene({
     setLeafMesh(found ?? null)
   }, [])
 
-  const interactionsActive = (playerMode || postIntro) && !interactionLocked
+  const interactionsActive = (playerMode || postIntro) && !interactionLocked && interactionsEnabled
 
   return (
     <>
