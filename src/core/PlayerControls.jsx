@@ -30,6 +30,7 @@ export function PlayerControls({
   flyMode = false,
   spawnAt,
   collisionObjects = [],
+  controlsRef,
 }) {
   const { camera } = useThree()
   const spawnRef = useRef(spawnAt)
@@ -154,5 +155,5 @@ export function PlayerControls({
     }
   })
 
-  return <PointerLockControls />
+  return <PointerLockControls ref={controlsRef} />
 }

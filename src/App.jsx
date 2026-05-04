@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Crosshair } from './app/Crosshair'
 import { IntroLoader } from './app/IntroLoader'
 import { NameInput } from './app/NameInput'
@@ -35,6 +35,8 @@ export default function App() {
   const [journalActive, setJournalActive] = useState(false)
   const [savoirActive, setSavoirActive] = useState(false)
   const [savoirOpen, setSavoirOpen] = useState(false)
+  const pointerControlsRef = useRef(null)
+  const journalActiveRef = useRef(false)
 
   const {
     selected: selectedSavoir,
@@ -107,6 +109,11 @@ export default function App() {
     setSavoirOpen(false)
   }
 
+  const requestScenePointerLock = useCallback(() => {
+    if (!(playerMode || postIntro)) return
+    pointerControlsRef.current?.lock()
+  }, [playerMode, postIntro])
+
   const interactionLocked =
     dialogueActive ||
     introMovementLocked ||
@@ -114,6 +121,14 @@ export default function App() {
     selectedSavoir !== null ||
     savoirActive ||
     journalActive
+  useEffect(() => {
+    const blockPointerLock = (e) => {
+      if (journalActiveRef.current) e.stopImmediatePropagation()
+    }
+    document.addEventListener('click', blockPointerLock, { capture: true })
+    return () => document.removeEventListener('click', blockPointerLock, { capture: true })
+  }, [])
+
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
@@ -218,11 +233,21 @@ export default function App() {
           onEvent: handleIntroEvent,
         }}
         leafMaterialMode={leafMaterialMode}
+        pointerControlsRef={pointerControlsRef}
         interactions={{
           onLeafClick: handleLeafClick,
           onLeafHover: setLeafHovered,
-          onJournalStart: () => setJournalActive(true),
-          onJournalEnd: () => setJournalActive(false),
+          onJournalStart: () => {
+            journalActiveRef.current = true
+            setJournalActive(true)
+            document.exitPointerLock()
+          },
+          onJournalCancel: () => requestScenePointerLock(),
+          onJournalEnd: () => {
+            journalActiveRef.current = false
+            setJournalActive(false)
+            requestScenePointerLock()
+          },
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}

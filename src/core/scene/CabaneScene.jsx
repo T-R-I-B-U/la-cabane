@@ -27,6 +27,7 @@ export function CabaneScene({
   onLeafHover,
   onJournalStart,
   onJournalEnd,
+  onJournalCancel,
   onIntroEvent,
   introWaitingAtDoor,
   playerMode,
@@ -120,6 +121,7 @@ export function CabaneScene({
         onIntroEvent={onIntroEvent}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
+        onJournalCancel={onJournalCancel}
         journalVisible={journal}
       />
 

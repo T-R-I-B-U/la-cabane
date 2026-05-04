@@ -3,7 +3,7 @@
     "name": "ground-hut",
     "type": "Mesh",
     "position": [
-      -25.1375,
+      -7.6254,
       0,
       -5.3587
     ],
@@ -22,7 +22,7 @@
     "name": "leaf",
     "type": "InstancedMesh",
     "position": [
-      -23.7436,
+      -6.2316,
       20.8444,
       -37.5281
     ],
@@ -41,7 +41,7 @@
     "name": "trunk",
     "type": "Mesh",
     "position": [
-      -25.1375,
+      -7.6254,
       -0.5431,
       -5.3587
     ],
@@ -60,28 +60,9 @@
     "name": "hut01",
     "type": "Object3D",
     "position": [
-      -27.8407,
+      -10.3286,
       2.3616,
       -3.77
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "counter01",
-    "type": "Mesh",
-    "position": [
-      -32.3414,
-      0,
-      -11.4356
     ],
     "rotation": [
       0,
@@ -98,32 +79,13 @@
     "name": "growingfruit",
     "type": "Mesh",
     "position": [
-      -30.4807,
-      0.7255,
-      -7.7019
+      -15.0032,
+      0.7183,
+      -8.4425
     ],
     "rotation": [
       0,
       0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "stairs01",
-    "type": "Object3D",
-    "position": [
-      -21.4086,
-      0.0104,
-      -1.6791
-    ],
-    "rotation": [
-      0,
-      -0.4294,
       0
     ],
     "scale": [
@@ -136,7 +98,7 @@
     "name": "workbench01",
     "type": "Object3D",
     "position": [
-      -22.0917,
+      -4.5796,
       0.6561,
       -13.259
     ],
@@ -152,93 +114,17 @@
     ]
   },
   {
-    "name": "platform-hut",
-    "type": "Mesh",
-    "position": [
-      -25.1375,
-      4.7198,
-      -5.3587
-    ],
-    "rotation": [
-      -3.1416,
-      -0.9325,
-      -3.1416
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "railling-hut",
     "type": "Object3D",
     "position": [
-      -25.1375,
-      4.7562,
+      -7.6254,
+      2.9068,
       -5.3587
     ],
     "rotation": [
       0,
-      0.0558,
+      -0.6661,
       0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "railling",
-    "type": "Object3D",
-    "position": [
-      -25.1375,
-      22.8757,
-      -5.3587
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "platform",
-    "type": "Mesh",
-    "position": [
-      -25.1375,
-      22.8757,
-      -5.4593
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "greenhouse",
-    "type": "Object3D",
-    "position": [
-      0.1631,
-      0.85,
-      -5.3587
-    ],
-    "rotation": [
-      -3.1416,
-      0,
-      -3.1416
     ],
     "scale": [
       1,
@@ -250,7 +136,7 @@
     "name": "stool",
     "type": "Object3D",
     "position": [
-      -22.1379,
+      -4.6259,
       0.3564,
       -13.3561
     ],
@@ -269,13 +155,317 @@
     "name": "nest",
     "type": "Object3D",
     "position": [
-      -35.058,
+      -17.5459,
       13.5346,
       22.9861
     ],
     "rotation": [
       0,
       -0.4362,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "workbench01",
+    "type": "Object3D",
+    "position": [
+      31.636,
+      0.4111,
+      -13.259
+    ],
+    "rotation": [
+      0,
+      1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "workbench01",
+    "type": "Object3D",
+    "position": [
+      -18.5706,
+      10.6204,
+      22.6702
+    ],
+    "rotation": [
+      0,
+      1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "juicemachine",
+    "type": "Object3D",
+    "position": [
+      29.6079,
+      0.4492,
+      -11.5233
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "greenhouse",
+    "type": "Object3D",
+    "position": [
+      30.804,
+      0.85,
+      -5.3587
+    ],
+    "rotation": [
+      -3.1416,
+      0,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "juiceglass",
+    "type": "Object3D",
+    "position": [
+      32.0221,
+      0.8816,
+      -13.4381
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "juiceglass",
+    "type": "Object3D",
+    "position": [
+      31.5995,
+      0.8816,
+      -13.4381
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "juiceglass",
+    "type": "Object3D",
+    "position": [
+      31.5995,
+      0.8816,
+      -13.1279
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform-hut",
+    "type": "Mesh",
+    "position": [
+      -7.6254,
+      0,
+      -5.3587
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform",
+    "type": "Mesh",
+    "position": [
+      -7.6254,
+      21.0884,
+      -5.2885
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "ladder",
+    "type": "Object3D",
+    "position": [
+      -4.1025,
+      0.1893,
+      -2.8149
+    ],
+    "rotation": [
+      3.0473,
+      -0.9666,
+      3.0703
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "railling",
+    "type": "Object3D",
+    "position": [
+      -7.6854,
+      21.1327,
+      -5.2758
+    ],
+    "rotation": [
+      -3.1416,
+      -0.0131,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "counter01",
+    "type": "Mesh",
+    "position": [
+      -14.8482,
+      0,
+      -10.4623
+    ],
+    "rotation": [
+      0,
+      0.3297,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stairs01",
+    "type": "Object3D",
+    "position": [
+      -5.9285,
+      2.9007,
+      2.3859
+    ],
+    "rotation": [
+      0,
+      -0.4132,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stairs02",
+    "type": "Object3D",
+    "position": [
+      4.8348,
+      -0.0156,
+      -0.9166
+    ],
+    "rotation": [
+      0,
+      -0.7234,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Object3D",
+    "position": [
+      32.8189,
+      1.5645,
+      -5.6124
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "welcome01",
+    "type": "Mesh",
+    "position": [
+      -14.6193,
+      4.515,
+      -10.23
+    ],
+    "rotation": [
+      0,
+      0,
       0
     ],
     "scale": [

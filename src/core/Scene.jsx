@@ -20,6 +20,7 @@ export default function Scene({
   debug,
   intro,
   leafMaterialMode,
+  pointerControlsRef,
   interactions,
   shaderEnabled,
   shaderRadius,
@@ -45,7 +46,7 @@ export default function Scene({
     interactionLocked,
     onEvent: onIntroEvent,
   } = intro
-  const { onLeafClick, onLeafHover, onJournalStart, onJournalEnd } = interactions
+  const { onLeafClick, onLeafHover, onJournalStart, onJournalEnd, onJournalCancel } = interactions
 
   const zone = useActiveZone()
   const [sceneColliders, setSceneColliders] = useState([])
@@ -87,6 +88,7 @@ export default function Scene({
             onLeafHover={onLeafHover}
             onJournalStart={onJournalStart}
             onJournalEnd={onJournalEnd}
+            onJournalCancel={onJournalCancel}
             onIntroEvent={onIntroEvent}
             introWaitingAtDoor={introWaitingAtDoor}
             playerMode={playerMode}
@@ -123,6 +125,7 @@ export default function Scene({
         movementLocked={movementLocked}
         postIntro={postIntro}
         postIntroLocked={postIntroLocked}
+        pointerControlsRef={pointerControlsRef}
         controlsRef={controlsRef}
         hutPosition={hutPosition}
         onCameraChange={onCameraChange}
