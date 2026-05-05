@@ -45,7 +45,6 @@ function cloneMaterial(material) {
   return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
 }
 
-
 export function JournalBook({
   position,
   rotationY = 0.08,
