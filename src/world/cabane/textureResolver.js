@@ -123,13 +123,13 @@ function findTextureUrl(names, suffix, textureBasePaths) {
 function loadTexture(url, colorSpace) {
   if (!textureCache.has(url)) {
     const promise = textureLoader.loadAsync(url).then((texture) => {
-      texture.flipY = false
-      if (colorSpace) texture.colorSpace = colorSpace
-      texture.generateMipmaps = false
-      texture.minFilter = THREE.LinearFilter
-      texture.magFilter = THREE.LinearFilter
-      return texture
-    })
+        texture.flipY = false
+        if (colorSpace) texture.colorSpace = colorSpace
+        texture.generateMipmaps = false
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        return texture
+      })
     textureCache.set(url, promise)
   }
 

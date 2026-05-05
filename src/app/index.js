@@ -1,3 +1,4 @@
+export { AppLoader } from './AppLoader'
 export { CharacterAnimationControls } from './CharacterAnimationControls'
 export { Crosshair } from './Crosshair'
 export { DevSection } from './DevSection'

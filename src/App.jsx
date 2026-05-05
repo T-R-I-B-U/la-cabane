@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import {
+  AppLoader,
   Crosshair,
   GameManager,
   IntroLoader,
@@ -292,6 +293,7 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
+      <AppLoader status={status} error={status === 'error' ? info : null} />
       <Subtitles />
 
       <Crosshair
@@ -372,7 +374,7 @@ export default function App() {
         />
       )}
 
-      {showUI && !introPending && !introActive && !postIntro && (
+      {showUI && sceneReady && !introPending && !introActive && !postIntro && (
         <ViewerControls
           status={status}
           info={info}

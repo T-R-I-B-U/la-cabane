@@ -48,8 +48,8 @@ function cloneScene(scene) {
 export async function loadModel(path) {
   if (!_cache.has(path)) {
     const promise = new Promise((resolve, reject) => {
-      _loader.load(path, resolve, undefined, (error) => reject(createLoadError(path, error)))
-    })
+        _loader.load(path, resolve, undefined, (error) => reject(createLoadError(path, error)))
+      })
     promise.catch(() => _cache.delete(path))
     _cache.set(path, promise)
   }
