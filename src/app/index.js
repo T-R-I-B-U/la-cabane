@@ -1,4 +1,6 @@
 export { AppLoader } from './AppLoader'
+export { ArbreContinueButton } from './ArbreContinueButton'
+export { useArbreFlow } from './useArbreFlow'
 export { CharacterAnimationControls } from './CharacterAnimationControls'
 export { Crosshair } from './Crosshair'
 export { DevSection } from './DevSection'

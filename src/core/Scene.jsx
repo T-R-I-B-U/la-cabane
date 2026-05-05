@@ -2,8 +2,6 @@ import { useState, useRef, useMemo, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
 import { WatercolorPass } from '../world/materials/WatercolorPass'
-import { GrowingFruit } from '../world/entities/GrowingFruit'
-import { Fruit } from '../world/entities/Fruit'
 import { Floor } from './Floor'
 import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -21,6 +19,8 @@ export default function Scene({
   player,
   debug,
   intro,
+  arbre,
+  platformPosition,
   leafMaterialMode,
   interactionsEnabled,
   pointerControlsRef,
@@ -59,6 +59,14 @@ export default function Scene({
     onJournalCancel,
   } = interactions
 
+  const {
+    active: arbreActive,
+    cameraStep: arbreCameraStep,
+    shouldAdvance: arbreShouldAdvance,
+    growingFruitPlaying: arbreGrowingFruitPlaying,
+    onEvent: onArbreEvent,
+  } = arbre
+
   const zone = useActiveZone()
   const [sceneColliders, setSceneColliders] = useState([])
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
@@ -90,14 +98,19 @@ export default function Scene({
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
       <BackgroundPlanes hutPosition={hutPosition} />
 
-      {zone === 'cabane' && (
+      {(zone === 'cabane' || zone === 'arbre') && (
         <Suspense fallback={null}>
           <CabaneScene
             performanceMode={performanceMode}
             onError={onError}
             onSceneReady={onReady}
             leafMaterialMode={leafMaterialMode}
-            interactionsEnabled={interactionsEnabled}
+            interactionsEnabled={
+              zone === 'cabane'
+                ? interactionsEnabled
+                : interactionsEnabled &&
+                  (arbreCameraStep === 'platform' || arbreCameraStep === 'leaves')
+            }
             onLeafClick={onLeafClick}
             onLeafHover={onLeafHover}
             onJournalStart={onJournalStart}
@@ -122,23 +135,23 @@ export default function Scene({
 
       {zone === 'arbre' && (
         <Suspense fallback={null}>
-          <ArbreScene />
+          <ArbreScene
+            platformPosition={platformPosition}
+            arbreActive={arbreActive}
+            arbreShouldAdvance={arbreShouldAdvance}
+            arbreGrowingFruitPlaying={arbreGrowingFruitPlaying}
+            onArbreEvent={onArbreEvent}
+            onFruitClick={onFruitClick}
+            onFruitHover={onFruitHover}
+            interactionsEnabled={sceneInteractionsActive}
+          />
         </Suspense>
       )}
-
-      <GrowingFruit />
-
-      <Fruit
-        fruitId="fruit_01"
-        position={[-23, 25.5, -9]}
-        active={sceneInteractionsActive}
-        onFruitClick={onFruitClick}
-        onFruitHover={onFruitHover}
-      />
 
       <SceneControls
         collisionObjects={collisionObjects}
         introActive={introActive}
+        arbreActive={arbreActive}
         introShouldAdvance={introShouldAdvance}
         introSpawn={introSpawn}
         onIntroEvent={onIntroEvent}

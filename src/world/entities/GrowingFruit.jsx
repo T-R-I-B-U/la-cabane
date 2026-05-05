@@ -17,10 +17,12 @@ function easeOutQuart(t) {
 // Positioned near the platform-facing leaves (~platform height, trunk x/z side)
 const DEFAULT_POSITION = [-25.5, 25.5, -9]
 
-export function GrowingFruit({ position = DEFAULT_POSITION }) {
+export function GrowingFruit({ position = DEFAULT_POSITION, playing = true, onComplete }) {
   const { scene } = useGLTF('/models/growingfruit.gltf')
   const pivotRef = useRef()
   const elapsedRef = useRef(0)
+  const completedRef = useRef(false)
+  const prevPlayingRef = useRef(playing)
 
   const cloned = useMemo(() => {
     const c = scene.clone(true)
@@ -46,11 +48,28 @@ export function GrowingFruit({ position = DEFAULT_POSITION }) {
 
   useFrame((_, delta) => {
     if (!pivotRef.current) return
-    elapsedRef.current = (elapsedRef.current + delta) % CYCLE_DURATION
-    // Only animate during the grow phase; hold at full scale for the remainder
+
+    // Reset when playing flips false → true
+    if (playing && !prevPlayingRef.current) {
+      elapsedRef.current = 0
+      completedRef.current = false
+    }
+    prevPlayingRef.current = playing
+
+    if (!playing) {
+      pivotRef.current.scale.setScalar(0)
+      return
+    }
+
+    if (elapsedRef.current < GROW_DURATION) elapsedRef.current += delta
     const t = Math.min(elapsedRef.current / GROW_DURATION, 1)
     const s = easeOutQuart(t)
     pivotRef.current.scale.setScalar(s)
+
+    if (t >= 1 && !completedRef.current) {
+      completedRef.current = true
+      onComplete?.()
+    }
   })
 
   return (

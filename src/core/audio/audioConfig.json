@@ -32,6 +32,30 @@
       "volume": 1,
       "autoplay": false,
       "subtitles": "thomas-dialogue.srt"
+    },
+    {
+      "id": "arbrePlateforme",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "arbre-plateforme.srt"
+    },
+    {
+      "id": "arbreFeuilles",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "arbre-feuilles.srt"
+    },
+    {
+      "id": "arbreFinal",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "arbre-final.srt"
     }
   ]
 }

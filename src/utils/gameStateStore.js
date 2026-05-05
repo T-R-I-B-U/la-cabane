@@ -7,6 +7,7 @@ export const GAME_STEPS = /** @type {const} */ ({
   INIT: 'INIT',
   INTRO: 'INTRO',
   EXPLORATION: 'EXPLORATION',
+  ARBRE_INTRO: 'ARBRE_INTRO',
 })
 
 let _step = GAME_STEPS.LOADING

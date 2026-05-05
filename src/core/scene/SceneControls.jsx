@@ -6,6 +6,7 @@ import { PlayerControls } from '../PlayerControls'
 export function SceneControls({
   collisionObjects,
   introActive,
+  arbreActive,
   introShouldAdvance,
   introSpawn,
   onIntroEvent,
@@ -21,6 +22,8 @@ export function SceneControls({
   hutPosition,
   onCameraChange,
 }) {
+  if (arbreActive) return null
+
   if (introActive) {
     return (
       <IntroCamera active={introActive} shouldAdvance={introShouldAdvance} onEvent={onIntroEvent} />

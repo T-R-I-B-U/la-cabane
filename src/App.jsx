@@ -12,6 +12,8 @@ import {
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
 import { useContactAssignment } from './app/useContactAssignment'
+import { ArbreContinueButton } from './app/ArbreContinueButton'
+import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import IntroCameraPanel from './core/IntroCameraPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
@@ -122,6 +124,7 @@ export default function App() {
   }, [contactActive])
 
   const sceneReady = status === 'ok'
+
   const {
     dialogueActive,
     introActive,
@@ -142,6 +145,33 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+
+  const spawnAtPlatform = useCallback(() => {
+    setPostIntro(false)
+    setPlayerSpawn(getPlatformSpawn(info?.platformPosition))
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(true)
+    setPlayerMode(true)
+    setFlyMode(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [info?.platformPosition, setPostIntro])
+
+  const {
+    arbreActive,
+    arbreCameraStep,
+    arbreShouldAdvance,
+    arbreShowContinueButton,
+    arbreShowFruitButton,
+    arbreMovementLocked,
+    arbreGrowingFruitPlaying,
+    handleArbreEvent,
+    handleContinueClick,
+    handleFruitButtonClick,
+    triggerArbre,
+  } = useArbreFlow({ onPlatformSpawn: spawnAtPlatform })
   const [showCameraEditor, setShowCameraEditor] = useState(false)
   const [liveCam, setLiveCam] = useState(null)
   const [capturedWaypoints, setCapturedWaypoints] = useState(
@@ -178,6 +208,7 @@ export default function App() {
   const interactionLocked =
     dialogueActive ||
     introMovementLocked ||
+    arbreMovementLocked ||
     showNameInput ||
     selectedSavoir !== null ||
     savoirActive ||
@@ -218,18 +249,7 @@ export default function App() {
   }, [])
 
   function goToPlatform() {
-    setPostIntro(false)
-    setPlayerSpawn(getPlatformSpawn(info?.platformPosition))
-    setPlayerSpawnKey((k) => k + 1)
-    setUserMovementLocked(true)
-    setPlayerMode(true)
-    setFlyMode(false)
-
-    // Request lock immediately on click
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas')
-      if (canvas) canvas.requestPointerLock()
-    }, 10)
+    spawnAtPlatform()
   }
 
   const cursorVisible =
@@ -276,6 +296,10 @@ export default function App() {
         // Dialogue2 terminé, joueur libre — on ouvre toutes les zones visibles.
         setVisibilityZones(['all'])
         // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
+        break
+
+      case GAME_STEPS.ARBRE_INTRO:
+        // Séquence arbre déclenchée — mouvement géré par arbreMovementLocked.
         break
 
       default:
@@ -339,6 +363,14 @@ export default function App() {
           interactionLocked,
           onEvent: handleIntroEvent,
         }}
+        arbre={{
+          active: arbreActive,
+          cameraStep: arbreCameraStep,
+          shouldAdvance: arbreShouldAdvance,
+          growingFruitPlaying: arbreGrowingFruitPlaying,
+          onEvent: handleArbreEvent,
+        }}
+        platformPosition={info?.platformPosition}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={interactionsEnabled}
         pointerControlsRef={pointerControlsRef}
@@ -397,6 +429,7 @@ export default function App() {
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={togglePlayerView}
           onGoToPlatform={goToPlatform}
+          onTestArbre={triggerArbre}
           onToggleFlyMode={() => setFlyMode((current) => !current)}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           shaderEnabled={shaderEnabled}
@@ -411,6 +444,12 @@ export default function App() {
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
+
+      {arbreShowFruitButton && (
+        <ArbreContinueButton label="Voir mon fruit" onClick={handleFruitButtonClick} />
+      )}
+
+      {arbreShowContinueButton && <ArbreContinueButton onClick={handleContinueClick} />}
 
       {savoirOpen && selectedSavoir && (
         <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />
