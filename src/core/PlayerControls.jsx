@@ -45,6 +45,15 @@ export function PlayerControls({
     verticalVelocity.current = 0
   }, [camera])
 
+  // If pointer lock is already active when this mounts (acquired on door click),
+  // THREE.PointerLockControls won't know until the next pointerlockchange event.
+  // Dispatching one here syncs its isLocked state immediately.
+  useEffect(() => {
+    if (document.pointerLockElement) {
+      document.dispatchEvent(new Event('pointerlockchange'))
+    }
+  }, [])
+
   useEffect(() => {
     const down = (e) => {
       keys.current[e.code] = true

@@ -266,8 +266,8 @@ export default function App() {
         break
 
       case GAME_STEPS.STORY:
-        // Intro terminée, on ouvre la visite guidée et ses objectifs.
-        setVisibilityZones(['all'])
+        // Intro terminée — cabane seulement, nid et serre masqués pour l'instant.
+        setVisibilityZones(['cabane'])
         break
 
       case GAME_STEPS.EXPLORATION:
