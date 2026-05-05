@@ -27,7 +27,6 @@ export default function Scene({
   interactions,
   shaderEnabled,
   shaderRadius,
-  onCameraChange,
 }) {
   const { onStats, onReady, onError } = sceneState
   const {
@@ -152,7 +151,6 @@ export default function Scene({
         pointerControlsRef={pointerControlsRef}
         controlsRef={controlsRef}
         hutPosition={hutPosition}
-        onCameraChange={onCameraChange}
       />
 
       {shaderEnabled && <WatercolorPass radius={shaderRadius} />}

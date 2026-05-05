@@ -13,7 +13,7 @@ import {
 import { ContactPanel } from './app/ContactPanel'
 import { useContactAssignment } from './app/useContactAssignment'
 import Scene from './core/Scene'
-import IntroCameraPanel from './core/IntroCameraPanel'
+import CameraEditorPanel from './core/CameraEditorPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
@@ -146,17 +146,6 @@ export default function App() {
     setPostIntro,
   } = useIntroFlow({ sceneReady })
   const [showCameraEditor, setShowCameraEditor] = useState(false)
-  const [liveCam, setLiveCam] = useState(null)
-  const [capturedWaypoints, setCapturedWaypoints] = useState(
-    Array.from({ length: 5 }, () => ({ position: null, target: null }))
-  )
-  const handleWaypointCapture = useCallback((i, live) => {
-    setCapturedWaypoints((prev) => {
-      const next = [...prev]
-      next[i] = { position: live.position, target: live.target }
-      return next
-    })
-  }, [])
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestScenePointerLock = useCallback(() => {
@@ -370,20 +359,13 @@ export default function App() {
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
-        onCameraChange={import.meta.env.DEV ? setLiveCam : undefined}
       />
 
       {import.meta.env.DEV && showUI && !introPending && !introActive && !postIntro && (
         <PerfMonitor stats={stats} scene={info} status={status} />
       )}
 
-      {import.meta.env.DEV && showCameraEditor && !introActive && !playerMode && !postIntro && (
-        <IntroCameraPanel
-          live={liveCam}
-          onCapture={handleWaypointCapture}
-          waypoints={capturedWaypoints}
-        />
-      )}
+      {import.meta.env.DEV && showCameraEditor && <CameraEditorPanel />}
 
       {showUI && sceneReady && !introPending && !introActive && !postIntro && (
         <ViewerControls
