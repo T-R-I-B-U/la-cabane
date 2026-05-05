@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableReception } from '../../world/entities/ClickableReception'
+import { ClickableTree } from '../../world/entities/ClickableTree'
 import { JournalBook } from '../../world/entities/JournalBook'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
@@ -14,8 +15,10 @@ export function SceneInteractions({
   introWaitingAtDoor,
   journalUnlocked,
   receptionActive,
+  treePhaseActive,
   onIntroEvent,
   onReceptionInteract,
+  onTreeInteract,
   onJournalStart,
   onJournalEnd,
   onJournalOpenComplete,
@@ -59,6 +62,8 @@ export function SceneInteractions({
         active={receptionActive}
         onInteract={onReceptionInteract}
       />
+
+      <ClickableTree cabane={cabane} active={treePhaseActive} onInteract={onTreeInteract} />
 
       {journalVisible && bookPosition && (
         <JournalBook

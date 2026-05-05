@@ -26,6 +26,7 @@ export function useIntroFlow({ sceneReady }) {
   const [journalCloseToken, setJournalCloseToken] = useState(0)
   const [journalPuzzleEnabled, setJournalPuzzleEnabled] = useState(false)
   const [returnHallVisible, setReturnHallVisible] = useState(false)
+  const [treePhaseActive, setTreePhaseActive] = useState(false)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
   const journalPlacedCountRef = useRef(0)
@@ -52,6 +53,7 @@ export function useIntroFlow({ sceneReady }) {
     setJournalCloseToken(0)
     setJournalPuzzleEnabled(false)
     setReturnHallVisible(false)
+    setTreePhaseActive(false)
     setPlayerName('')
     ignoreNextPointerUnlockRef.current = false
     journalPlacedCountRef.current = 0
@@ -169,6 +171,7 @@ export function useIntroFlow({ sceneReady }) {
 
     if (isPostBookTransitionRef.current) {
       isPostBookTransitionRef.current = false
+      setTreePhaseActive(true)
       return
     }
 
@@ -251,6 +254,23 @@ export function useIntroFlow({ sceneReady }) {
 
     return false
   }, [])
+
+  const handleTreeInteract = useCallback(() => {
+    setTreePhaseActive(false)
+    playDialogue('treeRacinesDialogue', {
+      onDone: () => {
+        playDialogue('treeBorneDialogue', {
+          onDone: () => {
+            playDialogue('treeArbreDialogue', {
+              onDone: () => {
+                // TODO: transition vers l'Établi une fois le POV défini
+              },
+            })
+          },
+        })
+      },
+    })
+  }, [playDialogue])
 
   const handleReturnToHall = useCallback(() => {
     setReturnHallVisible(false)
@@ -346,6 +366,7 @@ export function useIntroFlow({ sceneReady }) {
     postIntro,
     receptionChoiceVisible,
     returnHallVisible,
+    treePhaseActive,
     showNameInput,
     storyReady,
     currentStoryStepId: currentStepId,
@@ -359,6 +380,7 @@ export function useIntroFlow({ sceneReady }) {
     handleDebugGoToIntroStart: debugGoToIntroStart,
     handleDebugGoToReception: debugGoToReception,
     handleJournalEnd,
+    handleTreeInteract,
     handleJournalInteractionStart,
     handleJournalOpen,
     handleJournalPiecePlaced,

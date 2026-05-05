@@ -96,6 +96,30 @@
       "volume": 1,
       "autoplay": false,
       "subtitles": "thomas-dialogue.srt"
+    },
+    {
+      "id": "treeRacinesDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree-racines-dialogue.srt"
+    },
+    {
+      "id": "treeBorneDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree-borne-dialogue.srt"
+    },
+    {
+      "id": "treeArbreDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree-arbre-dialogue.srt"
     }
   ]
 }
