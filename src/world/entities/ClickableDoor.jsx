@@ -141,7 +141,12 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     }
 
     const onClick = () => {
-      if (hoveredRef.current) onDoorClickRef.current?.()
+      if (!hoveredRef.current) return
+      // Request pointer lock here — door click is the valid user gesture, so the
+      // browser grants it. PlayerControls (PointerLockControls) picks it up when
+      // it mounts after the intro animation, avoiding the extra click on entry.
+      canvas.requestPointerLock()
+      onDoorClickRef.current?.()
     }
 
     canvas.addEventListener('mousemove', onMouseMove)
