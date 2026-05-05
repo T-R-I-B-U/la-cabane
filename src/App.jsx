@@ -47,6 +47,7 @@ export default function App() {
   const [leafHovered, setLeafHovered] = useState(false)
   const [fruitHovered, setFruitHovered] = useState(false)
   const [interactionsEnabled, setInteractionsEnabled] = useState(false)
+  const [pendingPostIntroPointerLock, setPendingPostIntroPointerLock] = useState(false)
   const pointerControlsRef = useRef(null)
   const journalActiveRef = useRef(false)
 
@@ -141,7 +142,7 @@ export default function App() {
     handleIntroEvent,
     handleLoaderClick,
     handleLoaderKeyDown,
-    handleNameSubmit,
+    handleNameSubmit: handleNameSubmitInternal,
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
@@ -152,6 +153,25 @@ export default function App() {
     if (!(playerMode || postIntro)) return
     pointerControlsRef.current?.lock()
   }, [playerMode, postIntro])
+
+  const handleSceneIntroEvent = useCallback(
+    (event, payload) => {
+      if (event === 'door:clicked') {
+        setPendingPostIntroPointerLock(true)
+      }
+
+      handleIntroEvent(event, payload)
+    },
+    [handleIntroEvent]
+  )
+
+  const handleNameSubmit = useCallback(
+    (name) => {
+      setPendingPostIntroPointerLock(true)
+      handleNameSubmitInternal(name)
+    },
+    [handleNameSubmitInternal]
+  )
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -178,6 +198,44 @@ export default function App() {
     journalActive
 
   useEffect(() => {
+    if (!pendingPostIntroPointerLock || showNameInput || !postIntro || document.pointerLockElement) return
+
+    let cancelled = false
+    let frameId = 0
+    let attempts = 0
+
+    const tryLock = () => {
+      if (cancelled) return
+
+      if (document.pointerLockElement) {
+        setPendingPostIntroPointerLock(false)
+        return
+      }
+
+      if (pointerControlsRef.current?.lock) {
+        requestScenePointerLock()
+        window.setTimeout(() => {
+          if (!cancelled && document.pointerLockElement) {
+            setPendingPostIntroPointerLock(false)
+          }
+        }, 0)
+      }
+
+      if (!document.pointerLockElement && attempts < 8) {
+        attempts += 1
+        frameId = window.requestAnimationFrame(tryLock)
+      }
+    }
+
+    frameId = window.requestAnimationFrame(tryLock)
+
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(frameId)
+    }
+  }, [pendingPostIntroPointerLock, postIntro, requestScenePointerLock, showNameInput])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (journalActiveRef.current) e.stopImmediatePropagation()
     }
@@ -199,10 +257,6 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
-
-  useEffect(() => {
-    if (postIntro) setVisibilityZones(['cabane'])
-  }, [postIntro])
 
   const onReady = useCallback((data) => {
     setInfo(data)
@@ -230,6 +284,7 @@ export default function App() {
 
   const cursorVisible =
     introWaitingAtDoor ||
+    showNameInput ||
     (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
 
   function togglePlayerView() {
@@ -270,8 +325,7 @@ export default function App() {
         break
 
       case GAME_STEPS.STORY:
-        // Intro terminée — cabane seulement, nid et serre masqués pour l'instant.
-        setVisibilityZones(['cabane'])
+        // Intro terminee — pour l'instant on ne restreint pas la scene pendant le script.
         break
 
       case GAME_STEPS.EXPLORATION:
@@ -338,9 +392,9 @@ export default function App() {
           shouldAdvance: introShouldAdvance,
           spawn: introSpawn,
           postIntro,
-          postIntroLocked: !showNameInput,
+          postIntroLocked: postIntro,
           interactionLocked,
-          onEvent: handleIntroEvent,
+          onEvent: handleSceneIntroEvent,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={interactionsEnabled}

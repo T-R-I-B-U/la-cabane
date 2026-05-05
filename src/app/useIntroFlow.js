@@ -104,10 +104,6 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleNameSubmit = useCallback(
     (name) => {
-      // Called from a button click / Enter keydown — valid user gesture.
-      // Re-acquire pointer lock here so the camera is free immediately after
-      // the name input closes, without requiring an extra click on the canvas.
-      document.querySelector('canvas')?.requestPointerLock()
       setPlayerName(name)
       setShowNameInput(false)
       completeStep('intro.nameInput')
@@ -115,7 +111,6 @@ export function useIntroFlow({ sceneReady }) {
       playDialogue('dialogue2', {
         onDone: () => {
           completeStep('intro.cabanePresentation')
-          setIntroMovementLocked(false)
         },
       })
     },

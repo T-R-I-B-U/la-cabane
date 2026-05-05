@@ -47,12 +47,32 @@ export function PlayerControls({
 
   // If pointer lock is already active when this mounts (acquired on door click),
   // THREE.PointerLockControls won't know until the next pointerlockchange event.
-  // Dispatching one here syncs its isLocked state immediately.
+  // Dispatch on the next frame so Drei has time to attach its internal listener.
   useEffect(() => {
-    if (document.pointerLockElement) {
+    if (!document.pointerLockElement) return
+
+    let cancelled = false
+    let frameId = 0
+    let attempts = 0
+
+    const syncLockState = () => {
+      if (cancelled || !document.pointerLockElement) return
+
       document.dispatchEvent(new Event('pointerlockchange'))
+
+      if (controlsRef?.current?.isLocked || attempts >= 3) return
+
+      attempts += 1
+      frameId = window.requestAnimationFrame(syncLockState)
     }
-  }, [])
+
+    frameId = window.requestAnimationFrame(syncLockState)
+
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(frameId)
+    }
+  }, [controlsRef])
 
   useEffect(() => {
     const down = (e) => {
