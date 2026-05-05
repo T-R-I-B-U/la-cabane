@@ -200,6 +200,10 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  useEffect(() => {
+    if (postIntro) setVisibilityZones(['cabane'])
+  }, [postIntro])
+
   const onReady = useCallback((data) => {
     setInfo(data)
     setStatus('ok')
