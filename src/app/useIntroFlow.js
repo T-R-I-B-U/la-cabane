@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
+import { useStoryFlow } from './useStoryFlow'
 
 export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)
@@ -15,6 +16,8 @@ export function useIntroFlow({ sceneReady }) {
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
+  const { currentStepId, objective, completeStep, resetStory, startStory } = useStoryFlow()
+  const storyReady = currentStepId === 'intro.goToReception'
 
   const exitIntro = useCallback(() => {
     setIntroActive(false)
@@ -28,8 +31,9 @@ export function useIntroFlow({ sceneReady }) {
     setIntroSpawn(null)
     setPlayerName('')
     ignoreNextPointerUnlockRef.current = false
+    resetStory()
     stopDialogue()
-  }, [stopDialogue])
+  }, [resetStory, stopDialogue])
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -66,6 +70,10 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleIntroEvent = useCallback(
     (event, payload) => {
+      if (event === 'camera:ready') {
+        setLoaderFading(true)
+      }
+
       if (event === 'wait:door') setIntroWaitingAtDoor(true)
 
       if (event === 'door:clicked') {
@@ -82,24 +90,32 @@ export function useIntroFlow({ sceneReady }) {
         setIntroActive(false)
         setPostIntro(true)
         setIntroMovementLocked(true)
+        startStory('intro.treeWelcome')
         playDialogue('dialogue1', {
-          onDone: () => setShowNameInput(true),
+          onDone: () => {
+            completeStep('intro.treeWelcome')
+            setShowNameInput(true)
+          },
         })
       }
     },
-    [playDialogue]
+    [completeStep, playDialogue, startStory]
   )
 
   const handleNameSubmit = useCallback(
     (name) => {
       setPlayerName(name)
       setShowNameInput(false)
+      completeStep('intro.nameInput')
       setIntroMovementLocked(true)
       playDialogue('dialogue2', {
-        onDone: () => setIntroMovementLocked(false),
+        onDone: () => {
+          completeStep('intro.cabanePresentation')
+          setIntroMovementLocked(false)
+        },
       })
     },
-    [playDialogue]
+    [completeStep, playDialogue]
   )
 
   const launchIntro = useCallback(() => {
@@ -108,8 +124,9 @@ export function useIntroFlow({ sceneReady }) {
     setPostIntro(false)
     setShowNameInput(false)
     ignoreNextPointerUnlockRef.current = false
+    resetStory()
     setIntroPending(true)
-  }, [sceneReady])
+  }, [resetStory, sceneReady])
 
   const handleLoaderClick = useCallback(() => {
     if (!sceneReady || loaderFading) return
@@ -118,7 +135,6 @@ export function useIntroFlow({ sceneReady }) {
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
     setIntroActive(true)
-    setLoaderFading(true)
   }, [loaderFading, sceneReady])
 
   const handleLoaderKeyDown = useCallback(
@@ -146,9 +162,12 @@ export function useIntroFlow({ sceneReady }) {
     introShouldAdvance,
     introWaitingAtDoor,
     loaderFading,
+    objective,
     playerName,
     postIntro,
     showNameInput,
+    storyReady,
+    currentStoryStepId: currentStepId,
     dismissLoader,
     exitIntro,
     handleIntroEvent,

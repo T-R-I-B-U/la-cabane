@@ -132,8 +132,11 @@ export default function App() {
     introShouldAdvance,
     introWaitingAtDoor,
     loaderFading,
+    objective,
     postIntro,
     showNameInput,
+    storyReady,
+    currentStoryStepId,
     dismissLoader,
     handleIntroEvent,
     handleLoaderClick,
@@ -252,7 +255,7 @@ export default function App() {
     setFlyMode(false)
   }
 
-  const explorationReady = postIntro && !showNameInput && !dialogueActive && !introMovementLocked
+  const explorationReady = false
 
   // Appelé par GameManager à chaque transition d'étape.
   // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
@@ -272,8 +275,13 @@ export default function App() {
         // setVisibilityZones(['cabane']) ← si tu veux restreindre pendant l'intro
         break
 
+      case GAME_STEPS.STORY:
+        // Intro terminée, on ouvre la visite guidée et ses objectifs.
+        setVisibilityZones(['all'])
+        break
+
       case GAME_STEPS.EXPLORATION:
-        // Dialogue2 terminé, joueur libre — on ouvre toutes les zones visibles.
+        // La visite scénarisée est finie, le joueur peut explorer librement.
         setVisibilityZones(['all'])
         // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
         break
@@ -290,6 +298,7 @@ export default function App() {
         introPending={introPending}
         introActive={introActive}
         postIntro={postIntro}
+        storyReady={storyReady}
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
@@ -364,7 +373,9 @@ export default function App() {
         onCameraChange={import.meta.env.DEV ? setLiveCam : undefined}
       />
 
-      {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
+      {import.meta.env.DEV && showUI && !introPending && !introActive && !postIntro && (
+        <PerfMonitor stats={stats} scene={info} status={status} />
+      )}
 
       {import.meta.env.DEV && showCameraEditor && !introActive && !playerMode && !postIntro && (
         <IntroCameraPanel
@@ -411,6 +422,13 @@ export default function App() {
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
+
+      {showUI && objective && currentStoryStepId === 'intro.goToReception' && postIntro && !dialogueActive && (
+        <div className="story-objective" aria-live="polite">
+          <span className="story-objective-eyebrow">Objectif</span>
+          <p className="story-objective-copy">{objective}</p>
+        </div>
+      )}
 
       {savoirOpen && selectedSavoir && (
         <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />

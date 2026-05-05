@@ -13,19 +13,22 @@ import { getGameStep, setGameStep, GAME_STEPS } from '../utils'
  * Flow des étapes :
  *   LOADING → scène R3F chargée → INIT
  *   INIT    → utilisateur lance l'histoire → INTRO
- *   INTRO   → dialogue2 terminé + mouvement débloqué → EXPLORATION
+ *   INTRO   → intro narrative terminée → STORY
+ *   STORY   → visite guidée terminée → EXPLORATION
  *
  * Props :
  *   sceneReady       – true quand CabaneScene appelle onSceneReady (modèles chargés)
  *   introActive      – séquence caméra intro en cours
  *   postIntro        – à l'intérieur de la cabane, phase dialogue / saisie du prénom
- *   explorationReady – postIntro && !showNameInput && !dialogueActive && !introMovementLocked
+ *   storyReady       – l'objectif "Clique sur l'accueil" peut être affiché
+ *   explorationReady – la visite scénarisée est entièrement terminée
  *   onStepChange     – callback(step: GameStep) appelé à chaque transition
  */
 export function GameManager({
   sceneReady,
   introActive,
   postIntro,
+  storyReady,
   explorationReady,
   onStepChange,
 }) {
@@ -47,9 +50,17 @@ export function GameManager({
     }
   }, [introActive, postIntro, onStepChange])
 
-  // INTRO → EXPLORATION : dialogue2 terminé, mouvement débloqué, joueur libre
+  // INTRO → STORY : l'intro narrative est terminée, place aux objectifs guidés.
   useEffect(() => {
-    if (explorationReady && getGameStep() === GAME_STEPS.INTRO) {
+    if (storyReady && getGameStep() === GAME_STEPS.INTRO) {
+      setGameStep(GAME_STEPS.STORY)
+      onStepChange?.(GAME_STEPS.STORY)
+    }
+  }, [storyReady, onStepChange])
+
+  // STORY → EXPLORATION : la visite guidée est finie, joueur totalement libre.
+  useEffect(() => {
+    if (explorationReady && getGameStep() === GAME_STEPS.STORY) {
       setGameStep(GAME_STEPS.EXPLORATION)
       onStepChange?.(GAME_STEPS.EXPLORATION)
     }

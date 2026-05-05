@@ -47,6 +47,7 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
   const delayRef = useRef(0)
   const waitingRef = useRef(false)
   const advancedRef = useRef(false)
+  const readyNotifiedRef = useRef(false)
 
   useLayoutEffect(() => {
     if (active) {
@@ -55,14 +56,20 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
       delayRef.current = 0
       waitingRef.current = false
       advancedRef.current = false
+      readyNotifiedRef.current = false
 
       // Place the intro camera before the first visible paint so the user
       // does not see the default orbit camera between the loader fade and intro start.
       camera.position.copy(WAYPOINTS[0].position)
       camera.lookAt(WAYPOINTS[0].target)
       stepRef.current = 0
+
+      if (!readyNotifiedRef.current) {
+        readyNotifiedRef.current = true
+        onEvent?.('camera:ready')
+      }
     }
-  }, [active, camera])
+  }, [active, camera, onEvent])
 
   useEffect(() => {
     if (shouldAdvance && waitingRef.current && !advancedRef.current) {
