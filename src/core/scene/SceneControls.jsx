@@ -1,6 +1,6 @@
 import { OrbitControls } from '@react-three/drei'
 import IntroCamera from '../../world/entities/IntroCamera'
-import { CameraTracker } from '../IntroCameraDebug'
+import { CameraRegistrySync } from '../CameraRegistrySync'
 import { PlayerControls } from '../PlayerControls'
 
 export function SceneControls({
@@ -19,37 +19,47 @@ export function SceneControls({
   pointerControlsRef,
   controlsRef,
   hutPosition,
-  onCameraChange,
 }) {
+  const devSync = import.meta.env.DEV ? <CameraRegistrySync controlsRef={controlsRef} /> : null
+
   if (introActive) {
     return (
-      <IntroCamera active={introActive} shouldAdvance={introShouldAdvance} onEvent={onIntroEvent} />
+      <>
+        <IntroCamera active={introActive} shouldAdvance={introShouldAdvance} onEvent={onIntroEvent} />
+        {devSync}
+      </>
     )
   }
 
   if (playerMode) {
     return (
-      <PlayerControls
-        key={playerSpawnKey}
-        canMove={!movementLocked}
-        flyMode={flyMode}
-        spawnAt={playerSpawn}
-        collisionObjects={collisionObjects}
-        controlsRef={pointerControlsRef}
-      />
+      <>
+        <PlayerControls
+          key={playerSpawnKey}
+          canMove={!movementLocked}
+          flyMode={flyMode}
+          spawnAt={playerSpawn}
+          collisionObjects={collisionObjects}
+          controlsRef={pointerControlsRef}
+        />
+        {devSync}
+      </>
     )
   }
 
   if (postIntro) {
     return postIntroLocked ? (
-      <PlayerControls
-        canMove={!movementLocked}
-        flyMode={flyMode}
-        spawnAt={introSpawn?.position}
-        collisionObjects={collisionObjects}
-        controlsRef={pointerControlsRef}
-      />
-    ) : null
+      <>
+        <PlayerControls
+          canMove={!movementLocked}
+          flyMode={flyMode}
+          spawnAt={introSpawn?.position}
+          collisionObjects={collisionObjects}
+          controlsRef={pointerControlsRef}
+        />
+        {devSync}
+      </>
+    ) : devSync
   }
 
   return (
@@ -57,13 +67,12 @@ export function SceneControls({
       <OrbitControls
         ref={controlsRef}
         target={hutPosition}
-        enablePan={false}
+        enablePan
         enableDamping
-        minDistance={10}
-        maxDistance={80}
-        maxPolarAngle={Math.PI / 2.1}
+        minDistance={0.5}
+        maxDistance={500}
       />
-      {onCameraChange && <CameraTracker controlsRef={controlsRef} onChange={onCameraChange} />}
+      {devSync}
     </>
   )
 }
