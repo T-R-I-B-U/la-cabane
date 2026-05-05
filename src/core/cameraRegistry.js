@@ -10,7 +10,12 @@ const INTRO_LABELS = [
 
 function defaultState() {
   return {
-    introWaypoints: INTRO_LABELS.map((label, index) => ({ index, label, position: null, target: null })),
+    introWaypoints: INTRO_LABELS.map((label, index) => ({
+      index,
+      label,
+      position: null,
+      target: null,
+    })),
     storyPovs: [],
   }
 }
@@ -114,9 +119,7 @@ export function addStoryPov(label) {
 export function captureStoryPov(id, position, target) {
   _state = {
     ..._state,
-    storyPovs: _state.storyPovs.map((pov) =>
-      pov.id === id ? { ...pov, position, target } : pov
-    ),
+    storyPovs: _state.storyPovs.map((pov) => (pov.id === id ? { ...pov, position, target } : pov)),
   }
   persist(_state)
   notify()

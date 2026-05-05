@@ -97,9 +97,9 @@ export function JournalBook({
   const hoveredRef = useRef(false)
   const interactRaycasterRef = useRef(new THREE.Raycaster())
   const pointerNdcRef = useRef(new THREE.Vector2())
-const pointerMovedRef = useRef(false)
-const materialStatesRef = useRef(new Map())
-const outlinesRef = useRef([])
+  const pointerMovedRef = useRef(false)
+  const materialStatesRef = useRef(new Map())
+  const outlinesRef = useRef([])
   const debugStateRef = useRef({ hovered: false, hitCount: 0 })
 
   // Puzzle
@@ -371,7 +371,8 @@ const outlinesRef = useRef([])
 
     const onPointerDown = (e) => {
       const pieces = piecesRef.current
-      if (!pieces || !pieceInteractionEnabled || dragRef.current || stateRef.current !== 'OPEN') return
+      if (!pieces || !pieceInteractionEnabled || dragRef.current || stateRef.current !== 'OPEN')
+        return
 
       raycaster.setFromCamera(toNDC(e), camera)
       const pickable = pieces.filter((p) => p.state !== 'placed').map((p) => p.mesh)
@@ -600,12 +601,7 @@ const outlinesRef = useRef([])
   })
 
   return (
-    <group
-      ref={groupRef}
-      position={position}
-      rotation={[0, rotationY, 0]}
-      scale={MODEL_SCALE}
-    >
+    <group ref={groupRef} position={position} rotation={[0, rotationY, 0]} scale={MODEL_SCALE}>
       <mesh ref={rangeRef} scale={1 / MODEL_SCALE} renderOrder={1}>
         <sphereGeometry args={[1, 32, 16]} />
         <meshBasicMaterial transparent depthWrite={false} wireframe />

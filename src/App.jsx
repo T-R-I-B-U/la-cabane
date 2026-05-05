@@ -166,7 +166,9 @@ export default function App() {
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestScenePointerLock = useCallback(() => {
-    if (!(playerMode || (postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'))) {
+    if (
+      !(playerMode || (postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'))
+    ) {
       return
     }
     pointerControlsRef.current?.lock()
@@ -554,16 +556,29 @@ export default function App() {
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
       {receptionChoiceVisible && (
-        <div className="story-choice" role="dialog" aria-modal="true" aria-labelledby="story-choice-title">
+        <div
+          className="story-choice"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="story-choice-title"
+        >
           <div className="story-choice-card">
             <p id="story-choice-title" className="story-choice-label">
               Je te raconte l'origine du concept de Cabane si tu veux.
             </p>
             <div className="story-choice-actions">
-              <button type="button" className="camera-toggle" onClick={() => handleReceptionChoice('yes')}>
+              <button
+                type="button"
+                className="camera-toggle"
+                onClick={() => handleReceptionChoice('yes')}
+              >
                 Oui
               </button>
-              <button type="button" className="camera-toggle" onClick={() => handleReceptionChoice('no')}>
+              <button
+                type="button"
+                className="camera-toggle"
+                onClick={() => handleReceptionChoice('no')}
+              >
                 Non
               </button>
             </div>
@@ -572,7 +587,12 @@ export default function App() {
       )}
 
       {returnHallVisible && (
-        <div className="story-choice" role="dialog" aria-modal="true" aria-labelledby="return-hall-title">
+        <div
+          className="story-choice"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="return-hall-title"
+        >
           <div className="story-choice-card">
             <p id="return-hall-title" className="story-choice-label">
               Clique pour retourner dans le hall.

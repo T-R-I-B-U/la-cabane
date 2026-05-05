@@ -51,7 +51,11 @@ export function SceneControls({
   if (introActive) {
     return (
       <>
-        <IntroCamera active={introActive} shouldAdvance={introShouldAdvance} onEvent={onIntroEvent} />
+        <IntroCamera
+          active={introActive}
+          shouldAdvance={introShouldAdvance}
+          onEvent={onIntroEvent}
+        />
         {devSync}
       </>
     )

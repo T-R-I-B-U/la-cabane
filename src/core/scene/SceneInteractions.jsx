@@ -39,9 +39,11 @@ export function SceneInteractions({
 
     const bounds = new THREE.Box3().setFromObject(counter)
     const center = bounds.getCenter(new THREE.Vector3())
-    const offset = new THREE.Vector3(JOURNAL_OFFSET.x, JOURNAL_OFFSET.y, JOURNAL_OFFSET.z).applyQuaternion(
-      counter.getWorldQuaternion(new THREE.Quaternion())
-    )
+    const offset = new THREE.Vector3(
+      JOURNAL_OFFSET.x,
+      JOURNAL_OFFSET.y,
+      JOURNAL_OFFSET.z
+    ).applyQuaternion(counter.getWorldQuaternion(new THREE.Quaternion()))
 
     return [center.x + offset.x, bounds.max.y + offset.y, center.z + offset.z]
   }, [cabane])
