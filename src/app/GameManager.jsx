@@ -7,27 +7,28 @@ import { getGameStep, setGameStep, GAME_STEPS } from '../utils'
  * Rôle : observer l'état de la scène et de l'intro pour faire avancer
  * le game step global, puis notifier App via onStepChange.
  *
- * C'est App qui décide quoi faire à chaque transition (audio, UI, etc.).
- * GameManager ne connaît pas les sous-systèmes — il ne fait que piloter l'état.
+ * C'est App qui décide quoi faire à chaque transition (audio, UI, visibilité, etc.).
+ * GameManager ne connaît pas les sous-systèmes et ne fait que piloter le step global.
  *
  * Flow des étapes :
  *   LOADING → scène R3F chargée → INIT
  *   INIT    → utilisateur lance l'histoire → INTRO
- *   INTRO   → dialogue2 terminé + mouvement débloqué → EXPLORATION
+ *   INTRO   → intro narrative terminée → STORY
+ *   STORY   → visite guidée terminée → EXPLORATION
  *
  * Props :
  *   sceneReady       – true quand CabaneScene appelle onSceneReady (modèles chargés)
- *   introPending     – IntroLoader visible, attente du clic utilisateur
  *   introActive      – séquence caméra intro en cours
  *   postIntro        – à l'intérieur de la cabane, phase dialogue / saisie du prénom
- *   explorationReady – postIntro && !showNameInput && !dialogueActive && !introMovementLocked
+ *   storyReady       – l'objectif "Clique sur l'accueil" peut être affiché
+ *   explorationReady – la visite scénarisée est entièrement terminée
  *   onStepChange     – callback(step: GameStep) appelé à chaque transition
  */
 export function GameManager({
   sceneReady,
-  introPending,
   introActive,
   postIntro,
+  storyReady,
   explorationReady,
   onStepChange,
 }) {
@@ -39,20 +40,27 @@ export function GameManager({
     }
   }, [sceneReady, onStepChange])
 
-  // INIT → INTRO : l'utilisateur a cliqué sur IntroLoader (geste = AudioContext débloqué)
-  // introPending = bouton cliqué dans ViewerControls mais IntroLoader pas encore cliqué
+  // INIT → INTRO : seulement après le vrai geste utilisateur sur IntroLoader.
   // introActive  = clic sur IntroLoader, séquence caméra en cours
   // postIntro    = inside cabane (cas edge : scène rechargée pendant intro)
   useEffect(() => {
-    if ((introPending || introActive || postIntro) && getGameStep() === GAME_STEPS.INIT) {
+    if ((introActive || postIntro) && getGameStep() === GAME_STEPS.INIT) {
       setGameStep(GAME_STEPS.INTRO)
       onStepChange?.(GAME_STEPS.INTRO)
     }
-  }, [introPending, introActive, postIntro, onStepChange])
+  }, [introActive, postIntro, onStepChange])
 
-  // INTRO → EXPLORATION : dialogue2 terminé, mouvement débloqué, joueur libre
+  // INTRO → STORY : l'intro narrative est terminée, place aux objectifs guidés.
   useEffect(() => {
-    if (explorationReady && getGameStep() === GAME_STEPS.INTRO) {
+    if (storyReady && getGameStep() === GAME_STEPS.INTRO) {
+      setGameStep(GAME_STEPS.STORY)
+      onStepChange?.(GAME_STEPS.STORY)
+    }
+  }, [storyReady, onStepChange])
+
+  // STORY → EXPLORATION : la visite guidée est finie, joueur totalement libre.
+  useEffect(() => {
+    if (explorationReady && getGameStep() === GAME_STEPS.STORY) {
       setGameStep(GAME_STEPS.EXPLORATION)
       onStepChange?.(GAME_STEPS.EXPLORATION)
     }

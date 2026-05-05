@@ -1,0 +1,11 @@
+1
+00:00:00,000 --> 00:00:05,600
+Ca c'etait en 2039, tout le systeme en place implosait, un moment marquant n'est-ce pas...
+
+2
+00:00:05,600 --> 00:00:11,600
+Des collectifs de revolutionnaires ont donne un nouveau souffle de vie et d'espoir pour un nouvel avenir,
+
+3
+00:00:11,600 --> 00:00:15,200
+c'etait le temps du soulevement et la mort tant attendue du capitalisme.

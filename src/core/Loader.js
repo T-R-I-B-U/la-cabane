@@ -5,6 +5,15 @@ const _loader = new GLTFLoader()
 // Promise cache — concurrent requests for the same path share one load.
 const _cache = new Map()
 
+function getErrorMessage(error) {
+  if (error instanceof Error && error.message) return error.message
+  return String(error)
+}
+
+function createLoadError(path, error) {
+  return new Error(`Cannot load model "${path}": ${getErrorMessage(error)}`)
+}
+
 function cloneSingleMaterial(material) {
   const clone = material.clone()
 
@@ -32,18 +41,27 @@ function cloneScene(scene) {
 }
 
 /**
- * Load a GLB/GLTF and return a cloned scene root.
- * The raw GLTF is parsed once and cached; callers get independent clones.
+ * Charge un GLB/GLTF et renvoie une scène clonée indépendante.
+ * Le GLTF brut est parsé une seule fois et mis en cache par chemin.
+ * Chaque appel récupère ensuite son propre clone pour éviter les mutations partagées.
  */
 export async function loadModel(path) {
   if (!_cache.has(path)) {
     const promise = new Promise((resolve, reject) => {
-      _loader.load(path, resolve, undefined, reject)
+      _loader.load(path, resolve, undefined, (error) => reject(createLoadError(path, error)))
     })
     promise.catch(() => _cache.delete(path))
     _cache.set(path, promise)
   }
-  const gltf = await _cache.get(path)
+
+  let gltf
+  try {
+    gltf = await _cache.get(path)
+  } catch (error) {
+    throw createLoadError(path, error)
+  }
+
+  if (!gltf?.scene) throw new Error(`Cannot load model "${path}": missing scene root`)
   return cloneScene(gltf.scene)
 }
 
