@@ -51,9 +51,11 @@ export default function Scene({
     postIntro,
     postIntroLocked,
     receptionActive,
+    treePhaseActive,
     interactionLocked,
     onEvent: onIntroEvent,
     onReceptionInteract,
+    onTreeInteract,
     onStoryCameraTransitionComplete,
   } = intro
   const {
@@ -116,6 +118,8 @@ export default function Scene({
             onJournalPiecePlaced={onJournalPiecePlaced}
             onIntroEvent={onIntroEvent}
             receptionActive={receptionActive}
+            treePhaseActive={treePhaseActive}
+            onTreeInteract={onTreeInteract}
             onReceptionInteract={onReceptionInteract}
             introWaitingAtDoor={introWaitingAtDoor}
             journalUnlocked={journalUnlocked}

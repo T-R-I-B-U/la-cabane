@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:06,000
+Dans l'arbre chaque fruit représente un membre de la Cabane, et chaque feuille un savoir proposé par un Passeur.
+
+2
+00:00:06,000 --> 00:00:12,000
+Les savoirs sont reliés à l'artisanat, à l'agriculture ou aux connaissances théoriques. Ils sont proposés par des Passeurs de tout âge.
+
+3
+00:00:12,000 --> 00:00:17,000
+Nous irons plus tard visiter le haut de l'Arbre...
+
+4
+00:00:17,000 --> 00:00:23,000
+Allons voir l'Établi, Thomas travail dedans, c'est juste à côté de l'accueil.

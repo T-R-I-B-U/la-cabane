@@ -141,6 +141,7 @@ export default function App() {
     postIntro,
     receptionChoiceVisible,
     returnHallVisible,
+    treePhaseActive,
     showNameInput,
     storyReady,
     currentStoryStepId,
@@ -149,6 +150,7 @@ export default function App() {
     handleLoaderClick,
     handleLoaderKeyDown,
     handleJournalEnd,
+    handleTreeInteract,
     handleJournalInteractionStart,
     handleJournalOpen,
     handleJournalPiecePlaced,
@@ -462,6 +464,7 @@ export default function App() {
           storyCameraTransition,
           postIntro,
           postIntroLocked: postIntroCameraEnabled,
+          treePhaseActive,
           receptionActive:
             currentStoryStepId === 'intro.goToReception' &&
             postIntro &&
@@ -473,6 +476,7 @@ export default function App() {
           interactionLocked,
           onEvent: handleIntroEvent,
           onReceptionInteract: handleReceptionInteract,
+          onTreeInteract: handleTreeInteract,
           onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
         }}
         leafMaterialMode={leafMaterialMode}

@@ -29,6 +29,8 @@ export function CabaneScene({
   onIntroEvent,
   receptionActive,
   onReceptionInteract,
+  treePhaseActive,
+  onTreeInteract,
   introWaitingAtDoor,
   journalUnlocked,
   playerMode,
@@ -126,6 +128,8 @@ export function CabaneScene({
         journalUnlocked={journalUnlocked}
         onIntroEvent={onIntroEvent}
         onReceptionInteract={onReceptionInteract}
+        treePhaseActive={treePhaseActive}
+        onTreeInteract={onTreeInteract}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
         onJournalOpenComplete={onJournalOpenComplete}
