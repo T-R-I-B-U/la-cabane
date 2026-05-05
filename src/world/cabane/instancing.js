@@ -47,7 +47,20 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
       if (!response.ok) continue
 
       const buffer = await response.arrayBuffer()
+      if (buffer.byteLength < 4) {
+        throw new Error(`Invalid instance matrix file: expected header, got ${buffer.byteLength} bytes`)
+      }
+
       count = new DataView(buffer).getUint32(0, true)
+
+      const expectedFloatCount = count * 16
+      const actualFloatCount = (buffer.byteLength - 4) / 4
+      if (!Number.isInteger(actualFloatCount) || actualFloatCount !== expectedFloatCount) {
+        throw new Error(
+          `Invalid instance matrix file: expected ${expectedFloatCount} floats, got ${actualFloatCount}`
+        )
+      }
+
       floats = new Float32Array(buffer, 4, count * 16)
       loadedInstancePath = instancePath
       break
