@@ -27,7 +27,9 @@ export default function Scene({
   interactions,
   shaderEnabled,
   shaderRadius,
-  onCameraChange,
+  journalAutoOpenToken,
+  journalCloseToken,
+  journalPuzzleEnabled,
 }) {
   const { onStats, onReady, onError } = sceneState
   const {
@@ -43,11 +45,16 @@ export default function Scene({
     doorOpen: introDoorOpen,
     waitingAtDoor: introWaitingAtDoor,
     shouldAdvance: introShouldAdvance,
+    journalUnlocked,
     spawn: introSpawn,
+    storyCameraTransition,
     postIntro,
     postIntroLocked,
+    receptionActive,
     interactionLocked,
     onEvent: onIntroEvent,
+    onReceptionInteract,
+    onStoryCameraTransitionComplete,
   } = intro
   const {
     onLeafClick,
@@ -56,7 +63,9 @@ export default function Scene({
     onFruitHover,
     onJournalStart,
     onJournalEnd,
+    onJournalOpenComplete,
     onJournalCancel,
+    onJournalPiecePlaced,
   } = interactions
 
   const {
@@ -115,15 +124,23 @@ export default function Scene({
             onLeafHover={onLeafHover}
             onJournalStart={onJournalStart}
             onJournalEnd={onJournalEnd}
+            onJournalOpenComplete={onJournalOpenComplete}
             onJournalCancel={onJournalCancel}
+            onJournalPiecePlaced={onJournalPiecePlaced}
             onIntroEvent={onIntroEvent}
+            receptionActive={receptionActive}
+            onReceptionInteract={onReceptionInteract}
             introWaitingAtDoor={introWaitingAtDoor}
+            journalUnlocked={journalUnlocked}
             playerMode={playerMode}
             postIntro={postIntro}
             postIntroLocked={postIntroLocked}
             interactionLocked={interactionLocked}
             debugDoors={debugDoors}
             debugCollisions={debugCollisions}
+            journalAutoOpenToken={journalAutoOpenToken}
+            journalCloseToken={journalCloseToken}
+            journalPuzzleEnabled={journalPuzzleEnabled}
             forceOpenDoor={introDoorOpen}
             controlsRef={controlsRef}
             firstPersonMode={firstPersonMode}
@@ -154,6 +171,8 @@ export default function Scene({
         arbreActive={arbreActive}
         introShouldAdvance={introShouldAdvance}
         introSpawn={introSpawn}
+        storyCameraTransition={storyCameraTransition}
+        onStoryCameraTransitionComplete={onStoryCameraTransitionComplete}
         onIntroEvent={onIntroEvent}
         playerMode={playerMode}
         flyMode={flyMode}
@@ -165,7 +184,6 @@ export default function Scene({
         pointerControlsRef={pointerControlsRef}
         controlsRef={controlsRef}
         hutPosition={hutPosition}
-        onCameraChange={onCameraChange}
       />
 
       {shaderEnabled && <WatercolorPass radius={shaderRadius} />}

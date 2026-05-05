@@ -6,6 +6,7 @@ import {
   IntroLoader,
   NameInput,
   SavoirPanel,
+  StoryDebugPanel,
   ViewerControls,
   useIntroFlow,
   useSavoirAssignment,
@@ -15,7 +16,7 @@ import { useContactAssignment } from './app/useContactAssignment'
 import { ArbreContinueButton } from './app/ArbreContinueButton'
 import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
-import IntroCameraPanel from './core/IntroCameraPanel'
+import CameraEditorPanel from './core/CameraEditorPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
@@ -24,7 +25,6 @@ import { GAME_STEPS, unlockAndPlay, setVisibilityZones } from './utils'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
-
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [status, setStatus] = useState('loading')
@@ -49,6 +49,7 @@ export default function App() {
   const [leafHovered, setLeafHovered] = useState(false)
   const [fruitHovered, setFruitHovered] = useState(false)
   const [interactionsEnabled, setInteractionsEnabled] = useState(false)
+  const [pendingPostIntroPointerLock, setPendingPostIntroPointerLock] = useState(false)
   const pointerControlsRef = useRef(null)
   const journalActiveRef = useRef(false)
 
@@ -131,17 +132,35 @@ export default function App() {
     introDoorOpen,
     introMovementLocked,
     introSpawn,
+    storyCameraTransition,
     introPending,
     introShouldAdvance,
     introWaitingAtDoor,
+    journalAutoOpenToken,
+    journalCloseToken,
+    journalPuzzleEnabled,
+    journalUnlocked,
     loaderFading,
     postIntro,
+    receptionChoiceVisible,
+    returnHallVisible,
     showNameInput,
+    storyReady,
+    currentStoryStepId,
     dismissLoader,
     handleIntroEvent,
     handleLoaderClick,
     handleLoaderKeyDown,
-    handleNameSubmit,
+    handleJournalOpen,
+    handleJournalPiecePlaced,
+    handleNameSubmit: handleNameSubmitInternal,
+    handleDebugGoToDoorPassage,
+    handleDebugGoToIntroStart,
+    handleDebugGoToReception,
+    handleReceptionChoice: handleReceptionChoiceInternal,
+    handleReceptionInteract,
+    handleReturnToHall,
+    handleStoryCameraTransitionComplete,
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
@@ -173,23 +192,48 @@ export default function App() {
     triggerArbre,
   } = useArbreFlow({ onPlatformSpawn: spawnAtPlatform })
   const [showCameraEditor, setShowCameraEditor] = useState(false)
-  const [liveCam, setLiveCam] = useState(null)
-  const [capturedWaypoints, setCapturedWaypoints] = useState(
-    Array.from({ length: 5 }, () => ({ position: null, target: null }))
-  )
-  const handleWaypointCapture = useCallback((i, live) => {
-    setCapturedWaypoints((prev) => {
-      const next = [...prev]
-      next[i] = { position: live.position, target: live.target }
-      return next
-    })
-  }, [])
+  const [showStoryDebug, setShowStoryDebug] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestScenePointerLock = useCallback(() => {
-    if (!(playerMode || postIntro)) return
+    if (
+      !(playerMode || (postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'))
+    ) {
+      return
+    }
     pointerControlsRef.current?.lock()
-  }, [playerMode, postIntro])
+  }, [currentStoryStepId, playerMode, postIntro, showNameInput])
+
+  const handleNameSubmit = useCallback(
+    (name) => {
+      setPendingPostIntroPointerLock(true)
+      handleNameSubmitInternal(name)
+    },
+    [handleNameSubmitInternal]
+  )
+
+  const handleReceptionChoice = useCallback(
+    (choice) => {
+      setPendingPostIntroPointerLock(true)
+      handleReceptionChoiceInternal(choice)
+    },
+    [handleReceptionChoiceInternal]
+  )
+
+  const jumpToIntroStart = useCallback(() => {
+    setPendingPostIntroPointerLock(false)
+    handleDebugGoToIntroStart()
+  }, [handleDebugGoToIntroStart])
+
+  const jumpToDoorPassage = useCallback(() => {
+    setPendingPostIntroPointerLock(false)
+    handleDebugGoToDoorPassage()
+  }, [handleDebugGoToDoorPassage])
+
+  const jumpToReception = useCallback(() => {
+    setPendingPostIntroPointerLock(true)
+    handleDebugGoToReception()
+  }, [handleDebugGoToReception])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -210,11 +254,53 @@ export default function App() {
     introMovementLocked ||
     arbreMovementLocked ||
     showNameInput ||
+    receptionChoiceVisible ||
+    returnHallVisible ||
     selectedSavoir !== null ||
     savoirActive ||
     selectedContact !== null ||
     contactActive ||
     journalActive
+
+  useEffect(() => {
+    if (!pendingPostIntroPointerLock || showNameInput || !postIntro) return
+
+    let cancelled = false
+    let frameId = 0
+    let attempts = 0
+
+    const tryLock = () => {
+      if (cancelled) return
+
+      if (pointerControlsRef.current?.isLocked) {
+        setPendingPostIntroPointerLock(false)
+        return
+      }
+
+      if (document.pointerLockElement) {
+        document.dispatchEvent(new Event('pointerlockchange'))
+      } else if (pointerControlsRef.current?.lock) {
+        requestScenePointerLock()
+        window.setTimeout(() => {
+          if (!cancelled && pointerControlsRef.current?.isLocked) {
+            setPendingPostIntroPointerLock(false)
+          }
+        }, 0)
+      }
+
+      if (!pointerControlsRef.current?.isLocked && attempts < 8) {
+        attempts += 1
+        frameId = window.requestAnimationFrame(tryLock)
+      }
+    }
+
+    frameId = window.requestAnimationFrame(tryLock)
+
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(frameId)
+    }
+  }, [pendingPostIntroPointerLock, postIntro, requestScenePointerLock, showNameInput])
 
   useEffect(() => {
     const blockPointerLock = (e) => {
@@ -225,6 +311,28 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (!receptionChoiceVisible) return
+
+    const blockOutsideChoice = (event) => {
+      const target = event.target
+      if (!(target instanceof Element)) return
+      if (target.closest('.story-choice-card button')) return
+
+      event.preventDefault()
+      event.stopPropagation()
+      event.stopImmediatePropagation()
+    }
+
+    document.addEventListener('pointerdown', blockOutsideChoice, { capture: true })
+    document.addEventListener('click', blockOutsideChoice, { capture: true })
+
+    return () => {
+      document.removeEventListener('pointerdown', blockOutsideChoice, { capture: true })
+      document.removeEventListener('click', blockOutsideChoice, { capture: true })
+    }
+  }, [receptionChoiceVisible])
+
+  useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
@@ -232,6 +340,9 @@ export default function App() {
       } else if (event.code === 'F2') {
         event.preventDefault()
         setShowCameraEditor((current) => !current)
+      } else if (event.code === 'F3') {
+        event.preventDefault()
+        setShowStoryDebug((current) => !current)
       }
     }
 
@@ -253,7 +364,15 @@ export default function App() {
   }
 
   const cursorVisible =
-    !introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked)
+    introWaitingAtDoor ||
+    showNameInput ||
+    receptionChoiceVisible ||
+    returnHallVisible ||
+    (journalUnlocked && !journalActive) ||
+    (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
+
+  const postIntroCameraEnabled =
+    postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'
 
   function togglePlayerView() {
     setPostIntro(false)
@@ -272,7 +391,7 @@ export default function App() {
     setFlyMode(false)
   }
 
-  const explorationReady = postIntro && !showNameInput && !dialogueActive && !introMovementLocked
+  const explorationReady = false
 
   // Appelé par GameManager à chaque transition d'étape.
   // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
@@ -292,8 +411,12 @@ export default function App() {
         // setVisibilityZones(['cabane']) ← si tu veux restreindre pendant l'intro
         break
 
+      case GAME_STEPS.STORY:
+        // Intro terminee — pour l'instant on ne restreint pas la scene pendant le script.
+        break
+
       case GAME_STEPS.EXPLORATION:
-        // Dialogue2 terminé, joueur libre — on ouvre toutes les zones visibles.
+        // La visite scénarisée est finie, le joueur peut explorer librement.
         setVisibilityZones(['all'])
         // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
         break
@@ -314,6 +437,7 @@ export default function App() {
         introPending={introPending}
         introActive={introActive}
         postIntro={postIntro}
+        storyReady={storyReady}
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
@@ -322,7 +446,7 @@ export default function App() {
 
       <Crosshair
         visible={
-          (playerMode || postIntro) &&
+          (playerMode || postIntroCameraEnabled) &&
           !showNameInput &&
           !selectedSavoir &&
           !savoirActive &&
@@ -358,10 +482,21 @@ export default function App() {
           waitingAtDoor: introWaitingAtDoor,
           shouldAdvance: introShouldAdvance,
           spawn: introSpawn,
+          storyCameraTransition,
           postIntro,
-          postIntroLocked: !showNameInput,
+          postIntroLocked: postIntroCameraEnabled,
+          receptionActive:
+            currentStoryStepId === 'intro.goToReception' &&
+            postIntro &&
+            !dialogueActive &&
+            !storyCameraTransition &&
+            !receptionChoiceVisible &&
+            !journalUnlocked,
+          journalUnlocked,
           interactionLocked,
           onEvent: handleIntroEvent,
+          onReceptionInteract: handleReceptionInteract,
+          onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
         }}
         arbre={{
           active: arbreActive,
@@ -384,25 +519,33 @@ export default function App() {
             setJournalActive(true)
             document.exitPointerLock()
           },
-          onJournalCancel: () => requestScenePointerLock(),
+          onJournalOpenComplete: handleJournalOpen,
+          onJournalCancel: () => {},
           onJournalEnd: () => {
             journalActiveRef.current = false
             setJournalActive(false)
             requestScenePointerLock()
           },
+          onJournalPiecePlaced: handleJournalPiecePlaced,
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
-        onCameraChange={import.meta.env.DEV ? setLiveCam : undefined}
+        journalAutoOpenToken={journalAutoOpenToken}
+        journalCloseToken={journalCloseToken}
+        journalPuzzleEnabled={journalPuzzleEnabled}
       />
 
-      {import.meta.env.DEV && showUI && <PerfMonitor stats={stats} scene={info} status={status} />}
+      {import.meta.env.DEV && showUI && !introPending && !introActive && !postIntro && (
+        <PerfMonitor stats={stats} scene={info} status={status} />
+      )}
 
-      {import.meta.env.DEV && showCameraEditor && !introActive && !playerMode && !postIntro && (
-        <IntroCameraPanel
-          live={liveCam}
-          onCapture={handleWaypointCapture}
-          waypoints={capturedWaypoints}
+      {import.meta.env.DEV && showCameraEditor && <CameraEditorPanel />}
+
+      {import.meta.env.DEV && showStoryDebug && (
+        <StoryDebugPanel
+          onGoToIntroStart={jumpToIntroStart}
+          onGoToDoorPassage={jumpToDoorPassage}
+          onGoToReception={jumpToReception}
         />
       )}
 
@@ -450,6 +593,57 @@ export default function App() {
       )}
 
       {arbreShowContinueButton && <ArbreContinueButton onClick={handleContinueClick} />}
+
+      {receptionChoiceVisible && (
+        <div
+          className="story-choice"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="story-choice-title"
+        >
+          <div className="story-choice-card">
+            <p id="story-choice-title" className="story-choice-label">
+              Je te raconte l'origine du concept de Cabane si tu veux.
+            </p>
+            <div className="story-choice-actions">
+              <button
+                type="button"
+                className="camera-toggle"
+                onClick={() => handleReceptionChoice('yes')}
+              >
+                Oui
+              </button>
+              <button
+                type="button"
+                className="camera-toggle"
+                onClick={() => handleReceptionChoice('no')}
+              >
+                Non
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {returnHallVisible && (
+        <div
+          className="story-choice"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="return-hall-title"
+        >
+          <div className="story-choice-card">
+            <p id="return-hall-title" className="story-choice-label">
+              Clique pour retourner dans le hall.
+            </p>
+            <div className="story-choice-actions">
+              <button type="button" className="camera-toggle" onClick={handleReturnToHall}>
+                Retourner dans le hall
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {savoirOpen && selectedSavoir && (
         <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />

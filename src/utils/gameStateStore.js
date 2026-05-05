@@ -1,11 +1,12 @@
 import { useSyncExternalStore } from 'react'
 
-// @typedef {'LOADING' | 'INIT' | 'INTRO' | 'EXPLORATION'} GameStep
+// @typedef {'LOADING' | 'INIT' | 'INTRO' | 'STORY' | 'EXPLORATION'} GameStep
 
 export const GAME_STEPS = /** @type {const} */ ({
   LOADING: 'LOADING',
   INIT: 'INIT',
   INTRO: 'INTRO',
+  STORY: 'STORY',
   EXPLORATION: 'EXPLORATION',
   ARBRE_INTRO: 'ARBRE_INTRO',
 })

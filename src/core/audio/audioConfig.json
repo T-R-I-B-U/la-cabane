@@ -18,6 +18,70 @@
       "subtitles": "dialogue-2.srt"
     },
     {
+      "id": "receptionDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "reception-dialogue.srt"
+    },
+    {
+      "id": "receptionYesDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "reception-yes-dialogue.srt"
+    },
+    {
+      "id": "receptionNoDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "reception-no-dialogue.srt"
+    },
+    {
+      "id": "bookIntroDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "book-intro-dialogue.srt"
+    },
+    {
+      "id": "bookImg1Dialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "book-img1-dialogue.srt"
+    },
+    {
+      "id": "bookImg2Dialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "book-img2-dialogue.srt"
+    },
+    {
+      "id": "bookImg3Dialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "book-img3-dialogue.srt"
+    },
+    {
+      "id": "bookImg4Dialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "book-img4-dialogue.srt"
+    },
+    {
       "id": "marieDialogue",
       "type": "dialogue",
       "loop": false,

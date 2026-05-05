@@ -7,15 +7,21 @@ const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
 const OUTLINE_COLOR = 0xffffff
 const OUTLINE_OPACITY = 0.9
+const INTRO_DOOR_PARENT = 'door01'
 
-function findDoorMeshes(cabane) {
+function findIntroDoorMeshes(cabane) {
+  if (!cabane) return []
+
+  const parent = cabane.getObjectByName(INTRO_DOOR_PARENT)
+  if (!parent) return []
+
   const meshes = []
-  if (!cabane) return meshes
-  cabane.traverse((obj) => {
-    if (obj.isMesh && (obj.name.startsWith('door_right') || obj.name.startsWith('door_left'))) {
-      meshes.push(obj)
-    }
+  parent.traverse((obj) => {
+    if (!obj.isMesh) return
+    if (!obj.name.startsWith('door_right') && !obj.name.startsWith('door_left')) return
+    meshes.push(obj)
   })
+
   return meshes
 }
 
@@ -57,7 +63,7 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
 
   // Clone materials so we don't mutate shared GLB materials.
   const doorMeshes = useMemo(() => {
-    const found = findDoorMeshes(cabane)
+    const found = findIntroDoorMeshes(cabane)
     found.forEach((mesh) => {
       if (mesh.material) mesh.material = cloneMaterial(mesh.material)
     })
@@ -135,7 +141,12 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     }
 
     const onClick = () => {
-      if (hoveredRef.current) onDoorClickRef.current?.()
+      if (!hoveredRef.current) return
+      // Request pointer lock here — door click is the valid user gesture, so the
+      // browser grants it. PlayerControls (PointerLockControls) picks it up when
+      // it mounts after the intro animation, avoiding the extra click on entry.
+      canvas.requestPointerLock()
+      onDoorClickRef.current?.()
     }
 
     canvas.addEventListener('mousemove', onMouseMove)
