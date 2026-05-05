@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { playDialogue as playStoreDialogue, stopDialogue } from '../utils'
+import { useNpcDialogue } from './useNpcDialogue'
 
 export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)
@@ -10,21 +10,11 @@ export function useIntroFlow({ sceneReady }) {
   const [postIntro, setPostIntro] = useState(false)
   const [showNameInput, setShowNameInput] = useState(false)
   const [loaderFading, setLoaderFading] = useState(false)
-  const [dialogueActive, setDialogueActive] = useState(false)
   const [introMovementLocked, setIntroMovementLocked] = useState(false)
   const [introSpawn, setIntroSpawn] = useState(null)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
-
-  const playDialogue = useCallback((id, { onDone } = {}) => {
-    setDialogueActive(true)
-    playStoreDialogue(id, {
-      onDone: () => {
-        setDialogueActive(false)
-        onDone?.()
-      },
-    })
-  }, [])
+  const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
 
   const exitIntro = useCallback(() => {
     setIntroActive(false)
@@ -34,13 +24,12 @@ export function useIntroFlow({ sceneReady }) {
     setIntroDoorOpen(false)
     setIntroWaitingAtDoor(false)
     setIntroShouldAdvance(false)
-    setDialogueActive(false)
     setIntroMovementLocked(false)
     setIntroSpawn(null)
     setPlayerName('')
     ignoreNextPointerUnlockRef.current = false
     stopDialogue()
-  }, [])
+  }, [stopDialogue])
 
   useEffect(() => {
     const onKeyDown = (event) => {
