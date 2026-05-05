@@ -29,22 +29,29 @@ export function PlayerControls({
   canMove = true,
   flyMode = false,
   spawnAt,
+  lookAtTarget,
   collisionObjects = [],
   controlsRef,
   lockSelector,
 }) {
   const { camera } = useThree()
-  const spawnRef = useRef(spawnAt)
   const keys = useRef({})
   const wallRay = useRef(new THREE.Raycaster())
   const floorRay = useRef(new THREE.Raycaster())
   const verticalVelocity = useRef(0)
 
-  // Teleport camera once on mount — key prop on the parent re-triggers this effect.
+  // Apply scripted camera snaps when the active spawn/target changes.
   useEffect(() => {
-    if (spawnRef.current) camera.position.copy(spawnRef.current)
+    if (spawnAt) {
+      camera.position.set(spawnAt.x, spawnAt.y, spawnAt.z)
+    }
+
+    if (lookAtTarget) {
+      camera.lookAt(lookAtTarget.x, lookAtTarget.y, lookAtTarget.z)
+    }
+
     verticalVelocity.current = 0
-  }, [camera])
+  }, [camera, lookAtTarget, spawnAt])
 
   // If pointer lock is already active when this mounts (acquired on door click),
   // THREE.PointerLockControls won't know until the next pointerlockchange event.

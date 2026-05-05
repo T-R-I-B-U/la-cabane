@@ -25,7 +25,10 @@ export function CabaneScene({
   onJournalEnd,
   onJournalCancel,
   onIntroEvent,
+  receptionActive,
+  onReceptionInteract,
   introWaitingAtDoor,
+  journalUnlocked,
   playerMode,
   postIntro,
   interactionLocked,
@@ -114,7 +117,10 @@ export function CabaneScene({
         postIntro={postIntro}
         interactionLocked={interactionLocked}
         introWaitingAtDoor={introWaitingAtDoor}
+        receptionActive={receptionActive}
+        journalUnlocked={journalUnlocked}
         onIntroEvent={onIntroEvent}
+        onReceptionInteract={onReceptionInteract}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
         onJournalCancel={onJournalCancel}

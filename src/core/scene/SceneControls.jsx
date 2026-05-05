@@ -2,12 +2,15 @@ import { OrbitControls } from '@react-three/drei'
 import IntroCamera from '../../world/entities/IntroCamera'
 import { CameraRegistrySync } from '../CameraRegistrySync'
 import { PlayerControls } from '../PlayerControls'
+import { StoryCameraTransition } from '../StoryCameraTransition'
 
 export function SceneControls({
   collisionObjects,
   introActive,
   introShouldAdvance,
   introSpawn,
+  storyCameraTransition,
+  onStoryCameraTransitionComplete,
   onIntroEvent,
   playerMode,
   flyMode,
@@ -39,6 +42,7 @@ export function SceneControls({
           canMove={!movementLocked}
           flyMode={flyMode}
           spawnAt={playerSpawn}
+          lookAtTarget={null}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
         />
@@ -54,8 +58,13 @@ export function SceneControls({
           canMove={!movementLocked}
           flyMode={flyMode}
           spawnAt={introSpawn?.position}
+          lookAtTarget={introSpawn?.target}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
+        />
+        <StoryCameraTransition
+          transition={storyCameraTransition}
+          onComplete={onStoryCameraTransitionComplete}
         />
         {devSync}
       </>

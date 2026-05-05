@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
+import { ClickableReception } from '../../world/entities/ClickableReception'
 import { JournalBook } from '../../world/entities/JournalBook'
 
 const BOOK_COUNTER_OFFSET = new THREE.Vector3(-1.4586, 0.83, 0.9356)
@@ -11,13 +12,17 @@ export function SceneInteractions({
   postIntro,
   interactionLocked,
   introWaitingAtDoor,
+  journalUnlocked,
+  receptionActive,
   onIntroEvent,
+  onReceptionInteract,
   onJournalStart,
   onJournalEnd,
   onJournalCancel,
   journalVisible = true,
 }) {
   const interactionsActive = (playerMode || postIntro) && !interactionLocked
+  const journalActive = interactionsActive && journalUnlocked
   const bookPosition = useMemo(() => {
     if (!cabane) return null
 
@@ -36,10 +41,16 @@ export function SceneInteractions({
         onDoorClick={() => onIntroEvent?.('door:clicked')}
       />
 
+      <ClickableReception
+        cabane={cabane}
+        active={receptionActive}
+        onInteract={onReceptionInteract}
+      />
+
       {journalVisible && bookPosition && (
         <JournalBook
           position={bookPosition}
-          active={interactionsActive}
+          active={journalActive}
           onInteractionStart={onJournalStart}
           onInteractionEnd={onJournalEnd}
           onInteractionCancel={onJournalCancel}

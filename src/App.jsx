@@ -129,12 +129,14 @@ export default function App() {
     introDoorOpen,
     introMovementLocked,
     introSpawn,
+    storyCameraTransition,
     introPending,
     introShouldAdvance,
     introWaitingAtDoor,
+    journalUnlocked,
     loaderFading,
-    objective,
     postIntro,
+    receptionChoiceVisible,
     showNameInput,
     storyReady,
     currentStoryStepId,
@@ -143,6 +145,9 @@ export default function App() {
     handleLoaderClick,
     handleLoaderKeyDown,
     handleNameSubmit: handleNameSubmitInternal,
+    handleReceptionChoice: handleReceptionChoiceInternal,
+    handleReceptionInteract,
+    handleStoryCameraTransitionComplete,
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
@@ -160,6 +165,14 @@ export default function App() {
       handleNameSubmitInternal(name)
     },
     [handleNameSubmitInternal]
+  )
+
+  const handleReceptionChoice = useCallback(
+    (choice) => {
+      setPendingPostIntroPointerLock(true)
+      handleReceptionChoiceInternal(choice)
+    },
+    [handleReceptionChoiceInternal]
   )
 
   const handleCloseSavoir = useCallback(() => {
@@ -180,6 +193,7 @@ export default function App() {
     dialogueActive ||
     introMovementLocked ||
     showNameInput ||
+    receptionChoiceVisible ||
     selectedSavoir !== null ||
     savoirActive ||
     selectedContact !== null ||
@@ -276,6 +290,7 @@ export default function App() {
   const cursorVisible =
     introWaitingAtDoor ||
     showNameInput ||
+    receptionChoiceVisible ||
     (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
 
   const postIntroCameraEnabled = postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'
@@ -384,10 +399,20 @@ export default function App() {
           waitingAtDoor: introWaitingAtDoor,
           shouldAdvance: introShouldAdvance,
           spawn: introSpawn,
+          storyCameraTransition,
           postIntro,
           postIntroLocked: postIntroCameraEnabled,
+          receptionActive:
+            currentStoryStepId === 'intro.goToReception' &&
+            postIntro &&
+            !dialogueActive &&
+            !storyCameraTransition &&
+            !receptionChoiceVisible,
+          journalUnlocked,
           interactionLocked,
           onEvent: handleIntroEvent,
+          onReceptionInteract: handleReceptionInteract,
+          onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={interactionsEnabled}
@@ -457,10 +482,21 @@ export default function App() {
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
-      {showUI && objective && currentStoryStepId === 'intro.goToReception' && postIntro && !dialogueActive && (
-        <div className="story-objective" aria-live="polite">
-          <span className="story-objective-eyebrow">Objectif</span>
-          <p className="story-objective-copy">{objective}</p>
+      {receptionChoiceVisible && (
+        <div className="story-choice" role="dialog" aria-modal="true" aria-labelledby="story-choice-title">
+          <div className="story-choice-card">
+            <p id="story-choice-title" className="story-choice-label">
+              Je te raconte l'origine du concept de Cabane si tu veux.
+            </p>
+            <div className="story-choice-actions">
+              <button type="button" className="camera-toggle" onClick={() => handleReceptionChoice('yes')}>
+                Oui
+              </button>
+              <button type="button" className="camera-toggle" onClick={() => handleReceptionChoice('no')}>
+                Non
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

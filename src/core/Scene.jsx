@@ -42,11 +42,16 @@ export default function Scene({
     doorOpen: introDoorOpen,
     waitingAtDoor: introWaitingAtDoor,
     shouldAdvance: introShouldAdvance,
+    journalUnlocked,
     spawn: introSpawn,
+    storyCameraTransition,
     postIntro,
     postIntroLocked,
+    receptionActive,
     interactionLocked,
     onEvent: onIntroEvent,
+    onReceptionInteract,
+    onStoryCameraTransitionComplete,
   } = intro
   const {
     onLeafClick,
@@ -103,7 +108,10 @@ export default function Scene({
             onJournalEnd={onJournalEnd}
             onJournalCancel={onJournalCancel}
             onIntroEvent={onIntroEvent}
+            receptionActive={receptionActive}
+            onReceptionInteract={onReceptionInteract}
             introWaitingAtDoor={introWaitingAtDoor}
+            journalUnlocked={journalUnlocked}
             playerMode={playerMode}
             postIntro={postIntro}
             postIntroLocked={postIntroLocked}
@@ -140,6 +148,8 @@ export default function Scene({
         introActive={introActive}
         introShouldAdvance={introShouldAdvance}
         introSpawn={introSpawn}
+        storyCameraTransition={storyCameraTransition}
+        onStoryCameraTransitionComplete={onStoryCameraTransitionComplete}
         onIntroEvent={onIntroEvent}
         playerMode={playerMode}
         flyMode={flyMode}

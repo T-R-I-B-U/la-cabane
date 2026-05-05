@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
+import { STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
 
 export function useIntroFlow({ sceneReady }) {
@@ -13,10 +14,13 @@ export function useIntroFlow({ sceneReady }) {
   const [loaderFading, setLoaderFading] = useState(false)
   const [introMovementLocked, setIntroMovementLocked] = useState(false)
   const [introSpawn, setIntroSpawn] = useState(null)
+  const [storyCameraTransition, setStoryCameraTransition] = useState(null)
+  const [receptionChoiceVisible, setReceptionChoiceVisible] = useState(false)
+  const [journalUnlocked, setJournalUnlocked] = useState(false)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
-  const { currentStepId, objective, completeStep, resetStory, startStory } = useStoryFlow()
+  const { currentStepId, completeStep, resetStory, startStory } = useStoryFlow()
   const storyReady = currentStepId === 'intro.goToReception'
 
   const exitIntro = useCallback(() => {
@@ -29,6 +33,9 @@ export function useIntroFlow({ sceneReady }) {
     setIntroShouldAdvance(false)
     setIntroMovementLocked(false)
     setIntroSpawn(null)
+    setStoryCameraTransition(null)
+    setReceptionChoiceVisible(false)
+    setJournalUnlocked(false)
     setPlayerName('')
     ignoreNextPointerUnlockRef.current = false
     resetStory()
@@ -67,6 +74,13 @@ export function useIntroFlow({ sceneReady }) {
     ignoreNextPointerUnlockRef.current = true
     document.exitPointerLock()
   }, [showNameInput])
+
+  useEffect(() => {
+    if (!receptionChoiceVisible || !document.pointerLockElement) return
+
+    ignoreNextPointerUnlockRef.current = true
+    document.exitPointerLock()
+  }, [receptionChoiceVisible])
 
   const handleIntroEvent = useCallback(
     (event, payload) => {
@@ -121,6 +135,36 @@ export function useIntroFlow({ sceneReady }) {
     [completeStep, playDialogue]
   )
 
+  const handleReceptionInteract = useCallback(() => {
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.accueil, duration: 1.2 })
+  }, [])
+
+  const handleStoryCameraTransitionComplete = useCallback(() => {
+    if (!storyCameraTransition) return
+    setIntroSpawn(storyCameraTransition)
+    setStoryCameraTransition(null)
+    completeStep('intro.goToReception')
+    playDialogue('receptionDialogue', {
+      onDone: () => {
+        setReceptionChoiceVisible(true)
+      },
+    })
+  }, [completeStep, playDialogue, storyCameraTransition])
+
+  const handleReceptionChoice = useCallback(
+    (choice) => {
+      setReceptionChoiceVisible(false)
+      const dialogueId = choice === 'yes' ? 'receptionYesDialogue' : 'receptionNoDialogue'
+
+      playDialogue(dialogueId, {
+        onDone: () => {
+          setJournalUnlocked(true)
+        },
+      })
+    },
+    [playDialogue]
+  )
+
   const launchIntro = useCallback(() => {
     if (!sceneReady) return
 
@@ -161,13 +205,15 @@ export function useIntroFlow({ sceneReady }) {
     introDoorOpen,
     introMovementLocked,
     introSpawn,
+    storyCameraTransition,
     introPending,
     introShouldAdvance,
     introWaitingAtDoor,
     loaderFading,
-    objective,
+    journalUnlocked,
     playerName,
     postIntro,
+    receptionChoiceVisible,
     showNameInput,
     storyReady,
     currentStoryStepId: currentStepId,
@@ -177,6 +223,9 @@ export function useIntroFlow({ sceneReady }) {
     handleLoaderClick,
     handleLoaderKeyDown,
     handleNameSubmit,
+    handleReceptionChoice,
+    handleReceptionInteract,
+    handleStoryCameraTransitionComplete,
     launchIntro,
     playDialogue,
     setPostIntro,
