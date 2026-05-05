@@ -6,6 +6,7 @@ import {
   IntroLoader,
   NameInput,
   SavoirPanel,
+  StoryDebugPanel,
   ViewerControls,
   useIntroFlow,
   useSavoirAssignment,
@@ -22,7 +23,6 @@ import { GAME_STEPS, unlockAndPlay, setVisibilityZones } from './utils'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
-
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [status, setStatus] = useState('loading')
@@ -133,10 +133,14 @@ export default function App() {
     introPending,
     introShouldAdvance,
     introWaitingAtDoor,
+    journalAutoOpenToken,
+    journalCloseToken,
+    journalPuzzleEnabled,
     journalUnlocked,
     loaderFading,
     postIntro,
     receptionChoiceVisible,
+    returnHallVisible,
     showNameInput,
     storyReady,
     currentStoryStepId,
@@ -144,20 +148,29 @@ export default function App() {
     handleIntroEvent,
     handleLoaderClick,
     handleLoaderKeyDown,
+    handleJournalOpen,
+    handleJournalPiecePlaced,
     handleNameSubmit: handleNameSubmitInternal,
+    handleDebugGoToDoorPassage,
+    handleDebugGoToIntroStart,
+    handleDebugGoToReception,
     handleReceptionChoice: handleReceptionChoiceInternal,
     handleReceptionInteract,
+    handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
   const [showCameraEditor, setShowCameraEditor] = useState(false)
+  const [showStoryDebug, setShowStoryDebug] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestScenePointerLock = useCallback(() => {
-    if (!(playerMode || postIntro)) return
+    if (!(playerMode || (postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'))) {
+      return
+    }
     pointerControlsRef.current?.lock()
-  }, [playerMode, postIntro])
+  }, [currentStoryStepId, playerMode, postIntro, showNameInput])
 
   const handleNameSubmit = useCallback(
     (name) => {
@@ -174,6 +187,21 @@ export default function App() {
     },
     [handleReceptionChoiceInternal]
   )
+
+  const jumpToIntroStart = useCallback(() => {
+    setPendingPostIntroPointerLock(false)
+    handleDebugGoToIntroStart()
+  }, [handleDebugGoToIntroStart])
+
+  const jumpToDoorPassage = useCallback(() => {
+    setPendingPostIntroPointerLock(false)
+    handleDebugGoToDoorPassage()
+  }, [handleDebugGoToDoorPassage])
+
+  const jumpToReception = useCallback(() => {
+    setPendingPostIntroPointerLock(true)
+    handleDebugGoToReception()
+  }, [handleDebugGoToReception])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -194,6 +222,7 @@ export default function App() {
     introMovementLocked ||
     showNameInput ||
     receptionChoiceVisible ||
+    returnHallVisible ||
     selectedSavoir !== null ||
     savoirActive ||
     selectedContact !== null ||
@@ -249,6 +278,28 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (!receptionChoiceVisible) return
+
+    const blockOutsideChoice = (event) => {
+      const target = event.target
+      if (!(target instanceof Element)) return
+      if (target.closest('.story-choice-card button')) return
+
+      event.preventDefault()
+      event.stopPropagation()
+      event.stopImmediatePropagation()
+    }
+
+    document.addEventListener('pointerdown', blockOutsideChoice, { capture: true })
+    document.addEventListener('click', blockOutsideChoice, { capture: true })
+
+    return () => {
+      document.removeEventListener('pointerdown', blockOutsideChoice, { capture: true })
+      document.removeEventListener('click', blockOutsideChoice, { capture: true })
+    }
+  }, [receptionChoiceVisible])
+
+  useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
@@ -256,6 +307,9 @@ export default function App() {
       } else if (event.code === 'F2') {
         event.preventDefault()
         setShowCameraEditor((current) => !current)
+      } else if (event.code === 'F3') {
+        event.preventDefault()
+        setShowStoryDebug((current) => !current)
       }
     }
 
@@ -291,9 +345,12 @@ export default function App() {
     introWaitingAtDoor ||
     showNameInput ||
     receptionChoiceVisible ||
+    returnHallVisible ||
+    (journalUnlocked && !journalActive) ||
     (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
 
-  const postIntroCameraEnabled = postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'
+  const postIntroCameraEnabled =
+    postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'
 
   function togglePlayerView() {
     setPostIntro(false)
@@ -407,7 +464,8 @@ export default function App() {
             postIntro &&
             !dialogueActive &&
             !storyCameraTransition &&
-            !receptionChoiceVisible,
+            !receptionChoiceVisible &&
+            !journalUnlocked,
           journalUnlocked,
           interactionLocked,
           onEvent: handleIntroEvent,
@@ -427,15 +485,20 @@ export default function App() {
             setJournalActive(true)
             document.exitPointerLock()
           },
-          onJournalCancel: () => requestScenePointerLock(),
+          onJournalOpenComplete: handleJournalOpen,
+          onJournalCancel: () => {},
           onJournalEnd: () => {
             journalActiveRef.current = false
             setJournalActive(false)
             requestScenePointerLock()
           },
+          onJournalPiecePlaced: handleJournalPiecePlaced,
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
+        journalAutoOpenToken={journalAutoOpenToken}
+        journalCloseToken={journalCloseToken}
+        journalPuzzleEnabled={journalPuzzleEnabled}
       />
 
       {import.meta.env.DEV && showUI && !introPending && !introActive && !postIntro && (
@@ -443,6 +506,14 @@ export default function App() {
       )}
 
       {import.meta.env.DEV && showCameraEditor && <CameraEditorPanel />}
+
+      {import.meta.env.DEV && showStoryDebug && (
+        <StoryDebugPanel
+          onGoToIntroStart={jumpToIntroStart}
+          onGoToDoorPassage={jumpToDoorPassage}
+          onGoToReception={jumpToReception}
+        />
+      )}
 
       {showUI && sceneReady && !introPending && !introActive && !postIntro && (
         <ViewerControls
@@ -494,6 +565,21 @@ export default function App() {
               </button>
               <button type="button" className="camera-toggle" onClick={() => handleReceptionChoice('no')}>
                 Non
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {returnHallVisible && (
+        <div className="story-choice" role="dialog" aria-modal="true" aria-labelledby="return-hall-title">
+          <div className="story-choice-card">
+            <p id="return-hall-title" className="story-choice-label">
+              Clique pour retourner dans le hall.
+            </p>
+            <div className="story-choice-actions">
+              <button type="button" className="camera-toggle" onClick={handleReturnToHall}>
+                Retourner dans le hall
               </button>
             </div>
           </div>

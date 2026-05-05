@@ -5,7 +5,6 @@ import * as THREE from 'three'
 import { applyAutoTextures } from '../cabane/textureResolver'
 
 const MODEL_URL = '/models/book01.gltf'
-const MAX_INTERACT_DIST = 3.5
 const DUR_CAMERA = 0.8
 const DUR_OPEN = 0.9
 const DUR_CLOSE = 0.7
@@ -16,6 +15,10 @@ const LEFT_HINGE_X = -0.0688
 const LEFT_HINGE_Y = 0.013614202849566936
 const LEFT_CLOSED_X = -0.06768058240413666
 const CAMERA_TOP_DIRECTION = new THREE.Vector3(0, 0.98, 0.2).normalize()
+const HOVER_EMISSIVE = new THREE.Color(0xffefbf)
+const HOVER_EMISSIVE_INTENSITY = 0.35
+const OUTLINE_COLOR = 0xfff1c2
+const OUTLINE_OPACITY = 0.9
 
 // Puzzle
 const PIECE_NAMES = ['img01', 'img02', 'img03', 'img04']
@@ -44,22 +47,43 @@ function cloneMaterial(material) {
   return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
 }
 
+function createHoverOutline(mesh) {
+  const geometry = new THREE.EdgesGeometry(mesh.geometry, 20)
+  const material = new THREE.LineBasicMaterial({
+    color: OUTLINE_COLOR,
+    transparent: true,
+    opacity: OUTLINE_OPACITY,
+    depthTest: false,
+  })
+  const outline = new THREE.LineSegments(geometry, material)
+  outline.name = `${mesh.name}-hover-outline`
+  outline.visible = false
+  outline.renderOrder = 10
+  outline.raycast = () => {}
+  return outline
+}
+
 export function JournalBook({
   position,
+  rotationY = 0.08,
   active,
+  autoOpenToken = 0,
+  closeToken = 0,
+  pieceInteractionEnabled = true,
   onInteractionStart,
   onInteractionEnd,
   onInteractionCancel,
+  onOpenComplete,
+  onPiecePlaced,
 }) {
-  const { camera } = useThree()
+  const { camera, gl } = useThree()
   const { scene } = useGLTF(MODEL_URL)
 
   const groupRef = useRef()
   const leftPivotRef = useRef()
+  const rangeRef = useRef()
   const stateRef = useRef('CLOSED')
   const elapsedRef = useRef(0)
-  const restYRef = useRef(position[1])
-  const inRangeRef = useRef(false)
   const cameraInitPosRef = useRef(new THREE.Vector3())
   const cameraInitQuatRef = useRef(new THREE.Quaternion())
   const cameraTargetPosRef = useRef(new THREE.Vector3())
@@ -67,16 +91,25 @@ export function JournalBook({
   const cameraReturnStartPosRef = useRef(new THREE.Vector3())
   const cameraReturnStartQuatRef = useRef(new THREE.Quaternion())
   const restoreCameraAfterCloseRef = useRef(false)
+  const lastAutoOpenTokenRef = useRef(0)
+  const lastCloseTokenRef = useRef(closeToken)
+  const pendingAutoOpenRef = useRef(false)
+  const hoveredRef = useRef(false)
+  const interactRaycasterRef = useRef(new THREE.Raycaster())
+  const pointerNdcRef = useRef(new THREE.Vector2())
+const pointerMovedRef = useRef(false)
+const materialStatesRef = useRef(new Map())
+const outlinesRef = useRef([])
+  const debugStateRef = useRef({ hovered: false, hitCount: 0 })
 
   // Puzzle
   const piecesRef = useRef(null)
   const dragRef = useRef(null)
-  const shouldAutoCloseRef = useRef(false)
-
-  const { left, right } = useMemo(() => {
+  const { left, right, meshes } = useMemo(() => {
     const clone = scene.clone(true)
     const leftObject = clone.getObjectByName('book01-left')
     const rightObject = clone.getObjectByName('book01-right')
+    const meshList = []
 
     if (!leftObject || !rightObject) {
       throw new Error('JournalBook: expected book01-left and book01-right nodes in book01.gltf')
@@ -84,6 +117,7 @@ export function JournalBook({
 
     clone.traverse((object) => {
       if (!object.isMesh) return
+      meshList.push(object)
       object.geometry = object.geometry.clone()
       object.material = cloneMaterial(object.material)
       object.castShadow = true
@@ -93,7 +127,7 @@ export function JournalBook({
     leftObject.parent?.remove(leftObject)
     rightObject.parent?.remove(rightObject)
 
-    return { left: leftObject, right: rightObject }
+    return { left: leftObject, right: rightObject, meshes: meshList }
   }, [scene])
 
   useEffect(() => {
@@ -105,6 +139,41 @@ export function JournalBook({
   }, [left, right])
 
   useEffect(() => {
+    materialStatesRef.current = new Map()
+    const outlines = []
+
+    for (const root of [left, right]) {
+      root.traverse((object) => {
+        if (!object.isMesh) return
+
+        const outline = createHoverOutline(object)
+        object.add(outline)
+        outlines.push(outline)
+
+        const materials = Array.isArray(object.material) ? object.material : [object.material]
+        materials.forEach((material) => {
+          if (!material?.emissive) return
+          materialStatesRef.current.set(material, {
+            emissive: material.emissive.clone(),
+            emissiveIntensity: material.emissiveIntensity ?? 0,
+          })
+        })
+      })
+    }
+
+    outlinesRef.current = outlines
+
+    return () => {
+      outlines.forEach((outline) => {
+        outline.removeFromParent()
+        outline.geometry.dispose()
+        outline.material.dispose()
+      })
+      outlinesRef.current = []
+    }
+  }, [left, right])
+
+  useEffect(() => {
     return () => {
       document.body.style.cursor = 'default'
     }
@@ -113,6 +182,20 @@ export function JournalBook({
   useEffect(() => {
     if (!active) document.body.style.cursor = 'default'
   }, [active])
+
+  useEffect(() => {
+    const canvas = gl.domElement
+
+    const updatePointerNdc = (event) => {
+      const rect = canvas.getBoundingClientRect()
+      pointerNdcRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+      pointerNdcRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+      pointerMovedRef.current = true
+    }
+
+    canvas.addEventListener('pointermove', updatePointerNdc)
+    return () => canvas.removeEventListener('pointermove', updatePointerNdc)
+  }, [gl])
 
   const startCameraReturn = () => {
     cameraReturnStartPosRef.current.copy(camera.position)
@@ -153,6 +236,47 @@ export function JournalBook({
       elapsedRef.current = 0
     }
   })
+
+  const openBook = useCallback(() => {
+    if (!active || stateRef.current !== 'CLOSED') return
+
+    const bookPosition = groupRef.current.getWorldPosition(new THREE.Vector3())
+    cameraTargetPosRef.current
+      .copy(bookPosition)
+      .addScaledVector(CAMERA_TOP_DIRECTION, TOP_CAMERA_DISTANCE)
+    const lookAtMatrix = new THREE.Matrix4().lookAt(
+      cameraTargetPosRef.current,
+      bookPosition,
+      camera.up
+    )
+
+    cameraInitPosRef.current.copy(camera.position)
+    cameraInitQuatRef.current.copy(camera.quaternion)
+    cameraTargetQuatRef.current.setFromRotationMatrix(lookAtMatrix)
+
+    onInteractionStart?.()
+    restoreCameraAfterCloseRef.current = false
+    stateRef.current = 'CAMERA_MOVING'
+    elapsedRef.current = 0
+  }, [active, camera, onInteractionStart])
+
+  useEffect(() => {
+    const onPointerDown = (event) => {
+      if (event.button !== 0 || !hoveredRef.current) return
+      if (stateRef.current !== 'CLOSED') return
+      if (import.meta.env.DEV) {
+        console.debug('JournalBook: click open', {
+          state: stateRef.current,
+          hovered: hoveredRef.current,
+          hitCount: debugStateRef.current.hitCount,
+        })
+      }
+      openBook()
+    }
+
+    document.addEventListener('pointerdown', onPointerDown)
+    return () => document.removeEventListener('pointerdown', onPointerDown)
+  }, [openBook])
 
   // Called once the book is fully open — extracts pieces from book hierarchy,
   // stores their open positions as targets, then sends them to parking.
@@ -221,6 +345,18 @@ export function JournalBook({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
 
+  useEffect(() => {
+    if (autoOpenToken === lastAutoOpenTokenRef.current) return
+    lastAutoOpenTokenRef.current = autoOpenToken
+    pendingAutoOpenRef.current = true
+  }, [autoOpenToken, openBook])
+
+  useEffect(() => {
+    if (closeToken === lastCloseTokenRef.current) return
+    lastCloseTokenRef.current = closeToken
+    requestClose()
+  }, [closeToken])
+
   // Puzzle drag-and-drop — native events (pointer lock is off when book is open)
   useEffect(() => {
     const canvas = document.querySelector('canvas')
@@ -235,7 +371,7 @@ export function JournalBook({
 
     const onPointerDown = (e) => {
       const pieces = piecesRef.current
-      if (!pieces || dragRef.current || stateRef.current !== 'OPEN') return
+      if (!pieces || !pieceInteractionEnabled || dragRef.current || stateRef.current !== 'OPEN') return
 
       raycaster.setFromCamera(toNDC(e), camera)
       const pickable = pieces.filter((p) => p.state !== 'placed').map((p) => p.mesh)
@@ -283,9 +419,7 @@ export function JournalBook({
       if (piece.mesh.position.distanceTo(piece.targetPos) < DROP_THRESHOLD) {
         piece.mesh.position.copy(piece.targetPos)
         piece.state = 'placed'
-        if (piecesRef.current.every((p) => p.state === 'placed')) {
-          shouldAutoCloseRef.current = true
-        }
+        onPiecePlaced?.(piece.name)
       } else {
         piece.state = 'parking'
       }
@@ -300,54 +434,77 @@ export function JournalBook({
       document.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerup', onPointerUp)
     }
-  }, [camera])
-
-  const handlePointerDown = () => {
-    if (!active || !inRangeRef.current) return
-
-    if (stateRef.current === 'CLOSED') {
-      const bookPosition = groupRef.current.getWorldPosition(new THREE.Vector3())
-      cameraTargetPosRef.current
-        .copy(bookPosition)
-        .addScaledVector(CAMERA_TOP_DIRECTION, TOP_CAMERA_DISTANCE)
-      const lookAtMatrix = new THREE.Matrix4().lookAt(
-        cameraTargetPosRef.current,
-        bookPosition,
-        camera.up
-      )
-
-      cameraInitPosRef.current.copy(camera.position)
-      cameraInitQuatRef.current.copy(camera.quaternion)
-      cameraTargetQuatRef.current.setFromRotationMatrix(lookAtMatrix)
-
-      onInteractionStart?.()
-      restoreCameraAfterCloseRef.current = false
-      stateRef.current = 'CAMERA_MOVING'
-      elapsedRef.current = 0
-      return
-    }
-  }
-
-  const handlePointerEnter = () => {
-    if (active && inRangeRef.current) document.body.style.cursor = 'pointer'
-  }
-
-  const handlePointerLeave = () => {
-    document.body.style.cursor = 'default'
-  }
+  }, [camera, onPiecePlaced, pieceInteractionEnabled])
 
   useFrame((_, delta) => {
     const group = groupRef.current
     const leftPivot = leftPivotRef.current
-    if (!group || !leftPivot) return
+    const range = rangeRef.current
+    if (!group || !leftPivot || !range) return
 
-    const dist = camera.position.distanceTo(group.position)
-    inRangeRef.current = dist <= MAX_INTERACT_DIST
+    if (pendingAutoOpenRef.current && active && stateRef.current === 'CLOSED') {
+      pendingAutoOpenRef.current = false
+      openBook()
+    }
 
     const state = stateRef.current
 
+    if (active && state === 'CLOSED') {
+      const ndc = document.pointerLockElement
+        ? pointerNdcRef.current.set(0, 0)
+        : pointerMovedRef.current
+          ? pointerNdcRef.current
+          : null
+
+      if (ndc) {
+        interactRaycasterRef.current.setFromCamera(ndc, camera)
+        const hits = interactRaycasterRef.current.intersectObjects(meshes, true)
+        hoveredRef.current = hits.length > 0
+        debugStateRef.current.hitCount = hits.length
+      } else {
+        hoveredRef.current = false
+        debugStateRef.current.hitCount = 0
+      }
+
+      if (import.meta.env.DEV && debugStateRef.current.hovered !== hoveredRef.current) {
+        debugStateRef.current.hovered = hoveredRef.current
+        console.debug('JournalBook: hover', {
+          hovered: hoveredRef.current,
+          hitCount: debugStateRef.current.hitCount,
+          pointerLock: !!document.pointerLockElement,
+        })
+      }
+
+      range.visible = false
+      outlinesRef.current.forEach((outline) => {
+        outline.visible = hoveredRef.current
+      })
+
+      materialStatesRef.current.forEach((original, material) => {
+        material.emissive.copy(hoveredRef.current ? HOVER_EMISSIVE : original.emissive)
+        material.emissiveIntensity = hoveredRef.current
+          ? HOVER_EMISSIVE_INTENSITY
+          : original.emissiveIntensity
+      })
+
+      document.body.style.cursor = hoveredRef.current ? 'pointer' : 'default'
+    } else {
+      hoveredRef.current = false
+      debugStateRef.current.hitCount = 0
+      range.visible = false
+      outlinesRef.current.forEach((outline) => {
+        outline.visible = false
+      })
+
+      materialStatesRef.current.forEach((original, material) => {
+        material.emissive.copy(original.emissive)
+        material.emissiveIntensity = original.emissiveIntensity
+      })
+
+      document.body.style.cursor = 'default'
+    }
+
     if (state === 'CLOSED') {
-      group.position.y = restYRef.current + Math.sin(performance.now() * 0.0008) * 0.005
       leftPivot.rotation.z = 0
       return
     }
@@ -397,29 +554,12 @@ export function JournalBook({
         stateRef.current = 'OPEN'
         elapsedRef.current = 0
         setupPuzzle()
+        onOpenComplete?.()
       }
       return
     }
 
     if (state === 'OPEN') {
-      // Auto-close when all pieces placed
-      if (shouldAutoCloseRef.current) {
-        shouldAutoCloseRef.current = false
-        piecesRef.current?.forEach((p) => {
-          if (p.state === 'placed') {
-            p.originalParent.add(p.mesh)
-            p.mesh.position.copy(p.originalLocalPos)
-            p.mesh.quaternion.copy(p.originalLocalQuat)
-          } else {
-            p.mesh.position.y -= 0.5
-          }
-        })
-        restoreCameraAfterCloseRef.current = true
-        stateRef.current = 'CLOSING'
-        elapsedRef.current = 0
-        return
-      }
-
       // Animate pieces toward parking or back from drag
       const pieces = piecesRef.current
       if (pieces) {
@@ -463,12 +603,13 @@ export function JournalBook({
     <group
       ref={groupRef}
       position={position}
-      rotation={[0, 0.08, 0]}
+      rotation={[0, rotationY, 0]}
       scale={MODEL_SCALE}
-      onPointerDown={handlePointerDown}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
     >
+      <mesh ref={rangeRef} scale={1 / MODEL_SCALE} renderOrder={1}>
+        <sphereGeometry args={[1, 32, 16]} />
+        <meshBasicMaterial transparent depthWrite={false} wireframe />
+      </mesh>
       <primitive object={right} />
       <group ref={leftPivotRef} position={[LEFT_HINGE_X, LEFT_HINGE_Y, 0]}>
         <primitive object={left} position={[LEFT_CLOSED_X - LEFT_HINGE_X, 0, 0]} />

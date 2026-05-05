@@ -23,7 +23,9 @@ export function CabaneScene({
   onLeafHover,
   onJournalStart,
   onJournalEnd,
+  onJournalOpenComplete,
   onJournalCancel,
+  onJournalPiecePlaced,
   onIntroEvent,
   receptionActive,
   onReceptionInteract,
@@ -34,6 +36,9 @@ export function CabaneScene({
   interactionLocked,
   debugDoors,
   debugCollisions,
+  journalAutoOpenToken,
+  journalCloseToken,
+  journalPuzzleEnabled,
   forceOpenDoor,
   controlsRef,
   firstPersonMode,
@@ -123,7 +128,12 @@ export function CabaneScene({
         onReceptionInteract={onReceptionInteract}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
+        onJournalOpenComplete={onJournalOpenComplete}
         onJournalCancel={onJournalCancel}
+        onJournalPiecePlaced={onJournalPiecePlaced}
+        journalAutoOpenToken={journalAutoOpenToken}
+        journalCloseToken={journalCloseToken}
+        journalPuzzleEnabled={journalPuzzleEnabled}
         journalVisible={journal}
       />
 

@@ -27,6 +27,9 @@ export default function Scene({
   interactions,
   shaderEnabled,
   shaderRadius,
+  journalAutoOpenToken,
+  journalCloseToken,
+  journalPuzzleEnabled,
 }) {
   const { onStats, onReady, onError } = sceneState
   const {
@@ -60,7 +63,9 @@ export default function Scene({
     onFruitHover,
     onJournalStart,
     onJournalEnd,
+    onJournalOpenComplete,
     onJournalCancel,
+    onJournalPiecePlaced,
   } = interactions
 
   const zone = useActiveZone()
@@ -106,7 +111,9 @@ export default function Scene({
             onLeafHover={onLeafHover}
             onJournalStart={onJournalStart}
             onJournalEnd={onJournalEnd}
+            onJournalOpenComplete={onJournalOpenComplete}
             onJournalCancel={onJournalCancel}
+            onJournalPiecePlaced={onJournalPiecePlaced}
             onIntroEvent={onIntroEvent}
             receptionActive={receptionActive}
             onReceptionInteract={onReceptionInteract}
@@ -118,6 +125,9 @@ export default function Scene({
             interactionLocked={interactionLocked}
             debugDoors={debugDoors}
             debugCollisions={debugCollisions}
+            journalAutoOpenToken={journalAutoOpenToken}
+            journalCloseToken={journalCloseToken}
+            journalPuzzleEnabled={journalPuzzleEnabled}
             forceOpenDoor={introDoorOpen}
             controlsRef={controlsRef}
             firstPersonMode={firstPersonMode}

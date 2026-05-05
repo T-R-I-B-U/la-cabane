@@ -1,8 +1,31 @@
+import { useEffect } from 'react'
 import { OrbitControls } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
 import IntroCamera from '../../world/entities/IntroCamera'
 import { CameraRegistrySync } from '../CameraRegistrySync'
 import { PlayerControls } from '../PlayerControls'
 import { StoryCameraTransition } from '../StoryCameraTransition'
+
+function OrbitTargetSync({ controlsRef, target }) {
+  const { camera } = useThree()
+
+  useEffect(() => {
+    const controls = controlsRef.current
+    if (!controls) return
+
+    if (target) {
+      controls.target.set(target[0], target[1], target[2])
+      controls.update()
+      return
+    }
+
+    const lookDirection = camera.getWorldDirection(controls.target)
+    controls.target.copy(camera.position).add(lookDirection.multiplyScalar(5))
+    controls.update()
+  }, [camera, controlsRef, target])
+
+  return null
+}
 
 export function SceneControls({
   collisionObjects,
@@ -68,19 +91,31 @@ export function SceneControls({
         />
         {devSync}
       </>
-    ) : devSync
+    ) : (
+      <>
+        <OrbitControls
+          ref={controlsRef}
+          enablePan
+          enableDamping
+          minDistance={0.5}
+          maxDistance={500}
+        />
+        <OrbitTargetSync controlsRef={controlsRef} />
+        {devSync}
+      </>
+    )
   }
 
   return (
     <>
       <OrbitControls
         ref={controlsRef}
-        target={hutPosition}
         enablePan
         enableDamping
         minDistance={0.5}
         maxDistance={500}
       />
+      <OrbitTargetSync controlsRef={controlsRef} target={hutPosition} />
       {devSync}
     </>
   )
