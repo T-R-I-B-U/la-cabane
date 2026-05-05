@@ -11,7 +11,6 @@ export function SceneInteractions({
   cabane,
   playerMode,
   postIntro,
-  interactionLocked,
   introWaitingAtDoor,
   journalUnlocked,
   receptionActive,
@@ -27,8 +26,7 @@ export function SceneInteractions({
   journalPuzzleEnabled,
   journalVisible = true,
 }) {
-  const interactionsActive = (playerMode || postIntro) && !interactionLocked
-  const journalActive = interactionsActive && journalUnlocked
+  const journalActive = (playerMode || postIntro) && journalUnlocked
   const bookPosition = useMemo(() => {
     if (!cabane) return null
 

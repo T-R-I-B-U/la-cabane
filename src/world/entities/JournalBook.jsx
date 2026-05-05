@@ -16,9 +16,7 @@ const LEFT_HINGE_Y = 0.013614202849566936
 const LEFT_CLOSED_X = -0.06768058240413666
 const CAMERA_TOP_DIRECTION = new THREE.Vector3(0, 0.98, 0.2).normalize()
 const HOVER_EMISSIVE = new THREE.Color(0xffefbf)
-const HOVER_EMISSIVE_INTENSITY = 0.35
-const OUTLINE_COLOR = 0xfff1c2
-const OUTLINE_OPACITY = 0.9
+const HOVER_EMISSIVE_INTENSITY = 0.18
 
 // Puzzle
 const PIECE_NAMES = ['img01', 'img02', 'img03', 'img04']
@@ -47,21 +45,6 @@ function cloneMaterial(material) {
   return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
 }
 
-function createHoverOutline(mesh) {
-  const geometry = new THREE.EdgesGeometry(mesh.geometry, 20)
-  const material = new THREE.LineBasicMaterial({
-    color: OUTLINE_COLOR,
-    transparent: true,
-    opacity: OUTLINE_OPACITY,
-    depthTest: false,
-  })
-  const outline = new THREE.LineSegments(geometry, material)
-  outline.name = `${mesh.name}-hover-outline`
-  outline.visible = false
-  outline.renderOrder = 10
-  outline.raycast = () => {}
-  return outline
-}
 
 export function JournalBook({
   position,
@@ -99,7 +82,6 @@ export function JournalBook({
   const pointerNdcRef = useRef(new THREE.Vector2())
   const pointerMovedRef = useRef(false)
   const materialStatesRef = useRef(new Map())
-  const outlinesRef = useRef([])
   const debugStateRef = useRef({ hovered: false, hitCount: 0 })
 
   // Puzzle
@@ -140,15 +122,10 @@ export function JournalBook({
 
   useEffect(() => {
     materialStatesRef.current = new Map()
-    const outlines = []
 
     for (const root of [left, right]) {
       root.traverse((object) => {
         if (!object.isMesh) return
-
-        const outline = createHoverOutline(object)
-        object.add(outline)
-        outlines.push(outline)
 
         const materials = Array.isArray(object.material) ? object.material : [object.material]
         materials.forEach((material) => {
@@ -159,17 +136,6 @@ export function JournalBook({
           })
         })
       })
-    }
-
-    outlinesRef.current = outlines
-
-    return () => {
-      outlines.forEach((outline) => {
-        outline.removeFromParent()
-        outline.geometry.dispose()
-        outline.material.dispose()
-      })
-      outlinesRef.current = []
     }
   }, [left, right])
 
@@ -287,20 +253,20 @@ export function JournalBook({
     group.updateWorldMatrix(true, true)
 
     if (piecesRef.current) {
-      // Re-open: restore placed pieces to groupRef at target, animate others from below
-      piecesRef.current.forEach((piece, i) => {
+      // Re-open: restore placed pieces to groupRef at target, animate others from book position
+      piecesRef.current.forEach((piece) => {
         if (piece.state === 'placed') {
           group.attach(piece.mesh)
           piece.mesh.position.copy(piece.targetPos)
         } else {
-          piece.mesh.position.copy(PARKING_POSITIONS[i]).setY(PARKING_POSITIONS[i].y - 0.4)
+          piece.mesh.position.copy(piece.targetPos)
           piece.state = 'animating_in'
         }
       })
       return
     }
 
-    piecesRef.current = PIECE_NAMES.map((name, i) => {
+    piecesRef.current = PIECE_NAMES.map((name) => {
       const mesh = group.getObjectByName(name)
       if (!mesh) return null
 
@@ -314,8 +280,7 @@ export function JournalBook({
       group.attach(mesh)
       const targetPos = mesh.position.clone()
 
-      // Spawn below the book, animate up to parking
-      mesh.position.copy(PARKING_POSITIONS[i]).setY(PARKING_POSITIONS[i].y - 0.4)
+      // mesh.position is already targetPos after attach() — slides to PARKING_POSITIONS
 
       return {
         mesh,
@@ -335,6 +300,10 @@ export function JournalBook({
 
       const state = stateRef.current
       if (state === 'CLOSED') return
+
+      const allPlaced =
+        piecesRef.current?.length > 0 && piecesRef.current.every((p) => p.state === 'placed')
+      if (allPlaced) return
 
       event.preventDefault()
       event.stopPropagation()
@@ -477,9 +446,6 @@ export function JournalBook({
       }
 
       range.visible = false
-      outlinesRef.current.forEach((outline) => {
-        outline.visible = hoveredRef.current
-      })
 
       materialStatesRef.current.forEach((original, material) => {
         material.emissive.copy(hoveredRef.current ? HOVER_EMISSIVE : original.emissive)
@@ -493,9 +459,6 @@ export function JournalBook({
       hoveredRef.current = false
       debugStateRef.current.hitCount = 0
       range.visible = false
-      outlinesRef.current.forEach((outline) => {
-        outline.visible = false
-      })
 
       materialStatesRef.current.forEach((original, material) => {
         material.emissive.copy(original.emissive)

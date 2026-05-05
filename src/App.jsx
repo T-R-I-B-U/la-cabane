@@ -148,6 +148,8 @@ export default function App() {
     handleIntroEvent,
     handleLoaderClick,
     handleLoaderKeyDown,
+    handleJournalEnd,
+    handleJournalInteractionStart,
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleNameSubmit: handleNameSubmitInternal,
@@ -348,7 +350,7 @@ export default function App() {
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible ||
-    (journalUnlocked && !journalActive) ||
+    journalUnlocked ||
     (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
 
   const postIntroCameraEnabled =
@@ -483,6 +485,7 @@ export default function App() {
           onFruitClick: handleFruitClick,
           onFruitHover: handleFruitHover,
           onJournalStart: () => {
+            handleJournalInteractionStart()
             journalActiveRef.current = true
             setJournalActive(true)
             document.exitPointerLock()
@@ -492,6 +495,7 @@ export default function App() {
           onJournalEnd: () => {
             journalActiveRef.current = false
             setJournalActive(false)
+            handleJournalEnd()
             requestScenePointerLock()
           },
           onJournalPiecePlaced: handleJournalPiecePlaced,
