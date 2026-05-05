@@ -7,8 +7,8 @@ import { getGameStep, setGameStep, GAME_STEPS } from '../utils'
  * Rôle : observer l'état de la scène et de l'intro pour faire avancer
  * le game step global, puis notifier App via onStepChange.
  *
- * C'est App qui décide quoi faire à chaque transition (audio, UI, etc.).
- * GameManager ne connaît pas les sous-systèmes — il ne fait que piloter l'état.
+ * C'est App qui décide quoi faire à chaque transition (audio, UI, visibilité, etc.).
+ * GameManager ne connaît pas les sous-systèmes et ne fait que piloter le step global.
  *
  * Flow des étapes :
  *   LOADING → scène R3F chargée → INIT
@@ -17,7 +17,6 @@ import { getGameStep, setGameStep, GAME_STEPS } from '../utils'
  *
  * Props :
  *   sceneReady       – true quand CabaneScene appelle onSceneReady (modèles chargés)
- *   introPending     – IntroLoader visible, attente du clic utilisateur
  *   introActive      – séquence caméra intro en cours
  *   postIntro        – à l'intérieur de la cabane, phase dialogue / saisie du prénom
  *   explorationReady – postIntro && !showNameInput && !dialogueActive && !introMovementLocked
@@ -25,7 +24,6 @@ import { getGameStep, setGameStep, GAME_STEPS } from '../utils'
  */
 export function GameManager({
   sceneReady,
-  introPending,
   introActive,
   postIntro,
   explorationReady,
@@ -39,16 +37,15 @@ export function GameManager({
     }
   }, [sceneReady, onStepChange])
 
-  // INIT → INTRO : l'utilisateur a cliqué sur IntroLoader (geste = AudioContext débloqué)
-  // introPending = bouton cliqué dans ViewerControls mais IntroLoader pas encore cliqué
+  // INIT → INTRO : seulement après le vrai geste utilisateur sur IntroLoader.
   // introActive  = clic sur IntroLoader, séquence caméra en cours
   // postIntro    = inside cabane (cas edge : scène rechargée pendant intro)
   useEffect(() => {
-    if ((introPending || introActive || postIntro) && getGameStep() === GAME_STEPS.INIT) {
+    if ((introActive || postIntro) && getGameStep() === GAME_STEPS.INIT) {
       setGameStep(GAME_STEPS.INTRO)
       onStepChange?.(GAME_STEPS.INTRO)
     }
-  }, [introPending, introActive, postIntro, onStepChange])
+  }, [introActive, postIntro, onStepChange])
 
   // INTRO → EXPLORATION : dialogue2 terminé, mouvement débloqué, joueur libre
   useEffect(() => {

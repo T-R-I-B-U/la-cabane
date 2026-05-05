@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { FLOOR_Y, PLAYER_HEIGHT } from '../../core/SceneConfig'
@@ -48,15 +48,21 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
   const waitingRef = useRef(false)
   const advancedRef = useRef(false)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (active) {
       stepRef.current = -1
       progressRef.current = 0
       delayRef.current = 0
       waitingRef.current = false
       advancedRef.current = false
+
+      // Place the intro camera before the first visible paint so the user
+      // does not see the default orbit camera between the loader fade and intro start.
+      camera.position.copy(WAYPOINTS[0].position)
+      camera.lookAt(WAYPOINTS[0].target)
+      stepRef.current = 0
     }
-  }, [active])
+  }, [active, camera])
 
   useEffect(() => {
     if (shouldAdvance && waitingRef.current && !advancedRef.current) {
@@ -69,13 +75,6 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     if (!active) return
 
     const delta = Math.min(rawDelta, 0.1)
-
-    if (stepRef.current === -1) {
-      camera.position.copy(WAYPOINTS[0].position)
-      camera.lookAt(WAYPOINTS[0].target)
-      stepRef.current = 0
-      return
-    }
 
     const step = stepRef.current
     if (step >= WAYPOINTS.length - 1) return
