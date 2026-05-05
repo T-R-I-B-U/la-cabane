@@ -48,7 +48,9 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
 
       const buffer = await response.arrayBuffer()
       if (buffer.byteLength < 4) {
-        throw new Error(`Invalid instance matrix file: expected header, got ${buffer.byteLength} bytes`)
+        throw new Error(
+          `Invalid instance matrix file: expected header, got ${buffer.byteLength} bytes`
+        )
       }
 
       count = new DataView(buffer).getUint32(0, true)

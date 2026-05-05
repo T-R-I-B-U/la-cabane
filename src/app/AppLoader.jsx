@@ -4,7 +4,12 @@ export function AppLoader({ status, error }) {
   const failed = status === 'error'
 
   return (
-    <div className="app-loader" role="status" aria-live="polite" aria-label="Chargement de la scene">
+    <div
+      className="app-loader"
+      role="status"
+      aria-live="polite"
+      aria-label="Chargement de la scene"
+    >
       <div className="app-loader-panel">
         {failed ? (
           <>
