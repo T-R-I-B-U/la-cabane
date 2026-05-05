@@ -353,8 +353,7 @@ export default function App() {
     journalUnlocked ||
     (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
 
-  const postIntroCameraEnabled =
-    postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'
+  const postIntroCameraEnabled = postIntro
 
   function togglePlayerView() {
     setPostIntro(false)
