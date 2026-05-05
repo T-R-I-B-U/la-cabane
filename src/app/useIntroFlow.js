@@ -28,6 +28,9 @@ export function useIntroFlow({ sceneReady }) {
   const [returnHallVisible, setReturnHallVisible] = useState(false)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
+  const journalPlacedCountRef = useRef(0)
+  const journalCompletedRef = useRef(false)
+  const isPostBookTransitionRef = useRef(false)
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory, startStory } = useStoryFlow()
   const storyReady = currentStepId === 'intro.goToReception'
@@ -51,6 +54,9 @@ export function useIntroFlow({ sceneReady }) {
     setReturnHallVisible(false)
     setPlayerName('')
     ignoreNextPointerUnlockRef.current = false
+    journalPlacedCountRef.current = 0
+    journalCompletedRef.current = false
+    isPostBookTransitionRef.current = false
   }, [])
 
   const exitIntro = useCallback(() => {
@@ -160,6 +166,12 @@ export function useIntroFlow({ sceneReady }) {
     if (!storyCameraTransition) return
     setIntroSpawn(storyCameraTransition)
     setStoryCameraTransition(null)
+
+    if (isPostBookTransitionRef.current) {
+      isPostBookTransitionRef.current = false
+      return
+    }
+
     completeStep('intro.goToReception')
     playDialogue('receptionDialogue', {
       onDone: () => {
@@ -203,11 +215,15 @@ export function useIntroFlow({ sceneReady }) {
       const dialogueId = dialogueMap[pieceName]
       if (!dialogueId) return
 
+      journalPlacedCountRef.current += 1
+      const isLast = journalPlacedCountRef.current >= 4
+
       setJournalPuzzleEnabled(false)
       playDialogue(dialogueId, {
         onDone: () => {
-          if (pieceName === 'img04') {
-            setReturnHallVisible(true)
+          if (isLast) {
+            journalCompletedRef.current = true
+            setJournalCloseToken((t) => t + 1)
             return
           }
 
@@ -217,6 +233,24 @@ export function useIntroFlow({ sceneReady }) {
     },
     [playDialogue]
   )
+
+  const handleJournalInteractionStart = useCallback(() => {
+    ignoreNextPointerUnlockRef.current = true
+  }, [])
+
+  const handleJournalEnd = useCallback(() => {
+    const completed = journalCompletedRef.current
+    journalCompletedRef.current = false
+    setJournalUnlocked(false)
+
+    if (completed) {
+      isPostBookTransitionRef.current = true
+      setStoryCameraTransition({ ...INSIDE_POV, duration: 2.0 })
+      return true
+    }
+
+    return false
+  }, [])
 
   const handleReturnToHall = useCallback(() => {
     setReturnHallVisible(false)
@@ -324,6 +358,8 @@ export function useIntroFlow({ sceneReady }) {
     handleDebugGoToDoorPassage: debugGoToDoorPassage,
     handleDebugGoToIntroStart: debugGoToIntroStart,
     handleDebugGoToReception: debugGoToReception,
+    handleJournalEnd,
+    handleJournalInteractionStart,
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleReceptionChoice,
