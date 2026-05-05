@@ -15,6 +15,7 @@ export function SceneControls({
   playerSpawnKey,
   movementLocked,
   postIntro,
+  postIntroLocked,
   pointerControlsRef,
   controlsRef,
   hutPosition,
@@ -47,7 +48,7 @@ export function SceneControls({
   }
 
   if (postIntro) {
-    return (
+    return postIntroLocked ? (
       <>
         <PlayerControls
           canMove={!movementLocked}
@@ -58,7 +59,7 @@ export function SceneControls({
         />
         {devSync}
       </>
-    )
+    ) : devSync
   }
 
   return (

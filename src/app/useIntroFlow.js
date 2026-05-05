@@ -85,6 +85,10 @@ export function useIntroFlow({ sceneReady }) {
 
       if (event === 'inside') {
         if (payload) setIntroSpawn(payload)
+        if (document.pointerLockElement) {
+          ignoreNextPointerUnlockRef.current = true
+          document.exitPointerLock()
+        }
         setIntroDoorOpen(false)
         setIntroShouldAdvance(false)
         setIntroActive(false)

@@ -154,17 +154,6 @@ export default function App() {
     pointerControlsRef.current?.lock()
   }, [playerMode, postIntro])
 
-  const handleSceneIntroEvent = useCallback(
-    (event, payload) => {
-      if (event === 'door:clicked') {
-        setPendingPostIntroPointerLock(true)
-      }
-
-      handleIntroEvent(event, payload)
-    },
-    [handleIntroEvent]
-  )
-
   const handleNameSubmit = useCallback(
     (name) => {
       setPendingPostIntroPointerLock(true)
@@ -198,7 +187,7 @@ export default function App() {
     journalActive
 
   useEffect(() => {
-    if (!pendingPostIntroPointerLock || showNameInput || !postIntro || document.pointerLockElement) return
+    if (!pendingPostIntroPointerLock || showNameInput || !postIntro) return
 
     let cancelled = false
     let frameId = 0
@@ -207,21 +196,23 @@ export default function App() {
     const tryLock = () => {
       if (cancelled) return
 
-      if (document.pointerLockElement) {
+      if (pointerControlsRef.current?.isLocked) {
         setPendingPostIntroPointerLock(false)
         return
       }
 
-      if (pointerControlsRef.current?.lock) {
+      if (document.pointerLockElement) {
+        document.dispatchEvent(new Event('pointerlockchange'))
+      } else if (pointerControlsRef.current?.lock) {
         requestScenePointerLock()
         window.setTimeout(() => {
-          if (!cancelled && document.pointerLockElement) {
+          if (!cancelled && pointerControlsRef.current?.isLocked) {
             setPendingPostIntroPointerLock(false)
           }
         }, 0)
       }
 
-      if (!document.pointerLockElement && attempts < 8) {
+      if (!pointerControlsRef.current?.isLocked && attempts < 8) {
         attempts += 1
         frameId = window.requestAnimationFrame(tryLock)
       }
@@ -286,6 +277,8 @@ export default function App() {
     introWaitingAtDoor ||
     showNameInput ||
     (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
+
+  const postIntroCameraEnabled = postIntro && !showNameInput && currentStoryStepId !== 'intro.treeWelcome'
 
   function togglePlayerView() {
     setPostIntro(false)
@@ -355,7 +348,7 @@ export default function App() {
 
       <Crosshair
         visible={
-          (playerMode || postIntro) &&
+          (playerMode || postIntroCameraEnabled) &&
           !showNameInput &&
           !selectedSavoir &&
           !savoirActive &&
@@ -392,9 +385,9 @@ export default function App() {
           shouldAdvance: introShouldAdvance,
           spawn: introSpawn,
           postIntro,
-          postIntroLocked: postIntro,
+          postIntroLocked: postIntroCameraEnabled,
           interactionLocked,
-          onEvent: handleSceneIntroEvent,
+          onEvent: handleIntroEvent,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={interactionsEnabled}
