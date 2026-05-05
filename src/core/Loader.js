@@ -41,8 +41,9 @@ function cloneScene(scene) {
 }
 
 /**
- * Load a GLB/GLTF and return a cloned scene root.
- * The raw GLTF is parsed once and cached; callers get independent clones.
+ * Charge un GLB/GLTF et renvoie une scène clonée indépendante.
+ * Le GLTF brut est parsé une seule fois et mis en cache par chemin.
+ * Chaque appel récupère ensuite son propre clone pour éviter les mutations partagées.
  */
 export async function loadModel(path) {
   if (!_cache.has(path)) {

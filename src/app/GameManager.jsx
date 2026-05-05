@@ -7,8 +7,8 @@ import { getGameStep, setGameStep, GAME_STEPS } from '../utils'
  * Rôle : observer l'état de la scène et de l'intro pour faire avancer
  * le game step global, puis notifier App via onStepChange.
  *
- * C'est App qui décide quoi faire à chaque transition (audio, UI, etc.).
- * GameManager ne connaît pas les sous-systèmes — il ne fait que piloter l'état.
+ * C'est App qui décide quoi faire à chaque transition (audio, UI, visibilité, etc.).
+ * GameManager ne connaît pas les sous-systèmes et ne fait que piloter le step global.
  *
  * Flow des étapes :
  *   LOADING → scène R3F chargée → INIT

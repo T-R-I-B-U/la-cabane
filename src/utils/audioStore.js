@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import config from '../core/audio/audioConfig.json'
 
+// Store audio global : initialise le listener Three.js, charge les tracks,
+// et centralise lecture, dialogues et sous-titres pour l'app entière.
 const store = {
   camera: null,
   listener: null,

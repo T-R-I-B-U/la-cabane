@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { useThree } from '@react-three/fiber'
 import { detachAudio, initAudio } from '../../utils'
 
-// Doit être monté à l'intérieur du Canvas.
-// Crée l'AudioListener une fois puis le rattache à la caméra active si elle change.
+// Pont entre la caméra R3F active et le store audio global.
+// Doit être monté dans le Canvas pour fournir un AudioListener attaché à la bonne caméra.
 export default function AudioManager() {
   const { camera } = useThree()
 
