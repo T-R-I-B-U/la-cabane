@@ -236,7 +236,8 @@ export default function App() {
   }
 
   const cursorVisible =
-    !introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked)
+    introWaitingAtDoor ||
+    (!introActive && !postIntro && (!playerMode || interactionLocked || userMovementLocked))
 
   function togglePlayerView() {
     setPostIntro(false)
