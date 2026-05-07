@@ -347,6 +347,7 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleGreenhouseDoorClick = useCallback(() => {
     setGreenhousePhaseActive(false)
+    fade('ambianceWorkbench', 0, 1500)
     isGreenhouseTransitionRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
   }, [])
