@@ -10,6 +10,14 @@
       "autoplay": false
     },
     {
+      "id": "book",
+      "type": "sfx",
+      "src": "Book.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
+    },
+    {
       "id": "dialogue1",
       "type": "dialogue",
       "loop": false,
