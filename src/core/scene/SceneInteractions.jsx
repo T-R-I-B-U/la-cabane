@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
+import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
 import { JournalBook } from '../../world/entities/JournalBook'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
@@ -16,6 +17,8 @@ export function SceneInteractions({
   journalUnlocked,
   receptionActive,
   treePhaseActive,
+  workbenchPhaseActive,
+  onWorkbenchInteract,
   onIntroEvent,
   onReceptionInteract,
   onTreeInteract,
@@ -64,6 +67,12 @@ export function SceneInteractions({
       />
 
       <ClickableTree cabane={cabane} active={treePhaseActive} onInteract={onTreeInteract} />
+
+      <ClickableWorkbench
+        cabane={cabane}
+        active={workbenchPhaseActive}
+        onInteract={onWorkbenchInteract}
+      />
 
       {journalVisible && bookPosition && (
         <JournalBook

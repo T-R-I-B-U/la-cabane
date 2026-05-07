@@ -1,0 +1,19 @@
+1
+00:00:00,000 --> 00:00:05,000
+Hey salut, tu vas bien ? Je vois que tu viens explorer la cabane.
+
+2
+00:00:05,000 --> 00:00:13,000
+Tu veux connaître mes impressions sur le concept de Cabane ? Moi perso, depuis le temps que je viens ici, j'ai largement trouvé mon compte.
+
+3
+00:00:13,000 --> 00:00:23,000
+Je viens plusieurs fois par semaine pour enseigner la réparation et l'amélioration des vélos, en échange j'apprends à faire des semis de tomate avec Audrey, une voisine du bâtiment d'en face.
+
+4
+00:00:23,000 --> 00:00:30,000
+Le vendredi j'apprends l'aquarelle avec un groupe de 4 personnes du quartier. C'est top non ?
+
+5
+00:00:30,000 --> 00:00:36,000
+Je ne doute pas que tu trouveras de quoi faire ici ! Bonne visite à bientôt.

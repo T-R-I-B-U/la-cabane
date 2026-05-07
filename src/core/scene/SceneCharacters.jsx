@@ -1,26 +1,17 @@
 import { Suspense } from 'react'
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
+import { ClickableThomas } from '../../world/entities/ClickableThomas'
 import { FLOOR_Y } from '../SceneConfig'
 
 const compressedModelModules = import.meta.glob('/public/models/compressed/*.{glb,gltf}')
-const ZOE_ANIMATION_SEQUENCE = [
-  { clip: 'zoe-idle', duration: 5 },
-  { clip: 'zoe-pointing' },
-  { clip: 'zoe-idle', duration: 5 },
-  { clip: 'zoe-pointing', reverse: true },
-]
-const MARIE_ANIMATION_SEQUENCE = [
-  { clip: 'marie-sitting-idle', duration: 5 },
-  { clip: 'marie-standingup' },
-  { clip: 'marie-standiing-idle', duration: 5 },
-  { clip: 'marie-standingup', reverse: true },
-]
-const THOMAS_ANIMATION_SEQUENCE = [
-  { clip: 'thomas-back', duration: 5 },
-  { clip: 'thomas-turn' },
-  { clip: 'thomas-front', duration: 5 },
-  { clip: 'thomas-turn', reverse: true },
-]
+const THOMAS_SEQUENCES = {
+  back: [{ clip: 'thomas-back', duration: 999 }],
+  talking: [{ clip: 'thomas-turn' }, { clip: 'thomas-front', duration: 999 }],
+  returning: [
+    { clip: 'thomas-turn', reverse: true },
+    { clip: 'thomas-back', duration: 999 },
+  ],
+}
 
 function resolveCharacterUrl(fileName, performanceMode) {
   const compressedKey = `/public/models/compressed/${fileName}`
@@ -31,48 +22,33 @@ function resolveCharacterUrl(fileName, performanceMode) {
   return `/models/${fileName}`
 }
 
-export function SceneCharacters({ performanceMode, hutPosition }) {
-  // Zoe's compressed GLB is stale after the latest model edit, so keep the source GLB for now.
-  const zoeUrl = resolveCharacterUrl('zoe-animated.glb', false)
-  const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
+export function SceneCharacters({
+  performanceMode,
+  thomasEtabliPhaseActive,
+  onThomasEtabliInteract,
+  thomasAnimPhase = 'back',
+}) {
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
   const textureBasePaths = performanceMode
     ? ['/textures/compressed/', '/textures/']
     : ['/textures/']
+  const sequence = THOMAS_SEQUENCES[thomasAnimPhase] ?? THOMAS_SEQUENCES.back
 
   return (
-    <Suspense fallback={null}>
-      <AnimatedCharacter
-        key={zoeUrl}
-        url={zoeUrl}
-        animationUrl="/models/compressed/zoe-animated.glb"
-        animationSequence={ZOE_ANIMATION_SEQUENCE}
-        textureName="zoe-animated"
-        textureBasePaths={textureBasePaths}
-        position={[hutPosition[0] + 0.1, FLOOR_Y, hutPosition[2] - 9.1]}
-        rotation={[0, Math.PI * 0.08, 0]}
-        scale={9}
-      />
-      <AnimatedCharacter
-        key={marieUrl}
-        url={marieUrl}
-        animationSequence={MARIE_ANIMATION_SEQUENCE}
-        textureName="marie-animated"
-        textureBasePaths={textureBasePaths}
-        position={[hutPosition[0] + 1.4, FLOOR_Y, hutPosition[2] - 9.1]}
-        rotation={[0, Math.PI * 0.08, 0]}
-        scale={9}
-      />
-      <AnimatedCharacter
-        key={thomasUrl}
-        url={thomasUrl}
-        animationSequence={THOMAS_ANIMATION_SEQUENCE}
-        textureName="thomas"
-        textureBasePaths={textureBasePaths}
-        position={[hutPosition[0] + 2.7, FLOOR_Y, hutPosition[2] - 9.1]}
-        rotation={[0, Math.PI * 1.04, 0]}
-        scale={9}
-      />
-    </Suspense>
+    <>
+      <ClickableThomas active={thomasEtabliPhaseActive} onInteract={onThomasEtabliInteract} />
+      <Suspense fallback={null}>
+        <AnimatedCharacter
+          key={thomasUrl + '-' + thomasAnimPhase}
+          url={thomasUrl}
+          animationSequence={sequence}
+          textureName="thomas"
+          textureBasePaths={textureBasePaths}
+          position={[-3.0, FLOOR_Y, -13.259]}
+          rotation={[0, (110 * Math.PI) / 180, 0]}
+          scale={9}
+        />
+      </Suspense>
+    </>
   )
 }

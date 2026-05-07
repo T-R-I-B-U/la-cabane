@@ -120,6 +120,22 @@
       "volume": 1,
       "autoplay": false,
       "subtitles": "tree-arbre-dialogue.srt"
+    },
+    {
+      "id": "etabliDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "etabli-dialogue.srt"
+    },
+    {
+      "id": "thomasEtabliDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "thomas-etabli-dialogue.srt"
     }
   ]
 }
