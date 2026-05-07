@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
 import { STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
+import { fade, stop } from '../utils'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -65,6 +66,7 @@ export function useIntroFlow({ sceneReady }) {
     setThomasEtabliPhaseActive(false)
     setThomasAnimPhase('back')
     setPlayerName('')
+    stop('ambianceWorkbench')
     ignoreNextPointerUnlockRef.current = false
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
@@ -200,6 +202,7 @@ export function useIntroFlow({ sceneReady }) {
       playDialogue('thomasEtabliDialogue', {
         onDone: () => {
           setThomasAnimPhase('returning')
+          setTimeout(() => fade('ambianceWorkbench', 0.7, 2000), 2000)
         },
       })
       return
@@ -305,6 +308,7 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
+    fade('ambianceWorkbench', 0.7, 800)
     isEtabliTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelier, duration: 1.5 })
   }, [])
@@ -312,6 +316,7 @@ export function useIntroFlow({ sceneReady }) {
   const handleThomasEtabliInteract = useCallback(() => {
     setThomasEtabliPhaseActive(false)
     setThomasAnimPhase('talking')
+    fade('ambianceWorkbench', 0, 1500)
     isThomasTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.talkThomas, duration: 1.5 })
   }, [])

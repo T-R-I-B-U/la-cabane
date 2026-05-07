@@ -39,7 +39,7 @@ export function SceneCharacters({
       <ClickableThomas active={thomasEtabliPhaseActive} onInteract={onThomasEtabliInteract} />
       <Suspense fallback={null}>
         <AnimatedCharacter
-          key={thomasUrl + '-' + thomasAnimPhase}
+          key={thomasUrl}
           url={thomasUrl}
           animationSequence={sequence}
           textureName="thomas"

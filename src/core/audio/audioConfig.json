@@ -2,6 +2,14 @@
   "globalVolume": 1,
   "tracks": [
     {
+      "id": "ambianceWorkbench",
+      "type": "sfx",
+      "src": "Ambiance-Workbench.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
       "id": "slidingDoor",
       "type": "sfx",
       "src": "Sliding-Door.mp3",
