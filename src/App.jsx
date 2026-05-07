@@ -142,6 +142,9 @@ export default function App() {
     receptionChoiceVisible,
     returnHallVisible,
     treePhaseActive,
+    workbenchPhaseActive,
+    thomasEtabliPhaseActive,
+    thomasAnimPhase,
     showNameInput,
     storyReady,
     currentStoryStepId,
@@ -158,6 +161,10 @@ export default function App() {
     handleDebugGoToDoorPassage,
     handleDebugGoToIntroStart,
     handleDebugGoToReception,
+    handleDebugGoToTree,
+    handleDebugGoToEtabli,
+    handleWorkbenchInteract,
+    handleThomasEtabliInteract,
     handleReceptionChoice: handleReceptionChoiceInternal,
     handleReceptionInteract,
     handleReturnToHall,
@@ -208,6 +215,16 @@ export default function App() {
     setPendingPostIntroPointerLock(true)
     handleDebugGoToReception()
   }, [handleDebugGoToReception])
+
+  const jumpToTree = useCallback(() => {
+    setPendingPostIntroPointerLock(true)
+    handleDebugGoToTree()
+  }, [handleDebugGoToTree])
+
+  const jumpToEtabli = useCallback(() => {
+    setPendingPostIntroPointerLock(true)
+    handleDebugGoToEtabli()
+  }, [handleDebugGoToEtabli])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -474,9 +491,14 @@ export default function App() {
             !journalUnlocked,
           journalUnlocked,
           interactionLocked,
+          workbenchPhaseActive,
+          thomasEtabliPhaseActive,
+          thomasAnimPhase,
           onEvent: handleIntroEvent,
           onReceptionInteract: handleReceptionInteract,
           onTreeInteract: handleTreeInteract,
+          onWorkbenchInteract: handleWorkbenchInteract,
+          onThomasEtabliInteract: handleThomasEtabliInteract,
           onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
         }}
         leafMaterialMode={leafMaterialMode}
@@ -521,6 +543,8 @@ export default function App() {
           onGoToIntroStart={jumpToIntroStart}
           onGoToDoorPassage={jumpToDoorPassage}
           onGoToReception={jumpToReception}
+          onGoToTree={jumpToTree}
+          onGoToEtabli={jumpToEtabli}
         />
       )}
 

@@ -2,6 +2,14 @@
   "globalVolume": 1,
   "tracks": [
     {
+      "id": "ambianceWorkbench",
+      "type": "sfx",
+      "src": "Ambiance-Workbench.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
       "id": "slidingDoor",
       "type": "sfx",
       "src": "Sliding-Door.mp3",
@@ -136,6 +144,22 @@
       "volume": 1,
       "autoplay": false,
       "subtitles": "tree-arbre-dialogue.srt"
+    },
+    {
+      "id": "etabliDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "etabli-dialogue.srt"
+    },
+    {
+      "id": "thomasEtabliDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "thomas-etabli-dialogue.srt"
     }
   ]
 }

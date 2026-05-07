@@ -7,7 +7,7 @@ import { SlidingDoors } from '../../world/entities/SlidingDoors'
 import { CollisionDebug } from '../CollisionDebug'
 import { TriggerZone } from '../../world/interactions/TriggerZone'
 import { setZone, useVisibilityZones, applyVisibilityZone, getZoneComponents } from '../../utils'
-import { DEFAULT_HUT_POS, PLATFORM_POS } from '../SceneConfig'
+import { PLATFORM_POS } from '../SceneConfig'
 
 // Radius around the tree platform that triggers the arbre zone.
 // Tune once the full arbre scene geometry is known.
@@ -31,6 +31,11 @@ export function CabaneScene({
   onReceptionInteract,
   treePhaseActive,
   onTreeInteract,
+  workbenchPhaseActive,
+  onWorkbenchInteract,
+  thomasEtabliPhaseActive,
+  onThomasEtabliInteract,
+  thomasAnimPhase,
   introWaitingAtDoor,
   journalUnlocked,
   playerMode,
@@ -49,7 +54,6 @@ export function CabaneScene({
 }) {
   const [cabane, setCabane] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
-  const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const visibilityZones = useVisibilityZones()
   const { characters, leaves, journal } = getZoneComponents(visibilityZones)
 
@@ -66,7 +70,6 @@ export function CabaneScene({
   const handleReady = useCallback(
     (data) => {
       if (Array.isArray(data.hutPosition)) {
-        setHutPosition(data.hutPosition)
         onHutPositionReady?.(data.hutPosition)
       }
       onSceneReady?.(data)
@@ -115,7 +118,12 @@ export function CabaneScene({
       )}
 
       {characters && (
-        <SceneCharacters performanceMode={performanceMode} hutPosition={hutPosition} />
+        <SceneCharacters
+          performanceMode={performanceMode}
+          thomasEtabliPhaseActive={thomasEtabliPhaseActive}
+          onThomasEtabliInteract={onThomasEtabliInteract}
+          thomasAnimPhase={thomasAnimPhase}
+        />
       )}
 
       <SceneInteractions
@@ -130,6 +138,8 @@ export function CabaneScene({
         onReceptionInteract={onReceptionInteract}
         treePhaseActive={treePhaseActive}
         onTreeInteract={onTreeInteract}
+        workbenchPhaseActive={workbenchPhaseActive}
+        onWorkbenchInteract={onWorkbenchInteract}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
         onJournalOpenComplete={onJournalOpenComplete}

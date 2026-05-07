@@ -52,10 +52,15 @@ export default function Scene({
     postIntroLocked,
     receptionActive,
     treePhaseActive,
+    workbenchPhaseActive,
+    thomasEtabliPhaseActive,
+    thomasAnimPhase,
     interactionLocked,
     onEvent: onIntroEvent,
     onReceptionInteract,
     onTreeInteract,
+    onWorkbenchInteract,
+    onThomasEtabliInteract,
     onStoryCameraTransitionComplete,
   } = intro
   const {
@@ -119,6 +124,11 @@ export default function Scene({
             onIntroEvent={onIntroEvent}
             receptionActive={receptionActive}
             treePhaseActive={treePhaseActive}
+            workbenchPhaseActive={workbenchPhaseActive}
+            thomasEtabliPhaseActive={thomasEtabliPhaseActive}
+            thomasAnimPhase={thomasAnimPhase}
+            onWorkbenchInteract={onWorkbenchInteract}
+            onThomasEtabliInteract={onThomasEtabliInteract}
             onTreeInteract={onTreeInteract}
             onReceptionInteract={onReceptionInteract}
             introWaitingAtDoor={introWaitingAtDoor}
