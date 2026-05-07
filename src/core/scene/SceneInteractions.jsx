@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
-import { ClickableLadder } from '../../world/entities/ClickableLadder'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { JournalBook } from '../../world/entities/JournalBook'
 
@@ -16,10 +15,8 @@ export function SceneInteractions({
   introWaitingAtDoor,
   journalUnlocked,
   receptionActive,
-  ladderClickActive,
   onIntroEvent,
   onReceptionInteract,
-  onLadderClick,
   onJournalStart,
   onJournalEnd,
   onJournalOpenComplete,
@@ -64,8 +61,6 @@ export function SceneInteractions({
         active={receptionActive}
         onInteract={onReceptionInteract}
       />
-
-      <ClickableLadder cabane={cabane} active={ladderClickActive} onInteract={onLadderClick} />
 
       {journalVisible && bookPosition && (
         <JournalBook

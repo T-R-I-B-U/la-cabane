@@ -127,3 +127,5 @@ export function Fruit({
     </>
   )
 }
+
+useGLTF.preload('/models/growingfruit.gltf')

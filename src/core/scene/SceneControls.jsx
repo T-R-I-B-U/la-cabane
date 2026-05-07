@@ -40,6 +40,7 @@ export function SceneControls({
   playerMode,
   flyMode,
   playerSpawn,
+  playerSpawnTarget,
   playerSpawnKey,
   movementLocked,
   postIntro,
@@ -83,7 +84,7 @@ export function SceneControls({
           canMove={!movementLocked}
           flyMode={flyMode}
           spawnAt={playerSpawn}
-          lookAtTarget={null}
+          lookAtTarget={playerSpawnTarget}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
         />

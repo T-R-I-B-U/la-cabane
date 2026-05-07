@@ -36,6 +36,7 @@ export default function Scene({
     mode: playerMode,
     flyMode,
     spawn: playerSpawn,
+    spawnTarget: playerSpawnTarget,
     spawnKey: playerSpawnKey,
     movementLocked,
   } = player
@@ -130,9 +131,7 @@ export default function Scene({
             onJournalPiecePlaced={onJournalPiecePlaced}
             onIntroEvent={onIntroEvent}
             receptionActive={receptionActive}
-            ladderClickActive={ladderClickActive}
             onReceptionInteract={onReceptionInteract}
-            onLadderClick={onLadderClick}
             introWaitingAtDoor={introWaitingAtDoor}
             journalUnlocked={journalUnlocked}
             playerMode={playerMode}
@@ -157,7 +156,10 @@ export default function Scene({
         <Suspense fallback={null}>
           <ArbreScene
             platformPosition={platformPosition}
+            hutPosition={hutPosition}
             arbreActive={arbreActive}
+            ladderClickActive={ladderClickActive}
+            onLadderClick={onLadderClick}
             growingFruitPlaying={arbreGrowingFruitPlaying}
             fruitsClickActive={fruitsClickActive}
             onFruitClickDuringLeaves={onFruitClickDuringLeaves}
@@ -181,6 +183,7 @@ export default function Scene({
         playerMode={playerMode}
         flyMode={flyMode}
         playerSpawn={playerSpawn}
+        playerSpawnTarget={playerSpawnTarget}
         playerSpawnKey={playerSpawnKey}
         movementLocked={movementLocked}
         postIntro={postIntro}

@@ -17,7 +17,7 @@ import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import CameraEditorPanel from './core/CameraEditorPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
-import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
+import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import { GAME_STEPS, unlockAndPlay, setVisibilityZones } from './utils'
@@ -38,6 +38,7 @@ export default function App() {
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [showUI, setShowUI] = useState(true)
   const [playerSpawn, setPlayerSpawn] = useState(null)
+  const [playerSpawnTarget, setPlayerSpawnTarget] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
   const [journalActive, setJournalActive] = useState(false)
@@ -164,9 +165,25 @@ export default function App() {
     setPostIntro,
   } = useIntroFlow({ sceneReady })
 
+  const spawnAtLadder = useCallback(() => {
+    const spawn = getLadderBaseSpawn(info?.platformPosition, info?.hutPosition)
+    setPostIntro(false)
+    setPlayerSpawn(spawn.position)
+    setPlayerSpawnTarget(spawn.target)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setPlayerMode(true)
+    setFlyMode(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [info?.platformPosition, info?.hutPosition, setPostIntro])
+
   const spawnAtPlatform = useCallback(() => {
     setPostIntro(false)
     setPlayerSpawn(getPlatformSpawn(info?.platformPosition))
+    setPlayerSpawnTarget(null)
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setPlayerMode(true)
@@ -190,7 +207,11 @@ export default function App() {
     handleArbreTransitionComplete,
     handleFruitClickDuringLeaves,
     triggerArbre,
-  } = useArbreFlow({ platformPosition: info?.platformPosition, onPlatformSpawn: spawnAtPlatform })
+  } = useArbreFlow({
+    platformPosition: info?.platformPosition,
+    onLadderSpawn: spawnAtLadder,
+    onPlatformSpawn: spawnAtPlatform,
+  })
   const [showCameraEditor, setShowCameraEditor] = useState(false)
   const [showStoryDebug, setShowStoryDebug] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
@@ -470,6 +491,7 @@ export default function App() {
           mode: playerMode,
           flyMode,
           spawn: playerSpawn,
+          spawnTarget: playerSpawnTarget,
           spawnKey: playerSpawnKey,
           movementLocked: interactionLocked || userMovementLocked,
         }}

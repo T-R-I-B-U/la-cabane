@@ -31,7 +31,7 @@ function resolveArbrePovs(platformPosition) {
   }
 }
 
-export function useArbreFlow({ platformPosition, onPlatformSpawn } = {}) {
+export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn } = {}) {
   const [arbreActive, setArbreActive] = useState(false)
   const [arbreMovementLocked, setArbreMovementLocked] = useState(false)
   const [arbreDialogueActive, setArbreDialogueActive] = useState(false)
@@ -66,21 +66,23 @@ export function useArbreFlow({ platformPosition, onPlatformSpawn } = {}) {
     setGameStep(GAME_STEPS.EXPLORATION)
   }, [resetStory, stopDialogue])
 
-  // Oneshot trigger when zone becomes 'arbre', or forced via arbreStartToken
+  // Oneshot trigger when zone becomes 'arbre', or forced via arbreStartToken.
+  // Player spawns at base of ladder in free-movement mode; locking happens on ladder click.
   useEffect(() => {
     if (zone !== 'arbre') return
     if (playedRef.current) return
     playedRef.current = true
     setArbreActive(true)
-    setArbreMovementLocked(true)
+    setArbreMovementLocked(false)
     setGameStep(GAME_STEPS.ARBRE_INTRO)
     goToStep('arbre.atLadder')
     setLadderClickActive(true)
-    setArbreStoryCameraTransition({ ...povs.atLadder })
-  }, [zone, arbreStartToken, goToStep, povs])
+    onLadderSpawn?.()
+  }, [zone, arbreStartToken, goToStep, onLadderSpawn])
 
   const handleLadderClick = useCallback(() => {
     setLadderClickActive(false)
+    setArbreMovementLocked(true)
     completeStep('arbre.atLadder')
     setArbreStoryCameraTransition({ ...povs.atPlatform })
   }, [completeStep, povs])
@@ -97,18 +99,27 @@ export function useArbreFlow({ platformPosition, onPlatformSpawn } = {}) {
           completeStep('arbre.platformDialogue')
           setArbreMovementLocked(false)
           setFruitsClickActive(true)
-          setGrowingFruitPlaying(true)
         },
       })
-    } else if (currentStepId === 'arbre.finalDialogue') {
-      setArbreDialogueActive(true)
-      playDialogue('arbreFinal', {
-        onDone: () => {
-          setArbreDialogueActive(false)
-          completeStep('arbre.finalDialogue')
-          exitArbre()
-        },
-      })
+    } else if (currentStepId === 'arbre.leavesDialogue') {
+      setArbreStoryCameraTransition(null)
+      setTimeout(() => {
+        setArbreDialogueActive(true)
+        playDialogue('arbreFeuilles', {
+          onDone: () => {
+            setArbreDialogueActive(false)
+            completeStep('arbre.leavesDialogue')
+            setArbreDialogueActive(true)
+            playDialogue('arbreFinal', {
+              onDone: () => {
+                setArbreDialogueActive(false)
+                completeStep('arbre.finalDialogue')
+                exitArbre()
+              },
+            })
+          },
+        })
+      }, 1000)
     }
   }, [currentStepId, completeStep, onPlatformSpawn, playDialogue, exitArbre])
 
@@ -117,15 +128,9 @@ export function useArbreFlow({ platformPosition, onPlatformSpawn } = {}) {
     setFruitsClickActive(false)
     setArbreMovementLocked(true)
     completeStep('arbre.exploreLeaves')
-    setArbreDialogueActive(true)
-    playDialogue('arbreFeuilles', {
-      onDone: () => {
-        setArbreDialogueActive(false)
-        completeStep('arbre.leavesDialogue')
-        setArbreStoryCameraTransition({ ...povs.atFruitFocus })
-      },
-    })
-  }, [fruitsClickActive, completeStep, playDialogue, povs])
+    setGrowingFruitPlaying(true)
+    setArbreStoryCameraTransition({ ...povs.atFruitFocus })
+  }, [fruitsClickActive, completeStep, povs])
 
   const arbreLeafInteractionsEnabled = currentStepId === 'arbre.exploreLeaves'
 
