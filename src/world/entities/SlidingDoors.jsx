@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { playOnce } from '../../utils'
 
 const TRIGGER_DIST = 5
 const SLIDE_AMOUNT = 1.5
@@ -139,10 +140,12 @@ export function SlidingDoors({
 }) {
   const { camera } = useThree()
   const progressRef = useRef(new Map())
+  const targetStateRef = useRef(new Map())
   const doors = useMemo(() => collectDoors(cabane, debug), [cabane, debug])
 
   useEffect(() => {
     progressRef.current = new Map()
+    targetStateRef.current = new Map()
   }, [doors])
 
   useFrame((_, delta) => {
@@ -151,6 +154,7 @@ export function SlidingDoors({
     const viewerPos = firstPersonMode
       ? camera.position
       : (controlsRef?.current?.target ?? camera.position)
+    let shouldPlayDoorSound = false
 
     for (const door of doors) {
       const right = cabane?.getObjectByProperty('uuid', door.rightId)
@@ -158,7 +162,16 @@ export function SlidingDoors({
       if (!right || !left) continue
 
       const dist = viewerPos.distanceTo(door.center)
-      const target = forceOpen || dist < TRIGGER_DIST ? 1 : 0
+      const isTargetOpen = forceOpen || dist < TRIGGER_DIST
+      const target = isTargetOpen ? 1 : 0
+      const previousTargetState = targetStateRef.current.get(door.id)
+
+      if (previousTargetState !== undefined && previousTargetState !== isTargetOpen) {
+        shouldPlayDoorSound = true
+      }
+
+      targetStateRef.current.set(door.id, isTargetOpen)
+
       const progress = getDoorProgress(progressRef, door.id)
       const nextProgress = progress + (target - progress) * lerpAlpha
 
@@ -171,6 +184,8 @@ export function SlidingDoors({
       if (right.isMesh) right.userData.isDoorOpen = isOpen
       if (left.isMesh) left.userData.isDoorOpen = isOpen
     }
+
+    if (shouldPlayDoorSound) playOnce('slidingDoor')
   })
 
   if (!debug) return null
