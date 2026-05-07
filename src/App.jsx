@@ -143,6 +143,7 @@ export default function App() {
     returnHallVisible,
     treePhaseActive,
     workbenchPhaseActive,
+    greenhousePhaseActive,
     thomasEtabliPhaseActive,
     thomasAnimPhase,
     showNameInput,
@@ -163,7 +164,9 @@ export default function App() {
     handleDebugGoToReception,
     handleDebugGoToTree,
     handleDebugGoToEtabli,
+    handleDebugGoToSerre,
     handleWorkbenchInteract,
+    handleGreenhouseDoorClick,
     handleThomasEtabliInteract,
     handleReceptionChoice: handleReceptionChoiceInternal,
     handleReceptionInteract,
@@ -225,6 +228,11 @@ export default function App() {
     setPendingPostIntroPointerLock(true)
     handleDebugGoToEtabli()
   }, [handleDebugGoToEtabli])
+
+  const jumpToSerre = useCallback(() => {
+    setPendingPostIntroPointerLock(true)
+    handleDebugGoToSerre()
+  }, [handleDebugGoToSerre])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -492,12 +500,14 @@ export default function App() {
           journalUnlocked,
           interactionLocked,
           workbenchPhaseActive,
+          greenhousePhaseActive,
           thomasEtabliPhaseActive,
           thomasAnimPhase,
           onEvent: handleIntroEvent,
           onReceptionInteract: handleReceptionInteract,
           onTreeInteract: handleTreeInteract,
           onWorkbenchInteract: handleWorkbenchInteract,
+          onGreenhouseDoorClick: handleGreenhouseDoorClick,
           onThomasEtabliInteract: handleThomasEtabliInteract,
           onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
         }}
@@ -545,6 +555,7 @@ export default function App() {
           onGoToReception={jumpToReception}
           onGoToTree={jumpToTree}
           onGoToEtabli={jumpToEtabli}
+          onGoToSerre={jumpToSerre}
         />
       )}
 

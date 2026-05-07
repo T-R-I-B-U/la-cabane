@@ -53,6 +53,7 @@ export default function Scene({
     receptionActive,
     treePhaseActive,
     workbenchPhaseActive,
+    greenhousePhaseActive,
     thomasEtabliPhaseActive,
     thomasAnimPhase,
     interactionLocked,
@@ -60,6 +61,7 @@ export default function Scene({
     onReceptionInteract,
     onTreeInteract,
     onWorkbenchInteract,
+    onGreenhouseDoorClick,
     onThomasEtabliInteract,
     onStoryCameraTransitionComplete,
   } = intro
@@ -125,6 +127,8 @@ export default function Scene({
             receptionActive={receptionActive}
             treePhaseActive={treePhaseActive}
             workbenchPhaseActive={workbenchPhaseActive}
+            greenhousePhaseActive={greenhousePhaseActive}
+            onGreenhouseDoorClick={onGreenhouseDoorClick}
             thomasEtabliPhaseActive={thomasEtabliPhaseActive}
             thomasAnimPhase={thomasAnimPhase}
             onWorkbenchInteract={onWorkbenchInteract}

@@ -10,6 +10,14 @@
       "autoplay": false
     },
     {
+      "id": "ambianceGreenhouse",
+      "type": "sfx",
+      "src": "Ambiance-Greenhouse-ZoeNotTalking.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
       "id": "slidingDoor",
       "type": "sfx",
       "src": "Sliding-Door.mp3",

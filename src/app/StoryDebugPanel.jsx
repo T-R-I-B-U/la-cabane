@@ -4,6 +4,7 @@ export function StoryDebugPanel({
   onGoToReception,
   onGoToTree,
   onGoToEtabli,
+  onGoToSerre,
 }) {
   return (
     <aside className="story-debug-panel" aria-label="Story debug panel">
@@ -23,6 +24,9 @@ export function StoryDebugPanel({
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToEtabli}>
           Établi
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToSerre}>
+          Serre (porte)
         </button>
       </div>
     </aside>
