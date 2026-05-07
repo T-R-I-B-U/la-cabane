@@ -12,7 +12,7 @@ import { SceneControls } from './scene/SceneControls'
 import { SceneLighting } from './scene/SceneLighting'
 import { CabaneScene } from './scene/CabaneScene'
 import { ArbreScene } from './scene/ArbreScene'
-import { useActiveZone } from '../utils'
+import { useActiveZone } from '../utils/gameManagerStore'
 
 export default function Scene({
   performanceMode,
@@ -83,7 +83,7 @@ export default function Scene({
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const sceneInteractionsActive =
+  const areSceneInteractionsEnabled =
     (playerMode || postIntro) && !interactionLocked && interactionsEnabled
   const collisionObjects = useMemo(
     () => [...sceneColliders, mainFloorCollider].filter(Boolean),
@@ -166,7 +166,7 @@ export default function Scene({
       <Fruit
         fruitId="fruit_01"
         position={[-23, 25.5, -9]}
-        active={sceneInteractionsActive}
+        active={areSceneInteractionsEnabled}
         onFruitClick={onFruitClick}
         onFruitHover={onFruitHover}
       />

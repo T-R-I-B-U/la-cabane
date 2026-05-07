@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
 import { STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
-import { fade, stop } from '../utils'
+import { fade, stop } from '../utils/audioStore'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -334,27 +334,36 @@ export function useIntroFlow({ sceneReady }) {
     return false
   }, [])
 
+  const playTreeDialogueSequence = useCallback(
+    (onComplete) => {
+      playDialogue('treeRacinesDialogue', {
+        onDone: () => {
+          playDialogue('treeBorneDialogue', {
+            onDone: () => {
+              playDialogue('treeArbreDialogue', {
+                onDone: () => {
+                  playDialogue('treeOutroDialogue', {
+                    onDone: onComplete,
+                  })
+                },
+              })
+            },
+          })
+        },
+      })
+    },
+    [playDialogue]
+  )
+
+  const unlockWorkbenchPhase = useCallback(() => {
+    setEtabliPhaseActive(true)
+    setWorkbenchPhaseActive(true)
+  }, [])
+
   const handleTreeInteract = useCallback(() => {
     setTreePhaseActive(false)
-    playDialogue('treeRacinesDialogue', {
-      onDone: () => {
-        playDialogue('treeBorneDialogue', {
-          onDone: () => {
-            playDialogue('treeArbreDialogue', {
-              onDone: () => {
-                playDialogue('treeOutroDialogue', {
-                  onDone: () => {
-                    setEtabliPhaseActive(true)
-                    setWorkbenchPhaseActive(true)
-                  },
-                })
-              },
-            })
-          },
-        })
-      },
-    })
-  }, [playDialogue])
+    playTreeDialogueSequence(unlockWorkbenchPhase)
+  }, [playTreeDialogueSequence, unlockWorkbenchPhase])
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
@@ -384,21 +393,31 @@ export function useIntroFlow({ sceneReady }) {
     setJournalCloseToken((token) => token + 1)
   }, [])
 
-  const debugGoToIntroStart = useCallback(() => {
+  const prepareDebugStoryState = useCallback(() => {
     stopDialogue()
     resetFlowState()
-    resetStory()
     setLoaderFading(true)
-    setIntroActive(true)
-  }, [resetFlowState, resetStory, stopDialogue])
+  }, [resetFlowState, stopDialogue])
 
-  const debugGoToDoorPassage = useCallback(() => {
+  const prepareDebugPostIntroState = useCallback(() => {
     stopDialogue()
     resetFlowState()
     setLoaderFading(false)
     setPostIntro(true)
     setIntroSpawn(INSIDE_POV)
     setIntroMovementLocked(true)
+    setPlayerName('Debug')
+  }, [resetFlowState, stopDialogue])
+
+  const debugGoToIntroStart = useCallback(() => {
+    prepareDebugStoryState()
+    resetStory()
+    setIntroActive(true)
+  }, [prepareDebugStoryState, resetStory])
+
+  const debugGoToDoorPassage = useCallback(() => {
+    prepareDebugPostIntroState()
+    setPlayerName('')
     startStory('intro.treeWelcome')
     playDialogue('01-voice-tree', {
       onDone: () => {
@@ -406,69 +425,27 @@ export function useIntroFlow({ sceneReady }) {
         setShowNameInput(true)
       },
     })
-  }, [completeStep, playDialogue, resetFlowState, startStory, stopDialogue])
+  }, [completeStep, playDialogue, prepareDebugPostIntroState, startStory])
 
   const debugGoToReception = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
+    prepareDebugPostIntroState()
     goToStep('intro.goToReception')
-  }, [goToStep, resetFlowState, stopDialogue])
+  }, [goToStep, prepareDebugPostIntroState])
 
   const debugGoToTree = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
-    playDialogue('treeRacinesDialogue', {
-      onDone: () => {
-        playDialogue('treeBorneDialogue', {
-          onDone: () => {
-            playDialogue('treeArbreDialogue', {
-              onDone: () => {
-                playDialogue('treeOutroDialogue', {
-                  onDone: () => {
-                    setEtabliPhaseActive(true)
-                    setWorkbenchPhaseActive(true)
-                  },
-                })
-              },
-            })
-          },
-        })
-      },
-    })
-  }, [playDialogue, resetFlowState, stopDialogue])
+    prepareDebugPostIntroState()
+    playTreeDialogueSequence(unlockWorkbenchPhase)
+  }, [playTreeDialogueSequence, prepareDebugPostIntroState, unlockWorkbenchPhase])
 
   const debugGoToEtabli = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
-    setEtabliPhaseActive(true)
-    setWorkbenchPhaseActive(true)
-  }, [resetFlowState, stopDialogue])
+    prepareDebugPostIntroState()
+    unlockWorkbenchPhase()
+  }, [prepareDebugPostIntroState, unlockWorkbenchPhase])
 
   const debugGoToSerre = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
+    prepareDebugPostIntroState()
     setGreenhousePhaseActive(true)
-  }, [resetFlowState, stopDialogue])
+  }, [prepareDebugPostIntroState])
 
   const launchIntro = useCallback(() => {
     if (!sceneReady) return

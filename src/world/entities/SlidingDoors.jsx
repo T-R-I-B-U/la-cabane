@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { playOnce } from '../../utils'
+import { playOnce } from '../../utils/audioStore'
 
 const TRIGGER_DIST = 5
 const SLIDE_AMOUNT = 1.5

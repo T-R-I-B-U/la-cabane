@@ -35,7 +35,7 @@ export function SceneInteractions({
   journalPuzzleEnabled,
   journalVisible = true,
 }) {
-  const journalActive = (playerMode || postIntro) && journalUnlocked
+  const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   const bookPosition = useMemo(() => {
     if (!cabane) return null
 
@@ -65,28 +65,28 @@ export function SceneInteractions({
 
       <ClickableReception
         cabane={cabane}
-        active={receptionActive}
+        isInteractable={receptionActive}
         onInteract={onReceptionInteract}
       />
 
-      <ClickableTree cabane={cabane} active={treePhaseActive} onInteract={onTreeInteract} />
+      <ClickableTree cabane={cabane} isInteractable={treePhaseActive} onInteract={onTreeInteract} />
 
       <ClickableWorkbench
         cabane={cabane}
-        active={workbenchPhaseActive}
+        isInteractable={workbenchPhaseActive}
         onInteract={onWorkbenchInteract}
       />
 
       <ClickableGreenhouseDoor
         cabane={cabane}
-        active={greenhousePhaseActive}
+        isInteractable={greenhousePhaseActive}
         onDoorClick={onGreenhouseDoorClick}
       />
 
       {journalVisible && bookPosition && (
         <JournalBook
           position={bookPosition}
-          active={journalActive}
+          active={isJournalInteractable}
           autoOpenToken={journalAutoOpenToken}
           closeToken={journalCloseToken}
           pieceInteractionEnabled={journalPuzzleEnabled}

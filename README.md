@@ -7,14 +7,14 @@ Built by a team of 2 developers.
 
 ## Tech Stack
 
-| Tool | Version | Role |
-|---|---|---|
-| [Three.js](https://threejs.org/) | 0.183 | WebGL engine |
-| [React](https://react.dev/) | 19 | UI layer (DOM overlay on the canvas) |
-| [Vite](https://vitejs.dev/) | 7 | Bundler + HMR |
-| [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl) | — | Native `.glsl` file imports |
-| [ESLint](https://eslint.org/) (flat config) | — | JS/JSX linting |
-| Cinema 4D → `.gltf` / `.glb` | — | 3D asset export pipeline |
+| Tool                                                                | Version | Role                                 |
+| ------------------------------------------------------------------- | ------- | ------------------------------------ |
+| [Three.js](https://threejs.org/)                                    | 0.183   | WebGL engine                         |
+| [React](https://react.dev/)                                         | 19      | UI layer (DOM overlay on the canvas) |
+| [Vite](https://vitejs.dev/)                                         | 7       | Bundler + HMR                        |
+| [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl) | —       | Native `.glsl` file imports          |
+| [ESLint](https://eslint.org/) (flat config)                         | —       | JS/JSX linting                       |
+| Cinema 4D → `.gltf` / `.glb`                                        | —       | 3D asset export pipeline             |
 
 ---
 
@@ -51,7 +51,7 @@ index.html
 - `App.jsx` owns the DOM overlay state and passes display/debug options to `Scene`.
 - `core/` owns the R3F canvas, scene setup, controls, loaders, and rendering diagnostics.
 - `world/` owns project-specific scene content and entity behavior.
-- `utils/` is reserved for shared stateless helpers.
+- `utils/` contains shared helpers and small runtime stores used across app, scene, and audio flows.
 - Assets in `public/` are served statically and loaded at runtime — they are never bundled by Vite.
 
 ---
@@ -69,8 +69,7 @@ src/
   world/
     entities/   → one module/component per 3D object or scene behavior
     materials/  → reusable Three.js materials and custom shaders
-  utils/        → shared stateless helpers
-  assets/       → static assets imported directly by Vite (SVG, images)
+  utils/        → shared helpers and runtime stores
   App.jsx       → React root component
   main.jsx      → single entry point — mounts React and boots the engine
   index.css     → global styles
@@ -85,6 +84,7 @@ src/
 `App.jsx` delegates the intro state machine to `src/app/useIntroFlow.js`.
 
 Flow:
+
 - idle overlay → `launchIntro()`
 - intro loader overlay → click to start cinematic
 - `IntroCamera` emits scene events (`wait:door`, `door:open`, `inside`)
@@ -104,6 +104,7 @@ Flow:
 `src/world/entities/Cabane.js` is the public entrypoint for scene assembly.
 
 Internal modules:
+
 - `src/world/cabane/assetNaming.js` → asset naming normalization and model base-name resolution
 - `src/world/cabane/textureResolver.js` → runtime texture lookup and auto-application
 - `src/world/cabane/instancing.js` → `.bin` instanced mesh reconstruction
@@ -125,10 +126,11 @@ Internal modules:
 - New reusable core runtime helpers: `src/core/`
 - New project-specific 3D entities or interactions: `src/world/entities/`
 - New cabane build logic: `src/world/cabane/`
-- New shared stateless helpers: `src/utils/`
+- New shared helpers or small runtime stores: `src/utils/`
 - New runtime assets: `public/models`, `public/textures`, `public/audio`, `public/subtitles`
 
 When adding a new entity:
+
 - add the runtime component in `src/world/entities/`
 - keep DOM/UI concerns out of the entity
 - wire it from `Scene.jsx` or a focused `src/core/scene/*` orchestrator component
@@ -167,15 +169,15 @@ main              ← releases only (version tags, e.g. v0.1.0)
 
 ### Branch naming
 
-| Prefix | Use |
-|---|---|
-| `feat/` | New feature |
-| `fix/` | Bug fix |
-| `style/` | Visual / CSS / animation changes |
+| Prefix      | Use                                        |
+| ----------- | ------------------------------------------ |
+| `feat/`     | New feature                                |
+| `fix/`      | Bug fix                                    |
+| `style/`    | Visual / CSS / animation changes           |
 | `refactor/` | Internal restructuring, no behavior change |
-| `devtools/` | Config / build / tooling changes |
-| `docs/` | Documentation only |
-| `chore/` | Maintenance / cleanup |
+| `devtools/` | Config / build / tooling changes           |
+| `docs/`     | Documentation only                         |
+| `chore/`    | Maintenance / cleanup                      |
 
 Examples: `feat/tribe-tree-entity`, `fix/loader-draco-path`, `docs/readme-architecture`
 

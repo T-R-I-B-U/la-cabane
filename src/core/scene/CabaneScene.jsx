@@ -6,7 +6,12 @@ import { SceneInteractions } from './SceneInteractions'
 import { SlidingDoors } from '../../world/entities/SlidingDoors'
 import { CollisionDebug } from '../CollisionDebug'
 import { TriggerZone } from '../../world/interactions/TriggerZone'
-import { setZone, useVisibilityZones, applyVisibilityZone, getZoneComponents } from '../../utils'
+import { setZone } from '../../utils/gameManagerStore'
+import {
+  applyVisibilityZone,
+  getZoneComponents,
+  useVisibilityZones,
+} from '../../utils/visibilityZoneStore'
 import { PLATFORM_POS } from '../SceneConfig'
 
 // Radius around the tree platform that triggers the arbre zone.
@@ -54,65 +59,68 @@ export function CabaneScene({
   onCollisionReady,
   onHutPositionReady,
 }) {
-  const [cabane, setCabane] = useState(null)
+  const [cabaneGroup, setCabaneGroup] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
   const visibilityZones = useVisibilityZones()
   const { characters, leaves, journal } = getZoneComponents(visibilityZones)
 
   useEffect(() => {
-    if (!cabane) return
-    onCollisionReady?.([cabane])
+    if (!cabaneGroup) return
+    onCollisionReady?.([cabaneGroup])
     return () => onCollisionReady?.([])
-  }, [cabane, onCollisionReady])
+  }, [cabaneGroup, onCollisionReady])
 
   useEffect(() => {
-    applyVisibilityZone(cabane, visibilityZones)
-  }, [cabane, visibilityZones])
+    applyVisibilityZone(cabaneGroup, visibilityZones)
+  }, [cabaneGroup, visibilityZones])
 
-  const handleReady = useCallback(
-    (data) => {
-      if (Array.isArray(data.hutPosition)) {
-        onHutPositionReady?.(data.hutPosition)
+  const handleCabaneMapReady = useCallback(
+    (sceneInfo) => {
+      if (Array.isArray(sceneInfo.hutPosition)) {
+        onHutPositionReady?.(sceneInfo.hutPosition)
       }
-      onSceneReady?.(data)
+      onSceneReady?.(sceneInfo)
     },
     [onHutPositionReady, onSceneReady]
   )
 
-  const handleCabaneLoaded = useCallback((group) => {
-    setCabane(group)
+  const handleCabaneGroupLoaded = useCallback((group) => {
+    setCabaneGroup(group)
     if (!group) {
       setLeafMesh(null)
       return
     }
-    let found = null
-    group.traverse((obj) => {
-      if (!found && obj.isInstancedMesh && obj.name === 'leaf') found = obj
+    let leafInstancedMesh = null
+    group.traverse((object) => {
+      if (!leafInstancedMesh && object.isInstancedMesh && object.name === 'leaf') {
+        leafInstancedMesh = object
+      }
     })
-    if (found) {
+    if (leafInstancedMesh) {
       // Restore prototype raycast (was disabled in buildInstancedMesh for first-person perf).
-      delete found.raycast
+      delete leafInstancedMesh.raycast
       // Remove from cabane group so TreeLeaves is the sole owner of this mesh.
-      found.parent?.remove(found)
+      leafInstancedMesh.parent?.remove(leafInstancedMesh)
     }
-    setLeafMesh(found ?? null)
+    setLeafMesh(leafInstancedMesh ?? null)
   }, [])
 
-  const interactionsActive = (playerMode || postIntro) && !interactionLocked && interactionsEnabled
+  const areCabaneInteractionsEnabled =
+    (playerMode || postIntro) && !interactionLocked && interactionsEnabled
 
   return (
     <>
       <CabaneMap
         performanceMode={performanceMode}
-        onReady={handleReady}
+        onReady={handleCabaneMapReady}
         onError={onError}
-        onCabaneLoaded={handleCabaneLoaded}
+        onCabaneLoaded={handleCabaneGroupLoaded}
       />
 
       {leaves && (
         <TreeLeaves
           leafMesh={leafMesh}
-          active={interactionsActive}
+          active={areCabaneInteractionsEnabled}
           onLeafClick={onLeafClick}
           onLeafHover={onLeafHover}
           leafMaterialMode={leafMaterialMode}
@@ -129,7 +137,7 @@ export function CabaneScene({
       )}
 
       <SceneInteractions
-        cabane={cabane}
+        cabane={cabaneGroup}
         playerMode={playerMode}
         postIntro={postIntro}
         interactionLocked={interactionLocked}
@@ -155,10 +163,10 @@ export function CabaneScene({
         journalVisible={journal}
       />
 
-      {debugCollisions && <CollisionDebug cabane={cabane} />}
+      {debugCollisions && <CollisionDebug cabane={cabaneGroup} />}
 
       <SlidingDoors
-        cabane={cabane}
+        cabane={cabaneGroup}
         firstPersonMode={firstPersonMode}
         controlsRef={controlsRef}
         debug={debugDoors}

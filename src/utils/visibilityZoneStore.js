@@ -21,31 +21,54 @@ export const ZONE_COMPONENTS = {
 
 export const VISIBILITY_ZONES = Object.keys(NODE_WHITELIST)
 
-let _zonesSnapshot = ['all']
-const _subs = new Set()
+let visibilityZonesSnapshot = ['all']
+const listeners = new Set()
 
-function subscribe(fn) {
-  _subs.add(fn)
-  return () => _subs.delete(fn)
+function subscribe(listener) {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
 }
 
 export function getVisibilityZones() {
-  return _zonesSnapshot
+  return visibilityZonesSnapshot
+}
+
+function isValidVisibilityZone(zone) {
+  return VISIBILITY_ZONES.includes(zone)
+}
+
+function warnInvalidVisibilityZone(zone) {
+  if (!import.meta.env.DEV) return
+  console.warn(`[VisibilityZone] Ignoring unknown zone "${zone}"`)
+}
+
+function notifyVisibilityZoneListeners() {
+  listeners.forEach((listener) => listener())
 }
 
 export function toggleVisibilityZone(zone) {
-  const next = new Set(_zonesSnapshot)
+  if (!isValidVisibilityZone(zone)) {
+    warnInvalidVisibilityZone(zone)
+    return
+  }
+
+  const next = new Set(visibilityZonesSnapshot)
   if (next.has(zone)) next.delete(zone)
   else next.add(zone)
-  _zonesSnapshot = [...next]
-  _subs.forEach((fn) => fn())
+  visibilityZonesSnapshot = [...next]
+  notifyVisibilityZoneListeners()
 }
 
 // Remplace l'ensemble des zones actives d'un coup.
 // Utile pour piloter la visibilité depuis le GameManager (via onStepChange).
 export function setVisibilityZones(zones) {
-  _zonesSnapshot = zones
-  _subs.forEach((fn) => fn())
+  const validZones = zones.filter((zone) => {
+    const valid = isValidVisibilityZone(zone)
+    if (!valid) warnInvalidVisibilityZone(zone)
+    return valid
+  })
+  visibilityZonesSnapshot = validZones
+  notifyVisibilityZoneListeners()
 }
 
 export function useVisibilityZones() {
@@ -82,10 +105,14 @@ export function applyVisibilityZone(cabaneGroup, zones) {
   let showAll = false
   const merged = []
   for (const zone of zones) {
-    const wl = NODE_WHITELIST[zone] ?? null
-    if (wl === null) {
+    if (zone === 'all') {
       showAll = true
       break
+    }
+    const wl = NODE_WHITELIST[zone]
+    if (!wl) {
+      warnInvalidVisibilityZone(zone)
+      continue
     }
     for (const node of wl) {
       if (!merged.includes(node)) merged.push(node)

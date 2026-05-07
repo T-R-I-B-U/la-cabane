@@ -8,7 +8,7 @@ export function CabaneMap({ performanceMode, onReady, onError, onCabaneLoaded })
 
   useEffect(() => {
     let cancelled = false
-    let loadedCabane = null
+    let loadedCabaneGroup = null
 
     buildCabane({ performanceMode })
       .then((group) => {
@@ -17,24 +17,29 @@ export function CabaneMap({ performanceMode, onReady, onError, onCabaneLoaded })
           return
         }
 
-        loadedCabane = group
-        let meshes = 0
-        let pivots = 0
+        loadedCabaneGroup = group
+        let meshCount = 0
+        let pivotCount = 0
         let platformPosition = null
 
         group.updateWorldMatrix(true, true)
 
         group.traverse((object3d) => {
           if (object3d === group) return
-          if (object3d.isMesh) meshes += 1
-          else if (object3d.userData.cabaneNode) pivots += 1
+          if (object3d.isMesh) meshCount += 1
+          else if (object3d.userData.cabaneNode) pivotCount += 1
 
           if (object3d.isMesh && object3d.name === 'platform') {
             platformPosition = object3d.getWorldPosition(new THREE.Vector3()).toArray()
           }
         })
 
-        onReady({ meshes, pivots, hutPosition: group.userData.hutPosition, platformPosition })
+        onReady({
+          meshes: meshCount,
+          pivots: pivotCount,
+          hutPosition: group.userData.hutPosition,
+          platformPosition,
+        })
         onCabaneLoaded(group)
         setCabane(group)
       })
@@ -45,9 +50,9 @@ export function CabaneMap({ performanceMode, onReady, onError, onCabaneLoaded })
 
     return () => {
       cancelled = true
-      if (loadedCabane) {
+      if (loadedCabaneGroup) {
         clearTextureCache()
-        disposeObject3D(loadedCabane)
+        disposeObject3D(loadedCabaneGroup)
       }
       onCabaneLoaded(null)
     }

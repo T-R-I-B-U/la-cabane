@@ -3,7 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { applyAutoTextures } from '../cabane/textureResolver'
-import { playOnce } from '../../utils'
+import { playOnce } from '../../utils/audioStore'
 import { disposeObject3D } from '../../core/disposeObject3D'
 
 const MODEL_URL = '/models/book01.gltf'

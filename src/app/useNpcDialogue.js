@@ -1,5 +1,8 @@
 import { useCallback, useRef, useState } from 'react'
-import { playDialogue as playStoreDialogue, stopDialogue as stopStoreDialogue } from '../utils'
+import {
+  playDialogue as playStoreDialogue,
+  stopDialogue as stopStoreDialogue,
+} from '../utils/audioStore'
 
 // Couche React minimale pour piloter le dialogue applicatif.
 // Le hook expose un état local simple et délègue la lecture réelle au store audio global.
