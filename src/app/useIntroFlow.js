@@ -30,6 +30,7 @@ export function useIntroFlow({ sceneReady }) {
   const [treePhaseActive, setTreePhaseActive] = useState(false)
   const [, setEtabliPhaseActive] = useState(false)
   const [workbenchPhaseActive, setWorkbenchPhaseActive] = useState(false)
+  const [greenhousePhaseActive, setGreenhousePhaseActive] = useState(false)
   const [thomasEtabliPhaseActive, setThomasEtabliPhaseActive] = useState(false)
   const [thomasAnimPhase, setThomasAnimPhase] = useState('back')
   const [playerName, setPlayerName] = useState('')
@@ -39,6 +40,7 @@ export function useIntroFlow({ sceneReady }) {
   const isPostBookTransitionRef = useRef(false)
   const isEtabliTransitionRef = useRef(false)
   const isThomasTransitionRef = useRef(false)
+  const isGreenhouseTransitionRef = useRef(null)
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory, startStory } = useStoryFlow()
   const storyReady = currentStepId === 'intro.goToReception'
@@ -64,13 +66,16 @@ export function useIntroFlow({ sceneReady }) {
     setEtabliPhaseActive(false)
     setWorkbenchPhaseActive(false)
     setThomasEtabliPhaseActive(false)
+    setGreenhousePhaseActive(false)
     setThomasAnimPhase('back')
     setPlayerName('')
     stop('ambianceWorkbench')
+    stop('ambianceGreenhouse')
     ignoreNextPointerUnlockRef.current = false
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
+    isGreenhouseTransitionRef.current = null
   }, [])
 
   const exitIntro = useCallback(() => {
@@ -203,8 +208,31 @@ export function useIntroFlow({ sceneReady }) {
         onDone: () => {
           setThomasAnimPhase('returning')
           setTimeout(() => fade('ambianceWorkbench', 0.7, 2000), 2000)
+          setGreenhousePhaseActive(true)
         },
       })
+      return
+    }
+
+    if (isGreenhouseTransitionRef.current === 'front') {
+      isGreenhouseTransitionRef.current = 'corridor'
+      setTimeout(() => {
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseCorridor, duration: 2.5 })
+      }, 1000)
+      return
+    }
+
+    if (isGreenhouseTransitionRef.current === 'corridor') {
+      isGreenhouseTransitionRef.current = 'inside'
+      fade('ambianceGreenhouse', 0.7, 2000)
+      setTimeout(() => {
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInside, duration: 2.5 })
+      }, 1000)
+      return
+    }
+
+    if (isGreenhouseTransitionRef.current === 'inside') {
+      isGreenhouseTransitionRef.current = null
       return
     }
 
@@ -317,6 +345,12 @@ export function useIntroFlow({ sceneReady }) {
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelier, duration: 1.5 })
   }, [])
 
+  const handleGreenhouseDoorClick = useCallback(() => {
+    setGreenhousePhaseActive(false)
+    isGreenhouseTransitionRef.current = 'front'
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
+  }, [])
+
   const handleThomasEtabliInteract = useCallback(() => {
     setThomasEtabliPhaseActive(false)
     setThomasAnimPhase('talking')
@@ -406,6 +440,17 @@ export function useIntroFlow({ sceneReady }) {
     setWorkbenchPhaseActive(true)
   }, [resetFlowState, stopDialogue])
 
+  const debugGoToSerre = useCallback(() => {
+    stopDialogue()
+    resetFlowState()
+    setLoaderFading(false)
+    setPostIntro(true)
+    setIntroSpawn(INSIDE_POV)
+    setIntroMovementLocked(true)
+    setPlayerName('Debug')
+    setGreenhousePhaseActive(true)
+  }, [resetFlowState, stopDialogue])
+
   const launchIntro = useCallback(() => {
     if (!sceneReady) return
 
@@ -462,6 +507,7 @@ export function useIntroFlow({ sceneReady }) {
     treePhaseActive,
     workbenchPhaseActive,
     thomasEtabliPhaseActive,
+    greenhousePhaseActive,
     thomasAnimPhase,
     showNameInput,
     storyReady,
@@ -477,8 +523,10 @@ export function useIntroFlow({ sceneReady }) {
     handleDebugGoToReception: debugGoToReception,
     handleDebugGoToTree: debugGoToTree,
     handleDebugGoToEtabli: debugGoToEtabli,
+    handleDebugGoToSerre: debugGoToSerre,
     handleWorkbenchInteract,
     handleThomasEtabliInteract,
+    handleGreenhouseDoorClick,
     handleJournalEnd,
     handleTreeInteract,
     handleJournalInteractionStart,

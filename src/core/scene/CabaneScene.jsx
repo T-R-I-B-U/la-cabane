@@ -33,6 +33,8 @@ export function CabaneScene({
   onTreeInteract,
   workbenchPhaseActive,
   onWorkbenchInteract,
+  greenhousePhaseActive,
+  onGreenhouseDoorClick,
   thomasEtabliPhaseActive,
   onThomasEtabliInteract,
   thomasAnimPhase,
@@ -140,6 +142,8 @@ export function CabaneScene({
         onTreeInteract={onTreeInteract}
         workbenchPhaseActive={workbenchPhaseActive}
         onWorkbenchInteract={onWorkbenchInteract}
+        greenhousePhaseActive={greenhousePhaseActive}
+        onGreenhouseDoorClick={onGreenhouseDoorClick}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
         onJournalOpenComplete={onJournalOpenComplete}

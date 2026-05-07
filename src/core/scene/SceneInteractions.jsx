@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
+import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
 import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
@@ -18,10 +19,12 @@ export function SceneInteractions({
   receptionActive,
   treePhaseActive,
   workbenchPhaseActive,
+  greenhousePhaseActive,
   onWorkbenchInteract,
   onIntroEvent,
   onReceptionInteract,
   onTreeInteract,
+  onGreenhouseDoorClick,
   onJournalStart,
   onJournalEnd,
   onJournalOpenComplete,
@@ -72,6 +75,12 @@ export function SceneInteractions({
         cabane={cabane}
         active={workbenchPhaseActive}
         onInteract={onWorkbenchInteract}
+      />
+
+      <ClickableGreenhouseDoor
+        cabane={cabane}
+        active={greenhousePhaseActive}
+        onDoorClick={onGreenhouseDoorClick}
       />
 
       {journalVisible && bookPosition && (
