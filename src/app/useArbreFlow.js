@@ -59,7 +59,6 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     setArbreDialogueActive(false)
     setArbreStoryCameraTransition(null)
     setLadderClickActive(false)
-    setGrowingFruitPlaying(false)
     setFruitsClickActive(false)
     resetStory()
     stopDialogue()
@@ -72,6 +71,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     if (zone !== 'arbre') return
     if (playedRef.current) return
     playedRef.current = true
+    setGrowingFruitPlaying(false)
     setArbreActive(true)
     setArbreMovementLocked(false)
     setGameStep(GAME_STEPS.ARBRE_INTRO)
@@ -102,7 +102,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
         },
       })
     } else if (currentStepId === 'arbre.leavesDialogue') {
-      setArbreStoryCameraTransition(null)
+      setGrowingFruitPlaying(true)
       setTimeout(() => {
         setArbreDialogueActive(true)
         playDialogue('arbreFeuilles', {
@@ -128,7 +128,6 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     setFruitsClickActive(false)
     setArbreMovementLocked(true)
     completeStep('arbre.exploreLeaves')
-    setGrowingFruitPlaying(true)
     setArbreStoryCameraTransition({ ...povs.atFruitFocus })
   }, [fruitsClickActive, completeStep, povs])
 
