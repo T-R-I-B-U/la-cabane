@@ -18,12 +18,12 @@ function getInstanceCandidates(baseName, modelBasePaths) {
 export async function buildInstancedMesh(node, { modelBasePaths }) {
   const baseName = modelBaseName(node.name)
 
-  let template = null
+  let templateModel = null
   const templatePaths = getModelCandidates(baseName, modelBasePaths)
   const loadErrors = []
   for (const modelPath of templatePaths) {
     try {
-      template = await loadModel(modelPath)
+      templateModel = await loadModel(modelPath)
       break
     } catch (error) {
       loadErrors.push(`${modelPath}: ${error.message ?? error}`)
@@ -31,14 +31,14 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
     }
   }
 
-  if (!template) {
+  if (!templateModel) {
     warnMissingAsset(
       `No template model found for "${node.name}" (${templatePaths.join(', ')}). ${loadErrors.join(' | ')}`
     )
   }
 
-  let count = 0
-  let floats = null
+  let instanceCount = 0
+  let instanceMatrixArray = null
   const instancePaths = getInstanceCandidates(baseName, modelBasePaths)
   let loadedInstancePath = null
   for (const instancePath of instancePaths) {
@@ -53,9 +53,9 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
         )
       }
 
-      count = new DataView(buffer).getUint32(0, true)
+      instanceCount = new DataView(buffer).getUint32(0, true)
 
-      const expectedFloatCount = count * 16
+      const expectedFloatCount = instanceCount * 16
       const actualFloatCount = (buffer.byteLength - 4) / 4
       if (!Number.isInteger(actualFloatCount) || actualFloatCount !== expectedFloatCount) {
         throw new Error(
@@ -63,7 +63,7 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
         )
       }
 
-      floats = new Float32Array(buffer, 4, count * 16)
+      instanceMatrixArray = new Float32Array(buffer, 4, instanceCount * 16)
       loadedInstancePath = instancePath
       break
     } catch (error) {
@@ -79,7 +79,7 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
     )
   }
 
-  if (!template || count === 0 || !floats) {
+  if (!templateModel || instanceCount === 0 || !instanceMatrixArray) {
     const group = new THREE.Group()
     group.name = node.name
     group.userData.cabaneNode = true
@@ -89,18 +89,21 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
 
   let geometry = null
   let material = null
-  const templateRoot = template.children[0] ?? null
-  template.traverse((child) => {
+  const templateRoot = templateModel.children[0] ?? null
+  templateModel.traverse((child) => {
     if (!geometry && child.isMesh) {
       geometry = child.geometry.clone()
       material = cloneMaterialWithTextures(child.material)
-      material.side = THREE.DoubleSide
+      const materials = Array.isArray(material) ? material : [material]
+      materials.forEach((entry) => {
+        if (entry) entry.side = THREE.DoubleSide
+      })
     }
   })
 
-  if (!geometry) {
-    warnMissingAsset(`Template model for "${node.name}" does not contain a mesh`)
-    disposeObject3D(template)
+  if (!geometry || !material) {
+    warnMissingAsset(`Template model for "${node.name}" does not contain a usable mesh/material`)
+    disposeObject3D(templateModel)
     const group = new THREE.Group()
     group.name = node.name
     group.userData.cabaneNode = true
@@ -108,7 +111,7 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
     return group
   }
 
-  const mesh = new THREE.InstancedMesh(geometry, material, count)
+  const mesh = new THREE.InstancedMesh(geometry, material, instanceCount)
   mesh.name = node.name
   mesh.userData.cabaneNode = true
   const [px, py, pz] = node.position
@@ -130,9 +133,9 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
   }
   mesh.frustumCulled = false
   mesh.raycast = () => {}
-  mesh.instanceMatrix.array.set(floats)
+  mesh.instanceMatrix.array.set(instanceMatrixArray)
   mesh.instanceMatrix.needsUpdate = true
-  disposeObject3D(template)
+  disposeObject3D(templateModel)
 
   return mesh
 }

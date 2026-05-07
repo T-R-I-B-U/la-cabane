@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
 import { STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
-import { fade, stop } from '../utils'
+import { fade, stop } from '../utils/audioStore'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -32,7 +32,7 @@ export function useIntroFlow({ sceneReady }) {
   const [workbenchPhaseActive, setWorkbenchPhaseActive] = useState(false)
   const [greenhousePhaseActive, setGreenhousePhaseActive] = useState(false)
   const [thomasEtabliPhaseActive, setThomasEtabliPhaseActive] = useState(false)
-  const [thomasAnimPhase, setThomasAnimPhase] = useState('back')
+  const [thomasAnimationPhase, setThomasAnimationPhase] = useState('back')
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
   const journalPlacedCountRef = useRef(0)
@@ -40,12 +40,30 @@ export function useIntroFlow({ sceneReady }) {
   const isPostBookTransitionRef = useRef(false)
   const isEtabliTransitionRef = useRef(false)
   const isThomasTransitionRef = useRef(false)
-  const isGreenhouseTransitionRef = useRef(null)
+  const greenhouseTransitionStageRef = useRef(null)
+  const scheduledTimeoutsRef = useRef(new Set())
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory, startStory } = useStoryFlow()
   const storyReady = currentStepId === 'intro.goToReception'
 
+  const clearScheduledTimeouts = useCallback(() => {
+    scheduledTimeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId))
+    scheduledTimeoutsRef.current.clear()
+  }, [])
+
+  const scheduleFlowTimeout = useCallback((callback, delay) => {
+    const timeoutId = setTimeout(() => {
+      scheduledTimeoutsRef.current.delete(timeoutId)
+      callback()
+    }, delay)
+    scheduledTimeoutsRef.current.add(timeoutId)
+    return timeoutId
+  }, [])
+
+  useEffect(() => clearScheduledTimeouts, [clearScheduledTimeouts])
+
   const resetFlowState = useCallback(() => {
+    clearScheduledTimeouts()
     setIntroActive(false)
     setIntroPending(false)
     setPostIntro(false)
@@ -67,7 +85,7 @@ export function useIntroFlow({ sceneReady }) {
     setWorkbenchPhaseActive(false)
     setThomasEtabliPhaseActive(false)
     setGreenhousePhaseActive(false)
-    setThomasAnimPhase('back')
+    setThomasAnimationPhase('back')
     setPlayerName('')
     stop('ambianceWorkbench')
     stop('ambianceGreenhouse')
@@ -75,8 +93,8 @@ export function useIntroFlow({ sceneReady }) {
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
-    isGreenhouseTransitionRef.current = null
-  }, [])
+    greenhouseTransitionStageRef.current = null
+  }, [clearScheduledTimeouts])
 
   const exitIntro = useCallback(() => {
     resetFlowState()
@@ -206,33 +224,33 @@ export function useIntroFlow({ sceneReady }) {
       isThomasTransitionRef.current = false
       playDialogue('thomasEtabliDialogue', {
         onDone: () => {
-          setThomasAnimPhase('returning')
-          setTimeout(() => fade('ambianceWorkbench', 0.7, 2000), 2000)
+          setThomasAnimationPhase('returning')
+          scheduleFlowTimeout(() => fade('ambianceWorkbench', 0.7, 2000), 2000)
           setGreenhousePhaseActive(true)
         },
       })
       return
     }
 
-    if (isGreenhouseTransitionRef.current === 'front') {
-      isGreenhouseTransitionRef.current = 'corridor'
-      setTimeout(() => {
+    if (greenhouseTransitionStageRef.current === 'front') {
+      greenhouseTransitionStageRef.current = 'corridor'
+      scheduleFlowTimeout(() => {
         setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseCorridor, duration: 2.5 })
       }, 1000)
       return
     }
 
-    if (isGreenhouseTransitionRef.current === 'corridor') {
-      isGreenhouseTransitionRef.current = 'inside'
+    if (greenhouseTransitionStageRef.current === 'corridor') {
+      greenhouseTransitionStageRef.current = 'inside'
       fade('ambianceGreenhouse', 0.7, 2000)
-      setTimeout(() => {
+      scheduleFlowTimeout(() => {
         setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInside, duration: 2.5 })
       }, 1000)
       return
     }
 
-    if (isGreenhouseTransitionRef.current === 'inside') {
-      isGreenhouseTransitionRef.current = null
+    if (greenhouseTransitionStageRef.current === 'inside') {
+      greenhouseTransitionStageRef.current = null
       return
     }
 
@@ -242,7 +260,7 @@ export function useIntroFlow({ sceneReady }) {
         setReceptionChoiceVisible(true)
       },
     })
-  }, [completeStep, playDialogue, storyCameraTransition])
+  }, [completeStep, playDialogue, scheduleFlowTimeout, storyCameraTransition])
 
   const handleReceptionChoice = useCallback(
     (choice) => {
@@ -302,6 +320,10 @@ export function useIntroFlow({ sceneReady }) {
     ignoreNextPointerUnlockRef.current = true
   }, [])
 
+  const suspendPointerUnlockExit = useCallback(() => {
+    ignoreNextPointerUnlockRef.current = true
+  }, [])
+
   const handleJournalEnd = useCallback(() => {
     const completed = journalCompletedRef.current
     journalCompletedRef.current = false
@@ -316,27 +338,36 @@ export function useIntroFlow({ sceneReady }) {
     return false
   }, [])
 
+  const playTreeDialogueSequence = useCallback(
+    (onComplete) => {
+      playDialogue('treeRacinesDialogue', {
+        onDone: () => {
+          playDialogue('treeBorneDialogue', {
+            onDone: () => {
+              playDialogue('treeArbreDialogue', {
+                onDone: () => {
+                  playDialogue('treeOutroDialogue', {
+                    onDone: onComplete,
+                  })
+                },
+              })
+            },
+          })
+        },
+      })
+    },
+    [playDialogue]
+  )
+
+  const unlockWorkbenchPhase = useCallback(() => {
+    setEtabliPhaseActive(true)
+    setWorkbenchPhaseActive(true)
+  }, [])
+
   const handleTreeInteract = useCallback(() => {
     setTreePhaseActive(false)
-    playDialogue('treeRacinesDialogue', {
-      onDone: () => {
-        playDialogue('treeBorneDialogue', {
-          onDone: () => {
-            playDialogue('treeArbreDialogue', {
-              onDone: () => {
-                playDialogue('treeOutroDialogue', {
-                  onDone: () => {
-                    setEtabliPhaseActive(true)
-                    setWorkbenchPhaseActive(true)
-                  },
-                })
-              },
-            })
-          },
-        })
-      },
-    })
-  }, [playDialogue])
+    playTreeDialogueSequence(unlockWorkbenchPhase)
+  }, [playTreeDialogueSequence, unlockWorkbenchPhase])
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
@@ -348,13 +379,13 @@ export function useIntroFlow({ sceneReady }) {
   const handleGreenhouseDoorClick = useCallback(() => {
     setGreenhousePhaseActive(false)
     fade('ambianceWorkbench', 0, 1500)
-    isGreenhouseTransitionRef.current = 'front'
+    greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
   }, [])
 
   const handleThomasEtabliInteract = useCallback(() => {
     setThomasEtabliPhaseActive(false)
-    setThomasAnimPhase('talking')
+    setThomasAnimationPhase('talking')
     fade('ambianceWorkbench', 0, 1500)
     isThomasTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.talkThomas, duration: 1.5 })
@@ -366,21 +397,31 @@ export function useIntroFlow({ sceneReady }) {
     setJournalCloseToken((token) => token + 1)
   }, [])
 
-  const debugGoToIntroStart = useCallback(() => {
+  const prepareDebugStoryState = useCallback(() => {
     stopDialogue()
     resetFlowState()
-    resetStory()
     setLoaderFading(true)
-    setIntroActive(true)
-  }, [resetFlowState, resetStory, stopDialogue])
+  }, [resetFlowState, stopDialogue])
 
-  const debugGoToDoorPassage = useCallback(() => {
+  const prepareDebugPostIntroState = useCallback(() => {
     stopDialogue()
     resetFlowState()
     setLoaderFading(false)
     setPostIntro(true)
     setIntroSpawn(INSIDE_POV)
     setIntroMovementLocked(true)
+    setPlayerName('Debug')
+  }, [resetFlowState, stopDialogue])
+
+  const debugGoToIntroStart = useCallback(() => {
+    prepareDebugStoryState()
+    resetStory()
+    setIntroActive(true)
+  }, [prepareDebugStoryState, resetStory])
+
+  const debugGoToDoorPassage = useCallback(() => {
+    prepareDebugPostIntroState()
+    setPlayerName('')
     startStory('intro.treeWelcome')
     playDialogue('01-voice-tree', {
       onDone: () => {
@@ -388,69 +429,27 @@ export function useIntroFlow({ sceneReady }) {
         setShowNameInput(true)
       },
     })
-  }, [completeStep, playDialogue, resetFlowState, startStory, stopDialogue])
+  }, [completeStep, playDialogue, prepareDebugPostIntroState, startStory])
 
   const debugGoToReception = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
+    prepareDebugPostIntroState()
     goToStep('intro.goToReception')
-  }, [goToStep, resetFlowState, stopDialogue])
+  }, [goToStep, prepareDebugPostIntroState])
 
   const debugGoToTree = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
-    playDialogue('treeRacinesDialogue', {
-      onDone: () => {
-        playDialogue('treeBorneDialogue', {
-          onDone: () => {
-            playDialogue('treeArbreDialogue', {
-              onDone: () => {
-                playDialogue('treeOutroDialogue', {
-                  onDone: () => {
-                    setEtabliPhaseActive(true)
-                    setWorkbenchPhaseActive(true)
-                  },
-                })
-              },
-            })
-          },
-        })
-      },
-    })
-  }, [playDialogue, resetFlowState, stopDialogue])
+    prepareDebugPostIntroState()
+    playTreeDialogueSequence(unlockWorkbenchPhase)
+  }, [playTreeDialogueSequence, prepareDebugPostIntroState, unlockWorkbenchPhase])
 
   const debugGoToEtabli = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
-    setEtabliPhaseActive(true)
-    setWorkbenchPhaseActive(true)
-  }, [resetFlowState, stopDialogue])
+    prepareDebugPostIntroState()
+    unlockWorkbenchPhase()
+  }, [prepareDebugPostIntroState, unlockWorkbenchPhase])
 
   const debugGoToSerre = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
+    prepareDebugPostIntroState()
     setGreenhousePhaseActive(true)
-  }, [resetFlowState, stopDialogue])
+  }, [prepareDebugPostIntroState])
 
   const launchIntro = useCallback(() => {
     if (!sceneReady) return
@@ -509,7 +508,7 @@ export function useIntroFlow({ sceneReady }) {
     workbenchPhaseActive,
     thomasEtabliPhaseActive,
     greenhousePhaseActive,
-    thomasAnimPhase,
+    thomasAnimPhase: thomasAnimationPhase,
     showNameInput,
     storyReady,
     currentStoryStepId: currentStepId,
@@ -531,6 +530,7 @@ export function useIntroFlow({ sceneReady }) {
     handleJournalEnd,
     handleTreeInteract,
     handleJournalInteractionStart,
+    suspendPointerUnlockExit,
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleReceptionChoice,

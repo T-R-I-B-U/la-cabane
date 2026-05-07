@@ -1,5 +1,5 @@
 import { Environment, useTexture } from '@react-three/drei'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { getHdriOption } from './hdriOptions'
 
@@ -12,6 +12,10 @@ export function SceneLighting({ activeHdriId }) {
     texture.colorSpace = THREE.SRGBColorSpace
     return texture
   }, [skyTexture])
+
+  useEffect(() => {
+    return () => backgroundTexture?.dispose()
+  }, [backgroundTexture])
 
   return (
     <>

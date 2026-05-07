@@ -3,7 +3,8 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { applyAutoTextures } from '../cabane/textureResolver'
-import { playOnce } from '../../utils'
+import { playOnce } from '../../utils/audioStore'
+import { disposeObject3D } from '../../core/disposeObject3D'
 
 const MODEL_URL = '/models/book01.gltf'
 const DUR_CAMERA = 0.8
@@ -64,9 +65,9 @@ export function JournalBook({
 
   const groupRef = useRef()
   const leftPivotRef = useRef()
-  const rangeRef = useRef()
-  const stateRef = useRef('CLOSED')
-  const elapsedRef = useRef(0)
+  const debugRangeRef = useRef()
+  const bookStateRef = useRef('CLOSED')
+  const transitionElapsedRef = useRef(0)
   const cameraInitPosRef = useRef(new THREE.Vector3())
   const cameraInitQuatRef = useRef(new THREE.Quaternion())
   const cameraTargetPosRef = useRef(new THREE.Vector3())
@@ -85,8 +86,8 @@ export function JournalBook({
   const debugStateRef = useRef({ hovered: false, hitCount: 0 })
 
   // Puzzle
-  const piecesRef = useRef(null)
-  const dragRef = useRef(null)
+  const puzzlePiecesRef = useRef(null)
+  const draggedPuzzlePieceRef = useRef(null)
   const { left, right, meshes } = useMemo(() => {
     const clone = scene.clone(true)
     const leftObject = clone.getObjectByName('book01-left')
@@ -111,6 +112,13 @@ export function JournalBook({
 
     return { left: leftObject, right: rightObject, meshes: meshList }
   }, [scene])
+
+  useEffect(() => {
+    return () => {
+      disposeObject3D(left)
+      disposeObject3D(right)
+    }
+  }, [left, right])
 
   useEffect(() => {
     Promise.all([applyAutoTextures(left, 'book01'), applyAutoTextures(right, 'book01')]).catch(
@@ -166,27 +174,27 @@ export function JournalBook({
   const startCameraReturn = () => {
     cameraReturnStartPosRef.current.copy(camera.position)
     cameraReturnStartQuatRef.current.copy(camera.quaternion)
-    stateRef.current = 'CAMERA_RETURNING'
-    elapsedRef.current = 0
+    bookStateRef.current = 'CAMERA_RETURNING'
+    transitionElapsedRef.current = 0
   }
 
   const requestClose = useEffectEvent(() => {
-    const state = stateRef.current
+    const state = bookStateRef.current
     if (state === 'CLOSED' || state === 'CAMERA_RETURNING') return
 
     onInteractionCancel?.()
 
     // Re-parent placed pieces into their original parent so they follow the closing cover.
     // Hide unplaced pieces below the counter.
-    if (piecesRef.current) {
-      piecesRef.current.forEach((p) => {
-        if (p.state === 'placed') {
-          p.originalParent.add(p.mesh)
-          p.mesh.position.copy(p.originalLocalPos)
-          p.mesh.quaternion.copy(p.originalLocalQuat)
+    if (puzzlePiecesRef.current) {
+      puzzlePiecesRef.current.forEach((piece) => {
+        if (piece.state === 'placed') {
+          piece.originalParent.add(piece.mesh)
+          piece.mesh.position.copy(piece.originalLocalPos)
+          piece.mesh.quaternion.copy(piece.originalLocalQuat)
         } else {
-          p.mesh.position.y -= 0.5
-          p.state = 'hidden'
+          piece.mesh.position.y -= 0.5
+          piece.state = 'hidden'
         }
       })
     }
@@ -198,14 +206,14 @@ export function JournalBook({
 
     if (state === 'OPEN' || state === 'CLOSING') {
       restoreCameraAfterCloseRef.current = true
-      stateRef.current = 'CLOSING'
-      elapsedRef.current = 0
+      bookStateRef.current = 'CLOSING'
+      transitionElapsedRef.current = 0
       playOnce('book')
     }
   })
 
   const openBook = useCallback(() => {
-    if (!active || stateRef.current !== 'CLOSED') return
+    if (!active || bookStateRef.current !== 'CLOSED') return
 
     const bookPosition = groupRef.current.getWorldPosition(new THREE.Vector3())
     cameraTargetPosRef.current
@@ -223,17 +231,17 @@ export function JournalBook({
 
     onInteractionStart?.()
     restoreCameraAfterCloseRef.current = false
-    stateRef.current = 'CAMERA_MOVING'
-    elapsedRef.current = 0
+    bookStateRef.current = 'CAMERA_MOVING'
+    transitionElapsedRef.current = 0
   }, [active, camera, onInteractionStart])
 
   useEffect(() => {
     const onPointerDown = (event) => {
       if (event.button !== 0 || !hoveredRef.current) return
-      if (stateRef.current !== 'CLOSED') return
+      if (bookStateRef.current !== 'CLOSED') return
       if (import.meta.env.DEV) {
         console.debug('JournalBook: click open', {
-          state: stateRef.current,
+          state: bookStateRef.current,
           hovered: hoveredRef.current,
           hitCount: debugStateRef.current.hitCount,
         })
@@ -253,9 +261,9 @@ export function JournalBook({
     const group = groupRef.current
     group.updateWorldMatrix(true, true)
 
-    if (piecesRef.current) {
+    if (puzzlePiecesRef.current) {
       // Re-open: restore placed pieces to groupRef at target, animate others from book position
-      piecesRef.current.forEach((piece) => {
+      puzzlePiecesRef.current.forEach((piece) => {
         if (piece.state === 'placed') {
           group.attach(piece.mesh)
           piece.mesh.position.copy(piece.targetPos)
@@ -267,7 +275,7 @@ export function JournalBook({
       return
     }
 
-    piecesRef.current = PIECE_NAMES.map((name) => {
+    puzzlePiecesRef.current = PIECE_NAMES.map((name) => {
       const mesh = group.getObjectByName(name)
       if (!mesh) return null
 
@@ -299,11 +307,12 @@ export function JournalBook({
     const onKeyDown = (event) => {
       if (event.code !== 'Escape') return
 
-      const state = stateRef.current
+      const state = bookStateRef.current
       if (state === 'CLOSED') return
 
       const allPlaced =
-        piecesRef.current?.length > 0 && piecesRef.current.every((p) => p.state === 'placed')
+        puzzlePiecesRef.current?.length > 0 &&
+        puzzlePiecesRef.current.every((piece) => piece.state === 'placed')
       if (allPlaced) return
 
       event.preventDefault()
@@ -329,19 +338,25 @@ export function JournalBook({
 
   // Puzzle drag-and-drop — native events (pointer lock is off when book is open)
   useEffect(() => {
-    const canvas = document.querySelector('canvas')
-    if (!canvas) return
+    const canvas = gl.domElement
 
     const raycaster = new THREE.Raycaster()
-    const toNDC = (e) =>
-      new THREE.Vector2(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
+    const toNDC = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      return new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
       )
+    }
 
     const onPointerDown = (e) => {
-      const pieces = piecesRef.current
-      if (!pieces || !pieceInteractionEnabled || dragRef.current || stateRef.current !== 'OPEN')
+      const pieces = puzzlePiecesRef.current
+      if (
+        !pieces ||
+        !pieceInteractionEnabled ||
+        draggedPuzzlePieceRef.current ||
+        bookStateRef.current !== 'OPEN'
+      )
         return
 
       raycaster.setFromCamera(toNDC(e), camera)
@@ -356,16 +371,16 @@ export function JournalBook({
       if (index === -1) return
 
       pieces[index].state = 'dragging'
-      dragRef.current = { index }
+      draggedPuzzlePieceRef.current = { index }
     }
 
     const onPointerMove = (e) => {
-      if (!dragRef.current) return
+      if (!draggedPuzzlePieceRef.current) return
 
       const group = groupRef.current
       group.updateWorldMatrix(true, false)
 
-      const piece = piecesRef.current[dragRef.current.index]
+      const piece = puzzlePiecesRef.current[draggedPuzzlePieceRef.current.index]
       const groupWorldY = group.getWorldPosition(new THREE.Vector3()).y
       // Plane at the piece's target height (world space), so worldToLocal gives correct local Y
       const planeY = groupWorldY + piece.targetPos.y * MODEL_SCALE
@@ -381,12 +396,12 @@ export function JournalBook({
     }
 
     const onPointerUp = () => {
-      if (!dragRef.current) return
+      if (!draggedPuzzlePieceRef.current) return
 
-      const { index } = dragRef.current
-      dragRef.current = null
+      const { index } = draggedPuzzlePieceRef.current
+      draggedPuzzlePieceRef.current = null
 
-      const piece = piecesRef.current[index]
+      const piece = puzzlePiecesRef.current[index]
       if (piece.mesh.position.distanceTo(piece.targetPos) < DROP_THRESHOLD) {
         piece.mesh.position.copy(piece.targetPos)
         piece.state = 'placed'
@@ -405,20 +420,20 @@ export function JournalBook({
       document.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerup', onPointerUp)
     }
-  }, [camera, onPiecePlaced, pieceInteractionEnabled])
+  }, [camera, gl, onPiecePlaced, pieceInteractionEnabled])
 
   useFrame((_, delta) => {
     const group = groupRef.current
     const leftPivot = leftPivotRef.current
-    const range = rangeRef.current
-    if (!group || !leftPivot || !range) return
+    const debugRange = debugRangeRef.current
+    if (!group || !leftPivot || !debugRange) return
 
-    if (pendingAutoOpenRef.current && active && stateRef.current === 'CLOSED') {
+    if (pendingAutoOpenRef.current && active && bookStateRef.current === 'CLOSED') {
       pendingAutoOpenRef.current = false
       openBook()
     }
 
-    const state = stateRef.current
+    const state = bookStateRef.current
 
     if (active && state === 'CLOSED') {
       const ndc = document.pointerLockElement
@@ -446,7 +461,7 @@ export function JournalBook({
         })
       }
 
-      range.visible = false
+      debugRange.visible = false
 
       materialStatesRef.current.forEach((original, material) => {
         material.emissive.copy(hoveredRef.current ? HOVER_EMISSIVE : original.emissive)
@@ -459,7 +474,7 @@ export function JournalBook({
     } else {
       hoveredRef.current = false
       debugStateRef.current.hitCount = 0
-      range.visible = false
+      debugRange.visible = false
 
       materialStatesRef.current.forEach((original, material) => {
         material.emissive.copy(original.emissive)
@@ -474,8 +489,8 @@ export function JournalBook({
       return
     }
 
-    elapsedRef.current += Math.min(delta, 0.1)
-    const elapsed = elapsedRef.current
+    transitionElapsedRef.current += Math.min(delta, 0.1)
+    const elapsed = transitionElapsedRef.current
 
     if (state === 'CAMERA_MOVING') {
       const t = ease(Math.min(elapsed / DUR_CAMERA, 1))
@@ -485,8 +500,8 @@ export function JournalBook({
       if (elapsed >= DUR_CAMERA) {
         camera.position.copy(cameraTargetPosRef.current)
         camera.quaternion.copy(cameraTargetQuatRef.current)
-        stateRef.current = 'OPENING'
-        elapsedRef.current = 0
+        bookStateRef.current = 'OPENING'
+        transitionElapsedRef.current = 0
         playOnce('book')
       }
       return
@@ -504,8 +519,8 @@ export function JournalBook({
       if (elapsed >= DUR_CAMERA) {
         camera.position.copy(cameraInitPosRef.current)
         camera.quaternion.copy(cameraInitQuatRef.current)
-        stateRef.current = 'CLOSED'
-        elapsedRef.current = 0
+        bookStateRef.current = 'CLOSED'
+        transitionElapsedRef.current = 0
         onInteractionEnd?.()
       }
       return
@@ -517,8 +532,8 @@ export function JournalBook({
 
       if (elapsed >= DUR_OPEN) {
         leftPivot.rotation.z = OPEN_ROTATION_Z
-        stateRef.current = 'OPEN'
-        elapsedRef.current = 0
+        bookStateRef.current = 'OPEN'
+        transitionElapsedRef.current = 0
         setupPuzzle()
         onOpenComplete?.()
       }
@@ -527,7 +542,7 @@ export function JournalBook({
 
     if (state === 'OPEN') {
       // Animate pieces toward parking or back from drag
-      const pieces = piecesRef.current
+      const pieces = puzzlePiecesRef.current
       if (pieces) {
         pieces.forEach((piece, i) => {
           if (piece.state === 'animating_in' || piece.state === 'parking') {
@@ -551,7 +566,7 @@ export function JournalBook({
 
       if (elapsed >= DUR_CLOSE) {
         leftPivot.rotation.z = 0
-        elapsedRef.current = 0
+        transitionElapsedRef.current = 0
 
         if (restoreCameraAfterCloseRef.current) {
           restoreCameraAfterCloseRef.current = false
@@ -559,7 +574,7 @@ export function JournalBook({
           return
         }
 
-        stateRef.current = 'CLOSED'
+        bookStateRef.current = 'CLOSED'
         onInteractionEnd?.()
       }
     }
@@ -567,7 +582,7 @@ export function JournalBook({
 
   return (
     <group ref={groupRef} position={position} rotation={[0, rotationY, 0]} scale={MODEL_SCALE}>
-      <mesh ref={rangeRef} scale={1 / MODEL_SCALE} renderOrder={1}>
+      <mesh ref={debugRangeRef} scale={1 / MODEL_SCALE} renderOrder={1}>
         <sphereGeometry args={[1, 32, 16]} />
         <meshBasicMaterial transparent depthWrite={false} wireframe />
       </mesh>

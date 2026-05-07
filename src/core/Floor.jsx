@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useTexture } from '@react-three/drei'
 import { DoubleSide, RepeatWrapping, SRGBColorSpace } from 'three'
 import { FLOOR_Y } from './SceneConfig'
@@ -17,6 +17,10 @@ export function Floor({ mainFloorRef, hutPosition }) {
     texture.needsUpdate = true
     return texture
   }, [grassTexture])
+
+  useEffect(() => {
+    return () => tiledGrassTexture?.dispose()
+  }, [tiledGrassTexture])
 
   return (
     <>

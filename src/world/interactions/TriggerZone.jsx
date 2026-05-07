@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
@@ -11,6 +11,11 @@ export function TriggerZone({ center, radius, onEnter, onLeave }) {
   const inside = useRef(false)
   const centerVec = useRef(new THREE.Vector3(...center))
   const r2 = radius * radius
+
+  useEffect(() => {
+    centerVec.current.set(...center)
+    inside.current = false
+  }, [center])
 
   useFrame(() => {
     const dist2 = camera.position.distanceToSquared(centerVec.current)

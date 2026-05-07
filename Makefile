@@ -8,7 +8,7 @@ eslint:
 
 check:
 	make eslint
-	make prettier
+	npm run format:check
 
 setup:
 	git config core.hooksPath .githooks

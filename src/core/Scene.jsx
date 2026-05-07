@@ -12,7 +12,7 @@ import { SceneControls } from './scene/SceneControls'
 import { SceneLighting } from './scene/SceneLighting'
 import { CabaneScene } from './scene/CabaneScene'
 import { ArbreScene } from './scene/ArbreScene'
-import { useActiveZone } from '../utils'
+import { useActiveZone } from '../utils/gameManagerStore'
 
 export default function Scene({
   performanceMode,
@@ -81,9 +81,10 @@ export default function Scene({
   const [sceneColliders, setSceneColliders] = useState([])
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
+  const [platformPosition, setPlatformPosition] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const sceneInteractionsActive =
+  const areSceneInteractionsEnabled =
     (playerMode || postIntro) && !interactionLocked && interactionsEnabled
   const collisionObjects = useMemo(
     () => [...sceneColliders, mainFloorCollider].filter(Boolean),
@@ -108,56 +109,56 @@ export default function Scene({
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
       <BackgroundPlanes hutPosition={hutPosition} />
 
-      {zone === 'cabane' && (
-        <Suspense fallback={null}>
-          <CabaneScene
-            performanceMode={performanceMode}
-            onError={onError}
-            onSceneReady={onReady}
-            leafMaterialMode={leafMaterialMode}
-            interactionsEnabled={interactionsEnabled}
-            onLeafClick={onLeafClick}
-            onLeafHover={onLeafHover}
-            onJournalStart={onJournalStart}
-            onJournalEnd={onJournalEnd}
-            onJournalOpenComplete={onJournalOpenComplete}
-            onJournalCancel={onJournalCancel}
-            onJournalPiecePlaced={onJournalPiecePlaced}
-            onIntroEvent={onIntroEvent}
-            receptionActive={receptionActive}
-            treePhaseActive={treePhaseActive}
-            workbenchPhaseActive={workbenchPhaseActive}
-            greenhousePhaseActive={greenhousePhaseActive}
-            onGreenhouseDoorClick={onGreenhouseDoorClick}
-            thomasEtabliPhaseActive={thomasEtabliPhaseActive}
-            thomasAnimPhase={thomasAnimPhase}
-            onWorkbenchInteract={onWorkbenchInteract}
-            onThomasEtabliInteract={onThomasEtabliInteract}
-            onTreeInteract={onTreeInteract}
-            onReceptionInteract={onReceptionInteract}
-            introWaitingAtDoor={introWaitingAtDoor}
-            journalUnlocked={journalUnlocked}
-            playerMode={playerMode}
-            postIntro={postIntro}
-            postIntroLocked={postIntroLocked}
-            interactionLocked={interactionLocked}
-            debugDoors={debugDoors}
-            debugCollisions={debugCollisions}
-            journalAutoOpenToken={journalAutoOpenToken}
-            journalCloseToken={journalCloseToken}
-            journalPuzzleEnabled={journalPuzzleEnabled}
-            forceOpenDoor={introDoorOpen}
-            controlsRef={controlsRef}
-            firstPersonMode={firstPersonMode}
-            onCollisionReady={setSceneColliders}
-            onHutPositionReady={setHutPosition}
-          />
-        </Suspense>
-      )}
+      <Suspense fallback={null}>
+        <CabaneScene
+          performanceMode={performanceMode}
+          onError={onError}
+          onSceneReady={onReady}
+          leafMaterialMode={leafMaterialMode}
+          interactionsEnabled={interactionsEnabled}
+          onLeafClick={onLeafClick}
+          onLeafHover={onLeafHover}
+          onJournalStart={onJournalStart}
+          onJournalEnd={onJournalEnd}
+          onJournalOpenComplete={onJournalOpenComplete}
+          onJournalCancel={onJournalCancel}
+          onJournalPiecePlaced={onJournalPiecePlaced}
+          onIntroEvent={onIntroEvent}
+          receptionActive={receptionActive}
+          treePhaseActive={treePhaseActive}
+          workbenchPhaseActive={workbenchPhaseActive}
+          greenhousePhaseActive={greenhousePhaseActive}
+          onGreenhouseDoorClick={onGreenhouseDoorClick}
+          thomasEtabliPhaseActive={thomasEtabliPhaseActive}
+          thomasAnimPhase={thomasAnimPhase}
+          onWorkbenchInteract={onWorkbenchInteract}
+          onThomasEtabliInteract={onThomasEtabliInteract}
+          onTreeInteract={onTreeInteract}
+          onReceptionInteract={onReceptionInteract}
+          introWaitingAtDoor={introWaitingAtDoor}
+          journalUnlocked={journalUnlocked}
+          playerMode={playerMode}
+          postIntro={postIntro}
+          postIntroLocked={postIntroLocked}
+          interactionLocked={interactionLocked}
+          debugDoors={debugDoors}
+          debugCollisions={debugCollisions}
+          journalAutoOpenToken={journalAutoOpenToken}
+          journalCloseToken={journalCloseToken}
+          journalPuzzleEnabled={journalPuzzleEnabled}
+          forceOpenDoor={introDoorOpen}
+          controlsRef={controlsRef}
+          firstPersonMode={firstPersonMode}
+          platformPosition={platformPosition}
+          onCollisionReady={setSceneColliders}
+          onHutPositionReady={setHutPosition}
+          onPlatformPositionReady={setPlatformPosition}
+        />
+      </Suspense>
 
       {zone === 'arbre' && (
         <Suspense fallback={null}>
-          <ArbreScene />
+          <ArbreScene platformPosition={platformPosition} />
         </Suspense>
       )}
 
@@ -166,7 +167,7 @@ export default function Scene({
       <Fruit
         fruitId="fruit_01"
         position={[-23, 25.5, -9]}
-        active={sceneInteractionsActive}
+        active={areSceneInteractionsEnabled}
         onFruitClick={onFruitClick}
         onFruitHover={onFruitHover}
       />

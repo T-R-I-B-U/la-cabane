@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { getGameStep, setGameStep, GAME_STEPS } from '../utils'
+import { getGameStep, setGameStep, GAME_STEPS } from '../utils/gameStateStore'
 
 /**
  * Orchestrateur logique — ne rend rien dans le DOM.
