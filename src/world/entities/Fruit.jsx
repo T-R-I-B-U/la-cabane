@@ -9,8 +9,8 @@ import {
   useOutlineResolution,
 } from '../materials/outlineEffect'
 import { useHoverEffect } from '../interactions/useHoverEffect'
+import { applyAutoTextures } from '../cabane/textureResolver'
 
-const PURPLE = new THREE.Color('#7c3aed')
 const DEFAULT_POSITION = [-25.5, 25.5, -9]
 
 export function Fruit({
@@ -34,13 +34,10 @@ export function Fruit({
     const _bbox = new THREE.Box3()
     const _size = new THREE.Vector3()
 
+    applyAutoTextures(c, 'growingfruit', ['/textures/'])
+
     c.traverse((obj) => {
       if (!obj.isMesh) return
-      obj.material = new THREE.MeshStandardMaterial({
-        color: PURPLE,
-        roughness: 0.5,
-        metalness: 0.0,
-      })
 
       // Accumulate transform from obj up to c (accounts for GLTF node scales)
       _m.identity()

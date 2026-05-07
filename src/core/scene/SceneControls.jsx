@@ -30,11 +30,12 @@ function OrbitTargetSync({ controlsRef, target }) {
 export function SceneControls({
   collisionObjects,
   introActive,
-  arbreActive,
   introShouldAdvance,
   introSpawn,
   storyCameraTransition,
   onStoryCameraTransitionComplete,
+  arbreStoryCameraTransition,
+  onArbreTransitionComplete,
   onIntroEvent,
   playerMode,
   flyMode,
@@ -48,7 +49,18 @@ export function SceneControls({
   hutPosition,
 }) {
   const devSync = import.meta.env.DEV ? <CameraRegistrySync controlsRef={controlsRef} /> : null
-  if (arbreActive) return null
+
+  if (arbreStoryCameraTransition) {
+    return (
+      <>
+        <StoryCameraTransition
+          transition={arbreStoryCameraTransition}
+          onComplete={onArbreTransitionComplete}
+        />
+        {devSync}
+      </>
+    )
+  }
 
   if (introActive) {
     return (

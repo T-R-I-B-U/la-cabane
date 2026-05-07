@@ -3,11 +3,9 @@ import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { disposeObject3D } from '../../core/disposeObject3D'
-
-const PURPLE = new THREE.Color('#7c3aed')
+import { applyAutoTextures } from '../cabane/textureResolver'
 
 const GROW_DURATION = 3.0 // seconds: scale 0 → 1
-const CYCLE_DURATION = 6.0 // seconds: total period before restart
 
 // Fast start, decelerates into full size
 function easeOutQuart(t) {
@@ -31,14 +29,7 @@ export function GrowingFruit({ position = DEFAULT_POSITION, playing = true, onCo
     const box = new THREE.Box3().setFromObject(c)
     c.position.y = -box.max.y
 
-    c.traverse((obj) => {
-      if (!obj.isMesh) return
-      obj.material = new THREE.MeshStandardMaterial({
-        color: PURPLE,
-        roughness: 0.5,
-        metalness: 0.0,
-      })
-    })
+    applyAutoTextures(c, 'growingfruit', ['/textures/'])
     return c
   }, [scene])
 

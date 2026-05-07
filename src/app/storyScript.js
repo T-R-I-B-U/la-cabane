@@ -22,6 +22,41 @@ export const STORY_SCRIPT = {
     objective: "Clique sur l'accueil",
     next: null,
   },
+  'arbre.atLadder': {
+    id: 'arbre.atLadder',
+    type: 'objective',
+    objective: "Clique sur l'échelle",
+    next: 'arbre.toPlatform',
+  },
+  'arbre.toPlatform': {
+    id: 'arbre.toPlatform',
+    type: 'cinematic',
+    next: 'arbre.platformDialogue',
+  },
+  'arbre.platformDialogue': {
+    id: 'arbre.platformDialogue',
+    type: 'dialogue',
+    dialogueId: 'arbrePlateforme',
+    next: 'arbre.exploreLeaves',
+  },
+  'arbre.exploreLeaves': {
+    id: 'arbre.exploreLeaves',
+    type: 'objective',
+    objective: 'Clique sur un fruit',
+    next: 'arbre.leavesDialogue',
+  },
+  'arbre.leavesDialogue': {
+    id: 'arbre.leavesDialogue',
+    type: 'dialogue',
+    dialogueId: 'arbreFeuilles',
+    next: 'arbre.finalDialogue',
+  },
+  'arbre.finalDialogue': {
+    id: 'arbre.finalDialogue',
+    type: 'dialogue',
+    dialogueId: 'arbreFinal',
+    next: null,
+  },
 }
 
 export const STORY_START_STEP = 'intro.treeWelcome'

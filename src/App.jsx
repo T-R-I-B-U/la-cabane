@@ -13,7 +13,6 @@ import {
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
 import { useContactAssignment } from './app/useContactAssignment'
-import { ArbreContinueButton } from './app/ArbreContinueButton'
 import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import CameraEditorPanel from './core/CameraEditorPanel'
@@ -180,17 +179,18 @@ export default function App() {
 
   const {
     arbreActive,
-    arbreCameraStep,
-    arbreShouldAdvance,
-    arbreShowContinueButton,
-    arbreShowFruitButton,
     arbreMovementLocked,
-    arbreGrowingFruitPlaying,
-    handleArbreEvent,
-    handleContinueClick,
-    handleFruitButtonClick,
+    arbreDialogueActive,
+    arbreStoryCameraTransition,
+    ladderClickActive,
+    growingFruitPlaying: arbreGrowingFruitPlaying,
+    fruitsClickActive,
+    arbreLeafInteractionsEnabled,
+    handleLadderClick,
+    handleArbreTransitionComplete,
+    handleFruitClickDuringLeaves,
     triggerArbre,
-  } = useArbreFlow({ onPlatformSpawn: spawnAtPlatform })
+  } = useArbreFlow({ platformPosition: info?.platformPosition, onPlatformSpawn: spawnAtPlatform })
   const [showCameraEditor, setShowCameraEditor] = useState(false)
   const [showStoryDebug, setShowStoryDebug] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
@@ -251,6 +251,7 @@ export default function App() {
 
   const interactionLocked =
     dialogueActive ||
+    arbreDialogueActive ||
     introMovementLocked ||
     arbreMovementLocked ||
     showNameInput ||
@@ -500,10 +501,14 @@ export default function App() {
         }}
         arbre={{
           active: arbreActive,
-          cameraStep: arbreCameraStep,
-          shouldAdvance: arbreShouldAdvance,
+          storyCameraTransition: arbreStoryCameraTransition,
+          onTransitionComplete: handleArbreTransitionComplete,
+          ladderClickActive,
+          onLadderClick: handleLadderClick,
           growingFruitPlaying: arbreGrowingFruitPlaying,
-          onEvent: handleArbreEvent,
+          fruitsClickActive,
+          onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
+          leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
         platformPosition={info?.platformPosition}
         leafMaterialMode={leafMaterialMode}
@@ -587,12 +592,6 @@ export default function App() {
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
-
-      {arbreShowFruitButton && (
-        <ArbreContinueButton label="Voir mon fruit" onClick={handleFruitButtonClick} />
-      )}
-
-      {arbreShowContinueButton && <ArbreContinueButton onClick={handleContinueClick} />}
 
       {receptionChoiceVisible && (
         <div

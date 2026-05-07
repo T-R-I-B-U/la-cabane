@@ -1,108 +1,153 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
-import { useActiveZone, setZone } from '../utils/gameManagerStore'
+import { useStoryFlow } from './useStoryFlow'
+import { useActiveZone } from '../utils/gameManagerStore'
+import { setZone } from '../utils/gameManagerStore'
 import { setGameStep, GAME_STEPS } from '../utils/gameStateStore'
+import { PLATFORM_POS, PLAYER_HEIGHT } from '../core/SceneConfig'
 
-export function useArbreFlow({ onPlatformSpawn } = {}) {
+function resolveArbrePovs(platformPosition) {
+  const pos = platformPosition ?? PLATFORM_POS
+  const [px, py, pz] = pos
+  const spawnY = py + PLAYER_HEIGHT + 3
+  const fruitZ = pz - 1
+
+  return {
+    atLadder: {
+      position: { x: px, y: py - 5 + PLAYER_HEIGHT, z: pz + 5 },
+      target: { x: px, y: py + 2, z: pz },
+      duration: 0,
+    },
+    atPlatform: {
+      position: { x: px, y: spawnY - 0.5, z: pz },
+      target: { x: px, y: spawnY, z: fruitZ },
+      duration: 2.0,
+    },
+    atFruitFocus: {
+      position: { x: px + 2.5, y: spawnY - 0.5, z: pz + 2 },
+      target: { x: px, y: spawnY, z: fruitZ },
+      duration: 2.0,
+    },
+  }
+}
+
+export function useArbreFlow({ platformPosition, onPlatformSpawn } = {}) {
   const [arbreActive, setArbreActive] = useState(false)
-  const [arbreCameraStep, setArbreCameraStep] = useState('idle')
-  const [arbreShouldAdvance, setArbreShouldAdvance] = useState(false)
-  const [arbreShowContinueButton, setArbreShowContinueButton] = useState(false)
-  const [arbreShowFruitButton, setArbreShowFruitButton] = useState(false)
   const [arbreMovementLocked, setArbreMovementLocked] = useState(false)
-  const [arbreGrowingFruitPlaying, setArbreGrowingFruitPlaying] = useState(false)
+  const [arbreDialogueActive, setArbreDialogueActive] = useState(false)
+  const [arbreStoryCameraTransition, setArbreStoryCameraTransition] = useState(null)
+  const [ladderClickActive, setLadderClickActive] = useState(false)
+  const [growingFruitPlaying, setGrowingFruitPlaying] = useState(false)
+  const [fruitsClickActive, setFruitsClickActive] = useState(false)
+  // Token to force re-trigger when zone is already 'arbre'
+  const [arbreStartToken, setArbreStartToken] = useState(0)
 
   const playedRef = useRef(false)
   const zone = useActiveZone()
   const { playDialogue, stopDialogue } = useNpcDialogue()
+  const { currentStepId, completeStep, goToStep, resetStory } = useStoryFlow()
 
-  // Trigger once when player first enters arbre zone
-  useEffect(() => {
-    if (zone === 'arbre' && !playedRef.current) {
-      playedRef.current = true
-      onPlatformSpawn?.()
-      setArbreActive(true)
-      setArbreMovementLocked(true)
-      setArbreCameraStep('climbing')
-      setGameStep(GAME_STEPS.ARBRE_INTRO)
-    }
-  }, [zone, onPlatformSpawn])
+  const povs = useMemo(
+    () => resolveArbrePovs(platformPosition),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [platformPosition?.[0], platformPosition?.[1], platformPosition?.[2]]
+  )
 
   const exitArbre = useCallback(() => {
     setArbreActive(false)
-    setArbreCameraStep('idle')
-    setArbreShouldAdvance(false)
-    setArbreShowContinueButton(false)
-    setArbreShowFruitButton(false)
     setArbreMovementLocked(false)
-    setArbreGrowingFruitPlaying(false)
+    setArbreDialogueActive(false)
+    setArbreStoryCameraTransition(null)
+    setLadderClickActive(false)
+    setGrowingFruitPlaying(false)
+    setFruitsClickActive(false)
+    resetStory()
     stopDialogue()
     setGameStep(GAME_STEPS.EXPLORATION)
-  }, [stopDialogue])
+  }, [resetStory, stopDialogue])
 
-  const handleArbreEvent = useCallback(
-    (event) => {
-      if (event === 'reached:platform') {
-        setArbreCameraStep('platform')
-        setArbreShouldAdvance(false)
-        playDialogue('arbrePlateforme', {
-          onDone: () => setArbreShouldAdvance(true),
-        })
-      }
+  // Oneshot trigger when zone becomes 'arbre', or forced via arbreStartToken
+  useEffect(() => {
+    if (zone !== 'arbre') return
+    if (playedRef.current) return
+    playedRef.current = true
+    setArbreActive(true)
+    setArbreMovementLocked(true)
+    setGameStep(GAME_STEPS.ARBRE_INTRO)
+    goToStep('arbre.atLadder')
+    setLadderClickActive(true)
+    setArbreStoryCameraTransition({ ...povs.atLadder })
+  }, [zone, arbreStartToken, goToStep, povs])
 
-      if (event === 'reached:leaves') {
-        setArbreCameraStep('leaves')
-        setArbreShouldAdvance(false)
-        // Fruit démarre ici — visible pendant le dialogue "C'est ton fruit qui prend forme"
-        setArbreGrowingFruitPlaying(true)
-        playDialogue('arbreFeuilles', {
-          onDone: () => setArbreShowFruitButton(true),
-        })
-      }
+  const handleLadderClick = useCallback(() => {
+    setLadderClickActive(false)
+    completeStep('arbre.atLadder')
+    setArbreStoryCameraTransition({ ...povs.atPlatform })
+  }, [completeStep, povs])
 
-      if (event === 'reached:fruit') {
-        setArbreCameraStep('fruit')
-        setArbreShouldAdvance(false)
-        setArbreShowContinueButton(true)
-      }
+  const handleArbreTransitionComplete = useCallback(() => {
+    if (currentStepId === 'arbre.toPlatform') {
+      setArbreStoryCameraTransition(null)
+      onPlatformSpawn?.()
+      completeStep('arbre.toPlatform')
+      setArbreDialogueActive(true)
+      playDialogue('arbrePlateforme', {
+        onDone: () => {
+          setArbreDialogueActive(false)
+          completeStep('arbre.platformDialogue')
+          setArbreMovementLocked(false)
+          setFruitsClickActive(true)
+          setGrowingFruitPlaying(true)
+        },
+      })
+    } else if (currentStepId === 'arbre.finalDialogue') {
+      setArbreDialogueActive(true)
+      playDialogue('arbreFinal', {
+        onDone: () => {
+          setArbreDialogueActive(false)
+          completeStep('arbre.finalDialogue')
+          exitArbre()
+        },
+      })
+    }
+  }, [currentStepId, completeStep, onPlatformSpawn, playDialogue, exitArbre])
 
-      if (event === 'done') {
-        setArbreCameraStep('done')
-        exitArbre()
-      }
-    },
-    [playDialogue, exitArbre]
-  )
-
-  const handleFruitButtonClick = useCallback(() => {
-    setArbreShowFruitButton(false)
-    setArbreShouldAdvance(true)
-  }, [])
-
-  const handleContinueClick = useCallback(() => {
-    setArbreShowContinueButton(false)
-    playDialogue('arbreFinal', {
-      onDone: () => setArbreShouldAdvance(true),
+  const handleFruitClickDuringLeaves = useCallback(() => {
+    if (!fruitsClickActive) return
+    setFruitsClickActive(false)
+    setArbreMovementLocked(true)
+    completeStep('arbre.exploreLeaves')
+    setArbreDialogueActive(true)
+    playDialogue('arbreFeuilles', {
+      onDone: () => {
+        setArbreDialogueActive(false)
+        completeStep('arbre.leavesDialogue')
+        setArbreStoryCameraTransition({ ...povs.atFruitFocus })
+      },
     })
-  }, [playDialogue])
+  }, [fruitsClickActive, completeStep, playDialogue, povs])
+
+  const arbreLeafInteractionsEnabled = currentStepId === 'arbre.exploreLeaves'
 
   const triggerArbre = useCallback(() => {
     playedRef.current = false
     exitArbre()
     setZone('arbre')
+    setArbreStartToken((t) => t + 1)
   }, [exitArbre])
 
   return {
     arbreActive,
-    arbreCameraStep,
-    arbreShouldAdvance,
-    arbreShowContinueButton,
-    arbreShowFruitButton,
     arbreMovementLocked,
-    arbreGrowingFruitPlaying,
-    handleArbreEvent,
-    handleContinueClick,
-    handleFruitButtonClick,
+    arbreDialogueActive,
+    arbreStoryCameraTransition,
+    ladderClickActive,
+    growingFruitPlaying,
+    fruitsClickActive,
+    arbreLeafInteractionsEnabled,
+    handleLadderClick,
+    handleArbreTransitionComplete,
+    handleFruitClickDuringLeaves,
     exitArbre,
     triggerArbre,
   }

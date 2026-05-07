@@ -70,10 +70,14 @@ export default function Scene({
 
   const {
     active: arbreActive,
-    cameraStep: arbreCameraStep,
-    shouldAdvance: arbreShouldAdvance,
+    storyCameraTransition: arbreStoryCameraTransition,
+    onTransitionComplete: onArbreTransitionComplete,
+    ladderClickActive,
+    onLadderClick,
     growingFruitPlaying: arbreGrowingFruitPlaying,
-    onEvent: onArbreEvent,
+    fruitsClickActive,
+    onFruitClickDuringLeaves,
+    leafInteractionsEnabled: arbreLeafInteractionsEnabled,
   } = arbre
 
   const zone = useActiveZone()
@@ -115,10 +119,7 @@ export default function Scene({
             onSceneReady={onReady}
             leafMaterialMode={leafMaterialMode}
             interactionsEnabled={
-              zone === 'cabane'
-                ? interactionsEnabled
-                : interactionsEnabled &&
-                  (arbreCameraStep === 'platform' || arbreCameraStep === 'leaves')
+              zone === 'cabane' ? interactionsEnabled : arbreLeafInteractionsEnabled
             }
             onLeafClick={onLeafClick}
             onLeafHover={onLeafHover}
@@ -129,7 +130,9 @@ export default function Scene({
             onJournalPiecePlaced={onJournalPiecePlaced}
             onIntroEvent={onIntroEvent}
             receptionActive={receptionActive}
+            ladderClickActive={ladderClickActive}
             onReceptionInteract={onReceptionInteract}
+            onLadderClick={onLadderClick}
             introWaitingAtDoor={introWaitingAtDoor}
             journalUnlocked={journalUnlocked}
             playerMode={playerMode}
@@ -155,9 +158,9 @@ export default function Scene({
           <ArbreScene
             platformPosition={platformPosition}
             arbreActive={arbreActive}
-            arbreShouldAdvance={arbreShouldAdvance}
-            arbreGrowingFruitPlaying={arbreGrowingFruitPlaying}
-            onArbreEvent={onArbreEvent}
+            growingFruitPlaying={arbreGrowingFruitPlaying}
+            fruitsClickActive={fruitsClickActive}
+            onFruitClickDuringLeaves={onFruitClickDuringLeaves}
             onFruitClick={onFruitClick}
             onFruitHover={onFruitHover}
             interactionsEnabled={sceneInteractionsActive}
@@ -168,11 +171,12 @@ export default function Scene({
       <SceneControls
         collisionObjects={collisionObjects}
         introActive={introActive}
-        arbreActive={arbreActive}
         introShouldAdvance={introShouldAdvance}
         introSpawn={introSpawn}
         storyCameraTransition={storyCameraTransition}
         onStoryCameraTransitionComplete={onStoryCameraTransitionComplete}
+        arbreStoryCameraTransition={arbreStoryCameraTransition}
+        onArbreTransitionComplete={onArbreTransitionComplete}
         onIntroEvent={onIntroEvent}
         playerMode={playerMode}
         flyMode={flyMode}
