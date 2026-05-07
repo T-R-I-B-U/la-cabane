@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { applyAutoTextures } from '../cabane/textureResolver'
+import { playOnce } from '../../utils'
 
 const MODEL_URL = '/models/book01.gltf'
 const DUR_CAMERA = 0.8
@@ -199,6 +200,7 @@ export function JournalBook({
       restoreCameraAfterCloseRef.current = true
       stateRef.current = 'CLOSING'
       elapsedRef.current = 0
+      playOnce('book')
     }
   })
 
@@ -485,6 +487,7 @@ export function JournalBook({
         camera.quaternion.copy(cameraTargetQuatRef.current)
         stateRef.current = 'OPENING'
         elapsedRef.current = 0
+        playOnce('book')
       }
       return
     }
