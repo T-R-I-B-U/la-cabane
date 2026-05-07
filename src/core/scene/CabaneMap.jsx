@@ -50,6 +50,7 @@ export function CabaneMap({ performanceMode, onReady, onError, onCabaneLoaded })
 
     return () => {
       cancelled = true
+      setCabane(null)
       if (loadedCabaneGroup) {
         clearTextureCache()
         disposeObject3D(loadedCabaneGroup)

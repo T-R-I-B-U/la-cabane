@@ -65,26 +65,6 @@ export default function App() {
     closeContact: closeContactInternal,
   } = useContactAssignment()
 
-  const openSavoirFromLeaf = useCallback(
-    (id) => {
-      const didOpen = openSavoirForLeaf(id)
-      if (!didOpen) return
-      setIsSavoirInteractionActive(true)
-      document.exitPointerLock()
-    },
-    [openSavoirForLeaf]
-  )
-
-  const openContactFromFruit = useCallback(
-    (fruitId) => {
-      const didOpen = openContactForFruit(fruitId)
-      if (!didOpen) return
-      setIsContactInteractionActive(true)
-      document.exitPointerLock()
-    },
-    [openContactForFruit]
-  )
-
   const handleFruitHover = useCallback((hovered) => {
     setIsFruitHovered(hovered)
   }, [])
@@ -104,8 +84,8 @@ export default function App() {
     if (!isSavoirInteractionActive) return
 
     if (!document.pointerLockElement) {
-      requestAnimationFrame(() => setIsSavoirPanelOpen(true))
-      return
+      const frameId = requestAnimationFrame(() => setIsSavoirPanelOpen(true))
+      return () => cancelAnimationFrame(frameId)
     }
     const onRelease = () => {
       if (!document.pointerLockElement) setIsSavoirPanelOpen(true)
@@ -117,8 +97,8 @@ export default function App() {
   useEffect(() => {
     if (!isContactInteractionActive) return
     if (!document.pointerLockElement) {
-      requestAnimationFrame(() => setIsContactPanelOpen(true))
-      return
+      const frameId = requestAnimationFrame(() => setIsContactPanelOpen(true))
+      return () => cancelAnimationFrame(frameId)
     }
     const onRelease = () => {
       if (!document.pointerLockElement) setIsContactPanelOpen(true)
@@ -161,6 +141,7 @@ export default function App() {
     handleJournalEnd,
     handleTreeInteract,
     handleJournalInteractionStart,
+    suspendPointerUnlockExit,
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleNameSubmit: handleNameSubmitInternal,
@@ -180,11 +161,53 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+
+  const openSavoirFromLeaf = useCallback(
+    (id) => {
+      const didOpen = openSavoirForLeaf(id)
+      if (!didOpen) return
+      setIsSavoirInteractionActive(true)
+      if (document.pointerLockElement) {
+        suspendPointerUnlockExit()
+        document.exitPointerLock()
+      }
+    },
+    [openSavoirForLeaf, suspendPointerUnlockExit]
+  )
+
+  const openContactFromFruit = useCallback(
+    (fruitId) => {
+      const didOpen = openContactForFruit(fruitId)
+      if (!didOpen) return
+      setIsContactInteractionActive(true)
+      if (document.pointerLockElement) {
+        suspendPointerUnlockExit()
+        document.exitPointerLock()
+      }
+    },
+    [openContactForFruit, suspendPointerUnlockExit]
+  )
+
   const [showCameraEditor, setShowCameraEditor] = useState(false)
   const [showStoryDebug, setShowStoryDebug] = useState(false)
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestPointerLockIfSceneControlAllowed = useCallback(() => {
+    if (
+      dialogueActive ||
+      introMovementLocked ||
+      showNameInput ||
+      receptionChoiceVisible ||
+      returnHallVisible ||
+      selectedSavoirAssignment ||
+      isSavoirInteractionActive ||
+      selectedContactAssignment ||
+      isContactInteractionActive ||
+      isJournalInteractionActive
+    ) {
+      return
+    }
+
     if (
       !(
         isPlayerModeActive ||
@@ -194,7 +217,21 @@ export default function App() {
       return
     }
     pointerControlsRef.current?.lock()
-  }, [currentStoryStepId, isPlayerModeActive, postIntro, showNameInput])
+  }, [
+    currentStoryStepId,
+    dialogueActive,
+    introMovementLocked,
+    isContactInteractionActive,
+    isJournalInteractionActive,
+    isPlayerModeActive,
+    isSavoirInteractionActive,
+    postIntro,
+    receptionChoiceVisible,
+    returnHallVisible,
+    selectedContactAssignment,
+    selectedSavoirAssignment,
+    showNameInput,
+  ])
 
   const handleNameSubmit = useCallback(
     (name) => {
@@ -544,7 +581,7 @@ export default function App() {
             handleJournalInteractionStart()
             isJournalInteractionActiveRef.current = true
             setIsJournalInteractionActive(true)
-            document.exitPointerLock()
+            if (document.pointerLockElement) document.exitPointerLock()
           },
           onJournalOpenComplete: handleJournalOpen,
           onJournalCancel: () => {

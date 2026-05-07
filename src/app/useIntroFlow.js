@@ -320,6 +320,10 @@ export function useIntroFlow({ sceneReady }) {
     ignoreNextPointerUnlockRef.current = true
   }, [])
 
+  const suspendPointerUnlockExit = useCallback(() => {
+    ignoreNextPointerUnlockRef.current = true
+  }, [])
+
   const handleJournalEnd = useCallback(() => {
     const completed = journalCompletedRef.current
     journalCompletedRef.current = false
@@ -526,6 +530,7 @@ export function useIntroFlow({ sceneReady }) {
     handleJournalEnd,
     handleTreeInteract,
     handleJournalInteractionStart,
+    suspendPointerUnlockExit,
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleReceptionChoice,

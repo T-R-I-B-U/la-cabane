@@ -7,10 +7,10 @@ const CABANE_TRIGGER_RADIUS = 10
 
 /**
  */
-export function ArbreScene() {
+export function ArbreScene({ platformPosition }) {
   return (
     <TriggerZone
-      center={PLATFORM_POS}
+      center={platformPosition ?? PLATFORM_POS}
       radius={CABANE_TRIGGER_RADIUS}
       onLeave={() => setZone('cabane')}
     />

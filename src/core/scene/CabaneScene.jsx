@@ -56,8 +56,10 @@ export function CabaneScene({
   forceOpenDoor,
   controlsRef,
   firstPersonMode,
+  platformPosition,
   onCollisionReady,
   onHutPositionReady,
+  onPlatformPositionReady,
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -79,9 +81,12 @@ export function CabaneScene({
       if (Array.isArray(sceneInfo.hutPosition)) {
         onHutPositionReady?.(sceneInfo.hutPosition)
       }
+      if (Array.isArray(sceneInfo.platformPosition)) {
+        onPlatformPositionReady?.(sceneInfo.platformPosition)
+      }
       onSceneReady?.(sceneInfo)
     },
-    [onHutPositionReady, onSceneReady]
+    [onHutPositionReady, onPlatformPositionReady, onSceneReady]
   )
 
   const handleCabaneGroupLoaded = useCallback((group) => {
@@ -174,7 +179,7 @@ export function CabaneScene({
       />
 
       <TriggerZone
-        center={PLATFORM_POS}
+        center={platformPosition ?? PLATFORM_POS}
         radius={ARBRE_TRIGGER_RADIUS}
         onEnter={() => setZone('arbre')}
       />
