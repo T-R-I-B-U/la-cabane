@@ -25,8 +25,8 @@ import './App.css'
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
-  const [status, setStatus] = useState('loading')
-  const [info, setInfo] = useState(null)
+  const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
+  const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
   const [performanceMode, setPerformanceMode] = useState(false)
   const [playerMode, setPlayerMode] = useState(false)
   const [flyMode, setFlyMode] = useState(false)
@@ -39,56 +39,58 @@ export default function App() {
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
-  const [journalActive, setJournalActive] = useState(false)
-  const [savoirActive, setSavoirActive] = useState(false)
-  const [savoirOpen, setSavoirOpen] = useState(false)
-  const [contactActive, setContactActive] = useState(false)
-  const [contactOpen, setContactOpen] = useState(false)
-  const [leafHovered, setLeafHovered] = useState(false)
-  const [fruitHovered, setFruitHovered] = useState(false)
+  const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
+  const [isSavoirInteractionActive, setIsSavoirInteractionActive] = useState(false)
+  const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
+  const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
+  const [isContactPanelOpen, setIsContactPanelOpen] = useState(false)
+  const [isLeafHovered, setIsLeafHovered] = useState(false)
+  const [isFruitHovered, setIsFruitHovered] = useState(false)
   const [interactionsEnabled, setInteractionsEnabled] = useState(false)
   const [pendingPostIntroPointerLock, setPendingPostIntroPointerLock] = useState(false)
   const pointerControlsRef = useRef(null)
-  const journalActiveRef = useRef(false)
+  const isJournalInteractionActiveRef = useRef(false)
 
   const {
-    selected: selectedSavoir,
-    assignAndOpen,
-    close: closeSavoirInternal,
+    selectedSavoirAssignment,
+    openSavoirForLeaf,
+    closeSavoir: closeSavoirInternal,
   } = useSavoirAssignment()
   const {
-    selected: selectedContact,
-    openContact,
-    close: closeContactInternal,
+    selectedContactAssignment,
+    openContactForFruit,
+    closeContact: closeContactInternal,
   } = useContactAssignment()
 
-  const handleLeafClick = useCallback(
+  const openSavoirFromLeaf = useCallback(
     (id) => {
-      setSavoirActive(true)
+      const didOpen = openSavoirForLeaf(id)
+      if (!didOpen) return
+      setIsSavoirInteractionActive(true)
       document.exitPointerLock()
-      assignAndOpen(id)
     },
-    [assignAndOpen]
+    [openSavoirForLeaf]
   )
 
-  const handleFruitClick = useCallback(
+  const openContactFromFruit = useCallback(
     (fruitId) => {
-      setContactActive(true)
+      const didOpen = openContactForFruit(fruitId)
+      if (!didOpen) return
+      setIsContactInteractionActive(true)
       document.exitPointerLock()
-      openContact(fruitId)
     },
-    [openContact]
+    [openContactForFruit]
   )
 
   const handleFruitHover = useCallback((hovered) => {
-    setFruitHovered(hovered)
+    setIsFruitHovered(hovered)
   }, [])
 
   const handleToggleInteractionsEnabled = useCallback(() => {
     setInteractionsEnabled((current) => {
       if (current) {
-        setLeafHovered(false)
-        setFruitHovered(false)
+        setIsLeafHovered(false)
+        setIsFruitHovered(false)
       }
       return !current
     })
@@ -96,33 +98,33 @@ export default function App() {
 
   // Open panel only after pointer lock actually releases.
   useEffect(() => {
-    if (!savoirActive) return
+    if (!isSavoirInteractionActive) return
 
     if (!document.pointerLockElement) {
-      requestAnimationFrame(() => setSavoirOpen(true))
+      requestAnimationFrame(() => setIsSavoirPanelOpen(true))
       return
     }
     const onRelease = () => {
-      if (!document.pointerLockElement) setSavoirOpen(true)
+      if (!document.pointerLockElement) setIsSavoirPanelOpen(true)
     }
     document.addEventListener('pointerlockchange', onRelease)
     return () => document.removeEventListener('pointerlockchange', onRelease)
-  }, [savoirActive])
+  }, [isSavoirInteractionActive])
 
   useEffect(() => {
-    if (!contactActive) return
+    if (!isContactInteractionActive) return
     if (!document.pointerLockElement) {
-      requestAnimationFrame(() => setContactOpen(true))
+      requestAnimationFrame(() => setIsContactPanelOpen(true))
       return
     }
     const onRelease = () => {
-      if (!document.pointerLockElement) setContactOpen(true)
+      if (!document.pointerLockElement) setIsContactPanelOpen(true)
     }
     document.addEventListener('pointerlockchange', onRelease)
     return () => document.removeEventListener('pointerlockchange', onRelease)
-  }, [contactActive])
+  }, [isContactInteractionActive])
 
-  const sceneReady = status === 'ok'
+  const sceneReady = sceneLoadStatus === 'ok'
   const {
     dialogueActive,
     introActive,
@@ -236,15 +238,15 @@ export default function App() {
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
-    setSavoirActive(false)
-    setSavoirOpen(false)
+    setIsSavoirInteractionActive(false)
+    setIsSavoirPanelOpen(false)
     requestScenePointerLock()
   }, [closeSavoirInternal, requestScenePointerLock])
 
   const handleCloseContact = useCallback(() => {
     closeContactInternal()
-    setContactActive(false)
-    setContactOpen(false)
+    setIsContactInteractionActive(false)
+    setIsContactPanelOpen(false)
     requestScenePointerLock()
   }, [closeContactInternal, requestScenePointerLock])
 
@@ -254,11 +256,11 @@ export default function App() {
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible ||
-    selectedSavoir !== null ||
-    savoirActive ||
-    selectedContact !== null ||
-    contactActive ||
-    journalActive
+    selectedSavoirAssignment !== null ||
+    isSavoirInteractionActive ||
+    selectedContactAssignment !== null ||
+    isContactInteractionActive ||
+    isJournalInteractionActive
 
   useEffect(() => {
     if (!pendingPostIntroPointerLock || showNameInput || !postIntro) return
@@ -302,7 +304,7 @@ export default function App() {
 
   useEffect(() => {
     const blockPointerLock = (e) => {
-      if (journalActiveRef.current) e.stopImmediatePropagation()
+      if (isJournalInteractionActiveRef.current) e.stopImmediatePropagation()
     }
     document.addEventListener('click', blockPointerLock, { capture: true })
     return () => document.removeEventListener('click', blockPointerLock, { capture: true })
@@ -349,17 +351,17 @@ export default function App() {
   }, [])
 
   const onReady = useCallback((data) => {
-    setInfo(data)
-    setStatus('ok')
+    setSceneLoadInfo(data)
+    setSceneLoadStatus('ok')
   }, [])
   const onError = useCallback((msg) => {
-    setInfo(msg)
-    setStatus('error')
+    setSceneLoadInfo(msg)
+    setSceneLoadStatus('error')
   }, [])
 
   function goToPlatform() {
     setPostIntro(false)
-    setPlayerSpawn(getPlatformSpawn(info?.platformPosition))
+    setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setPlayerMode(true)
@@ -392,7 +394,7 @@ export default function App() {
       return
     }
 
-    setPlayerSpawn(getPlayerSpawn(info?.hutPosition))
+    setPlayerSpawn(getPlayerSpawn(sceneLoadInfo?.hutPosition))
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(false)
     setPlayerMode(true)
@@ -445,20 +447,23 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      <AppLoader status={status} error={status === 'error' ? info : null} />
+      <AppLoader
+        status={sceneLoadStatus}
+        error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
+      />
       <Subtitles />
 
       <Crosshair
         visible={
           (playerMode || postIntroCameraEnabled) &&
           !showNameInput &&
-          !selectedSavoir &&
-          !savoirActive &&
-          !selectedContact &&
-          !contactActive &&
-          !journalActive
+          !selectedSavoirAssignment &&
+          !isSavoirInteractionActive &&
+          !selectedContactAssignment &&
+          !isContactInteractionActive &&
+          !isJournalInteractionActive
         }
-        active={interactionsEnabled && (leafHovered || fruitHovered)}
+        active={interactionsEnabled && (isLeafHovered || isFruitHovered)}
       />
 
       <Scene
@@ -515,21 +520,25 @@ export default function App() {
         interactionsEnabled={interactionsEnabled}
         pointerControlsRef={pointerControlsRef}
         interactions={{
-          onLeafClick: handleLeafClick,
-          onLeafHover: setLeafHovered,
-          onFruitClick: handleFruitClick,
+          onLeafClick: openSavoirFromLeaf,
+          onLeafHover: setIsLeafHovered,
+          onFruitClick: openContactFromFruit,
           onFruitHover: handleFruitHover,
           onJournalStart: () => {
             handleJournalInteractionStart()
-            journalActiveRef.current = true
-            setJournalActive(true)
+            isJournalInteractionActiveRef.current = true
+            setIsJournalInteractionActive(true)
             document.exitPointerLock()
           },
           onJournalOpenComplete: handleJournalOpen,
-          onJournalCancel: () => {},
+          onJournalCancel: () => {
+            isJournalInteractionActiveRef.current = false
+            setIsJournalInteractionActive(false)
+            requestScenePointerLock()
+          },
           onJournalEnd: () => {
-            journalActiveRef.current = false
-            setJournalActive(false)
+            isJournalInteractionActiveRef.current = false
+            setIsJournalInteractionActive(false)
             handleJournalEnd()
             requestScenePointerLock()
           },
@@ -543,7 +552,7 @@ export default function App() {
       />
 
       {import.meta.env.DEV && showUI && !introPending && !introActive && !postIntro && (
-        <PerfMonitor stats={stats} scene={info} status={status} />
+        <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
       )}
 
       {import.meta.env.DEV && showCameraEditor && <CameraEditorPanel />}
@@ -561,8 +570,8 @@ export default function App() {
 
       {showUI && sceneReady && !introPending && !introActive && !postIntro && (
         <ViewerControls
-          status={status}
-          info={info}
+          status={sceneLoadStatus}
+          info={sceneLoadInfo}
           sceneReady={sceneReady}
           performanceMode={performanceMode}
           introPending={introPending}
@@ -648,12 +657,12 @@ export default function App() {
         </div>
       )}
 
-      {savoirOpen && selectedSavoir && (
-        <SavoirPanel savoir={selectedSavoir.savoir} onClose={handleCloseSavoir} />
+      {isSavoirPanelOpen && selectedSavoirAssignment && (
+        <SavoirPanel savoir={selectedSavoirAssignment.savoir} onClose={handleCloseSavoir} />
       )}
 
-      {contactOpen && selectedContact && (
-        <ContactPanel contact={selectedContact.contact} onClose={handleCloseContact} />
+      {isContactPanelOpen && selectedContactAssignment && (
+        <ContactPanel contact={selectedContactAssignment.contact} onClose={handleCloseContact} />
       )}
 
       {introPending && (

@@ -15,6 +15,9 @@ export function warnMissingAsset(message) {
 }
 
 export function cloneMaterialWithTextures(material) {
+  if (!material) return null
+  if (Array.isArray(material)) return material.map(cloneMaterialWithTextures).filter(Boolean)
+
   const clone = material.clone()
 
   for (const [key, value] of Object.entries(clone)) {
