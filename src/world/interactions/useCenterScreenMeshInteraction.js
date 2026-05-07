@@ -26,20 +26,26 @@ export function useCenterScreenMeshInteraction({
   const { camera } = useThree()
   const hoveredRef = useRef(false)
   const materialStatesRef = useRef(new Map())
+  const clonedMaterialsRef = useRef(new Map())
   const raycasterRef = useRef(new THREE.Raycaster())
   const onInteractRef = useStableInteractionCallback(onInteract)
 
   const interactionMeshes = useMemo(() => {
-    const foundMeshes = findMeshes(cabaneGroup)
-    foundMeshes.forEach((mesh) => {
-      if (mesh.material) mesh.material = cloneMeshMaterialShallow(mesh.material)
-    })
-    return foundMeshes
+    return findMeshes(cabaneGroup)
   }, [cabaneGroup, findMeshes])
 
   useEffect(() => {
     materialStatesRef.current = new Map()
+    clonedMaterialsRef.current = new Map()
+
     interactionMeshes.forEach((mesh) => {
+      const originalMaterial = mesh.material
+      if (originalMaterial) {
+        const clonedMaterial = cloneMeshMaterialShallow(originalMaterial)
+        mesh.material = clonedMaterial
+        clonedMaterialsRef.current.set(mesh, { originalMaterial, clonedMaterial })
+      }
+
       forEachMeshMaterial(mesh.material, (material) => {
         if (!material.emissive) return
         materialStatesRef.current.set(material, {
@@ -48,6 +54,16 @@ export function useCenterScreenMeshInteraction({
         })
       })
     })
+
+    return () => {
+      clonedMaterialsRef.current.forEach(({ originalMaterial, clonedMaterial }, mesh) => {
+        mesh.material = originalMaterial
+        forEachMeshMaterial(clonedMaterial, (material) => material.dispose())
+      })
+      clonedMaterialsRef.current = new Map()
+      materialStatesRef.current = new Map()
+      hoveredRef.current = false
+    }
   }, [interactionMeshes])
 
   useEffect(() => {

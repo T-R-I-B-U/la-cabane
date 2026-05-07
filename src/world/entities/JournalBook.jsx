@@ -338,15 +338,16 @@ export function JournalBook({
 
   // Puzzle drag-and-drop — native events (pointer lock is off when book is open)
   useEffect(() => {
-    const canvas = document.querySelector('canvas')
-    if (!canvas) return
+    const canvas = gl.domElement
 
     const raycaster = new THREE.Raycaster()
-    const toNDC = (e) =>
-      new THREE.Vector2(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
+    const toNDC = (e) => {
+      const rect = canvas.getBoundingClientRect()
+      return new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        -((e.clientY - rect.top) / rect.height) * 2 + 1
       )
+    }
 
     const onPointerDown = (e) => {
       const pieces = puzzlePiecesRef.current
@@ -419,7 +420,7 @@ export function JournalBook({
       document.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerup', onPointerUp)
     }
-  }, [camera, onPiecePlaced, pieceInteractionEnabled])
+  }, [camera, gl, onPiecePlaced, pieceInteractionEnabled])
 
   useFrame((_, delta) => {
     const group = groupRef.current
