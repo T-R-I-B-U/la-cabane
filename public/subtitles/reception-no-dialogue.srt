@@ -1,7 +1,0 @@
-1
-00:00:00,000 --> 00:00:05,000
-Tu vas me trouver impertinent, mais je vais quand meme te la raconter,
-
-2
-00:00:05,000 --> 00:00:10,200
-c'est ton histoire a toi aussi apres tout ! Regarde dans ce livre, il retrace notre parcours.

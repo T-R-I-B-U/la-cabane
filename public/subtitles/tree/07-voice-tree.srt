@@ -1,0 +1,16 @@
+1
+00:00:00,000 --> 00:00:03,240
+C'est une ville-marque en 2031.
+
+2
+00:00:03,240 --> 00:00:09,480
+Les villes devenaient irrespirables, inaccessibles, engorgées de voitures polluantes.
+
+3
+00:00:09,480 --> 00:00:12,280
+La violence était omniprésente.
+
+4
+00:00:12,280 --> 00:00:14,720
+Tu dois t'en souvenir j'imagine…
+

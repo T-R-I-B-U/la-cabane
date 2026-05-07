@@ -1,7 +1,0 @@
-1
-00:00:00,000 --> 00:00:06,200
-C'est une ville-marque en 2031, les villes devenaient irrespirables, inaccessibles,
-
-2
-00:00:06,200 --> 00:00:11,800
-engorgees de voitures polluantes, la violence etait omnipresente, tu dois t'en souvenir j'imagine...

@@ -146,7 +146,7 @@ export function useIntroFlow({ sceneReady }) {
         setPostIntro(true)
         setIntroMovementLocked(true)
         startStory('intro.treeWelcome')
-        playDialogue('dialogue1', {
+        playDialogue('01-voice-tree', {
           onDone: () => {
             completeStep('intro.treeWelcome')
             setShowNameInput(true)
@@ -163,7 +163,7 @@ export function useIntroFlow({ sceneReady }) {
       setShowNameInput(false)
       completeStep('intro.nameInput')
       setIntroMovementLocked(true)
-      playDialogue('dialogue2', {
+      playDialogue('02-voice-tree', {
         onDone: () => {
           completeStep('intro.cabanePresentation')
         },
@@ -296,8 +296,12 @@ export function useIntroFlow({ sceneReady }) {
           onDone: () => {
             playDialogue('treeArbreDialogue', {
               onDone: () => {
-                setEtabliPhaseActive(true)
-                setWorkbenchPhaseActive(true)
+                playDialogue('treeOutroDialogue', {
+                  onDone: () => {
+                    setEtabliPhaseActive(true)
+                    setWorkbenchPhaseActive(true)
+                  },
+                })
               },
             })
           },
@@ -343,7 +347,7 @@ export function useIntroFlow({ sceneReady }) {
     setIntroSpawn(INSIDE_POV)
     setIntroMovementLocked(true)
     startStory('intro.treeWelcome')
-    playDialogue('dialogue1', {
+    playDialogue('01-voice-tree', {
       onDone: () => {
         completeStep('intro.treeWelcome')
         setShowNameInput(true)
@@ -376,8 +380,12 @@ export function useIntroFlow({ sceneReady }) {
           onDone: () => {
             playDialogue('treeArbreDialogue', {
               onDone: () => {
-                setEtabliPhaseActive(true)
-                setWorkbenchPhaseActive(true)
+                playDialogue('treeOutroDialogue', {
+                  onDone: () => {
+                    setEtabliPhaseActive(true)
+                    setWorkbenchPhaseActive(true)
+                  },
+                })
               },
             })
           },

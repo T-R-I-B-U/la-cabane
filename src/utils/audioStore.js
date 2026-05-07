@@ -293,10 +293,6 @@ export function playDialogue(id, { onDone } = {}) {
     const cues = track.cfg.subtitles
 
     if (track.audio) {
-      _resumeContext()
-      if (track.audio.isPlaying) track.audio.stop()
-      track.audio.play()
-      _startSubtitles(id)
       if (onDone) {
         const prev = track.audio.onEnded
         track.audio.onEnded = function () {
@@ -305,6 +301,10 @@ export function playDialogue(id, { onDone } = {}) {
           onDone()
         }
       }
+      _resumeContext()
+      if (track.audio.isPlaying) track.audio.stop()
+      track.audio.play()
+      _startSubtitles(id)
       return
     }
 

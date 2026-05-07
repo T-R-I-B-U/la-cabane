@@ -1,0 +1,4 @@
+1
+00:00:00,000 --> 00:00:04,160
+Oui, super ! Je me doutais bien que tu étais intrigué.
+
