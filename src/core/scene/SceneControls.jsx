@@ -45,6 +45,7 @@ export function SceneControls({
   pointerControlsRef,
   controlsRef,
   hutPosition,
+  cameraFixed,
 }) {
   const devSync = import.meta.env.DEV ? <CameraRegistrySync controlsRef={controlsRef} /> : null
 
@@ -81,14 +82,17 @@ export function SceneControls({
   if (postIntro) {
     return postIntroLocked ? (
       <>
-        <PlayerControls
-          canMove={!movementLocked}
-          flyMode={flyMode}
-          spawnAt={introSpawn?.position}
-          lookAtTarget={introSpawn?.target}
-          collisionObjects={collisionObjects}
-          controlsRef={pointerControlsRef}
-        />
+        {/* cameraFixed: skip PlayerControls/PointerLock during minigame so pointer events work */}
+        {!cameraFixed && (
+          <PlayerControls
+            canMove={!movementLocked}
+            flyMode={flyMode}
+            spawnAt={introSpawn?.position}
+            lookAtTarget={introSpawn?.target}
+            collisionObjects={collisionObjects}
+            controlsRef={pointerControlsRef}
+          />
+        )}
         <StoryCameraTransition
           transition={storyCameraTransition}
           onComplete={onStoryCameraTransitionComplete}

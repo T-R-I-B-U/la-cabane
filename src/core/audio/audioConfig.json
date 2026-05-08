@@ -200,6 +200,46 @@
       "volume": 1,
       "autoplay": false,
       "subtitles": "thomas-etabli-dialogue.srt"
+    },
+    {
+      "id": "serreNarration",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "serre-narration.srt"
+    },
+    {
+      "id": "zoeIntro",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "zoe-intro.srt"
+    },
+    {
+      "id": "zoeJuice",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "zoe-juice.srt"
+    },
+    {
+      "id": "zoeFarewell",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "zoe-farewell.srt"
+    },
+    {
+      "id": "zoeUnripe",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "zoe-unripe.srt"
     }
   ]
 }

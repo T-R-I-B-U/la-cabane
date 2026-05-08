@@ -1,14 +1,22 @@
-import { useMemo } from 'react'
+import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
 import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
+import { ClickableZoe } from '../../world/entities/ClickableZoe'
 import { JournalBook } from '../../world/entities/JournalBook'
+import { RaspberryMinigame } from '../../world/entities/RaspberryMinigame'
+import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
 const JOURNAL_ROTATION_Y = 0.41
+
+// Greenhouse serre interior world offset — place minigame group at the serre origin.
+// Calibrate in dev by reading camera position when inside the serre.
+const SERRE_GROUP_POSITION = [24.5, 0, -5.4]
+const ZOE_TEXTURE_BASE_PATHS = ['/textures/compressed/', '/textures/']
 
 export function SceneInteractions({
   cabane,
@@ -34,6 +42,14 @@ export function SceneInteractions({
   journalCloseToken,
   journalPuzzleEnabled,
   journalVisible = true,
+  serreActive,
+  zoePhaseActive,
+  raspberryPhaseActive,
+  juicePhaseActive,
+  zoeClip,
+  onZoeTalk,
+  onMinigameStateChange,
+  onUnripeAttempt,
 }) {
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   const bookPosition = useMemo(() => {
@@ -97,6 +113,31 @@ export function SceneInteractions({
           onInteractionCancel={onJournalCancel}
           onPiecePlaced={onJournalPiecePlaced}
         />
+      )}
+
+      <ClickableZoe isInteractable={zoePhaseActive} onZoeTalk={onZoeTalk} />
+
+      {raspberryPhaseActive && (
+        <RaspberryMinigame
+          isActive
+          position={SERRE_GROUP_POSITION}
+          onStateChange={onMinigameStateChange}
+          onUnripeAttempt={onUnripeAttempt}
+        />
+      )}
+
+      {(serreActive || zoePhaseActive || raspberryPhaseActive || juicePhaseActive) && (
+        <Suspense fallback={null}>
+          <AnimatedCharacter
+            url="/models/zoe-animated.glb"
+            clip={zoeClip}
+            textureName="zoe-animated"
+            textureBasePaths={ZOE_TEXTURE_BASE_PATHS}
+            position={[26.0, 0.9, -5.4]}
+            rotation={[0, -Math.PI / 2, 0]}
+            scale={11}
+          />
+        </Suspense>
       )}
     </>
   )

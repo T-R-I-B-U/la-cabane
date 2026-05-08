@@ -33,6 +33,11 @@ export function useIntroFlow({ sceneReady }) {
   const [greenhousePhaseActive, setGreenhousePhaseActive] = useState(false)
   const [thomasEtabliPhaseActive, setThomasEtabliPhaseActive] = useState(false)
   const [thomasAnimationPhase, setThomasAnimationPhase] = useState('back')
+  const [serreActive, setSerreActive] = useState(false)
+  const [zoePhaseActive, setZoePhaseActive] = useState(false)
+  const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
+  const [juicePhaseActive, setJuicePhaseActive] = useState(false)
+  const [zoeClip, setZoeClip] = useState(null)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
   const journalPlacedCountRef = useRef(0)
@@ -40,6 +45,8 @@ export function useIntroFlow({ sceneReady }) {
   const isPostBookTransitionRef = useRef(false)
   const isEtabliTransitionRef = useRef(false)
   const isThomasTransitionRef = useRef(false)
+  const isSerreZoeTransitionRef = useRef(false)
+  const isSerreRaspberryTransitionRef = useRef(false)
   const greenhouseTransitionStageRef = useRef(null)
   const scheduledTimeoutsRef = useRef(new Set())
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
@@ -86,6 +93,11 @@ export function useIntroFlow({ sceneReady }) {
     setThomasEtabliPhaseActive(false)
     setGreenhousePhaseActive(false)
     setThomasAnimationPhase('back')
+    setSerreActive(false)
+    setZoePhaseActive(false)
+    setRaspberryPhaseActive(false)
+    setJuicePhaseActive(false)
+    setZoeClip(null)
     setPlayerName('')
     stop('ambianceWorkbench')
     stop('ambianceGreenhouse')
@@ -93,6 +105,8 @@ export function useIntroFlow({ sceneReady }) {
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
+    isSerreZoeTransitionRef.current = false
+    isSerreRaspberryTransitionRef.current = false
     greenhouseTransitionStageRef.current = null
   }, [clearScheduledTimeouts])
 
@@ -232,6 +246,23 @@ export function useIntroFlow({ sceneReady }) {
       return
     }
 
+    if (isSerreZoeTransitionRef.current) {
+      isSerreZoeTransitionRef.current = false
+      playDialogue('zoeIntro', {
+        onDone: () => {
+          isSerreRaspberryTransitionRef.current = true
+          setRaspberryPhaseActive(true)
+          setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 1.0 })
+        },
+      })
+      return
+    }
+
+    if (isSerreRaspberryTransitionRef.current) {
+      isSerreRaspberryTransitionRef.current = false
+      return
+    }
+
     if (greenhouseTransitionStageRef.current === 'front') {
       greenhouseTransitionStageRef.current = 'corridor'
       scheduleFlowTimeout(() => {
@@ -251,6 +282,12 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'inside') {
       greenhouseTransitionStageRef.current = null
+      setSerreActive(true)
+      scheduleFlowTimeout(() => {
+        playDialogue('serreNarration', {
+          onDone: () => setZoePhaseActive(true),
+        })
+      }, 500)
       return
     }
 
@@ -375,6 +412,30 @@ export function useIntroFlow({ sceneReady }) {
     isEtabliTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelier, duration: 1.5 })
   }, [])
+
+  const handleZoeTalk = useCallback(() => {
+    setZoePhaseActive(false)
+    isSerreZoeTransitionRef.current = true
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreZoe, duration: 1.0 })
+  }, [])
+
+  const handleMinigameStateChange = useCallback(
+    (state) => {
+      if (!state.complete) return
+      setRaspberryPhaseActive(false)
+      setZoeClip('zoe-pointing')
+      scheduleFlowTimeout(() => {
+        playDialogue('zoeJuice', {
+          onDone: () => setJuicePhaseActive(true),
+        })
+      }, 500)
+    },
+    [playDialogue, scheduleFlowTimeout]
+  )
+
+  const handleUnripeAttempt = useCallback(() => {
+    playDialogue('zoeUnripe')
+  }, [playDialogue])
 
   const handleGreenhouseDoorClick = useCallback(() => {
     setGreenhousePhaseActive(false)
@@ -509,6 +570,11 @@ export function useIntroFlow({ sceneReady }) {
     thomasEtabliPhaseActive,
     greenhousePhaseActive,
     thomasAnimPhase: thomasAnimationPhase,
+    serreActive,
+    zoePhaseActive,
+    raspberryPhaseActive,
+    juicePhaseActive,
+    zoeClip,
     showNameInput,
     storyReady,
     currentStoryStepId: currentStepId,
@@ -527,6 +593,9 @@ export function useIntroFlow({ sceneReady }) {
     handleWorkbenchInteract,
     handleThomasEtabliInteract,
     handleGreenhouseDoorClick,
+    handleZoeTalk,
+    handleMinigameStateChange,
+    handleUnripeAttempt,
     handleJournalEnd,
     handleTreeInteract,
     handleJournalInteractionStart,
