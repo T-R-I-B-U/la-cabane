@@ -38,6 +38,7 @@ export function useIntroFlow({ sceneReady }) {
   const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
   const [zoeClip, setZoeClip] = useState(null)
+  const [minigameCount, setMinigameCount] = useState(0)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
   const journalPlacedCountRef = useRef(0)
@@ -98,6 +99,7 @@ export function useIntroFlow({ sceneReady }) {
     setRaspberryPhaseActive(false)
     setJuicePhaseActive(false)
     setZoeClip(null)
+    setMinigameCount(0)
     setPlayerName('')
     stop('ambianceWorkbench')
     stop('ambianceGreenhouse')
@@ -282,7 +284,6 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'inside') {
       greenhouseTransitionStageRef.current = null
-      setSerreActive(true)
       scheduleFlowTimeout(() => {
         playDialogue('serreNarration', {
           onDone: () => setZoePhaseActive(true),
@@ -421,6 +422,7 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleMinigameStateChange = useCallback(
     (state) => {
+      setMinigameCount(state.count)
       if (!state.complete) return
       setRaspberryPhaseActive(false)
       setZoeClip('zoe-pointing')
@@ -439,6 +441,7 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleGreenhouseDoorClick = useCallback(() => {
     setGreenhousePhaseActive(false)
+    setSerreActive(true)
     fade('ambianceWorkbench', 0, 1500)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
@@ -575,6 +578,7 @@ export function useIntroFlow({ sceneReady }) {
     raspberryPhaseActive,
     juicePhaseActive,
     zoeClip,
+    minigameCount,
     showNameInput,
     storyReady,
     currentStoryStepId: currentStepId,

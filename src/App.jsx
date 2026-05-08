@@ -12,6 +12,7 @@ import {
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
+import { RaspberryCounter } from './app/RaspberryCounter'
 import { useContactAssignment } from './app/useContactAssignment'
 import Scene from './core/Scene'
 import CameraEditorPanel from './core/CameraEditorPanel'
@@ -136,6 +137,7 @@ export default function App() {
     raspberryPhaseActive,
     juicePhaseActive,
     zoeClip,
+    minigameCount,
     showNameInput,
     storyReady,
     currentStoryStepId,
@@ -736,6 +738,8 @@ export default function App() {
       {isContactPanelOpen && selectedContactAssignment && (
         <ContactPanel contact={selectedContactAssignment.contact} onClose={handleCloseContact} />
       )}
+
+      {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
       {introPending && (
         <IntroLoader

@@ -7,7 +7,7 @@ const CENTER_NDC = new THREE.Vector2(0, 0)
 
 // Match Zoé's world position in SceneInteractions — update both together.
 // Box center at chest height: floor_y + ~0.9 of body height.
-const ZOE_HITBOX_POSITION = [26.0, 1.8, -5.4]
+const ZOE_HITBOX_POSITION = [26.0, 2.0, -5.4]
 
 export function ClickableZoe({ isInteractable, onZoeTalk }) {
   const { camera } = useThree()

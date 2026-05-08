@@ -64,9 +64,11 @@ function RaspberryInstance({
   const originPos = definition.position
   const baseScale = definition.isRipe ? 0.46 : 0.38
 
-  const [pos, setPos] = useState([...originPos])
-  const [collectedSlot, setCollectedSlot] = useState(null)
-  const [animScale, setAnimScale] = useState(baseScale)
+  // Refs for per-frame state — avoids setState in useFrame which causes freeze
+  const meshRef = useRef()
+  const posRef = useRef([...originPos])
+  const collectedSlotRef = useRef(null)
+  const animScaleRef = useRef(baseScale)
 
   const dragging = useRef(false)
   const _hit = useMemo(() => new THREE.Vector3(), [])
@@ -119,7 +121,8 @@ function RaspberryInstance({
       if (!dragging.current) return
       dragging.current = false
       document.body.style.cursor = 'auto'
-      setPos([...originPos])
+      posRef.current = [...originPos]
+      meshRef.current?.position.set(...originPos)
     }
     window.addEventListener('pointerup', onGlobalUp)
     return () => window.removeEventListener('pointerup', onGlobalUp)
@@ -127,7 +130,7 @@ function RaspberryInstance({
 
   const onPointerDown = useCallback(
     (e) => {
-      if (!isActive || collectedSlot !== null) return
+      if (!isActive || collectedSlotRef.current !== null) return
       e.stopPropagation()
       // Drag plane faces the camera — works regardless of serre orientation
       const camDir = new THREE.Vector3()
@@ -136,7 +139,7 @@ function RaspberryInstance({
       dragging.current = true
       document.body.style.cursor = 'grabbing'
     },
-    [isActive, collectedSlot]
+    [isActive]
   )
 
   const onPointerUp = useCallback(() => {
@@ -144,38 +147,46 @@ function RaspberryInstance({
     dragging.current = false
     document.body.style.cursor = 'auto'
 
-    const current = new THREE.Vector3(...pos)
+    const current = new THREE.Vector3(...posRef.current)
     if (current.distanceTo(_basketPos) < BASKET_RADIUS) {
       if (!definition.isRipe) {
         onUnripeAttempt?.()
-        setPos([...originPos])
+        posRef.current = [...originPos]
+        meshRef.current?.position.set(...originPos)
       } else {
         const slot = onCollected(index)
-        setCollectedSlot(slot)
+        collectedSlotRef.current = slot
       }
     } else {
-      setPos([...originPos])
+      posRef.current = [...originPos]
+      meshRef.current?.position.set(...originPos)
     }
-  }, [pos, _basketPos, originPos, onCollected, onUnripeAttempt, definition.isRipe, index])
+  }, [_basketPos, originPos, onCollected, onUnripeAttempt, definition.isRipe, index])
 
   useFrame(({ camera, pointer }) => {
-    if (collectedSlot !== null) {
-      const s = BASKET_SLOTS[collectedSlot]
-      const [tx, ty, tz] = [
-        BASKET_LOCAL_POS[0] + s[0],
-        BASKET_LOCAL_POS[1] + s[1],
-        BASKET_LOCAL_POS[2] + s[2],
-      ]
-      const [cx, cy, cz] = pos
-      const dx = tx - cx,
-        dy = ty - cy,
-        dz = tz - cz
-      if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) > 0.002)
-        setPos([cx + dx * 0.12, cy + dy * 0.12, cz + dz * 0.12])
-      setAnimScale((s) => {
-        const diff = BASKET_SCALE_IN - s
-        return Math.abs(diff) > 0.001 ? s + diff * 0.12 : BASKET_SCALE_IN
-      })
+    if (collectedSlotRef.current !== null) {
+      const s = BASKET_SLOTS[collectedSlotRef.current]
+      const tx = BASKET_LOCAL_POS[0] + s[0]
+      const ty = BASKET_LOCAL_POS[1] + s[1]
+      const tz = BASKET_LOCAL_POS[2] + s[2]
+      const [cx, cy, cz] = posRef.current
+      const dx = tx - cx
+      const dy = ty - cy
+      const dz = tz - cz
+      if (Math.abs(dx) + Math.abs(dy) + Math.abs(dz) > 0.002) {
+        const nx = cx + dx * 0.12
+        const ny = cy + dy * 0.12
+        const nz = cz + dz * 0.12
+        posRef.current = [nx, ny, nz]
+        meshRef.current?.position.set(nx, ny, nz)
+      }
+      const scale = animScaleRef.current
+      const diff = BASKET_SCALE_IN - scale
+      if (Math.abs(diff) > 0.001) {
+        const ns = scale + diff * 0.12
+        animScaleRef.current = ns
+        meshRef.current?.scale.setScalar(ns)
+      }
       return
     }
 
@@ -184,19 +195,24 @@ function RaspberryInstance({
     if (_raycaster.ray.intersectPlane(dragPlane.current, _hit) && groupRef.current) {
       // Convert world hit to local group space for position-agnostic mounting
       const local = groupRef.current.worldToLocal(_hit.clone())
-      setPos([local.x, Math.max(local.y, 0.08), local.z])
+      const nx = local.x
+      const ny = Math.max(local.y, 0.08)
+      const nz = local.z
+      posRef.current = [nx, ny, nz]
+      meshRef.current?.position.set(nx, ny, nz)
     }
   })
 
   return (
     <primitive
+      ref={meshRef}
       object={cloned}
-      position={pos}
-      scale={animScale}
+      position={originPos}
+      scale={baseScale}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onPointerEnter={() => {
-        if (isActive && collectedSlot === null) document.body.style.cursor = 'grab'
+        if (isActive && collectedSlotRef.current === null) document.body.style.cursor = 'grab'
       }}
       onPointerLeave={() => {
         if (!dragging.current) document.body.style.cursor = 'auto'

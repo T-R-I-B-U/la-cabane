@@ -133,7 +133,7 @@ export function SceneInteractions({
             clip={zoeClip}
             textureName="zoe-animated"
             textureBasePaths={ZOE_TEXTURE_BASE_PATHS}
-            position={[26.0, 0.9, -5.4]}
+            position={[26.0, 1.1, -5.4]}
             rotation={[0, -Math.PI / 2, 0]}
             scale={11}
           />
