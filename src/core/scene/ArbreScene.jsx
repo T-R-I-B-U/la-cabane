@@ -8,7 +8,6 @@ import { DEFAULT_HUT_POS, PLATFORM_POS, PLAYER_HEIGHT } from '../SceneConfig'
 
 const CABANE_TRIGGER_RADIUS = 10
 
-// Fruit positions computed relative to the platform so they move with the real GLTF.
 function usePlatformLayout(platformPosition, hutPosition) {
   return useMemo(() => {
     const pos = platformPosition ?? PLATFORM_POS
@@ -63,7 +62,11 @@ export function ArbreScene({
         onLeave={() => setZone('cabane')}
       />
 
-      <InteractionPoint position={ladderPOI} active={ladderClickActive} onInteract={onLadderClick} />
+      <InteractionPoint
+        position={ladderPOI}
+        active={ladderClickActive}
+        onInteract={onLadderClick}
+      />
       {ladderClickActive && (
         <mesh position={ladderPOI}>
           <sphereGeometry args={[0.12, 8, 8]} />

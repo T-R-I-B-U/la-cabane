@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useTexture } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -44,6 +44,12 @@ export function BackgroundPlanes({ hutPosition }) {
       return nextTexture
     })
   }, [backgroundTexture1, backgroundTexture2, backgroundTexture3])
+
+  useEffect(() => {
+    return () => {
+      textures.forEach((texture) => texture?.dispose())
+    }
+  }, [textures])
   const planeConfigs = useMemo(() => {
     return PLANES.map((plane) => ({
       ...plane,

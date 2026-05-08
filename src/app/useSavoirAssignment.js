@@ -1,34 +1,47 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 export function useSavoirAssignment() {
-  const [selected, setSelected] = useState(null)
+  const [selectedSavoirAssignment, setSelectedSavoirAssignment] = useState(null)
   const savoirs = useRef([])
   // Map<instanceId, savoirIdx> — assigned during session, not persisted
   const assignments = useRef(new Map())
-  const nextIdx = useRef(0)
+  const nextSavoirIndex = useRef(0)
 
   useEffect(() => {
+    let cancelled = false
+
     fetch('/savoirs.json')
-      .then((res) => res.json())
-      .then((data) => {
-        savoirs.current = data
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        return response.json()
       })
-  }, [])
+      .then((savoirItems) => {
+        if (!cancelled && Array.isArray(savoirItems)) savoirs.current = savoirItems
+      })
+      .catch((error) => {
+        console.error('useSavoirAssignment: failed to load /savoirs.json', error)
+      })
 
-  const assignAndOpen = useCallback((instanceId) => {
-    if (savoirs.current.length === 0) return
-    let idx = assignments.current.get(instanceId)
-    if (idx === undefined) {
-      idx = nextIdx.current % savoirs.current.length
-      nextIdx.current += 1
-      assignments.current.set(instanceId, idx)
+    return () => {
+      cancelled = true
     }
-    setSelected({ instanceId, savoir: savoirs.current[idx] })
   }, [])
 
-  const close = useCallback(() => {
-    setSelected(null)
+  const openSavoirForLeaf = useCallback((instanceId) => {
+    if (savoirs.current.length === 0) return false
+    let savoirIndex = assignments.current.get(instanceId)
+    if (savoirIndex === undefined) {
+      savoirIndex = nextSavoirIndex.current % savoirs.current.length
+      nextSavoirIndex.current += 1
+      assignments.current.set(instanceId, savoirIndex)
+    }
+    setSelectedSavoirAssignment({ instanceId, savoir: savoirs.current[savoirIndex] })
+    return true
   }, [])
 
-  return { selected, assignAndOpen, close }
+  const closeSavoir = useCallback(() => {
+    setSelectedSavoirAssignment(null)
+  }, [])
+
+  return { selectedSavoirAssignment, openSavoirForLeaf, closeSavoir }
 }

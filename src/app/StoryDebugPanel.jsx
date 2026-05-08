@@ -1,4 +1,11 @@
-export function StoryDebugPanel({ onGoToIntroStart, onGoToDoorPassage, onGoToReception }) {
+export function StoryDebugPanel({
+  onGoToIntroStart,
+  onGoToDoorPassage,
+  onGoToReception,
+  onGoToTree,
+  onGoToEtabli,
+  onGoToSerre,
+}) {
   return (
     <aside className="story-debug-panel" aria-label="Story debug panel">
       <span className="story-debug-eyebrow">Debug story</span>
@@ -11,6 +18,15 @@ export function StoryDebugPanel({ onGoToIntroStart, onGoToDoorPassage, onGoToRec
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToReception}>
           Accueil
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToTree}>
+          Arbre (dialogues)
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToEtabli}>
+          Établi
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToSerre}>
+          Serre (porte)
         </button>
       </div>
     </aside>

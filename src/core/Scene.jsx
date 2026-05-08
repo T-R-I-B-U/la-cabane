@@ -10,7 +10,7 @@ import { SceneControls } from './scene/SceneControls'
 import { SceneLighting } from './scene/SceneLighting'
 import { CabaneScene } from './scene/CabaneScene'
 import { ArbreScene } from './scene/ArbreScene'
-import { useActiveZone } from '../utils'
+import { useActiveZone } from '../utils/gameManagerStore'
 
 export default function Scene({
   performanceMode,
@@ -20,7 +20,6 @@ export default function Scene({
   debug,
   intro,
   arbre,
-  platformPosition,
   leafMaterialMode,
   interactionsEnabled,
   pointerControlsRef,
@@ -52,9 +51,18 @@ export default function Scene({
     postIntro,
     postIntroLocked,
     receptionActive,
+    treePhaseActive,
+    workbenchPhaseActive,
+    greenhousePhaseActive,
+    thomasEtabliPhaseActive,
+    thomasAnimPhase,
     interactionLocked,
     onEvent: onIntroEvent,
     onReceptionInteract,
+    onTreeInteract,
+    onWorkbenchInteract,
+    onGreenhouseDoorClick,
+    onThomasEtabliInteract,
     onStoryCameraTransitionComplete,
   } = intro
   const {
@@ -85,9 +93,10 @@ export default function Scene({
   const [sceneColliders, setSceneColliders] = useState([])
   const [mainFloorCollider, setMainFloorCollider] = useState(null)
   const [hutPosition, setHutPosition] = useState(DEFAULT_HUT_POS)
+  const [platformPosition, setPlatformPosition] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const sceneInteractionsActive =
+  const areSceneInteractionsEnabled =
     (playerMode || postIntro) && !interactionLocked && interactionsEnabled
   const collisionObjects = useMemo(
     () => [...sceneColliders, mainFloorCollider].filter(Boolean),
@@ -131,6 +140,15 @@ export default function Scene({
             onJournalPiecePlaced={onJournalPiecePlaced}
             onIntroEvent={onIntroEvent}
             receptionActive={receptionActive}
+            treePhaseActive={treePhaseActive}
+            workbenchPhaseActive={workbenchPhaseActive}
+            greenhousePhaseActive={greenhousePhaseActive}
+            onGreenhouseDoorClick={onGreenhouseDoorClick}
+            thomasEtabliPhaseActive={thomasEtabliPhaseActive}
+            thomasAnimPhase={thomasAnimPhase}
+            onWorkbenchInteract={onWorkbenchInteract}
+            onThomasEtabliInteract={onThomasEtabliInteract}
+            onTreeInteract={onTreeInteract}
             onReceptionInteract={onReceptionInteract}
             introWaitingAtDoor={introWaitingAtDoor}
             journalUnlocked={journalUnlocked}
@@ -146,8 +164,10 @@ export default function Scene({
             forceOpenDoor={introDoorOpen}
             controlsRef={controlsRef}
             firstPersonMode={firstPersonMode}
+            platformPosition={platformPosition}
             onCollisionReady={setSceneColliders}
             onHutPositionReady={setHutPosition}
+            onPlatformPositionReady={setPlatformPosition}
           />
         </Suspense>
       )}
@@ -165,7 +185,7 @@ export default function Scene({
             onFruitClickDuringLeaves={onFruitClickDuringLeaves}
             onFruitClick={onFruitClick}
             onFruitHover={onFruitHover}
-            interactionsEnabled={sceneInteractionsActive}
+            interactionsEnabled={areSceneInteractionsEnabled}
           />
         </Suspense>
       )}

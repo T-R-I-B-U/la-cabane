@@ -59,18 +59,21 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const onDoorClickRef = useStableInteractionCallback(onDoorClick)
   const outlinesRef = useRef([])
   const materialStatesRef = useRef(new Map())
+  const clonedMaterialsRef = useRef(new Map())
   const raycaster = useRef(new THREE.Raycaster())
 
-  // Clone materials so we don't mutate shared GLB materials.
-  const doorMeshes = useMemo(() => {
-    const found = findIntroDoorMeshes(cabane)
-    found.forEach((mesh) => {
-      if (mesh.material) mesh.material = cloneMaterial(mesh.material)
-    })
-    return found
-  }, [cabane])
+  const doorMeshes = useMemo(() => findIntroDoorMeshes(cabane), [cabane])
 
   useEffect(() => {
+    clonedMaterialsRef.current = new Map()
+    doorMeshes.forEach((mesh) => {
+      if (!mesh.material) return
+      const originalMaterial = mesh.material
+      const clonedMaterial = cloneMaterial(originalMaterial)
+      mesh.material = clonedMaterial
+      clonedMaterialsRef.current.set(mesh, { originalMaterial, clonedMaterial })
+    })
+
     const outlines = doorMeshes.map((mesh) => {
       const outline = createDoorOutline(mesh)
       mesh.add(outline)
@@ -96,6 +99,12 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
         outline.geometry.dispose()
         outline.material.dispose()
       })
+      clonedMaterialsRef.current.forEach(({ originalMaterial, clonedMaterial }, mesh) => {
+        mesh.material = originalMaterial
+        forEachMaterial(clonedMaterial, (material) => material.dispose())
+      })
+      clonedMaterialsRef.current = new Map()
+      materialStatesRef.current = new Map()
       outlinesRef.current = []
     }
   }, [doorMeshes])

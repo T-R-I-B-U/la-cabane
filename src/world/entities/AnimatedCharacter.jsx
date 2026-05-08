@@ -169,10 +169,17 @@ export function AnimatedCharacter({
     return () => {
       cancelled = true
       timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId))
+      // Keep activeActionRef and current action playing so the next sequence
+      // can crossFadeFrom it instead of snapping to bind pose.
+    }
+  }, [actions, animationSequence])
+
+  useEffect(() => {
+    return () => {
       Object.values(actions).forEach((entry) => entry?.stop())
       activeActionRef.current = null
     }
-  }, [actions, animationSequence])
+  }, [actions])
 
   return (
     <group ref={group} {...props}>

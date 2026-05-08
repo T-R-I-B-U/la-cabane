@@ -1,7 +1,10 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
+import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableReception } from '../../world/entities/ClickableReception'
+import { ClickableTree } from '../../world/entities/ClickableTree'
+import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
 import { JournalBook } from '../../world/entities/JournalBook'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
@@ -11,12 +14,17 @@ export function SceneInteractions({
   cabane,
   playerMode,
   postIntro,
-  interactionLocked,
   introWaitingAtDoor,
   journalUnlocked,
   receptionActive,
+  treePhaseActive,
+  workbenchPhaseActive,
+  greenhousePhaseActive,
+  onWorkbenchInteract,
   onIntroEvent,
   onReceptionInteract,
+  onTreeInteract,
+  onGreenhouseDoorClick,
   onJournalStart,
   onJournalEnd,
   onJournalOpenComplete,
@@ -27,8 +35,7 @@ export function SceneInteractions({
   journalPuzzleEnabled,
   journalVisible = true,
 }) {
-  const interactionsActive = (playerMode || postIntro) && !interactionLocked
-  const journalActive = interactionsActive && journalUnlocked
+  const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   const bookPosition = useMemo(() => {
     if (!cabane) return null
 
@@ -58,14 +65,28 @@ export function SceneInteractions({
 
       <ClickableReception
         cabane={cabane}
-        active={receptionActive}
+        isInteractable={receptionActive}
         onInteract={onReceptionInteract}
+      />
+
+      <ClickableTree cabane={cabane} isInteractable={treePhaseActive} onInteract={onTreeInteract} />
+
+      <ClickableWorkbench
+        cabane={cabane}
+        isInteractable={workbenchPhaseActive}
+        onInteract={onWorkbenchInteract}
+      />
+
+      <ClickableGreenhouseDoor
+        cabane={cabane}
+        isInteractable={greenhousePhaseActive}
+        onDoorClick={onGreenhouseDoorClick}
       />
 
       {journalVisible && bookPosition && (
         <JournalBook
           position={bookPosition}
-          active={journalActive}
+          active={isJournalInteractable}
           autoOpenToken={journalAutoOpenToken}
           closeToken={journalCloseToken}
           pieceInteractionEnabled={journalPuzzleEnabled}

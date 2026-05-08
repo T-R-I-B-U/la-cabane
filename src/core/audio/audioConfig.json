@@ -2,84 +2,126 @@
   "globalVolume": 1,
   "tracks": [
     {
-      "id": "dialogue1",
-      "type": "dialogue",
-      "loop": false,
-      "volume": 1,
-      "autoplay": false,
-      "subtitles": "dialogue-1.srt"
+      "id": "ambianceWorkbench",
+      "type": "sfx",
+      "src": "Ambiance-Workbench.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
     },
     {
-      "id": "dialogue2",
+      "id": "ambianceGreenhouse",
+      "type": "sfx",
+      "src": "Ambiance-Greenhouse-ZoeNotTalking.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
+      "id": "slidingDoor",
+      "type": "sfx",
+      "src": "Sliding-Door.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
+    },
+    {
+      "id": "book",
+      "type": "sfx",
+      "src": "Book.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
+    },
+    {
+      "id": "01-voice-tree",
       "type": "dialogue",
+      "src": "tree/01-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "dialogue-2.srt"
+      "subtitles": "tree/01-voice-tree.srt"
+    },
+    {
+      "id": "02-voice-tree",
+      "type": "dialogue",
+      "src": "tree/02-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/02-voice-tree.srt"
     },
     {
       "id": "receptionDialogue",
       "type": "dialogue",
+      "src": "tree/03-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "reception-dialogue.srt"
+      "subtitles": "tree/03-voice-tree.srt"
     },
     {
       "id": "receptionYesDialogue",
       "type": "dialogue",
+      "src": "tree/04-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "reception-yes-dialogue.srt"
+      "subtitles": "tree/04-voice-tree.srt"
     },
     {
       "id": "receptionNoDialogue",
       "type": "dialogue",
+      "src": "tree/05-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "reception-no-dialogue.srt"
+      "subtitles": "tree/05-voice-tree.srt"
     },
     {
       "id": "bookIntroDialogue",
       "type": "dialogue",
+      "src": "tree/06-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "book-intro-dialogue.srt"
+      "subtitles": "tree/06-voice-tree.srt"
     },
     {
       "id": "bookImg1Dialogue",
       "type": "dialogue",
+      "src": "tree/07-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "book-img1-dialogue.srt"
+      "subtitles": "tree/07-voice-tree.srt"
     },
     {
       "id": "bookImg2Dialogue",
       "type": "dialogue",
+      "src": "tree/08-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "book-img2-dialogue.srt"
+      "subtitles": "tree/08-voice-tree.srt"
     },
     {
       "id": "bookImg3Dialogue",
       "type": "dialogue",
+      "src": "tree/09-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "book-img3-dialogue.srt"
+      "subtitles": "tree/09-voice-tree.srt"
     },
     {
       "id": "bookImg4Dialogue",
       "type": "dialogue",
+      "src": "tree/10-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "book-img4-dialogue.srt"
+      "subtitles": "tree/10-voice-tree.srt"
     },
     {
       "id": "marieDialogue",
@@ -96,6 +138,68 @@
       "volume": 1,
       "autoplay": false,
       "subtitles": "thomas-dialogue.srt"
+    },
+    {
+      "id": "treePiedDialogue",
+      "type": "dialogue",
+      "src": "tree/11-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/11-voice-tree.srt"
+    },
+    {
+      "id": "treeRacinesDialogue",
+      "type": "dialogue",
+      "src": "tree/12-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/12-voice-tree.srt"
+    },
+    {
+      "id": "treeBorneDialogue",
+      "type": "dialogue",
+      "src": "tree/13-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/13-voice-tree.srt"
+    },
+    {
+      "id": "treeArbreDialogue",
+      "type": "dialogue",
+      "src": "tree/14-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/14-voice-tree.srt"
+    },
+    {
+      "id": "treeOutroDialogue",
+      "type": "dialogue",
+      "src": "tree/15-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/15-voice-tree.srt"
+    },
+    {
+      "id": "etabliDialogue",
+      "type": "dialogue",
+      "src": "tree/16-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/16-voice-tree.srt"
+    },
+    {
+      "id": "thomasEtabliDialogue",
+      "type": "dialogue",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "thomas-etabli-dialogue.srt"
     },
     {
       "id": "arbrePlateforme",
