@@ -147,6 +147,7 @@ export default function App() {
     zoePhaseActive,
     raspberryPhaseActive,
     juicePhaseActive,
+    exitSerrePhaseActive,
     zoeClip,
     minigameCount,
     showNameInput,
@@ -170,8 +171,10 @@ export default function App() {
     handleDebugGoToEtabli,
     handleDebugGoToSerre,
     handleDebugGoToMinijeu,
+    handleDebugGoToPostMinigame,
     handleWorkbenchInteract,
     handleGreenhouseDoorClick,
+    handleExitSerreDoorClick,
     handleThomasEtabliInteract,
     handleZoeTalk,
     handleMinigameStateChange,
@@ -356,6 +359,11 @@ export default function App() {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToMinijeu()
   }, [handleDebugGoToMinijeu])
+
+  const jumpToPostMinigame = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handleDebugGoToPostMinigame()
+  }, [handleDebugGoToPostMinigame])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -640,6 +648,7 @@ export default function App() {
           interactionLocked: isPlayerInteractionLocked,
           workbenchPhaseActive,
           greenhousePhaseActive,
+          exitSerrePhaseActive,
           thomasEtabliPhaseActive,
           thomasAnimPhase,
           onEvent: handleIntroEvent,
@@ -647,6 +656,7 @@ export default function App() {
           onTreeInteract: handleTreeInteract,
           onWorkbenchInteract: handleWorkbenchInteract,
           onGreenhouseDoorClick: handleGreenhouseDoorClick,
+          onExitSerreDoorClick: handleExitSerreDoorClick,
           onThomasEtabliInteract: handleThomasEtabliInteract,
           onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
           serreActive,
@@ -733,6 +743,7 @@ export default function App() {
             onGoToEtabli={jumpToEtabli}
             onGoToSerre={jumpToSerre}
             onGoToMinijeu={jumpToMinijeu}
+            onGoToPostMinigame={jumpToPostMinigame}
           />
         </Suspense>
       )}

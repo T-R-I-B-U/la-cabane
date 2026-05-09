@@ -203,6 +203,24 @@
       "subtitles": "thomas-etabli-dialogue.srt"
     },
     {
+      "id": "18-voice-tree",
+      "type": "dialogue",
+      "src": "tree/18-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/18-voice-tree.srt"
+    },
+    {
+      "id": "19-voice-tree",
+      "type": "dialogue",
+      "src": "tree/19-voice-tree.mp3",
+      "loop": false,
+      "volume": 1,
+      "autoplay": false,
+      "subtitles": "tree/19-voice-tree.srt"
+    },
+    {
       "id": "arbrePlateforme",
       "type": "dialogue",
       "loop": false,

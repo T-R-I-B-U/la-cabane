@@ -23,6 +23,18 @@ export const STORY_CAMERA_POVS = {
     position: { x: 21.6589, y: 1.5532, z: -5.3551 },
     target: { x: 22.4904, y: 1.5065, z: -5.417 },
   },
+  greenhouseInsideExit: {
+    position: { x: 21.6589, y: 1.5532, z: -5.3551 },
+    target: { x: 7.1841, y: 1.4256, z: -5.3363 },
+  },
+  greenhouseCorridorExit: {
+    position: { x: 7.1841, y: 1.4256, z: -5.3363 },
+    target: { x: 0.1301, y: 1.461, z: -5.2966 },
+  },
+  greenhouseFrontDoorExit: {
+    position: { x: 0.1301, y: 1.461, z: -5.2966 },
+    target: { x: -10, y: 1.461, z: -5.2966 },
+  },
   // Calibrate in-game: camera.position / controls.target printed via CameraRegistrySync
   // outsideplant02 world pos: [32.8189, 1.5645, -5.6124]
   serreZoe: {

@@ -39,7 +39,9 @@ export function CabaneScene({
   workbenchPhaseActive,
   onWorkbenchInteract,
   greenhousePhaseActive,
+  exitSerrePhaseActive,
   onGreenhouseDoorClick,
+  onExitSerreDoorClick,
   thomasEtabliPhaseActive,
   onThomasEtabliInteract,
   thomasAnimPhase,
@@ -166,7 +168,9 @@ export function CabaneScene({
         workbenchPhaseActive={workbenchPhaseActive}
         onWorkbenchInteract={onWorkbenchInteract}
         greenhousePhaseActive={greenhousePhaseActive}
+        exitSerrePhaseActive={exitSerrePhaseActive}
         onGreenhouseDoorClick={onGreenhouseDoorClick}
+        onExitSerreDoorClick={onExitSerreDoorClick}
         serreActive={serreActive}
         zoePhaseActive={zoePhaseActive}
         raspberryPhaseActive={raspberryPhaseActive}

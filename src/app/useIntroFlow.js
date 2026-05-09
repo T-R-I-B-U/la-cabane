@@ -37,6 +37,7 @@ export function useIntroFlow({ sceneReady }) {
   const [zoePhaseActive, setZoePhaseActive] = useState(false)
   const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
+  const [exitSerrePhaseActive, setExitSerrePhaseActive] = useState(false)
   const [zoeClip, setZoeClip] = useState(null)
   const [minigameCount, setMinigameCount] = useState(0)
   const [playerName, setPlayerName] = useState('')
@@ -104,6 +105,7 @@ export function useIntroFlow({ sceneReady }) {
     setZoePhaseActive(false)
     setRaspberryPhaseActive(false)
     setJuicePhaseActive(false)
+    setExitSerrePhaseActive(false)
     setZoeClip(null)
     setMinigameCount(0)
     setPlayerName('')
@@ -279,6 +281,32 @@ export function useIntroFlow({ sceneReady }) {
 
     if (isSerreJuiceTransitionRef.current) {
       isSerreJuiceTransitionRef.current = false
+      return
+    }
+
+    if (greenhouseTransitionStageRef.current === 'exitIndoor') {
+      greenhouseTransitionStageRef.current = 'exitCorridor'
+      scheduleFlowTimeout(() => {
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseCorridorExit, duration: 2.5 })
+      }, 1000)
+      return
+    }
+
+    if (greenhouseTransitionStageRef.current === 'exitCorridor') {
+      greenhouseTransitionStageRef.current = 'exitFront'
+      scheduleFlowTimeout(() => {
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoorExit, duration: 2.5 })
+      }, 1000)
+      return
+    }
+
+    if (greenhouseTransitionStageRef.current === 'exitFront') {
+      greenhouseTransitionStageRef.current = null
+      scheduleFlowTimeout(() => {
+        playDialogue('18-voice-tree', {
+          onDone: () => playDialogue('19-voice-tree'),
+        })
+      }, 500)
       return
     }
 
@@ -462,7 +490,9 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleJuiceInteract = useCallback(() => {
     setJuicePhaseActive(false)
-    playDialogue('zoeFarewell')
+    playDialogue('zoeFarewell', {
+      onDone: () => setExitSerrePhaseActive(true),
+    })
   }, [playDialogue])
 
   const handleGreenhouseDoorClick = useCallback(() => {
@@ -474,6 +504,13 @@ export function useIntroFlow({ sceneReady }) {
     fade('ambianceWorkbench', 0, 1500)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
+  }, [])
+
+  const handleExitSerreDoorClick = useCallback(() => {
+    setExitSerrePhaseActive(false)
+    fade('ambianceGreenhouse', 0, 1500)
+    greenhouseTransitionStageRef.current = 'exitIndoor'
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInsideExit, duration: 2.0 })
   }, [])
 
   const handleThomasEtabliInteract = useCallback(() => {
@@ -555,6 +592,15 @@ export function useIntroFlow({ sceneReady }) {
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 0.01 })
   }, [prepareDebugPostIntroState])
 
+  const debugGoToPostMinigame = useCallback(() => {
+    prepareDebugPostIntroState()
+    ignoreNextPointerUnlockRef.current = true
+    if (document.pointerLockElement) document.exitPointerLock()
+    setSerreActive(true)
+    setExitSerrePhaseActive(true)
+    setIntroSpawn({ ...STORY_CAMERA_POVS.greenhouseFrontDoor })
+  }, [prepareDebugPostIntroState])
+
   const launchIntro = useCallback(() => {
     if (!sceneReady) return
 
@@ -617,6 +663,7 @@ export function useIntroFlow({ sceneReady }) {
     zoePhaseActive,
     raspberryPhaseActive,
     juicePhaseActive,
+    exitSerrePhaseActive,
     zoeClip,
     minigameCount,
     showNameInput,
@@ -635,9 +682,11 @@ export function useIntroFlow({ sceneReady }) {
     handleDebugGoToEtabli: debugGoToEtabli,
     handleDebugGoToSerre: debugGoToSerre,
     handleDebugGoToMinijeu: debugGoToMinijeu,
+    handleDebugGoToPostMinigame: debugGoToPostMinigame,
     handleWorkbenchInteract,
     handleThomasEtabliInteract,
     handleGreenhouseDoorClick,
+    handleExitSerreDoorClick,
     handleZoeTalk,
     handleMinigameStateChange,
     handleUnripeAttempt,

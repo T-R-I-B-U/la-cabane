@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
+import { ClickableSerreCorridorDoor } from '../../world/entities/ClickableSerreCorridorDoor'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
 import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
@@ -38,11 +39,13 @@ export function SceneInteractions({
   treePhaseActive,
   workbenchPhaseActive,
   greenhousePhaseActive,
+  exitSerrePhaseActive,
   onWorkbenchInteract,
   onIntroEvent,
   onReceptionInteract,
   onTreeInteract,
   onGreenhouseDoorClick,
+  onExitSerreDoorClick,
   onJournalStart,
   onJournalEnd,
   onJournalOpenComplete,
@@ -116,6 +119,12 @@ export function SceneInteractions({
         cabane={cabane}
         isInteractable={greenhousePhaseActive}
         onDoorClick={onGreenhouseDoorClick}
+      />
+
+      <ClickableSerreCorridorDoor
+        cabane={cabane}
+        isInteractable={exitSerrePhaseActive}
+        onDoorClick={onExitSerreDoorClick}
       />
 
       {journalVisible && bookPosition && (
