@@ -196,6 +196,7 @@
     {
       "id": "thomasEtabliDialogue",
       "type": "dialogue",
+      "src": "thomas/THOMAS.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
@@ -228,6 +229,7 @@
     {
       "id": "serreNarration",
       "type": "dialogue",
+      "src": "tree/17-voice-tree.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
