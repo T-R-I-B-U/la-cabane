@@ -34,10 +34,13 @@ export function SceneControls({
   introSpawn,
   storyCameraTransition,
   onStoryCameraTransitionComplete,
+  arbreStoryCameraTransition,
+  onArbreTransitionComplete,
   onIntroEvent,
   playerMode,
   flyMode,
   playerSpawn,
+  playerSpawnTarget,
   playerSpawnKey,
   movementLocked,
   postIntro,
@@ -47,6 +50,18 @@ export function SceneControls({
   hutPosition,
 }) {
   const devSync = import.meta.env.DEV ? <CameraRegistrySync controlsRef={controlsRef} /> : null
+
+  if (arbreStoryCameraTransition) {
+    return (
+      <>
+        <StoryCameraTransition
+          transition={arbreStoryCameraTransition}
+          onComplete={onArbreTransitionComplete}
+        />
+        {devSync}
+      </>
+    )
+  }
 
   if (introActive) {
     return (
@@ -69,7 +84,7 @@ export function SceneControls({
           canMove={!movementLocked}
           flyMode={flyMode}
           spawnAt={playerSpawn}
-          lookAtTarget={null}
+          lookAtTarget={playerSpawnTarget}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
         />

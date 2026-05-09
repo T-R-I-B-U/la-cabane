@@ -49,6 +49,7 @@ export function ViewerControls({
   onToggleDebugCollisions,
   onToggleInteractionsEnabled,
   onLeafMaterialChange,
+  onTestArbre,
 }) {
   const visibilityZones = useVisibilityZones()
 
@@ -187,6 +188,15 @@ export function ViewerControls({
           onClick={onGoToPlatform}
         >
           Vue plateforme
+        </button>
+
+        <button
+          type="button"
+          className="camera-toggle"
+          disabled={!sceneReady}
+          onClick={onTestArbre}
+        >
+          Test arbre ↑
         </button>
 
         {playerMode && (

@@ -13,10 +13,11 @@ import {
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
 import { useContactAssignment } from './app/useContactAssignment'
+import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import CameraEditorPanel from './core/CameraEditorPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
-import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
+import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
@@ -39,6 +40,7 @@ export default function App() {
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(true)
   const [playerSpawn, setPlayerSpawn] = useState(null)
+  const [playerSpawnTarget, setPlayerSpawnTarget] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
   const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
@@ -161,6 +163,54 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+
+  const spawnAtLadder = useCallback(() => {
+    const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
+    setPostIntro(false)
+    setPlayerSpawn(spawn.position)
+    setPlayerSpawnTarget(spawn.target)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition, setPostIntro])
+
+  const spawnAtPlatform = useCallback(() => {
+    setPostIntro(false)
+    setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(null)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(true)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [sceneLoadInfo?.platformPosition, setPostIntro])
+
+  const {
+    arbreActive,
+    arbreMovementLocked,
+    arbreDialogueActive,
+    arbreStoryCameraTransition,
+    ladderClickActive,
+    growingFruitPlaying: arbreGrowingFruitPlaying,
+    fruitsClickActive,
+    arbreLeafInteractionsEnabled,
+    handleLadderClick,
+    handleArbreTransitionComplete,
+    handleFruitClickDuringLeaves,
+    triggerArbre,
+  } = useArbreFlow({
+    platformPosition: sceneLoadInfo?.platformPosition,
+    onLadderSpawn: spawnAtLadder,
+    onPlatformSpawn: spawnAtPlatform,
+  })
 
   const openSavoirFromLeaf = useCallback(
     (id) => {
@@ -295,7 +345,9 @@ export default function App() {
 
   const isStoryBlockingPlayer =
     dialogueActive ||
+    arbreDialogueActive ||
     introMovementLocked ||
+    arbreMovementLocked ||
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible
@@ -410,19 +462,8 @@ export default function App() {
     setSceneLoadStatus('error')
   }, [])
 
-  function enterPlatformView() {
-    setPostIntro(false)
-    setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
-    setPlayerSpawnKey((k) => k + 1)
-    setUserMovementLocked(true)
-    setIsPlayerModeActive(true)
-    setIsFlyModeActive(false)
-
-    // Request lock immediately on click
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas')
-      if (canvas) canvas.requestPointerLock()
-    }, 10)
+  function goToPlatform() {
+    spawnAtPlatform()
   }
 
   const isCursorVisible =
@@ -484,6 +525,10 @@ export default function App() {
         // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
         break
 
+      case GAME_STEPS.ARBRE_INTRO:
+        // Séquence arbre déclenchée — mouvement géré par arbreMovementLocked.
+        break
+
       default:
         break
     }
@@ -531,6 +576,7 @@ export default function App() {
           mode: isPlayerModeActive,
           flyMode: isFlyModeActive,
           spawn: playerSpawn,
+          spawnTarget: playerSpawnTarget,
           spawnKey: playerSpawnKey,
           movementLocked: isPlayerInteractionLocked || userMovementLocked,
         }}
@@ -568,6 +614,17 @@ export default function App() {
           onGreenhouseDoorClick: handleGreenhouseDoorClick,
           onThomasEtabliInteract: handleThomasEtabliInteract,
           onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
+        }}
+        arbre={{
+          active: arbreActive,
+          storyCameraTransition: arbreStoryCameraTransition,
+          onTransitionComplete: handleArbreTransitionComplete,
+          ladderClickActive,
+          onLadderClick: handleLadderClick,
+          growingFruitPlaying: arbreGrowingFruitPlaying,
+          fruitsClickActive,
+          onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
+          leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={interactionsEnabled}
@@ -645,7 +702,8 @@ export default function App() {
           onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
           onLaunchIntro={launchIntro}
           onTogglePlayerMode={toggleFreePlayerView}
-          onGoToPlatform={enterPlatformView}
+          onGoToPlatform={goToPlatform}
+          onTestArbre={triggerArbre}
           onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
           onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
           shaderEnabled={shaderEnabled}

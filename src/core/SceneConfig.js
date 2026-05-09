@@ -23,3 +23,13 @@ export function getPlatformSpawn(platformPosition = PLATFORM_POS) {
     platformPosition[2]
   )
 }
+
+// Spawn at hut-platform level in front of the ladder, looking up toward the tree platform.
+export function getLadderBaseSpawn(platformPosition = PLATFORM_POS, hutPosition = DEFAULT_HUT_POS) {
+  const p = Array.isArray(platformPosition) ? platformPosition : PLATFORM_POS
+  const hutY = Array.isArray(hutPosition) ? hutPosition[1] : DEFAULT_HUT_POS[1]
+  return {
+    position: new THREE.Vector3(p[0], hutY + PLAYER_HEIGHT, p[2] + 4),
+    target: new THREE.Vector3(p[0], p[1], p[2]),
+  }
+}
