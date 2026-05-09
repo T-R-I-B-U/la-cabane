@@ -100,7 +100,6 @@ export default function Scene({
     storyCameraTransition: arbreStoryCameraTransition,
     onTransitionComplete: onArbreTransitionComplete,
     ladderClickActive,
-    ladderIsStoryMode,
     onLadderClick,
     growingFruitPlaying: arbreGrowingFruitPlaying,
     fruitsClickActive,
@@ -163,6 +162,8 @@ export default function Scene({
             workbenchPhaseActive={workbenchPhaseActive}
             greenhousePhaseActive={greenhousePhaseActive}
             exitSerrePhaseActive={exitSerrePhaseActive}
+            ladderClickActive={ladderClickActive}
+            onLadderClick={onLadderClick}
             onGreenhouseDoorClick={onGreenhouseDoorClick}
             onExitSerreDoorClick={onExitSerreDoorClick}
             thomasEtabliPhaseActive={thomasEtabliPhaseActive}
@@ -207,11 +208,7 @@ export default function Scene({
         <Suspense fallback={null}>
           <ArbreScene
             platformPosition={platformPosition}
-            hutPosition={hutPosition}
             arbreActive={arbreActive}
-            ladderClickActive={ladderClickActive}
-            ladderIsStoryMode={ladderIsStoryMode}
-            onLadderClick={onLadderClick}
             growingFruitPlaying={arbreGrowingFruitPlaying}
             fruitsClickActive={fruitsClickActive}
             onFruitClickDuringLeaves={onFruitClickDuringLeaves}

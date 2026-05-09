@@ -155,6 +155,10 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
   const arbreLeafInteractionsEnabled = currentStepId === 'arbre.exploreLeaves'
 
   const activateLadderFromStory = useCallback(() => {
+    // Mark as played so the zone effect doesn't re-run the init sequence when zone → 'arbre'
+    playedRef.current = true
+    // Switch zone now so the ladder mesh becomes visible and ArbreScene mounts
+    setZone('arbre')
     setArbreActive(true)
     setArbreMovementLocked(false)
     setLadderIsStoryMode(true)

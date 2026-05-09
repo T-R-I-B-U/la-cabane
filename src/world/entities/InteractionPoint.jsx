@@ -11,7 +11,13 @@ const COLOR_HOVER = new THREE.Color(0xffdd55)
 // Interaction hotspot placed in front of an NPC.
 // Kept invisible in the scene, but still raycastable for center-screen interaction.
 // Fires onInteract on canvas click while hovered, onHoverChange when hover state changes.
-export function InteractionPoint({ position, active, onInteract, onHoverChange, maxDistance = SHOW_DIST }) {
+export function InteractionPoint({
+  position,
+  active,
+  onInteract,
+  onHoverChange,
+  maxDistance = SHOW_DIST,
+}) {
   const { camera } = useThree()
   const meshRef = useRef()
   const materialRef = useRef()

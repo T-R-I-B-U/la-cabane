@@ -9,7 +9,7 @@ const INSIDE_POV = {
   target: { x: -12.5066, y: 1.7137, z: -5.2008 },
 }
 
-export function useIntroFlow({ sceneReady }) {
+export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
   const [introWaitingAtDoor, setIntroWaitingAtDoor] = useState(false)
@@ -148,6 +148,8 @@ export function useIntroFlow({ sceneReady }) {
         ignoreNextPointerUnlockRef.current = false
       } else if (raspberryPhaseActiveRef.current) {
         // minigame owns the pointer — ignore spontaneous unlocks
+      } else if (arbreActiveRef?.current) {
+        // arbre sequence owns the pointer — ignore spontaneous unlocks
       } else if (wasLocked) {
         exitIntro()
       }
@@ -155,7 +157,7 @@ export function useIntroFlow({ sceneReady }) {
 
     document.addEventListener('pointerlockchange', onPointerLockChange)
     return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
-  }, [postIntro, exitIntro])
+  }, [postIntro, exitIntro, arbreActiveRef])
 
   useEffect(() => {
     if (!showNameInput || !document.pointerLockElement) return
@@ -306,7 +308,8 @@ export function useIntroFlow({ sceneReady }) {
       greenhouseTransitionStageRef.current = null
       scheduleFlowTimeout(() => {
         playDialogue('18-voice-tree', {
-          onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
+          onDone: () =>
+            playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
         })
         scheduleFlowTimeout(() => {
           greenhouseTransitionStageRef.current = 'arbreStairs1'

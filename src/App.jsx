@@ -54,6 +54,7 @@ export default function App() {
   const [userMovementLocked, setUserMovementLocked] = useState(false)
   const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
   const isMinigameActiveRef = useRef(false)
+  const arbreActiveRef = useRef(false)
   const [isSavoirInteractionActive, setIsSavoirInteractionActive] = useState(false)
   const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
   const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
@@ -65,6 +66,7 @@ export default function App() {
     useState(false)
   const pointerControlsRef = useRef(null)
   const isJournalInteractionActiveRef = useRef(false)
+  const arbreStoryContinuityRef = useRef(false)
 
   const {
     selectedSavoirAssignment,
@@ -187,11 +189,11 @@ export default function App() {
     handleStoryCameraTransitionComplete,
     launchIntro,
     setPostIntro,
-  } = useIntroFlow({ sceneReady })
+  } = useIntroFlow({ sceneReady, arbreActiveRef })
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
-    setPostIntro(false)
+    if (!arbreStoryContinuityRef.current) setPostIntro(false)
     setPlayerSpawn(spawn.position)
     setPlayerSpawnTarget(spawn.target)
     setPlayerSpawnKey((k) => k + 1)
@@ -205,7 +207,7 @@ export default function App() {
   }, [sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition, setPostIntro])
 
   const spawnAtPlatform = useCallback(() => {
-    setPostIntro(false)
+    if (!arbreStoryContinuityRef.current) setPostIntro(false)
     setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
     setPlayerSpawnTarget(null)
     setPlayerSpawnKey((k) => k + 1)
@@ -368,8 +370,21 @@ export default function App() {
     handleDebugGoToPostMinigame()
   }, [handleDebugGoToPostMinigame])
 
+  const handleTestArbre = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerArbre()
+  }, [setPostIntro, triggerArbre])
+
+  const handleGoToPlatform = useCallback(() => {
+    arbreStoryContinuityRef.current = false
+    spawnAtPlatform()
+  }, [spawnAtPlatform])
+
   useEffect(() => {
     if (!arbreLadderPending) return
+    arbreStoryContinuityRef.current = true
     activateLadderFromStory()
   }, [arbreLadderPending, activateLadderFromStory])
 
@@ -454,6 +469,10 @@ export default function App() {
   }, [raspberryPhaseActive])
 
   useEffect(() => {
+    arbreActiveRef.current = arbreActive
+  }, [arbreActive])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -511,10 +530,6 @@ export default function App() {
     setSceneLoadStatus('error')
   }, [])
 
-  function goToPlatform() {
-    spawnAtPlatform()
-  }
-
   const isCursorVisible =
     introWaitingAtDoor ||
     showNameInput ||
@@ -529,6 +544,7 @@ export default function App() {
   const isStoryCameraControlEnabled = postIntro
 
   function toggleFreePlayerView() {
+    arbreStoryContinuityRef.current = false
     setPostIntro(false)
 
     if (isPlayerModeActive) {
@@ -546,6 +562,7 @@ export default function App() {
   }
 
   const explorationReady = false
+  const showDevOverlays = import.meta.env.DEV && !introPending && !introActive && !postIntro
 
   // Appelé par GameManager à chaque transition d'étape.
   // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
@@ -676,7 +693,7 @@ export default function App() {
           onMinigameStateChange: handleMinigameStateChange,
           onUnripeAttempt: handleUnripeAttempt,
           onJuiceInteract: handleJuiceInteract,
-          cameraFixed: raspberryPhaseActive,
+          cameraFixed: raspberryPhaseActive || (arbreActive && !ladderClickActive),
           serrePreview: isPlayerModeActive && !postIntro,
         }}
         arbre={{
@@ -726,23 +743,19 @@ export default function App() {
         journalPuzzleEnabled={journalPuzzleEnabled}
       />
 
-      {import.meta.env.DEV &&
-        isViewerControlsVisible &&
-        !introPending &&
-        !introActive &&
-        !postIntro && (
+      {showDevOverlays && isViewerControlsVisible && (
           <Suspense fallback={null}>
             <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
           </Suspense>
         )}
 
-      {import.meta.env.DEV && showCameraEditor && (
+      {showDevOverlays && showCameraEditor && (
         <Suspense fallback={null}>
           <CameraEditorPanel />
         </Suspense>
       )}
 
-      {import.meta.env.DEV && showStoryDebug && (
+      {showDevOverlays && showStoryDebug && (
         <Suspense fallback={null}>
           <StoryDebugPanel
             onGoToIntroStart={jumpToIntroStart}
@@ -757,7 +770,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {isViewerControlsVisible && sceneReady && !introPending && !introActive && !postIntro && (
+      {showDevOverlays && isViewerControlsVisible && sceneReady && (
         <Suspense fallback={null}>
           <ViewerControls
             status={sceneLoadStatus}
@@ -780,8 +793,8 @@ export default function App() {
             onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
             onLaunchIntro={launchIntro}
             onTogglePlayerMode={toggleFreePlayerView}
-            onGoToPlatform={goToPlatform}
-            onTestArbre={triggerArbre}
+            onGoToPlatform={handleGoToPlatform}
+            onTestArbre={handleTestArbre}
             onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
             onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
             shaderEnabled={shaderEnabled}
