@@ -69,6 +69,16 @@ export default function Scene({
     onGreenhouseDoorClick,
     onThomasEtabliInteract,
     onStoryCameraTransitionComplete,
+    serreActive,
+    zoePhaseActive,
+    raspberryPhaseActive,
+    juicePhaseActive,
+    zoeClip,
+    onZoeTalk,
+    onMinigameStateChange,
+    onUnripeAttempt,
+    cameraFixed,
+    serrePreview,
   } = intro
   const {
     onLeafClick,
@@ -157,6 +167,15 @@ export default function Scene({
             onReceptionInteract={onReceptionInteract}
             introWaitingAtDoor={introWaitingAtDoor}
             journalUnlocked={journalUnlocked}
+            serreActive={serreActive}
+            zoePhaseActive={zoePhaseActive}
+            raspberryPhaseActive={raspberryPhaseActive}
+            juicePhaseActive={juicePhaseActive}
+            zoeClip={zoeClip}
+            onZoeTalk={onZoeTalk}
+            onMinigameStateChange={onMinigameStateChange}
+            onUnripeAttempt={onUnripeAttempt}
+            serrePreview={serrePreview}
             playerMode={playerMode}
             postIntro={postIntro}
             postIntroLocked={postIntroLocked}
@@ -216,6 +235,7 @@ export default function Scene({
         pointerControlsRef={pointerControlsRef}
         controlsRef={controlsRef}
         hutPosition={hutPosition}
+        cameraFixed={cameraFixed}
       />
 
       {shaderEnabled && (

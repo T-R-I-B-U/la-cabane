@@ -33,13 +33,23 @@ export function useIntroFlow({ sceneReady }) {
   const [greenhousePhaseActive, setGreenhousePhaseActive] = useState(false)
   const [thomasEtabliPhaseActive, setThomasEtabliPhaseActive] = useState(false)
   const [thomasAnimationPhase, setThomasAnimationPhase] = useState('back')
+  const [serreActive, setSerreActive] = useState(false)
+  const [zoePhaseActive, setZoePhaseActive] = useState(false)
+  const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
+  const [juicePhaseActive, setJuicePhaseActive] = useState(false)
+  const [zoeClip, setZoeClip] = useState(null)
+  const [minigameCount, setMinigameCount] = useState(0)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
+  const raspberryPhaseActiveRef = useRef(false)
   const journalPlacedCountRef = useRef(0)
   const journalCompletedRef = useRef(false)
   const isPostBookTransitionRef = useRef(false)
   const isEtabliTransitionRef = useRef(false)
   const isThomasTransitionRef = useRef(false)
+  const isSerreZoeTransitionRef = useRef(false)
+  const isSerreRaspberryTransitionRef = useRef(false)
+  const isSerreJuiceTransitionRef = useRef(false)
   const greenhouseTransitionStageRef = useRef(null)
   const scheduledTimeoutsRef = useRef(new Set())
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
@@ -61,6 +71,10 @@ export function useIntroFlow({ sceneReady }) {
   }, [])
 
   useEffect(() => clearScheduledTimeouts, [clearScheduledTimeouts])
+
+  useEffect(() => {
+    raspberryPhaseActiveRef.current = raspberryPhaseActive
+  }, [raspberryPhaseActive])
 
   const resetFlowState = useCallback(() => {
     clearScheduledTimeouts()
@@ -86,6 +100,12 @@ export function useIntroFlow({ sceneReady }) {
     setThomasEtabliPhaseActive(false)
     setGreenhousePhaseActive(false)
     setThomasAnimationPhase('back')
+    setSerreActive(false)
+    setZoePhaseActive(false)
+    setRaspberryPhaseActive(false)
+    setJuicePhaseActive(false)
+    setZoeClip(null)
+    setMinigameCount(0)
     setPlayerName('')
     stop('ambianceWorkbench')
     stop('ambianceGreenhouse')
@@ -93,6 +113,9 @@ export function useIntroFlow({ sceneReady }) {
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
+    isSerreZoeTransitionRef.current = false
+    isSerreRaspberryTransitionRef.current = false
+    isSerreJuiceTransitionRef.current = false
     greenhouseTransitionStageRef.current = null
   }, [clearScheduledTimeouts])
 
@@ -119,6 +142,8 @@ export function useIntroFlow({ sceneReady }) {
       if (document.pointerLockElement) wasLocked = true
       else if (ignoreNextPointerUnlockRef.current) {
         ignoreNextPointerUnlockRef.current = false
+      } else if (raspberryPhaseActiveRef.current) {
+        // minigame owns the pointer — ignore spontaneous unlocks
       } else if (wasLocked) {
         exitIntro()
       }
@@ -232,6 +257,31 @@ export function useIntroFlow({ sceneReady }) {
       return
     }
 
+    if (isSerreZoeTransitionRef.current) {
+      isSerreZoeTransitionRef.current = false
+      playDialogue('zoeIntro', {
+        onDone: () => {
+          // Release pointer lock before minigame — PointerLockControls won't do it on unmount
+          ignoreNextPointerUnlockRef.current = true
+          if (document.pointerLockElement) document.exitPointerLock()
+          isSerreRaspberryTransitionRef.current = true
+          setRaspberryPhaseActive(true)
+          setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 1.0 })
+        },
+      })
+      return
+    }
+
+    if (isSerreRaspberryTransitionRef.current) {
+      isSerreRaspberryTransitionRef.current = false
+      return
+    }
+
+    if (isSerreJuiceTransitionRef.current) {
+      isSerreJuiceTransitionRef.current = false
+      return
+    }
+
     if (greenhouseTransitionStageRef.current === 'front') {
       greenhouseTransitionStageRef.current = 'corridor'
       scheduleFlowTimeout(() => {
@@ -251,6 +301,11 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'inside') {
       greenhouseTransitionStageRef.current = null
+      scheduleFlowTimeout(() => {
+        playDialogue('serreNarration', {
+          onDone: () => setZoePhaseActive(true),
+        })
+      }, 500)
       return
     }
 
@@ -376,8 +431,46 @@ export function useIntroFlow({ sceneReady }) {
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelier, duration: 1.5 })
   }, [])
 
+  const handleZoeTalk = useCallback(() => {
+    setZoePhaseActive(false)
+    isSerreZoeTransitionRef.current = true
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreZoe, duration: 1.0 })
+  }, [])
+
+  const handleMinigameStateChange = useCallback(
+    (state) => {
+      setMinigameCount(state.count)
+      if (!state.complete) return
+      setRaspberryPhaseActive(false)
+      setZoeClip('zoe-pointing')
+      scheduleFlowTimeout(() => {
+        playDialogue('zoeJuice', {
+          onDone: () => {
+            setJuicePhaseActive(true)
+            isSerreJuiceTransitionRef.current = true
+            setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreJuice, duration: 1.5 })
+          },
+        })
+      }, 500)
+    },
+    [playDialogue, scheduleFlowTimeout]
+  )
+
+  const handleUnripeAttempt = useCallback(() => {
+    playDialogue('zoeUnripe')
+  }, [playDialogue])
+
+  const handleJuiceInteract = useCallback(() => {
+    setJuicePhaseActive(false)
+    playDialogue('zoeFarewell')
+  }, [playDialogue])
+
   const handleGreenhouseDoorClick = useCallback(() => {
     setGreenhousePhaseActive(false)
+    setSerreActive(true)
+    // Release pointer lock at serre entry — entire serre sequence is scripted, no FPS needed
+    ignoreNextPointerUnlockRef.current = true
+    if (document.pointerLockElement) document.exitPointerLock()
     fade('ambianceWorkbench', 0, 1500)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
@@ -451,6 +544,17 @@ export function useIntroFlow({ sceneReady }) {
     setGreenhousePhaseActive(true)
   }, [prepareDebugPostIntroState])
 
+  const debugGoToMinijeu = useCallback(() => {
+    prepareDebugPostIntroState()
+    ignoreNextPointerUnlockRef.current = true
+    if (document.pointerLockElement) document.exitPointerLock()
+    // Mark transition so handleStoryCameraTransitionComplete knows to just clear and return
+    isSerreRaspberryTransitionRef.current = true
+    setSerreActive(true)
+    setRaspberryPhaseActive(true)
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 0.01 })
+  }, [prepareDebugPostIntroState])
+
   const launchIntro = useCallback(() => {
     if (!sceneReady) return
 
@@ -509,6 +613,12 @@ export function useIntroFlow({ sceneReady }) {
     thomasEtabliPhaseActive,
     greenhousePhaseActive,
     thomasAnimPhase: thomasAnimationPhase,
+    serreActive,
+    zoePhaseActive,
+    raspberryPhaseActive,
+    juicePhaseActive,
+    zoeClip,
+    minigameCount,
     showNameInput,
     storyReady,
     currentStoryStepId: currentStepId,
@@ -524,9 +634,14 @@ export function useIntroFlow({ sceneReady }) {
     handleDebugGoToTree: debugGoToTree,
     handleDebugGoToEtabli: debugGoToEtabli,
     handleDebugGoToSerre: debugGoToSerre,
+    handleDebugGoToMinijeu: debugGoToMinijeu,
     handleWorkbenchInteract,
     handleThomasEtabliInteract,
     handleGreenhouseDoorClick,
+    handleZoeTalk,
+    handleMinigameStateChange,
+    handleUnripeAttempt,
+    handleJuiceInteract,
     handleJournalEnd,
     handleTreeInteract,
     handleJournalInteractionStart,

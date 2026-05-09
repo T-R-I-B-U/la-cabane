@@ -23,4 +23,20 @@ export const STORY_CAMERA_POVS = {
     position: { x: 21.6589, y: 1.5532, z: -5.3551 },
     target: { x: 22.4904, y: 1.5065, z: -5.417 },
   },
+  // Calibrate in-game: camera.position / controls.target printed via CameraRegistrySync
+  // outsideplant02 world pos: [32.8189, 1.5645, -5.6124]
+  serreZoe: {
+    position: { x: 23.5, y: 1.6, z: -5.4 },
+    target: { x: 26.0, y: 1.4, z: -5.4 },
+  },
+  serreRaspberry: {
+    position: { x: 31.5, y: 1.9, z: -5.4 },
+    target: { x: 32.8, y: 1.4, z: -5.6 },
+  },
+  // Calibrate in-game: camera.position / controls.target printed via CameraRegistrySync
+  // juiceglass world pos: ~[31.6, 0.88, -13.3] / juicemachine: [29.6, 0.45, -11.5]
+  serreJuice: {
+    position: { x: 29.5, y: 1.8, z: -11.5 },
+    target: { x: 31.6, y: 0.9, z: -13.3 },
+  },
 }

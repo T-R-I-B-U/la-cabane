@@ -60,6 +60,15 @@ export function CabaneScene({
   onCollisionReady,
   onHutPositionReady,
   onPlatformPositionReady,
+  serreActive,
+  zoePhaseActive,
+  raspberryPhaseActive,
+  juicePhaseActive,
+  zoeClip,
+  onZoeTalk,
+  onMinigameStateChange,
+  onUnripeAttempt,
+  serrePreview,
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -157,6 +166,16 @@ export function CabaneScene({
         onWorkbenchInteract={onWorkbenchInteract}
         greenhousePhaseActive={greenhousePhaseActive}
         onGreenhouseDoorClick={onGreenhouseDoorClick}
+        serreActive={serreActive}
+        zoePhaseActive={zoePhaseActive}
+        raspberryPhaseActive={raspberryPhaseActive}
+        juicePhaseActive={juicePhaseActive}
+        zoeClip={zoeClip}
+        onZoeTalk={onZoeTalk}
+        onMinigameStateChange={onMinigameStateChange}
+        onUnripeAttempt={onUnripeAttempt}
+        serrePreview={serrePreview}
+        performanceMode={performanceMode}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
         onJournalOpenComplete={onJournalOpenComplete}
