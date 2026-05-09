@@ -15,7 +15,7 @@ const BASKET_SNAP = [
   BASKET_ORIGIN[1] + 0.109 * 0.75 + 0.05,
   BASKET_ORIGIN[2] + 0.807 * 0.75,
 ]
-const BASKET_RADIUS = 0.3
+const BASKET_NDC_RADIUS = 0.2
 
 // Berry slots: offsets from BASKET_SNAP center
 const BASKET_SLOTS = [
@@ -186,7 +186,15 @@ export function RaspberryMinigame({ isActive, cabane = null, onStateChange, onUn
   const pointerNdcRef = useRef(new THREE.Vector2())
   const raycaster = useMemo(() => new THREE.Raycaster(), [])
   const _hit = useMemo(() => new THREE.Vector3(), [])
-  const _basketPos = useMemo(() => new THREE.Vector3(...BASKET_SNAP), [])
+  const _basketWorldPos = useMemo(
+    () =>
+      new THREE.Vector3(
+        GROUP_WORLD_POS[0] + BASKET_SNAP[0],
+        GROUP_WORLD_POS[1] + BASKET_SNAP[1],
+        GROUP_WORLD_POS[2] + BASKET_SNAP[2]
+      ),
+    []
+  )
 
   // Release pointer lock when minigame becomes active
   useEffect(() => {
@@ -249,20 +257,23 @@ export function RaspberryMinigame({ isActive, cabane = null, onStateChange, onUn
       meshRegistryRef.current[idx]?.position.set(nx, ny, nz)
     }
 
-    const onPointerUp = () => {
+    const onPointerUp = (e) => {
       const idx = draggedIndexRef.current
       if (idx === null) return
       draggedIndexRef.current = null
       document.body.style.cursor = 'auto'
+      toNDC(e)
 
-      const pos = posRefs.current[idx]
-      const current = new THREE.Vector3(...pos)
-      if (current.distanceTo(_basketPos) < BASKET_RADIUS) {
-        const def = RASPBERRY_DEFS[idx]
+      const basketNdc = _basketWorldPos.clone().project(camera)
+      const dx = pointerNdcRef.current.x - basketNdc.x
+      const dy = pointerNdcRef.current.y - basketNdc.y
+      const def = RASPBERRY_DEFS[idx]
+
+      if (Math.sqrt(dx * dx + dy * dy) < BASKET_NDC_RADIUS) {
         if (!def.isRipe) {
           onUnripeAttempt?.()
-          posRefs.current[idx] = [...RASPBERRY_DEFS[idx].position]
-          meshRegistryRef.current[idx]?.position.set(...RASPBERRY_DEFS[idx].position)
+          posRefs.current[idx] = [...def.position]
+          meshRegistryRef.current[idx]?.position.set(...def.position)
         } else {
           const slot = collectedCountRef.current
           collectedCountRef.current += 1
@@ -271,8 +282,8 @@ export function RaspberryMinigame({ isActive, cabane = null, onStateChange, onUn
           onStateChange?.({ active: true, count, complete: count >= RIPE_COUNT })
         }
       } else {
-        posRefs.current[idx] = [...RASPBERRY_DEFS[idx].position]
-        meshRegistryRef.current[idx]?.position.set(...RASPBERRY_DEFS[idx].position)
+        posRefs.current[idx] = [...def.position]
+        meshRegistryRef.current[idx]?.position.set(...def.position)
       }
     }
 
@@ -283,7 +294,7 @@ export function RaspberryMinigame({ isActive, cabane = null, onStateChange, onUn
       document.removeEventListener('pointerup', onPointerUp)
       document.body.style.cursor = 'auto'
     }
-  }, [isActive, camera, gl, toNDC, raycaster, onStateChange, onUnripeAttempt, _basketPos, _hit])
+  }, [isActive, camera, gl, toNDC, raycaster, onStateChange, onUnripeAttempt, _basketWorldPos, _hit])
 
   // Hover cursor + basket-snap / scale animation
   useFrame(() => {

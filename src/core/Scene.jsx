@@ -77,6 +77,7 @@ export default function Scene({
     onZoeTalk,
     onMinigameStateChange,
     onUnripeAttempt,
+    onJuiceInteract,
     cameraFixed,
     serrePreview,
   } = intro
@@ -175,6 +176,7 @@ export default function Scene({
             onZoeTalk={onZoeTalk}
             onMinigameStateChange={onMinigameStateChange}
             onUnripeAttempt={onUnripeAttempt}
+            onJuiceInteract={onJuiceInteract}
             serrePreview={serrePreview}
             playerMode={playerMode}
             postIntro={postIntro}
