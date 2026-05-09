@@ -11,6 +11,7 @@ import { JournalBook } from '../../world/entities/JournalBook'
 import { Basket, RaspberryMinigame } from '../../world/entities/RaspberryMinigame'
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 import { publicAssetManifest } from 'virtual:public-asset-manifest'
+import {FLOOR_Y} from "../SceneConfig.js";
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
 // outsideplant02 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
@@ -163,7 +164,7 @@ export function SceneInteractions({
             clip={zoeClip}
             textureName="zoe-animated"
             textureBasePaths={textureBasePaths}
-            position={[26.0, 1.1, -5.4]}
+            position={[26.0, FLOOR_Y, -5.4]}
             rotation={[0, -Math.PI / 2, 0]}
             scale={11}
           />
