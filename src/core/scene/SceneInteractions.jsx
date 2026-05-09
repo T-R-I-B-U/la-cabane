@@ -9,13 +9,22 @@ import { ClickableZoe } from '../../world/entities/ClickableZoe'
 import { JournalBook } from '../../world/entities/JournalBook'
 import { Basket, RaspberryMinigame } from '../../world/entities/RaspberryMinigame'
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
+import { publicAssetManifest } from 'virtual:public-asset-manifest'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
 // outsideplant02 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
 const BASKET_PREVIEW_POS = [32.7189, 1.1645, -5.4124]
 const JOURNAL_ROTATION_Y = 0.41
+const compressedModelFiles = new Set(publicAssetManifest.compressedModelFiles)
 
-const ZOE_TEXTURE_BASE_PATHS = ['/textures/compressed/', '/textures/']
+function resolveCharacterUrl(fileName, performanceMode) {
+  const compressedUrl = `/models/compressed/${fileName}`
+  if (performanceMode && compressedModelFiles.has(compressedUrl)) {
+    return compressedUrl
+  }
+
+  return `/models/${fileName}`
+}
 
 export function SceneInteractions({
   cabane,
@@ -50,8 +59,15 @@ export function SceneInteractions({
   onMinigameStateChange,
   onUnripeAttempt,
   serrePreview,
+  performanceMode,
 }) {
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
+  // Keep Zoe's visible mesh on the source GLB and reuse the compressed GLB for animation clips,
+  // matching the historical fix that restored her motion after model export changes.
+  const zoeUrl = resolveCharacterUrl('zoe-animated.glb', false)
+  const textureBasePaths = performanceMode
+    ? ['/textures/compressed/', '/textures/']
+    : ['/textures/']
   const bookPosition = useMemo(() => {
     if (!cabane) return null
 
@@ -133,10 +149,12 @@ export function SceneInteractions({
         serrePreview) && (
         <Suspense fallback={null}>
           <AnimatedCharacter
-            url="/models/zoe-animated.glb"
+            key={zoeUrl}
+            url={zoeUrl}
+            animationUrl="/models/compressed/zoe-animated.glb"
             clip={zoeClip}
             textureName="zoe-animated"
-            textureBasePaths={ZOE_TEXTURE_BASE_PATHS}
+            textureBasePaths={textureBasePaths}
             position={[26.0, 1.1, -5.4]}
             rotation={[0, -Math.PI / 2, 0]}
             scale={11}

@@ -20,6 +20,7 @@ function pickDefaultClip(actions, names, defaultClip) {
 
 export function AnimatedCharacter({
   url,
+  animationUrl,
   clip,
   animationSequence,
   textureName,
@@ -28,7 +29,8 @@ export function AnimatedCharacter({
 }) {
   const group = useRef()
   const activeActionRef = useRef(null)
-  const { scene, animations } = useGLTF(url)
+  const { scene } = useGLTF(url)
+  const { animations } = useGLTF(animationUrl ?? url)
   const clonedScene = useMemo(() => clone(scene), [scene])
   const { actions, names } = useAnimations(animations, group)
 
@@ -66,9 +68,12 @@ export function AnimatedCharacter({
 
     const action = actions[nextClip]
     action.reset()
+    action.enabled = true
+    action.paused = false
+    action.timeScale = 1
+    action.clampWhenFinished = false
     action.setLoop(LoopRepeat, Infinity)
     action.fadeIn(0.2).play()
-
     activeActionRef.current = action
 
     return () => {
@@ -137,7 +142,7 @@ export function AnimatedCharacter({
     return () => {
       cancelled = true
       timeoutIds.forEach((id) => window.clearTimeout(id))
-      // Keep current action playing so next sequence can crossFadeFrom it
+      activeActionRef.current = null
     }
   }, [actions, animationSequence])
 
