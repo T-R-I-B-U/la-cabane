@@ -73,6 +73,7 @@ export default function Scene({
     onMinigameStateChange,
     onUnripeAttempt,
     cameraFixed,
+    serrePreview,
   } = intro
   const {
     onLeafClick,
@@ -154,6 +155,7 @@ export default function Scene({
           onZoeTalk={onZoeTalk}
           onMinigameStateChange={onMinigameStateChange}
           onUnripeAttempt={onUnripeAttempt}
+          serrePreview={serrePreview}
           playerMode={playerMode}
           postIntro={postIntro}
           postIntroLocked={postIntroLocked}

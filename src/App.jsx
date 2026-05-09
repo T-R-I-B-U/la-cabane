@@ -43,6 +43,7 @@ export default function App() {
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
   const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
+  const isMinigameActiveRef = useRef(false)
   const [isSavoirInteractionActive, setIsSavoirInteractionActive] = useState(false)
   const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
   const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
@@ -158,6 +159,7 @@ export default function App() {
     handleDebugGoToTree,
     handleDebugGoToEtabli,
     handleDebugGoToSerre,
+    handleDebugGoToMinijeu,
     handleWorkbenchInteract,
     handleGreenhouseDoorClick,
     handleThomasEtabliInteract,
@@ -213,7 +215,8 @@ export default function App() {
       isSavoirInteractionActive ||
       selectedContactAssignment ||
       isContactInteractionActive ||
-      isJournalInteractionActive
+      isJournalInteractionActive ||
+      raspberryPhaseActive
     ) {
       return
     }
@@ -236,6 +239,7 @@ export default function App() {
     isPlayerModeActive,
     isSavoirInteractionActive,
     postIntro,
+    raspberryPhaseActive,
     receptionChoiceVisible,
     returnHallVisible,
     selectedContactAssignment,
@@ -285,9 +289,14 @@ export default function App() {
   }, [handleDebugGoToEtabli])
 
   const jumpToSerre = useCallback(() => {
-    setShouldRestorePointerLockAfterStoryUi(true)
+    setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToSerre()
   }, [handleDebugGoToSerre])
+
+  const jumpToMinijeu = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handleDebugGoToMinijeu()
+  }, [handleDebugGoToMinijeu])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -364,8 +373,13 @@ export default function App() {
   ])
 
   useEffect(() => {
+    isMinigameActiveRef.current = raspberryPhaseActive
+  }, [raspberryPhaseActive])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
-      if (isJournalInteractionActiveRef.current) e.stopImmediatePropagation()
+      if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
+        e.stopImmediatePropagation()
     }
     document.addEventListener('click', blockPointerLock, { capture: true })
     return () => document.removeEventListener('click', blockPointerLock, { capture: true })
@@ -441,6 +455,7 @@ export default function App() {
     receptionChoiceVisible ||
     returnHallVisible ||
     journalUnlocked ||
+    raspberryPhaseActive ||
     (!introActive &&
       !postIntro &&
       (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked))
@@ -524,7 +539,8 @@ export default function App() {
           !isSavoirInteractionActive &&
           !selectedContactAssignment &&
           !isContactInteractionActive &&
-          !isJournalInteractionActive
+          !isJournalInteractionActive &&
+          !raspberryPhaseActive
         }
         active={interactionsEnabled && (isLeafHovered || isFruitHovered)}
       />
@@ -587,6 +603,7 @@ export default function App() {
           onMinigameStateChange: handleMinigameStateChange,
           onUnripeAttempt: handleUnripeAttempt,
           cameraFixed: raspberryPhaseActive,
+          serrePreview: isPlayerModeActive && !postIntro,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={interactionsEnabled}
@@ -639,6 +656,7 @@ export default function App() {
           onGoToTree={jumpToTree}
           onGoToEtabli={jumpToEtabli}
           onGoToSerre={jumpToSerre}
+          onGoToMinijeu={jumpToMinijeu}
         />
       )}
 

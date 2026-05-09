@@ -68,6 +68,7 @@ export function CabaneScene({
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
+  serrePreview,
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
@@ -173,6 +174,7 @@ export function CabaneScene({
         onZoeTalk={onZoeTalk}
         onMinigameStateChange={onMinigameStateChange}
         onUnripeAttempt={onUnripeAttempt}
+        serrePreview={serrePreview}
         performanceMode={performanceMode}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}

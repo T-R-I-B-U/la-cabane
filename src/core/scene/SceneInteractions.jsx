@@ -7,15 +7,14 @@ import { ClickableTree } from '../../world/entities/ClickableTree'
 import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
 import { ClickableZoe } from '../../world/entities/ClickableZoe'
 import { JournalBook } from '../../world/entities/JournalBook'
-import { RaspberryMinigame } from '../../world/entities/RaspberryMinigame'
+import { Basket, RaspberryMinigame } from '../../world/entities/RaspberryMinigame'
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
+// outsideplant02 world pos [32.8189,1.5645,-5.6124] + basket local [-0.4,-0.5,0.6]
+const BASKET_PREVIEW_POS = [32.4189, 1.0645, -5.0124]
 const JOURNAL_ROTATION_Y = 0.41
 
-// Greenhouse serre interior world offset — place minigame group at the serre origin.
-// Calibrate in dev by reading camera position when inside the serre.
-const SERRE_GROUP_POSITION = [24.5, 0, -5.4]
 const ZOE_TEXTURE_BASE_PATHS = ['/textures/compressed/', '/textures/']
 
 export function SceneInteractions({
@@ -50,6 +49,7 @@ export function SceneInteractions({
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
+  serrePreview,
 }) {
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   const bookPosition = useMemo(() => {
@@ -120,13 +120,13 @@ export function SceneInteractions({
       {raspberryPhaseActive && (
         <RaspberryMinigame
           isActive
-          position={SERRE_GROUP_POSITION}
+          cabane={cabane}
           onStateChange={onMinigameStateChange}
           onUnripeAttempt={onUnripeAttempt}
         />
       )}
 
-      {(serreActive || zoePhaseActive || raspberryPhaseActive || juicePhaseActive) && (
+      {(serreActive || zoePhaseActive || raspberryPhaseActive || juicePhaseActive || serrePreview) && (
         <Suspense fallback={null}>
           <AnimatedCharacter
             url="/models/zoe-animated.glb"
@@ -138,6 +138,10 @@ export function SceneInteractions({
             scale={11}
           />
         </Suspense>
+      )}
+
+      {serrePreview && !raspberryPhaseActive && (
+        <Basket position={BASKET_PREVIEW_POS} />
       )}
     </>
   )

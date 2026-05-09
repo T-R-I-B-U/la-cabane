@@ -41,6 +41,7 @@ export function useIntroFlow({ sceneReady }) {
   const [minigameCount, setMinigameCount] = useState(0)
   const [playerName, setPlayerName] = useState('')
   const ignoreNextPointerUnlockRef = useRef(false)
+  const raspberryPhaseActiveRef = useRef(false)
   const journalPlacedCountRef = useRef(0)
   const journalCompletedRef = useRef(false)
   const isPostBookTransitionRef = useRef(false)
@@ -69,6 +70,10 @@ export function useIntroFlow({ sceneReady }) {
   }, [])
 
   useEffect(() => clearScheduledTimeouts, [clearScheduledTimeouts])
+
+  useEffect(() => {
+    raspberryPhaseActiveRef.current = raspberryPhaseActive
+  }, [raspberryPhaseActive])
 
   const resetFlowState = useCallback(() => {
     clearScheduledTimeouts()
@@ -135,6 +140,8 @@ export function useIntroFlow({ sceneReady }) {
       if (document.pointerLockElement) wasLocked = true
       else if (ignoreNextPointerUnlockRef.current) {
         ignoreNextPointerUnlockRef.current = false
+      } else if (raspberryPhaseActiveRef.current) {
+        // minigame owns the pointer — ignore spontaneous unlocks
       } else if (wasLocked) {
         exitIntro()
       }
@@ -252,6 +259,9 @@ export function useIntroFlow({ sceneReady }) {
       isSerreZoeTransitionRef.current = false
       playDialogue('zoeIntro', {
         onDone: () => {
+          // Release pointer lock before minigame — PointerLockControls won't do it on unmount
+          ignoreNextPointerUnlockRef.current = true
+          if (document.pointerLockElement) document.exitPointerLock()
           isSerreRaspberryTransitionRef.current = true
           setRaspberryPhaseActive(true)
           setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 1.0 })
@@ -442,6 +452,9 @@ export function useIntroFlow({ sceneReady }) {
   const handleGreenhouseDoorClick = useCallback(() => {
     setGreenhousePhaseActive(false)
     setSerreActive(true)
+    // Release pointer lock at serre entry — entire serre sequence is scripted, no FPS needed
+    ignoreNextPointerUnlockRef.current = true
+    if (document.pointerLockElement) document.exitPointerLock()
     fade('ambianceWorkbench', 0, 1500)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
@@ -513,6 +526,17 @@ export function useIntroFlow({ sceneReady }) {
   const debugGoToSerre = useCallback(() => {
     prepareDebugPostIntroState()
     setGreenhousePhaseActive(true)
+  }, [prepareDebugPostIntroState])
+
+  const debugGoToMinijeu = useCallback(() => {
+    prepareDebugPostIntroState()
+    ignoreNextPointerUnlockRef.current = true
+    if (document.pointerLockElement) document.exitPointerLock()
+    // Mark transition so handleStoryCameraTransitionComplete knows to just clear and return
+    isSerreRaspberryTransitionRef.current = true
+    setSerreActive(true)
+    setRaspberryPhaseActive(true)
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 0.01 })
   }, [prepareDebugPostIntroState])
 
   const launchIntro = useCallback(() => {
@@ -594,6 +618,7 @@ export function useIntroFlow({ sceneReady }) {
     handleDebugGoToTree: debugGoToTree,
     handleDebugGoToEtabli: debugGoToEtabli,
     handleDebugGoToSerre: debugGoToSerre,
+    handleDebugGoToMinijeu: debugGoToMinijeu,
     handleWorkbenchInteract,
     handleThomasEtabliInteract,
     handleGreenhouseDoorClick,

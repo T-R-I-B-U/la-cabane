@@ -5,6 +5,7 @@ export function StoryDebugPanel({
   onGoToTree,
   onGoToEtabli,
   onGoToSerre,
+  onGoToMinijeu,
 }) {
   return (
     <aside className="story-debug-panel" aria-label="Story debug panel">
@@ -27,6 +28,9 @@ export function StoryDebugPanel({
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToSerre}>
           Serre (porte)
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToMinijeu}>
+          Mini-jeu framboise
         </button>
       </div>
     </aside>
