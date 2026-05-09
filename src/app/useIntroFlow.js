@@ -597,9 +597,13 @@ export function useIntroFlow({ sceneReady }) {
     ignoreNextPointerUnlockRef.current = true
     if (document.pointerLockElement) document.exitPointerLock()
     setSerreActive(true)
-    setExitSerrePhaseActive(true)
-    setIntroSpawn({ ...STORY_CAMERA_POVS.greenhouseFrontDoor })
-  }, [prepareDebugPostIntroState])
+    setIntroSpawn({ ...STORY_CAMERA_POVS.greenhouseFrontDoorExit })
+    scheduleFlowTimeout(() => {
+      playDialogue('18-voice-tree', {
+        onDone: () => playDialogue('19-voice-tree'),
+      })
+    }, 500)
+  }, [prepareDebugPostIntroState, playDialogue, scheduleFlowTimeout])
 
   const launchIntro = useCallback(() => {
     if (!sceneReady) return
