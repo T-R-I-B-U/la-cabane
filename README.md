@@ -61,7 +61,7 @@ The app is split into **4 layers** that don't mix:
 └─────────────────────────────────────────────┘
 ```
 
-`App.jsx` holds ~50 `useState` values. **`Scene.jsx` has none** — it only receives props. The R3F `<Canvas>` boundary separates React DOM rendering from Three.js's `requestAnimationFrame` loop.
+`App.jsx` holds most narrative and UI state. `Scene.jsx` mainly receives props, while keeping a few scene-local state values such as colliders and resolved world positions. The R3F `<Canvas>` boundary separates React DOM rendering from Three.js's `requestAnimationFrame` loop.
 
 ### Architecture rules
 

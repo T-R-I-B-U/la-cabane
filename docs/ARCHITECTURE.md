@@ -26,7 +26,7 @@ Il rend **deux types de choses en parallèle** :
 - `<Scene>` (le canvas R3F, couche 3D)
 - Les overlays UI en dehors du canvas (sous-titres, crosshair, panneaux, loaders)
 
-**Règle critique** : `<Scene>` ne contient **aucun `useState`**. Toute la logique d'état vit dans `App.jsx` et descend en props.
+**Règle critique** : la logique narrative et UI reste dans `App.jsx`. `<Scene>` ne garde qu'un petit état technique local à la scène 3D, comme les colliders et les positions du monde nécessaires au wiring R3F.
 
 ---
 
