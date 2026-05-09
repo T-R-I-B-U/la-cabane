@@ -41,6 +41,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
   const [fruitsClickActive, setFruitsClickActive] = useState(false)
   // Token to force re-trigger when zone is already 'arbre'
   const [arbreStartToken, setArbreStartToken] = useState(0)
+  const [ladderIsStoryMode, setLadderIsStoryMode] = useState(false)
 
   const playedRef = useRef(false)
   const scheduledTimeoutsRef = useRef(new Set())
@@ -79,6 +80,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     setArbreStoryCameraTransition(null)
     setLadderClickActive(false)
     setFruitsClickActive(false)
+    setLadderIsStoryMode(false)
     resetStory()
     stopDialogue()
     setGameStep(GAME_STEPS.EXPLORATION)
@@ -155,6 +157,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
   const activateLadderFromStory = useCallback(() => {
     setArbreActive(true)
     setArbreMovementLocked(false)
+    setLadderIsStoryMode(true)
     goToStep('arbre.atLadder')
     setLadderClickActive(true)
   }, [goToStep])
@@ -172,6 +175,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     arbreDialogueActive,
     arbreStoryCameraTransition,
     ladderClickActive,
+    ladderIsStoryMode,
     growingFruitPlaying,
     fruitsClickActive,
     arbreLeafInteractionsEnabled,

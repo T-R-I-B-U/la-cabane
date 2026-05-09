@@ -36,6 +36,7 @@ export function ArbreScene({
   hutPosition,
   arbreActive,
   ladderClickActive,
+  ladderIsStoryMode,
   onLadderClick,
   growingFruitPlaying,
   fruitsClickActive,
@@ -66,6 +67,7 @@ export function ArbreScene({
         position={ladderPOI}
         active={ladderClickActive}
         onInteract={onLadderClick}
+        maxDistance={ladderIsStoryMode ? Infinity : undefined}
       />
       {ladderClickActive && (
         <mesh position={ladderPOI}>
