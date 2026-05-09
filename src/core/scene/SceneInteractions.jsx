@@ -1,6 +1,7 @@
 import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
+import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
@@ -49,6 +50,7 @@ export function SceneInteractions({
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
+  onJuiceInteract,
   serrePreview,
 }) {
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
@@ -116,6 +118,12 @@ export function SceneInteractions({
       )}
 
       <ClickableZoe isInteractable={zoePhaseActive} onZoeTalk={onZoeTalk} />
+
+      <ClickableJuiceTable
+        cabane={cabane}
+        isInteractable={juicePhaseActive}
+        onInteract={onJuiceInteract}
+      />
 
       {raspberryPhaseActive && (
         <RaspberryMinigame

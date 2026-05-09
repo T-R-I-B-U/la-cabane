@@ -33,8 +33,10 @@ export const STORY_CAMERA_POVS = {
     position: { x: 31.5, y: 1.9, z: -5.4 },
     target: { x: 32.8, y: 1.4, z: -5.6 },
   },
+  // Calibrate in-game: camera.position / controls.target printed via CameraRegistrySync
+  // juiceglass world pos: ~[31.6, 0.88, -13.3] / juicemachine: [29.6, 0.45, -11.5]
   serreJuice: {
-    position: { x: 29.0, y: 1.7, z: -5.4 },
-    target: { x: 32.8, y: 1.0, z: -5.6 },
+    position: { x: 29.5, y: 1.8, z: -11.5 },
+    target: { x: 31.6, y: 0.9, z: -13.3 },
   },
 }
