@@ -5,14 +5,39 @@ Built by a team of 2 developers.
 
 ---
 
+## Documentation technique
+
+La documentation complète du projet est dans [`docs/`](./docs/) :
+
+| Fichier | Contenu |
+|---------|---------|
+| [ARCHITECTURE.md](./docs/ARCHITECTURE.md) | 4 couches, séparation App/Scene, stores, prop drilling |
+| [STATE_MACHINE.md](./docs/STATE_MACHINE.md) | `useIntroFlow` — toutes les phases narratives |
+| [AUDIO.md](./docs/AUDIO.md) | `audioStore`, dialogue, sous-titres, SRT |
+| [SCENE.md](./docs/SCENE.md) | Pipeline R3F : Scene → CabaneScene → sous-composants |
+| [INTERACTIONS.md](./docs/INTERACTIONS.md) | 3 patterns d'interaction, TriggerZone, zones |
+| [ASSETS.md](./docs/ASSETS.md) | nodeBuilder, instancing, textureResolver, cabane.json |
+| [PLAYER.md](./docs/PLAYER.md) | PlayerControls, pointer lock, collision, spawns |
+| [CHARACTERS.md](./docs/CHARACTERS.md) | AnimatedCharacter, séquences Thomas |
+| [JOURNAL.md](./docs/JOURNAL.md) | JournalBook, machine à états, puzzle drag-and-drop |
+| [SAVOIRS.md](./docs/SAVOIRS.md) | useSavoirAssignment, useContactAssignment, panels |
+| [SHADER.md](./docs/SHADER.md) | WatercolorPass, KuwaharaEffect, outlineEffect |
+| [DATA_FLOW.md](./docs/DATA_FLOW.md) | Flux props App → Scene → entités, stores globaux |
+| [TOOLING.md](./docs/TOOLING.md) | Vite, ESLint, Prettier, Makefile, build |
+
+---
+
 ## Tech Stack
 
 | Tool                                                                | Version | Role                                 |
 | ------------------------------------------------------------------- | ------- | ------------------------------------ |
+| [React Three Fiber](https://docs.pmnd.rs/react-three-fiber)         | —       | Three.js via React JSX (canvas layer)|
 | [Three.js](https://threejs.org/)                                    | 0.183   | WebGL engine                         |
+| [@react-three/drei](https://github.com/pmndrs/drei)                 | —       | R3F helpers (controls, loaders…)     |
 | [React](https://react.dev/)                                         | 19      | UI layer (DOM overlay on the canvas) |
 | [Vite](https://vitejs.dev/)                                         | 7       | Bundler + HMR                        |
 | [vite-plugin-glsl](https://github.com/UstymUkhman/vite-plugin-glsl) | —       | Native `.glsl` file imports          |
+| [postprocessing](https://github.com/pmndrs/postprocessing)          | —       | Kuwahara watercolor post-FX          |
 | [ESLint](https://eslint.org/) (flat config)                         | —       | JS/JSX linting                       |
 | Cinema 4D → `.gltf` / `.glb`                                        | —       | 3D asset export pipeline             |
 
@@ -22,37 +47,29 @@ Built by a team of 2 developers.
 
 ### Core principle
 
-The app is split between a React DOM overlay and a React Three Fiber canvas. React owns UI state and passes scene options to the canvas through component props; Three.js-specific behavior stays inside R3F scene components and world entities.
+The app is split into **4 layers** that don't mix:
 
 ```
-index.html
-  └── #root (React)
-        └── App.jsx                  ← React UI shell and debug controls
-              ├── core/Scene.jsx     ← React Three Fiber canvas + scene setup
-              ├── core/PerfMonitor   ← DOM performance overlay
-              └── App.css            ← UI styling
-
-  R3F scene layer (src/core/)
-        Scene.jsx                    ← Canvas, lights, controls, floor, stats
-        Loader.js                    ← shared GLTFLoader cache
-
-  World content layer (src/world/)
-        entities/Cabane.js           ← builds the scene graph from cabane.json
-        entities/SlidingDoors.jsx    ← animated interactive doors
-        materials/                   ← reusable materials / custom shaders
-
-  Runtime assets (public/)
-        cabane.json                  ← exported scene placement data
-        models/                      ← GLTF/GLB models and instance matrices
+┌─────────────────────────────────────────────┐
+│  React DOM  (App.jsx, app/)                  │  narrative state, UI overlays
+├─────────────────────────────────────────────┤
+│  R3F Canvas  (core/)                         │  3D scene, camera, controls
+├─────────────────────────────────────────────┤
+│  World  (world/)                             │  entities, materials, interactions
+├─────────────────────────────────────────────┤
+│  Utils  (utils/)                             │  decoupled singleton stores
+└─────────────────────────────────────────────┘
 ```
+
+`App.jsx` holds most narrative and UI state. `Scene.jsx` mainly receives props, while keeping a few scene-local state values such as colliders and resolved world positions. The R3F `<Canvas>` boundary separates React DOM rendering from Three.js's `requestAnimationFrame` loop.
 
 ### Architecture rules
 
-- `App.jsx` owns the DOM overlay state and passes display/debug options to `Scene`.
-- `core/` owns the R3F canvas, scene setup, controls, loaders, and rendering diagnostics.
-- `world/` owns project-specific scene content and entity behavior.
-- `utils/` contains shared helpers and small runtime stores used across app, scene, and audio flows.
-- Assets in `public/` are served statically and loaded at runtime — they are never bundled by Vite.
+- `App.jsx` owns all narrative state; everything flows down as props to `<Scene>`.
+- `core/` owns the R3F canvas, camera systems, player controls, and loaders.
+- `world/` owns project-specific 3D content — entities receive `isInteractable` / `onInteract` props without knowing the narrative context.
+- `utils/` stores (`audioStore`, `gameManagerStore`, `gameStateStore`, `visibilityZoneStore`) are singleton modules accessible anywhere without prop drilling, using `useSyncExternalStore` for React hooks.
+- Assets in `public/` are served statically and loaded at runtime — never bundled by Vite.
 
 ---
 
@@ -60,19 +77,81 @@ index.html
 
 ```
 public/
-  models/       → .gltf/.glb files exported from Cinema 4D (loaded via GLTFLoader)
-  textures/     → textures (loaded via TextureLoader)
-  audio/        → ambience tracks and sound effects (loaded via AudioLoader)
+  cabane.json       → scene graph definition (nodes, positions, types)
+  models/           → .gltf/.glb files + .bin instancing matrices
+    compressed/     → Draco-compressed variants (performance mode)
+  textures/         → PBR textures (color, normal, roughness, ao…)
+    compressed/     → compressed variants
+  audio/            → ambience tracks, SFX, voice-over
+  subtitles/        → .srt files for dialogue tracks
+  hdri/             → .hdr / .exr environment maps (optional)
+  savoirs.json      → leaf knowledge content (round-robin assignment)
+  contacts.json     → fruit contact content (per fruitId lookup)
 
 src/
-  core/         → React Three Fiber scene setup, loaders, controls, debug helpers
-  world/
-    entities/   → one module/component per 3D object or scene behavior
-    materials/  → reusable Three.js materials and custom shaders
-  utils/        → shared helpers and runtime stores
-  App.jsx       → React root component
-  main.jsx      → single entry point — mounts React and boots the engine
-  index.css     → global styles
+  App.jsx                   → root component, ~50 useState, all narrative state
+  main.jsx                  → React entry point
+  app/                      → narrative state machine, UI overlays, hooks
+    useIntroFlow.js          → central story machine (~545 lines)
+    useNpcDialogue.js        → thin wrapper over audioStore dialogue
+    useSavoirAssignment.js   → round-robin leaf → savoir mapping
+    useContactAssignment.js  → direct fruitId → contact mapping
+    useStoryFlow.js          → storyScript step tracker
+    GameManager.jsx          → null component, drives LOADING→EXPLORATION steps
+    ViewerControls.jsx       → dev panel (performance, shader, zones…)
+    StoryDebugPanel.jsx      → F3 debug panel (jump to any phase)
+    SavoirPanel.jsx / ContactPanel.jsx / NameInput.jsx / …
+  core/                     → R3F canvas, player, loaders, scene wiring
+    Scene.jsx                → <Canvas> root, zone-conditional rendering
+    PlayerControls.jsx       → FPS movement, gravity, wall collision
+    StoryCameraTransition.jsx → lerp/slerp to narrative POV
+    SceneConfig.js           → spawn positions, floor/player heights
+    Loader.js                → GLTFLoader singleton with promise cache
+    Floor.jsx                → invisible floor collider + visible grass
+    audio/
+      AudioManager.jsx       → attaches THREE.AudioListener to camera
+      Subtitles.jsx          → subscribes to audioStore subtitle updates
+    scene/
+      CabaneScene.jsx        → cabane orchestrator (load → interact → zone)
+      ArbreScene.jsx         → arbre zone trigger (return to cabane)
+      SceneControls.jsx      → camera selector (IntroCamera / Player / Orbit)
+      SceneCharacters.jsx    → Thomas + ClickableThomas
+      SceneInteractions.jsx  → all Clickable* + JournalBook assembly
+      SceneLighting.jsx      → ambient + directional + HDRI environment
+      hdriOptions.js         → HDRI_OPTIONS from virtual:hdri-options
+  world/                    → project-specific 3D content
+    cabane/
+      nodeBuilder.js         → recursive GLTF assembly from cabane.json
+      instancing.js          → .bin → THREE.InstancedMesh
+      textureResolver.js     → auto PBR texture lookup + alias map
+      assetNaming.js         → name normalization, window01 alias
+      runtime.js             → applyTransform, findNodePosition helpers
+    entities/               → one component per 3D object
+      Cabane.js              → buildCabane() entry point + collider generation
+      AnimatedCharacter.jsx  → generic GLB + animation + texture cloning
+      IntroCamera.jsx        → 5-waypoint cinematic camera
+      JournalBook.jsx        → 6-state interactive book + drag-and-drop puzzle
+      TreeLeaves.jsx         → InstancedMesh + PRNG animation + LOD
+      SlidingDoors.jsx       → auto-detected door pairs, proximity lerp
+      Fruit.jsx              → cloned GLB, outline, hover, click
+      GrowingFruit.jsx       → decorative animated fruit (easeOutQuart)
+      ClickableDoor.jsx      → intro door, mouse hover + outline
+      ClickableTree / ClickableReception / ClickableWorkbench / …
+    interactions/
+      useCenterScreenMeshInteraction.js  → FPS center-screen raycasting
+      TriggerZone.jsx        → spherical camera trigger (distanceToSquared)
+      useHoverEffect.js      → cursor + pointer events helper
+      useStableInteractionCallback.js    → stable ref for event handlers
+    materials/
+      WatercolorPass.jsx     → Kuwahara post-processing effect (EffectComposer)
+      KuwaharaEffect.js      → 4-quadrant variance filter GLSL
+      outlineEffect.js       → glow outline (ShaderMaterial + InstancedBufferGeometry)
+  utils/                    → singleton stores, shared helpers
+    audioStore.js            → Web Audio engine, SRT subtitles, RAF loop
+    gameManagerStore.js      → active zone ('cabane' | 'arbre')
+    gameStateStore.js        → global step (LOADING → EXPLORATION)
+    visibilityZoneStore.js   → node whitelist + ZONE_COMPONENTS
+    ConditionalEdgesGeometry.js → edge geometry filtered by angle threshold
 ```
 
 ---

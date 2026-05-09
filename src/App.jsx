@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
 import {
   AppLoader,
   Crosshair,
@@ -6,19 +6,16 @@ import {
   IntroLoader,
   NameInput,
   SavoirPanel,
-  StoryDebugPanel,
-  ViewerControls,
   useIntroFlow,
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
 import { RaspberryCounter } from './app/RaspberryCounter'
 import { useContactAssignment } from './app/useContactAssignment'
+import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
-import CameraEditorPanel from './core/CameraEditorPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
-import { getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
-import { PerfMonitor } from './core/PerfMonitor'
+import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -26,6 +23,18 @@ import { setVisibilityZones } from './utils/visibilityZoneStore'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
+const ViewerControls = lazy(() =>
+  import('./app/ViewerControls').then((mod) => ({ default: mod.ViewerControls }))
+)
+const StoryDebugPanel = lazy(() =>
+  import('./app/StoryDebugPanel').then((mod) => ({ default: mod.StoryDebugPanel }))
+)
+const CameraEditorPanel = lazy(() =>
+  import('./core/CameraEditorPanel').then((mod) => ({ default: mod.default }))
+)
+const PerfMonitor = lazy(() =>
+  import('./core/PerfMonitor').then((mod) => ({ default: mod.PerfMonitor }))
+)
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
@@ -40,6 +49,7 @@ export default function App() {
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(true)
   const [playerSpawn, setPlayerSpawn] = useState(null)
+  const [playerSpawnTarget, setPlayerSpawnTarget] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
   const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
@@ -173,6 +183,54 @@ export default function App() {
     launchIntro,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+
+  const spawnAtLadder = useCallback(() => {
+    const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
+    setPostIntro(false)
+    setPlayerSpawn(spawn.position)
+    setPlayerSpawnTarget(spawn.target)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition, setPostIntro])
+
+  const spawnAtPlatform = useCallback(() => {
+    setPostIntro(false)
+    setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(null)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(true)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [sceneLoadInfo?.platformPosition, setPostIntro])
+
+  const {
+    arbreActive,
+    arbreMovementLocked,
+    arbreDialogueActive,
+    arbreStoryCameraTransition,
+    ladderClickActive,
+    growingFruitPlaying: arbreGrowingFruitPlaying,
+    fruitsClickActive,
+    arbreLeafInteractionsEnabled,
+    handleLadderClick,
+    handleArbreTransitionComplete,
+    handleFruitClickDuringLeaves,
+    triggerArbre,
+  } = useArbreFlow({
+    platformPosition: sceneLoadInfo?.platformPosition,
+    onLadderSpawn: spawnAtLadder,
+    onPlatformSpawn: spawnAtPlatform,
+  })
 
   const openSavoirFromLeaf = useCallback(
     (id) => {
@@ -314,7 +372,9 @@ export default function App() {
 
   const isStoryBlockingPlayer =
     dialogueActive ||
+    arbreDialogueActive ||
     introMovementLocked ||
+    arbreMovementLocked ||
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible
@@ -434,19 +494,8 @@ export default function App() {
     setSceneLoadStatus('error')
   }, [])
 
-  function enterPlatformView() {
-    setPostIntro(false)
-    setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
-    setPlayerSpawnKey((k) => k + 1)
-    setUserMovementLocked(true)
-    setIsPlayerModeActive(true)
-    setIsFlyModeActive(false)
-
-    // Request lock immediately on click
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas')
-      if (canvas) canvas.requestPointerLock()
-    }, 10)
+  function goToPlatform() {
+    spawnAtPlatform()
   }
 
   const isCursorVisible =
@@ -509,6 +558,10 @@ export default function App() {
         // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
         break
 
+      case GAME_STEPS.ARBRE_INTRO:
+        // Séquence arbre déclenchée — mouvement géré par arbreMovementLocked.
+        break
+
       default:
         break
     }
@@ -557,6 +610,7 @@ export default function App() {
           mode: isPlayerModeActive,
           flyMode: isFlyModeActive,
           spawn: playerSpawn,
+          spawnTarget: playerSpawnTarget,
           spawnKey: playerSpawnKey,
           movementLocked: isPlayerInteractionLocked || userMovementLocked,
         }}
@@ -605,6 +659,17 @@ export default function App() {
           cameraFixed: raspberryPhaseActive,
           serrePreview: isPlayerModeActive && !postIntro,
         }}
+        arbre={{
+          active: arbreActive,
+          storyCameraTransition: arbreStoryCameraTransition,
+          onTransitionComplete: handleArbreTransitionComplete,
+          ladderClickActive,
+          onLadderClick: handleLadderClick,
+          growingFruitPlaying: arbreGrowingFruitPlaying,
+          fruitsClickActive,
+          onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
+          leafInteractionsEnabled: arbreLeafInteractionsEnabled,
+        }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={interactionsEnabled}
         pointerControlsRef={pointerControlsRef}
@@ -644,56 +709,69 @@ export default function App() {
         isViewerControlsVisible &&
         !introPending &&
         !introActive &&
-        !postIntro && <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />}
+        !postIntro && (
+          <Suspense fallback={null}>
+            <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
+          </Suspense>
+        )}
 
-      {import.meta.env.DEV && showCameraEditor && <CameraEditorPanel />}
+      {import.meta.env.DEV && showCameraEditor && (
+        <Suspense fallback={null}>
+          <CameraEditorPanel />
+        </Suspense>
+      )}
 
       {import.meta.env.DEV && showStoryDebug && (
-        <StoryDebugPanel
-          onGoToIntroStart={jumpToIntroStart}
-          onGoToDoorPassage={jumpToDoorPassage}
-          onGoToReception={jumpToReception}
-          onGoToTree={jumpToTree}
-          onGoToEtabli={jumpToEtabli}
-          onGoToSerre={jumpToSerre}
-          onGoToMinijeu={jumpToMinijeu}
-        />
+        <Suspense fallback={null}>
+          <StoryDebugPanel
+            onGoToIntroStart={jumpToIntroStart}
+            onGoToDoorPassage={jumpToDoorPassage}
+            onGoToReception={jumpToReception}
+            onGoToTree={jumpToTree}
+            onGoToEtabli={jumpToEtabli}
+            onGoToSerre={jumpToSerre}
+            onGoToMinijeu={jumpToMinijeu}
+          />
+        </Suspense>
       )}
 
       {isViewerControlsVisible && sceneReady && !introPending && !introActive && !postIntro && (
-        <ViewerControls
-          status={sceneLoadStatus}
-          info={sceneLoadInfo}
-          sceneReady={sceneReady}
-          performanceMode={performanceMode}
-          introPending={introPending}
-          introActive={introActive}
-          playerMode={isPlayerModeActive}
-          flyMode={isFlyModeActive}
-          userMovementLocked={userMovementLocked}
-          debugDoors={debugDoors}
-          debugCollisions={debugCollisions}
-          leafMaterialMode={leafMaterialMode}
-          interactionsEnabled={interactionsEnabled}
-          hdriOptions={HDRI_OPTIONS}
-          noHdriId={NO_HDRI_ID}
-          activeHdriId={activeHdriId}
-          onHdriChange={setActiveHdriId}
-          onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
-          onLaunchIntro={launchIntro}
-          onTogglePlayerMode={toggleFreePlayerView}
-          onGoToPlatform={enterPlatformView}
-          onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
-          onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
-          shaderEnabled={shaderEnabled}
-          shaderRadius={shaderRadius}
-          onToggleShader={() => setShaderEnabled((current) => !current)}
-          onShaderRadiusChange={setShaderRadius}
-          onToggleDebugDoors={() => setDebugDoors((current) => !current)}
-          onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
-          onToggleInteractionsEnabled={handleToggleInteractionsEnabled}
-          onLeafMaterialChange={setLeafMaterialMode}
-        />
+        <Suspense fallback={null}>
+          <ViewerControls
+            status={sceneLoadStatus}
+            info={sceneLoadInfo}
+            sceneReady={sceneReady}
+            performanceMode={performanceMode}
+            introPending={introPending}
+            introActive={introActive}
+            playerMode={isPlayerModeActive}
+            flyMode={isFlyModeActive}
+            userMovementLocked={userMovementLocked}
+            debugDoors={debugDoors}
+            debugCollisions={debugCollisions}
+            leafMaterialMode={leafMaterialMode}
+            interactionsEnabled={interactionsEnabled}
+            hdriOptions={HDRI_OPTIONS}
+            noHdriId={NO_HDRI_ID}
+            activeHdriId={activeHdriId}
+            onHdriChange={setActiveHdriId}
+            onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
+            onLaunchIntro={launchIntro}
+            onTogglePlayerMode={toggleFreePlayerView}
+            onGoToPlatform={goToPlatform}
+            onTestArbre={triggerArbre}
+            onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
+            onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
+            shaderEnabled={shaderEnabled}
+            shaderRadius={shaderRadius}
+            onToggleShader={() => setShaderEnabled((current) => !current)}
+            onShaderRadiusChange={setShaderRadius}
+            onToggleDebugDoors={() => setDebugDoors((current) => !current)}
+            onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+            onToggleInteractionsEnabled={handleToggleInteractionsEnabled}
+            onLeafMaterialChange={setLeafMaterialMode}
+          />
+        </Suspense>
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
