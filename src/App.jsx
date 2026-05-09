@@ -744,10 +744,10 @@ export default function App() {
       />
 
       {showDevOverlays && isViewerControlsVisible && (
-          <Suspense fallback={null}>
-            <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
-          </Suspense>
-        )}
+        <Suspense fallback={null}>
+          <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
+        </Suspense>
+      )}
 
       {showDevOverlays && showCameraEditor && (
         <Suspense fallback={null}>
