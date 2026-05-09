@@ -1,7 +1,6 @@
-import { useState, useRef, useMemo, Suspense } from 'react'
+import { useState, useRef, useMemo, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
 import AudioManager from './audio/AudioManager'
-import { WatercolorPass } from '../world/materials/WatercolorPass'
 import { Floor } from './Floor'
 import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -9,8 +8,14 @@ import { StatsCollector } from './StatsCollector'
 import { SceneControls } from './scene/SceneControls'
 import { SceneLighting } from './scene/SceneLighting'
 import { CabaneScene } from './scene/CabaneScene'
-import { ArbreScene } from './scene/ArbreScene'
 import { useActiveZone } from '../utils/gameManagerStore'
+
+const ArbreScene = lazy(() =>
+  import('./scene/ArbreScene').then((mod) => ({ default: mod.ArbreScene }))
+)
+const WatercolorPass = lazy(() =>
+  import('../world/materials/WatercolorPass').then((mod) => ({ default: mod.WatercolorPass }))
+)
 
 export default function Scene({
   performanceMode,
@@ -213,7 +218,11 @@ export default function Scene({
         hutPosition={hutPosition}
       />
 
-      {shaderEnabled && <WatercolorPass radius={shaderRadius} />}
+      {shaderEnabled && (
+        <Suspense fallback={null}>
+          <WatercolorPass radius={shaderRadius} />
+        </Suspense>
+      )}
     </Canvas>
   )
 }

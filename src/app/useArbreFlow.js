@@ -43,9 +43,25 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
   const [arbreStartToken, setArbreStartToken] = useState(0)
 
   const playedRef = useRef(false)
+  const scheduledTimeoutsRef = useRef(new Set())
   const zone = useActiveZone()
   const { playDialogue, stopDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory } = useStoryFlow()
+
+  const clearScheduledTimeouts = useCallback(() => {
+    scheduledTimeoutsRef.current.forEach((timeoutId) => clearTimeout(timeoutId))
+    scheduledTimeoutsRef.current.clear()
+  }, [])
+
+  const scheduleFlowTimeout = useCallback((callback, delay) => {
+    const timeoutId = setTimeout(() => {
+      scheduledTimeoutsRef.current.delete(timeoutId)
+      callback()
+    }, delay)
+
+    scheduledTimeoutsRef.current.add(timeoutId)
+    return timeoutId
+  }, [])
 
   const povs = useMemo(
     () => resolveArbrePovs(platformPosition),
@@ -53,7 +69,10 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     [platformPosition?.[0], platformPosition?.[1], platformPosition?.[2]]
   )
 
+  useEffect(() => clearScheduledTimeouts, [clearScheduledTimeouts])
+
   const exitArbre = useCallback(() => {
+    clearScheduledTimeouts()
     setArbreActive(false)
     setArbreMovementLocked(false)
     setArbreDialogueActive(false)
@@ -63,7 +82,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     resetStory()
     stopDialogue()
     setGameStep(GAME_STEPS.EXPLORATION)
-  }, [resetStory, stopDialogue])
+  }, [clearScheduledTimeouts, resetStory, stopDialogue])
 
   // Oneshot trigger when zone becomes 'arbre', or forced via arbreStartToken.
   // Player spawns at base of ladder in free-movement mode; locking happens on ladder click.
@@ -103,7 +122,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
       })
     } else if (currentStepId === 'arbre.leavesDialogue') {
       setGrowingFruitPlaying(true)
-      setTimeout(() => {
+      scheduleFlowTimeout(() => {
         setArbreDialogueActive(true)
         playDialogue('arbreFeuilles', {
           onDone: () => {
@@ -121,7 +140,7 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
         })
       }, 1000)
     }
-  }, [currentStepId, completeStep, onPlatformSpawn, playDialogue, exitArbre])
+  }, [currentStepId, completeStep, onPlatformSpawn, playDialogue, exitArbre, scheduleFlowTimeout])
 
   const handleFruitClickDuringLeaves = useCallback(() => {
     if (!fruitsClickActive) return

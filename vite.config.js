@@ -2,20 +2,62 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import glsl from 'vite-plugin-glsl'
 import { existsSync, readdirSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { relative, resolve, sep } from 'node:path'
 import process from 'node:process'
 
 const VIRTUAL_HDRI_MODULE_ID = 'virtual:hdri-options'
 const RESOLVED_VIRTUAL_HDRI_MODULE_ID = `\0${VIRTUAL_HDRI_MODULE_ID}`
+const VIRTUAL_PUBLIC_ASSET_MANIFEST_MODULE_ID = 'virtual:public-asset-manifest'
+const RESOLVED_VIRTUAL_PUBLIC_ASSET_MANIFEST_MODULE_ID =
+  `\0${VIRTUAL_PUBLIC_ASSET_MANIFEST_MODULE_ID}`
+
+function toPublicUrl(rootDir, filePath) {
+  const publicRoot = resolve(rootDir, 'public')
+  const relativePath = relative(publicRoot, filePath)
+  return `/${relativePath.split(sep).map(encodeURIComponent).join('/')}`
+}
+
+function listPublicFiles(directory, matcher) {
+  if (!existsSync(directory)) return []
+
+  const files = []
+
+  function visit(currentDirectory) {
+    const entries = readdirSync(currentDirectory, { withFileTypes: true })
+
+    entries.forEach((entry) => {
+      const entryPath = resolve(currentDirectory, entry.name)
+      if (entry.isDirectory()) {
+        visit(entryPath)
+        return
+      }
+
+      if (matcher.test(entry.name)) files.push(entryPath)
+    })
+  }
+
+  visit(directory)
+  return files.sort((a, b) => a.localeCompare(b))
+}
 
 function listHdriFiles() {
-  const hdriDir = resolve(process.cwd(), 'public/hdri')
-  if (!existsSync(hdriDir)) return []
+  const rootDir = process.cwd()
+  const hdriDir = resolve(rootDir, 'public/hdri')
+  return listPublicFiles(hdriDir, /\.(hdr|exr)$/i).map((filePath) => toPublicUrl(rootDir, filePath))
+}
 
-  return readdirSync(hdriDir)
-    .filter((fileName) => /\.(hdr|exr)$/i.test(fileName))
-    .sort((a, b) => a.localeCompare(b))
-    .map((fileName) => `/hdri/${encodeURIComponent(fileName)}`)
+function createPublicAssetManifest() {
+  const rootDir = process.cwd()
+
+  return {
+    textureFiles: listPublicFiles(resolve(rootDir, 'public/textures'), /\.(png|jpe?g|webp)$/i).map(
+      (filePath) => toPublicUrl(rootDir, filePath)
+    ),
+    compressedModelFiles: listPublicFiles(
+      resolve(rootDir, 'public/models/compressed'),
+      /\.(glb|gltf)$/i
+    ).map((filePath) => toPublicUrl(rootDir, filePath)),
+  }
 }
 
 function hdriOptionsPlugin() {
@@ -43,11 +85,28 @@ function hdriOptionsPlugin() {
   }
 }
 
+function publicAssetManifestPlugin() {
+  return {
+    name: 'public-asset-manifest',
+    resolveId(id) {
+      if (id === VIRTUAL_PUBLIC_ASSET_MANIFEST_MODULE_ID) {
+        return RESOLVED_VIRTUAL_PUBLIC_ASSET_MANIFEST_MODULE_ID
+      }
+    },
+    load(id) {
+      if (id !== RESOLVED_VIRTUAL_PUBLIC_ASSET_MANIFEST_MODULE_ID) return null
+
+      return `export const publicAssetManifest = ${JSON.stringify(createPublicAssetManifest())}`
+    },
+  }
+}
+
 export default defineConfig({
   plugins: [
     react(),
     glsl(),
     hdriOptionsPlugin(),
+    publicAssetManifestPlugin(),
   ],
   assetsInclude: ['**/*.glb', '**/*.gltf']
 })

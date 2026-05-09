@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
 import {
   AppLoader,
   Crosshair,
@@ -6,8 +6,6 @@ import {
   IntroLoader,
   NameInput,
   SavoirPanel,
-  StoryDebugPanel,
-  ViewerControls,
   useIntroFlow,
   useSavoirAssignment,
 } from './app/index'
@@ -15,10 +13,8 @@ import { ContactPanel } from './app/ContactPanel'
 import { useContactAssignment } from './app/useContactAssignment'
 import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
-import CameraEditorPanel from './core/CameraEditorPanel'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
-import { PerfMonitor } from './core/PerfMonitor'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -26,6 +22,18 @@ import { setVisibilityZones } from './utils/visibilityZoneStore'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
+const ViewerControls = lazy(() =>
+  import('./app/ViewerControls').then((mod) => ({ default: mod.ViewerControls }))
+)
+const StoryDebugPanel = lazy(() =>
+  import('./app/StoryDebugPanel').then((mod) => ({ default: mod.StoryDebugPanel }))
+)
+const CameraEditorPanel = lazy(() =>
+  import('./core/CameraEditorPanel').then((mod) => ({ default: mod.default }))
+)
+const PerfMonitor = lazy(() =>
+  import('./core/PerfMonitor').then((mod) => ({ default: mod.PerfMonitor }))
+)
 export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
@@ -665,56 +673,68 @@ export default function App() {
         isViewerControlsVisible &&
         !introPending &&
         !introActive &&
-        !postIntro && <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />}
+        !postIntro && (
+          <Suspense fallback={null}>
+            <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
+          </Suspense>
+        )}
 
-      {import.meta.env.DEV && showCameraEditor && <CameraEditorPanel />}
+      {import.meta.env.DEV && showCameraEditor && (
+        <Suspense fallback={null}>
+          <CameraEditorPanel />
+        </Suspense>
+      )}
 
       {import.meta.env.DEV && showStoryDebug && (
-        <StoryDebugPanel
-          onGoToIntroStart={jumpToIntroStart}
-          onGoToDoorPassage={jumpToDoorPassage}
-          onGoToReception={jumpToReception}
-          onGoToTree={jumpToTree}
-          onGoToEtabli={jumpToEtabli}
-          onGoToSerre={jumpToSerre}
-        />
+        <Suspense fallback={null}>
+          <StoryDebugPanel
+            onGoToIntroStart={jumpToIntroStart}
+            onGoToDoorPassage={jumpToDoorPassage}
+            onGoToReception={jumpToReception}
+            onGoToTree={jumpToTree}
+            onGoToEtabli={jumpToEtabli}
+            onGoToSerre={jumpToSerre}
+          />
+        </Suspense>
       )}
 
       {isViewerControlsVisible && sceneReady && !introPending && !introActive && !postIntro && (
-        <ViewerControls
-          status={sceneLoadStatus}
-          info={sceneLoadInfo}
-          sceneReady={sceneReady}
-          performanceMode={performanceMode}
-          introPending={introPending}
-          introActive={introActive}
-          playerMode={isPlayerModeActive}
-          flyMode={isFlyModeActive}
-          userMovementLocked={userMovementLocked}
-          debugDoors={debugDoors}
-          debugCollisions={debugCollisions}
-          leafMaterialMode={leafMaterialMode}
-          interactionsEnabled={interactionsEnabled}
-          hdriOptions={HDRI_OPTIONS}
-          noHdriId={NO_HDRI_ID}
-          activeHdriId={activeHdriId}
-          onHdriChange={setActiveHdriId}
-          onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
-          onLaunchIntro={launchIntro}
-          onTogglePlayerMode={toggleFreePlayerView}
-          onGoToPlatform={goToPlatform}
-          onTestArbre={triggerArbre}
-          onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
-          onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
-          shaderEnabled={shaderEnabled}
-          shaderRadius={shaderRadius}
-          onToggleShader={() => setShaderEnabled((current) => !current)}
-          onShaderRadiusChange={setShaderRadius}
-          onToggleDebugDoors={() => setDebugDoors((current) => !current)}
-          onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
-          onToggleInteractionsEnabled={handleToggleInteractionsEnabled}
-          onLeafMaterialChange={setLeafMaterialMode}
-        />
+        <Suspense fallback={null}>
+          <ViewerControls
+            status={sceneLoadStatus}
+            info={sceneLoadInfo}
+            sceneReady={sceneReady}
+            performanceMode={performanceMode}
+            introPending={introPending}
+            introActive={introActive}
+            playerMode={isPlayerModeActive}
+            flyMode={isFlyModeActive}
+            userMovementLocked={userMovementLocked}
+            debugDoors={debugDoors}
+            debugCollisions={debugCollisions}
+            leafMaterialMode={leafMaterialMode}
+            interactionsEnabled={interactionsEnabled}
+            hdriOptions={HDRI_OPTIONS}
+            noHdriId={NO_HDRI_ID}
+            activeHdriId={activeHdriId}
+            onHdriChange={setActiveHdriId}
+            onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
+            onLaunchIntro={launchIntro}
+            onTogglePlayerMode={toggleFreePlayerView}
+            onGoToPlatform={goToPlatform}
+            onTestArbre={triggerArbre}
+            onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
+            onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
+            shaderEnabled={shaderEnabled}
+            shaderRadius={shaderRadius}
+            onToggleShader={() => setShaderEnabled((current) => !current)}
+            onShaderRadiusChange={setShaderRadius}
+            onToggleDebugDoors={() => setDebugDoors((current) => !current)}
+            onToggleDebugCollisions={() => setDebugCollisions((current) => !current)}
+            onToggleInteractionsEnabled={handleToggleInteractionsEnabled}
+            onLeafMaterialChange={setLeafMaterialMode}
+          />
+        </Suspense>
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
