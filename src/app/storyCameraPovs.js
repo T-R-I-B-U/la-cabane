@@ -27,6 +27,14 @@ export const STORY_CAMERA_POVS = {
     position: { x: 21.6589, y: 1.5532, z: -5.3551 },
     target: { x: 7.1841, y: 1.4256, z: -5.3363 },
   },
+  stairs01Floor: {
+    position: { x: 0.0332, y: 1.374, z: -2.2348 },
+    target: { x: -5.5832, y: 2.4222, z: 4.8415 },
+  },
+  stairs01Top: {
+    position: { x: -5.2257, y: 4.6038, z: 3.4697 },
+    target: { x: -5.3461, y: 4.574, z: 2.9853 },
+  },
   greenhouseCorridorExit: {
     position: { x: 7.1841, y: 1.4256, z: -5.3363 },
     target: { x: 0.1301, y: 1.461, z: -5.2966 },

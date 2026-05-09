@@ -306,7 +306,24 @@ export function useIntroFlow({ sceneReady }) {
         playDialogue('18-voice-tree', {
           onDone: () => playDialogue('19-voice-tree'),
         })
+        scheduleFlowTimeout(() => {
+          greenhouseTransitionStageRef.current = 'arbreStairs1'
+          setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
+        }, 2000)
       }, 500)
+      return
+    }
+
+    if (greenhouseTransitionStageRef.current === 'arbreStairs1') {
+      greenhouseTransitionStageRef.current = 'arbreStairs2'
+      scheduleFlowTimeout(() => {
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Top, duration: 2.0 })
+      }, 2000)
+      return
+    }
+
+    if (greenhouseTransitionStageRef.current === 'arbreStairs2') {
+      greenhouseTransitionStageRef.current = null
       return
     }
 
@@ -602,6 +619,10 @@ export function useIntroFlow({ sceneReady }) {
       playDialogue('18-voice-tree', {
         onDone: () => playDialogue('19-voice-tree'),
       })
+      scheduleFlowTimeout(() => {
+        greenhouseTransitionStageRef.current = 'arbreStairs1'
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
+      }, 2000)
     }, 500)
   }, [prepareDebugPostIntroState, playDialogue, scheduleFlowTimeout])
 
