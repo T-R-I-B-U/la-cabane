@@ -11,8 +11,8 @@ import { Basket, RaspberryMinigame } from '../../world/entities/RaspberryMinigam
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
-// outsideplant02 world pos [32.8189,1.5645,-5.6124] + basket local [-0.4,-0.5,0.6]
-const BASKET_PREVIEW_POS = [32.4189, 1.0645, -5.0124]
+// outsideplant02 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
+const BASKET_PREVIEW_POS = [32.7189, 1.1645, -5.4124]
 const JOURNAL_ROTATION_Y = 0.41
 
 const ZOE_TEXTURE_BASE_PATHS = ['/textures/compressed/', '/textures/']
@@ -126,7 +126,11 @@ export function SceneInteractions({
         />
       )}
 
-      {(serreActive || zoePhaseActive || raspberryPhaseActive || juicePhaseActive || serrePreview) && (
+      {(serreActive ||
+        zoePhaseActive ||
+        raspberryPhaseActive ||
+        juicePhaseActive ||
+        serrePreview) && (
         <Suspense fallback={null}>
           <AnimatedCharacter
             url="/models/zoe-animated.glb"
@@ -140,9 +144,7 @@ export function SceneInteractions({
         </Suspense>
       )}
 
-      {serrePreview && !raspberryPhaseActive && (
-        <Basket position={BASKET_PREVIEW_POS} />
-      )}
+      {serrePreview && !raspberryPhaseActive && <Basket position={BASKET_PREVIEW_POS} />}
     </>
   )
 }
