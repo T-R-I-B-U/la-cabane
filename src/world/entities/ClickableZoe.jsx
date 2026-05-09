@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useStableInteractionCallback } from '../interactions/useStableInteractionCallback'
-import {FLOOR_Y} from "../../core/SceneConfig.js";
+import { FLOOR_Y } from '../../core/SceneConfig.js'
 
 const CENTER_NDC = new THREE.Vector2(0, 0)
 

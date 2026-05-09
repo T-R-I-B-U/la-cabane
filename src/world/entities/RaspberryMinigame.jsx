@@ -294,7 +294,17 @@ export function RaspberryMinigame({ isActive, cabane = null, onStateChange, onUn
       document.removeEventListener('pointerup', onPointerUp)
       document.body.style.cursor = 'auto'
     }
-  }, [isActive, camera, gl, toNDC, raycaster, onStateChange, onUnripeAttempt, _basketWorldPos, _hit])
+  }, [
+    isActive,
+    camera,
+    gl,
+    toNDC,
+    raycaster,
+    onStateChange,
+    onUnripeAttempt,
+    _basketWorldPos,
+    _hit,
+  ])
 
   // Hover cursor + basket-snap / scale animation
   useFrame(() => {
