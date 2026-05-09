@@ -176,6 +176,7 @@ export default function App() {
     handleZoeTalk,
     handleMinigameStateChange,
     handleUnripeAttempt,
+    handleJuiceInteract,
     handleReceptionChoice: handleReceptionChoiceInternal,
     handleReceptionInteract,
     handleReturnToHall,
@@ -656,6 +657,7 @@ export default function App() {
           onZoeTalk: handleZoeTalk,
           onMinigameStateChange: handleMinigameStateChange,
           onUnripeAttempt: handleUnripeAttempt,
+          onJuiceInteract: handleJuiceInteract,
           cameraFixed: raspberryPhaseActive,
           serrePreview: isPlayerModeActive && !postIntro,
         }}

@@ -49,6 +49,7 @@ export function useIntroFlow({ sceneReady }) {
   const isThomasTransitionRef = useRef(false)
   const isSerreZoeTransitionRef = useRef(false)
   const isSerreRaspberryTransitionRef = useRef(false)
+  const isSerreJuiceTransitionRef = useRef(false)
   const greenhouseTransitionStageRef = useRef(null)
   const scheduledTimeoutsRef = useRef(new Set())
   const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
@@ -114,6 +115,7 @@ export function useIntroFlow({ sceneReady }) {
     isPostBookTransitionRef.current = false
     isSerreZoeTransitionRef.current = false
     isSerreRaspberryTransitionRef.current = false
+    isSerreJuiceTransitionRef.current = false
     greenhouseTransitionStageRef.current = null
   }, [clearScheduledTimeouts])
 
@@ -272,6 +274,11 @@ export function useIntroFlow({ sceneReady }) {
 
     if (isSerreRaspberryTransitionRef.current) {
       isSerreRaspberryTransitionRef.current = false
+      return
+    }
+
+    if (isSerreJuiceTransitionRef.current) {
+      isSerreJuiceTransitionRef.current = false
       return
     }
 
@@ -438,7 +445,11 @@ export function useIntroFlow({ sceneReady }) {
       setZoeClip('zoe-pointing')
       scheduleFlowTimeout(() => {
         playDialogue('zoeJuice', {
-          onDone: () => setJuicePhaseActive(true),
+          onDone: () => {
+            setJuicePhaseActive(true)
+            isSerreJuiceTransitionRef.current = true
+            setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreJuice, duration: 1.5 })
+          },
         })
       }, 500)
     },
@@ -447,6 +458,11 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleUnripeAttempt = useCallback(() => {
     playDialogue('zoeUnripe')
+  }, [playDialogue])
+
+  const handleJuiceInteract = useCallback(() => {
+    setJuicePhaseActive(false)
+    playDialogue('zoeFarewell')
   }, [playDialogue])
 
   const handleGreenhouseDoorClick = useCallback(() => {
@@ -625,6 +641,7 @@ export function useIntroFlow({ sceneReady }) {
     handleZoeTalk,
     handleMinigameStateChange,
     handleUnripeAttempt,
+    handleJuiceInteract,
     handleJournalEnd,
     handleTreeInteract,
     handleJournalInteractionStart,
