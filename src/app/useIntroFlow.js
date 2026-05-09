@@ -38,6 +38,7 @@ export function useIntroFlow({ sceneReady }) {
   const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
   const [exitSerrePhaseActive, setExitSerrePhaseActive] = useState(false)
+  const [arbreLadderPending, setArbreLadderPending] = useState(false)
   const [zoeClip, setZoeClip] = useState(null)
   const [minigameCount, setMinigameCount] = useState(0)
   const [playerName, setPlayerName] = useState('')
@@ -106,6 +107,7 @@ export function useIntroFlow({ sceneReady }) {
     setRaspberryPhaseActive(false)
     setJuicePhaseActive(false)
     setExitSerrePhaseActive(false)
+    setArbreLadderPending(false)
     setZoeClip(null)
     setMinigameCount(0)
     setPlayerName('')
@@ -304,7 +306,7 @@ export function useIntroFlow({ sceneReady }) {
       greenhouseTransitionStageRef.current = null
       scheduleFlowTimeout(() => {
         playDialogue('18-voice-tree', {
-          onDone: () => playDialogue('19-voice-tree'),
+          onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
         })
         scheduleFlowTimeout(() => {
           greenhouseTransitionStageRef.current = 'arbreStairs1'
@@ -617,7 +619,7 @@ export function useIntroFlow({ sceneReady }) {
     setIntroSpawn({ ...STORY_CAMERA_POVS.greenhouseFrontDoorExit })
     scheduleFlowTimeout(() => {
       playDialogue('18-voice-tree', {
-        onDone: () => playDialogue('19-voice-tree'),
+        onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
       })
       scheduleFlowTimeout(() => {
         greenhouseTransitionStageRef.current = 'arbreStairs1'
@@ -689,6 +691,7 @@ export function useIntroFlow({ sceneReady }) {
     raspberryPhaseActive,
     juicePhaseActive,
     exitSerrePhaseActive,
+    arbreLadderPending,
     zoeClip,
     minigameCount,
     showNameInput,

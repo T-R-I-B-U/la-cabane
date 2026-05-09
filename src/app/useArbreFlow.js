@@ -133,14 +133,14 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
               onDone: () => {
                 setArbreDialogueActive(false)
                 completeStep('arbre.finalDialogue')
-                exitArbre()
+                // scenario continues — nothing happens yet
               },
             })
           },
         })
       }, 1000)
     }
-  }, [currentStepId, completeStep, onPlatformSpawn, playDialogue, exitArbre, scheduleFlowTimeout])
+  }, [currentStepId, completeStep, onPlatformSpawn, playDialogue, scheduleFlowTimeout])
 
   const handleFruitClickDuringLeaves = useCallback(() => {
     if (!fruitsClickActive) return
@@ -151,6 +151,13 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
   }, [fruitsClickActive, completeStep, povs])
 
   const arbreLeafInteractionsEnabled = currentStepId === 'arbre.exploreLeaves'
+
+  const activateLadderFromStory = useCallback(() => {
+    setArbreActive(true)
+    setArbreMovementLocked(false)
+    goToStep('arbre.atLadder')
+    setLadderClickActive(true)
+  }, [goToStep])
 
   const triggerArbre = useCallback(() => {
     playedRef.current = false
@@ -173,5 +180,6 @@ export function useArbreFlow({ platformPosition, onLadderSpawn, onPlatformSpawn 
     handleFruitClickDuringLeaves,
     exitArbre,
     triggerArbre,
+    activateLadderFromStory,
   }
 }

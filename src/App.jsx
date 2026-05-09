@@ -148,6 +148,7 @@ export default function App() {
     raspberryPhaseActive,
     juicePhaseActive,
     exitSerrePhaseActive,
+    arbreLadderPending,
     zoeClip,
     minigameCount,
     showNameInput,
@@ -230,6 +231,7 @@ export default function App() {
     handleArbreTransitionComplete,
     handleFruitClickDuringLeaves,
     triggerArbre,
+    activateLadderFromStory,
   } = useArbreFlow({
     platformPosition: sceneLoadInfo?.platformPosition,
     onLadderSpawn: spawnAtLadder,
@@ -364,6 +366,11 @@ export default function App() {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToPostMinigame()
   }, [handleDebugGoToPostMinigame])
+
+  useEffect(() => {
+    if (!arbreLadderPending) return
+    activateLadderFromStory()
+  }, [arbreLadderPending, activateLadderFromStory])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
