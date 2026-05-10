@@ -23,6 +23,10 @@ function resolveCharacterUrl(fileName, performanceMode) {
   return `/models/${fileName}`
 }
 
+const MARIE_SEQUENCES = {
+  idle: [{ clip: 'marie-standiing-idle', duration: 999 }],
+}
+
 export function SceneCharacters({
   performanceMode,
   thomasEtabliPhaseActive,
@@ -30,6 +34,7 @@ export function SceneCharacters({
   thomasAnimPhase = 'back',
 }) {
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
+  const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
   const textureBasePaths = performanceMode
     ? ['/textures/compressed/', '/textures/']
     : ['/textures/']
@@ -47,6 +52,18 @@ export function SceneCharacters({
           textureBasePaths={textureBasePaths}
           position={[-3.0, FLOOR_Y, -13.259]}
           rotation={[0, (110 * Math.PI) / 180, 0]}
+          scale={9}
+        />
+      </Suspense>
+      <Suspense fallback={null}>
+        <AnimatedCharacter
+          key={marieUrl}
+          url={marieUrl}
+          animationSequence={MARIE_SEQUENCES.idle}
+          textureName="marie-animated"
+          textureBasePaths={textureBasePaths}
+          position={[-20.0, 9.15, 24.0]}
+          rotation={[0, (160 * Math.PI) / 180, 0]}
           scale={9}
         />
       </Suspense>

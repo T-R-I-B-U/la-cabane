@@ -59,6 +59,7 @@ export default function Scene({
     treePhaseActive,
     workbenchPhaseActive,
     greenhousePhaseActive,
+    exitSerrePhaseActive,
     thomasEtabliPhaseActive,
     thomasAnimPhase,
     interactionLocked,
@@ -67,6 +68,7 @@ export default function Scene({
     onTreeInteract,
     onWorkbenchInteract,
     onGreenhouseDoorClick,
+    onExitSerreDoorClick,
     onThomasEtabliInteract,
     onStoryCameraTransitionComplete,
     serreActive,
@@ -77,6 +79,7 @@ export default function Scene({
     onZoeTalk,
     onMinigameStateChange,
     onUnripeAttempt,
+    onJuiceInteract,
     cameraFixed,
     serrePreview,
   } = intro
@@ -97,7 +100,10 @@ export default function Scene({
     storyCameraTransition: arbreStoryCameraTransition,
     onTransitionComplete: onArbreTransitionComplete,
     ladderClickActive,
+    stairsClickActive,
     onLadderClick,
+    onStairsClick,
+    onStairsHover,
     growingFruitPlaying: arbreGrowingFruitPlaying,
     fruitsClickActive,
     onFruitClickDuringLeaves,
@@ -158,7 +164,14 @@ export default function Scene({
             treePhaseActive={treePhaseActive}
             workbenchPhaseActive={workbenchPhaseActive}
             greenhousePhaseActive={greenhousePhaseActive}
+            exitSerrePhaseActive={exitSerrePhaseActive}
+            ladderClickActive={ladderClickActive}
+            onLadderClick={onLadderClick}
+            stairsClickActive={stairsClickActive}
+            onStairsClick={onStairsClick}
+            onStairsHover={onStairsHover}
             onGreenhouseDoorClick={onGreenhouseDoorClick}
+            onExitSerreDoorClick={onExitSerreDoorClick}
             thomasEtabliPhaseActive={thomasEtabliPhaseActive}
             thomasAnimPhase={thomasAnimPhase}
             onWorkbenchInteract={onWorkbenchInteract}
@@ -175,6 +188,7 @@ export default function Scene({
             onZoeTalk={onZoeTalk}
             onMinigameStateChange={onMinigameStateChange}
             onUnripeAttempt={onUnripeAttempt}
+            onJuiceInteract={onJuiceInteract}
             serrePreview={serrePreview}
             playerMode={playerMode}
             postIntro={postIntro}
@@ -200,10 +214,7 @@ export default function Scene({
         <Suspense fallback={null}>
           <ArbreScene
             platformPosition={platformPosition}
-            hutPosition={hutPosition}
             arbreActive={arbreActive}
-            ladderClickActive={ladderClickActive}
-            onLadderClick={onLadderClick}
             growingFruitPlaying={arbreGrowingFruitPlaying}
             fruitsClickActive={fruitsClickActive}
             onFruitClickDuringLeaves={onFruitClickDuringLeaves}

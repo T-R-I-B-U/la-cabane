@@ -54,17 +54,20 @@ export default function App() {
   const [userMovementLocked, setUserMovementLocked] = useState(false)
   const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
   const isMinigameActiveRef = useRef(false)
+  const arbreActiveRef = useRef(false)
   const [isSavoirInteractionActive, setIsSavoirInteractionActive] = useState(false)
   const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
   const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
   const [isContactPanelOpen, setIsContactPanelOpen] = useState(false)
   const [isLeafHovered, setIsLeafHovered] = useState(false)
   const [isFruitHovered, setIsFruitHovered] = useState(false)
+  const [isStairsHovered, setIsStairsHovered] = useState(false)
   const [interactionsEnabled, setInteractionsEnabled] = useState(false)
   const [shouldRestorePointerLockAfterStoryUi, setShouldRestorePointerLockAfterStoryUi] =
     useState(false)
   const pointerControlsRef = useRef(null)
   const isJournalInteractionActiveRef = useRef(false)
+  const arbreStoryContinuityRef = useRef(false)
 
   const {
     selectedSavoirAssignment,
@@ -147,6 +150,8 @@ export default function App() {
     zoePhaseActive,
     raspberryPhaseActive,
     juicePhaseActive,
+    exitSerrePhaseActive,
+    arbreLadderPending,
     zoeClip,
     minigameCount,
     showNameInput,
@@ -170,8 +175,10 @@ export default function App() {
     handleDebugGoToEtabli,
     handleDebugGoToSerre,
     handleDebugGoToMinijeu,
+    handleDebugGoToPostMinigame,
     handleWorkbenchInteract,
     handleGreenhouseDoorClick,
+    handleExitSerreDoorClick,
     handleThomasEtabliInteract,
     handleZoeTalk,
     handleMinigameStateChange,
@@ -183,11 +190,11 @@ export default function App() {
     handleStoryCameraTransitionComplete,
     launchIntro,
     setPostIntro,
-  } = useIntroFlow({ sceneReady })
+  } = useIntroFlow({ sceneReady, arbreActiveRef })
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
-    setPostIntro(false)
+    if (!arbreStoryContinuityRef.current) setPostIntro(false)
     setPlayerSpawn(spawn.position)
     setPlayerSpawnTarget(spawn.target)
     setPlayerSpawnKey((k) => k + 1)
@@ -201,7 +208,7 @@ export default function App() {
   }, [sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition, setPostIntro])
 
   const spawnAtPlatform = useCallback(() => {
-    setPostIntro(false)
+    if (!arbreStoryContinuityRef.current) setPostIntro(false)
     setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
     setPlayerSpawnTarget(null)
     setPlayerSpawnKey((k) => k + 1)
@@ -214,23 +221,46 @@ export default function App() {
     }, 10)
   }, [sceneLoadInfo?.platformPosition, setPostIntro])
 
+  // Respawn at ladderDown position after the arbre story ends.
+  // Camera is already there from the story transition — no visible teleport.
+  const spawnAtLadderDown = useCallback(() => {
+    setPlayerSpawn({ x: -3.8412, y: 4.0818, z: -0.9827 })
+    setPlayerSpawnTarget({ x: -3.9712, y: 4.444, z: -1.3019 })
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [])
+
   const {
     arbreActive,
     arbreMovementLocked,
     arbreDialogueActive,
     arbreStoryCameraTransition,
     ladderClickActive,
+    stairsClickActive,
+    ladderIsStoryMode,
     growingFruitPlaying: arbreGrowingFruitPlaying,
     fruitsClickActive,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
+    handleStairsClick,
     handleArbreTransitionComplete,
     handleFruitClickDuringLeaves,
     triggerArbre,
+    triggerArbreBase,
+    triggerNestDialogue25,
+    activateLadderFromStory,
   } = useArbreFlow({
     platformPosition: sceneLoadInfo?.platformPosition,
     onLadderSpawn: spawnAtLadder,
     onPlatformSpawn: spawnAtPlatform,
+    onBackAtBase: spawnAtLadderDown,
+    onOutroComplete: handleDebugGoToIntroStart,
   })
 
   const openSavoirFromLeaf = useCallback(
@@ -357,6 +387,43 @@ export default function App() {
     handleDebugGoToMinijeu()
   }, [handleDebugGoToMinijeu])
 
+  const jumpToPostMinigame = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handleDebugGoToPostMinigame()
+  }, [handleDebugGoToPostMinigame])
+
+  const handleTestArbre = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerArbre()
+  }, [setPostIntro, triggerArbre])
+
+  const handleGoToArbreBase = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerArbreBase()
+  }, [setPostIntro, triggerArbreBase])
+
+  const handleGoToNestDialogue25 = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerNestDialogue25()
+  }, [setPostIntro, triggerNestDialogue25])
+
+  const handleGoToPlatform = useCallback(() => {
+    arbreStoryContinuityRef.current = false
+    spawnAtPlatform()
+  }, [spawnAtPlatform])
+
+  useEffect(() => {
+    if (!arbreLadderPending) return
+    arbreStoryContinuityRef.current = true
+    activateLadderFromStory()
+  }, [arbreLadderPending, activateLadderFromStory])
+
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
     setIsSavoirInteractionActive(false)
@@ -438,6 +505,10 @@ export default function App() {
   }, [raspberryPhaseActive])
 
   useEffect(() => {
+    arbreActiveRef.current = arbreActive
+  }, [arbreActive])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -495,10 +566,6 @@ export default function App() {
     setSceneLoadStatus('error')
   }, [])
 
-  function goToPlatform() {
-    spawnAtPlatform()
-  }
-
   const isCursorVisible =
     introWaitingAtDoor ||
     showNameInput ||
@@ -513,6 +580,7 @@ export default function App() {
   const isStoryCameraControlEnabled = postIntro
 
   function toggleFreePlayerView() {
+    arbreStoryContinuityRef.current = false
     setPostIntro(false)
 
     if (isPlayerModeActive) {
@@ -530,6 +598,7 @@ export default function App() {
   }
 
   const explorationReady = false
+  const showDevOverlays = import.meta.env.DEV && !introPending && !introActive && !postIntro
 
   // Appelé par GameManager à chaque transition d'étape.
   // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
@@ -596,7 +665,7 @@ export default function App() {
           !isJournalInteractionActive &&
           !raspberryPhaseActive
         }
-        active={interactionsEnabled && (isLeafHovered || isFruitHovered)}
+        active={(interactionsEnabled && (isLeafHovered || isFruitHovered)) || isStairsHovered}
       />
 
       <Scene
@@ -640,6 +709,7 @@ export default function App() {
           interactionLocked: isPlayerInteractionLocked,
           workbenchPhaseActive,
           greenhousePhaseActive,
+          exitSerrePhaseActive,
           thomasEtabliPhaseActive,
           thomasAnimPhase,
           onEvent: handleIntroEvent,
@@ -647,6 +717,7 @@ export default function App() {
           onTreeInteract: handleTreeInteract,
           onWorkbenchInteract: handleWorkbenchInteract,
           onGreenhouseDoorClick: handleGreenhouseDoorClick,
+          onExitSerreDoorClick: handleExitSerreDoorClick,
           onThomasEtabliInteract: handleThomasEtabliInteract,
           onStoryCameraTransitionComplete: handleStoryCameraTransitionComplete,
           serreActive,
@@ -658,7 +729,8 @@ export default function App() {
           onMinigameStateChange: handleMinigameStateChange,
           onUnripeAttempt: handleUnripeAttempt,
           onJuiceInteract: handleJuiceInteract,
-          cameraFixed: raspberryPhaseActive,
+          cameraFixed:
+            raspberryPhaseActive || (arbreActive && !ladderClickActive && !stairsClickActive),
           serrePreview: isPlayerModeActive && !postIntro,
         }}
         arbre={{
@@ -666,7 +738,11 @@ export default function App() {
           storyCameraTransition: arbreStoryCameraTransition,
           onTransitionComplete: handleArbreTransitionComplete,
           ladderClickActive,
+          stairsClickActive,
+          ladderIsStoryMode,
           onLadderClick: handleLadderClick,
+          onStairsClick: handleStairsClick,
+          onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
           fruitsClickActive,
           onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
@@ -707,23 +783,19 @@ export default function App() {
         journalPuzzleEnabled={journalPuzzleEnabled}
       />
 
-      {import.meta.env.DEV &&
-        isViewerControlsVisible &&
-        !introPending &&
-        !introActive &&
-        !postIntro && (
-          <Suspense fallback={null}>
-            <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
-          </Suspense>
-        )}
+      {showDevOverlays && isViewerControlsVisible && (
+        <Suspense fallback={null}>
+          <PerfMonitor stats={stats} scene={sceneLoadInfo} status={sceneLoadStatus} />
+        </Suspense>
+      )}
 
-      {import.meta.env.DEV && showCameraEditor && (
+      {showDevOverlays && showCameraEditor && (
         <Suspense fallback={null}>
           <CameraEditorPanel />
         </Suspense>
       )}
 
-      {import.meta.env.DEV && showStoryDebug && (
+      {showDevOverlays && showStoryDebug && (
         <Suspense fallback={null}>
           <StoryDebugPanel
             onGoToIntroStart={jumpToIntroStart}
@@ -733,11 +805,14 @@ export default function App() {
             onGoToEtabli={jumpToEtabli}
             onGoToSerre={jumpToSerre}
             onGoToMinijeu={jumpToMinijeu}
+            onGoToPostMinigame={jumpToPostMinigame}
+            onGoToArbreBase={handleGoToArbreBase}
+            onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>
       )}
 
-      {isViewerControlsVisible && sceneReady && !introPending && !introActive && !postIntro && (
+      {showDevOverlays && isViewerControlsVisible && sceneReady && (
         <Suspense fallback={null}>
           <ViewerControls
             status={sceneLoadStatus}
@@ -760,8 +835,9 @@ export default function App() {
             onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
             onLaunchIntro={launchIntro}
             onTogglePlayerMode={toggleFreePlayerView}
-            onGoToPlatform={goToPlatform}
-            onTestArbre={triggerArbre}
+            onGoToPlatform={handleGoToPlatform}
+            onTestArbre={handleTestArbre}
+            onGoToArbreBase={handleGoToArbreBase}
             onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
             onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
             shaderEnabled={shaderEnabled}

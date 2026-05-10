@@ -1,11 +1,11 @@
 1
-00:00:00,000 --> 00:00:04,400
-Nous voilà dans ma partie préférée, la Serre.
+00:00:00,000 --> 00:00:03,400
+Nous voila dans ma partie préférée, la Serre.
 
 2
-00:00:04,400 --> 00:00:09,000
+00:00:03,400 --> 00:00:12,860
 C'est un grand jardin de culture pour étudier et faire des recherches sur la production d'une alimentation locale.
 
 3
-00:00:09,000 --> 00:00:11,800
+00:00:12,860 --> 00:00:17,880
 N'hésite pas à demander des conseils et voir si tu peux te rendre utile pour essayer !

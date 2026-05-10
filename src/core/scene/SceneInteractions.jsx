@@ -3,6 +3,9 @@ import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
+import { ClickableSerreCorridorDoor } from '../../world/entities/ClickableSerreCorridorDoor'
+import { ClickableLadder } from '../../world/entities/ClickableLadder'
+import { ClickableStairs } from '../../world/entities/ClickableStairs'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
 import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
@@ -11,6 +14,7 @@ import { JournalBook } from '../../world/entities/JournalBook'
 import { Basket, RaspberryMinigame } from '../../world/entities/RaspberryMinigame'
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 import { publicAssetManifest } from 'virtual:public-asset-manifest'
+import { FLOOR_Y } from '../SceneConfig.js'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
 // outsideplant02 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
@@ -37,11 +41,18 @@ export function SceneInteractions({
   treePhaseActive,
   workbenchPhaseActive,
   greenhousePhaseActive,
+  exitSerrePhaseActive,
+  ladderClickActive,
+  onLadderClick,
+  stairsClickActive,
+  onStairsClick,
+  onStairsHover,
   onWorkbenchInteract,
   onIntroEvent,
   onReceptionInteract,
   onTreeInteract,
   onGreenhouseDoorClick,
+  onExitSerreDoorClick,
   onJournalStart,
   onJournalEnd,
   onJournalOpenComplete,
@@ -117,6 +128,25 @@ export function SceneInteractions({
         onDoorClick={onGreenhouseDoorClick}
       />
 
+      <ClickableSerreCorridorDoor
+        cabane={cabane}
+        isInteractable={exitSerrePhaseActive}
+        onDoorClick={onExitSerreDoorClick}
+      />
+
+      <ClickableLadder
+        cabane={cabane}
+        isInteractable={ladderClickActive}
+        onInteract={onLadderClick}
+      />
+
+      <ClickableStairs
+        cabane={cabane}
+        isInteractable={stairsClickActive}
+        onInteract={onStairsClick}
+        onHover={onStairsHover}
+      />
+
       {journalVisible && bookPosition && (
         <JournalBook
           position={bookPosition}
@@ -163,7 +193,7 @@ export function SceneInteractions({
             clip={zoeClip}
             textureName="zoe-animated"
             textureBasePaths={textureBasePaths}
-            position={[26.0, 1.1, -5.4]}
+            position={[26.0, FLOOR_Y, -5.4]}
             rotation={[0, -Math.PI / 2, 0]}
             scale={11}
           />

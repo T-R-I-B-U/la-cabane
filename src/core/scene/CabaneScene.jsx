@@ -39,7 +39,14 @@ export function CabaneScene({
   workbenchPhaseActive,
   onWorkbenchInteract,
   greenhousePhaseActive,
+  exitSerrePhaseActive,
+  ladderClickActive,
+  onLadderClick,
+  stairsClickActive,
+  onStairsClick,
+  onStairsHover,
   onGreenhouseDoorClick,
+  onExitSerreDoorClick,
   thomasEtabliPhaseActive,
   onThomasEtabliInteract,
   thomasAnimPhase,
@@ -68,6 +75,7 @@ export function CabaneScene({
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
+  onJuiceInteract,
   serrePreview,
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
@@ -165,7 +173,14 @@ export function CabaneScene({
         workbenchPhaseActive={workbenchPhaseActive}
         onWorkbenchInteract={onWorkbenchInteract}
         greenhousePhaseActive={greenhousePhaseActive}
+        exitSerrePhaseActive={exitSerrePhaseActive}
+        ladderClickActive={ladderClickActive}
+        onLadderClick={onLadderClick}
+        stairsClickActive={stairsClickActive}
+        onStairsClick={onStairsClick}
+        onStairsHover={onStairsHover}
         onGreenhouseDoorClick={onGreenhouseDoorClick}
+        onExitSerreDoorClick={onExitSerreDoorClick}
         serreActive={serreActive}
         zoePhaseActive={zoePhaseActive}
         raspberryPhaseActive={raspberryPhaseActive}
@@ -174,6 +189,7 @@ export function CabaneScene({
         onZoeTalk={onZoeTalk}
         onMinigameStateChange={onMinigameStateChange}
         onUnripeAttempt={onUnripeAttempt}
+        onJuiceInteract={onJuiceInteract}
         serrePreview={serrePreview}
         performanceMode={performanceMode}
         onJournalStart={onJournalStart}
