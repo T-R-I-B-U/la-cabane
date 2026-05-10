@@ -893,14 +893,9 @@
   transition: background 0.12s ease;
 }
 
-.crosshair--active .crosshair-dot {
-  background: rgba(255, 221, 60, 0.95);
-}
-
 .crosshair--active .crosshair-ring {
   width: 24px;
   height: 24px;
-  border-color: rgba(255, 221, 60, 0.7);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────── */
