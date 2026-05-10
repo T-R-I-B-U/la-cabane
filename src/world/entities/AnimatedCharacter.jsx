@@ -10,32 +10,6 @@ const NO_RAYCAST = () => {}
 const CROSSFADE_DURATION = 0.2
 const CLIP_END_EPSILON = 1 / 60
 
-function cloneSingleMaterial(material) {
-  const clone = material.clone()
-
-  for (const [key, value] of Object.entries(clone)) {
-    if (value?.isTexture) clone[key] = value.clone()
-  }
-
-  return clone
-}
-
-function cloneMaterial(material) {
-  return Array.isArray(material) ? material.map(cloneSingleMaterial) : cloneSingleMaterial(material)
-}
-
-function cloneCharacterScene(scene) {
-  const clonedScene = clone(scene)
-
-  clonedScene.traverse((obj) => {
-    if (!obj.isMesh) return
-    obj.geometry = obj.geometry.clone()
-    obj.material = cloneMaterial(obj.material)
-  })
-
-  return clonedScene
-}
-
 function pickDefaultClip(actions, names, defaultClip) {
   if (defaultClip && actions[defaultClip]) return defaultClip
 
@@ -58,14 +32,15 @@ export function AnimatedCharacter({
   const activeActionRef = useRef(null)
   const { scene } = useGLTF(url)
   const { animations } = useGLTF(animationUrl ?? url)
-  const clonedScene = useMemo(() => cloneCharacterScene(scene), [scene])
+  const clonedScene = useMemo(() => clone(scene), [scene])
   const { actions, names } = useAnimations(animations, group)
 
   useEffect(() => {
     clonedScene.traverse((obj) => {
       if (!obj.isMesh) return
       obj.raycast = NO_RAYCAST
-      obj.frustumCulled = true
+      // Skinned meshes need frustum culling disabled — rest-pose bbox desync causes invisible characters
+      obj.frustumCulled = false
       obj.userData.isCharacter = true
     })
 
@@ -79,29 +54,27 @@ export function AnimatedCharacter({
     applyAutoTextures(clonedScene, textureName, textureBasePaths)
   }, [clonedScene, textureName, textureBasePaths])
 
+  // Simple looping clip — used by characters without a sequence (e.g. Zoé idle)
   useEffect(() => {
     if (animationSequence?.length) return
 
     const nextClip = pickDefaultClip(actions, names, clip)
     if (!nextClip) return
 
-    const action = actions[nextClip]
-    const previousAction = activeActionRef.current
+    Object.values(actions).forEach((entry) => {
+      if (!entry) return
+      entry.fadeOut(0.15)
+      entry.stop()
+    })
 
+    const action = actions[nextClip]
     action.reset()
     action.enabled = true
     action.paused = false
     action.timeScale = 1
     action.clampWhenFinished = false
     action.setLoop(LoopRepeat, Infinity)
-    action.play()
-
-    if (previousAction && previousAction !== action) {
-      action.crossFadeFrom(previousAction, CROSSFADE_DURATION, false)
-    } else {
-      action.fadeIn(CROSSFADE_DURATION)
-    }
-
+    action.fadeIn(0.2).play()
     activeActionRef.current = action
 
     return () => {
@@ -110,6 +83,7 @@ export function AnimatedCharacter({
     }
   }, [actions, names, clip, animationSequence])
 
+  // Sequenced animation — used by characters with multi-step transitions (e.g. Thomas)
   useEffect(() => {
     if (!animationSequence?.length) return
 
@@ -168,9 +142,8 @@ export function AnimatedCharacter({
 
     return () => {
       cancelled = true
-      timeoutIds.forEach((timeoutId) => window.clearTimeout(timeoutId))
-      // Keep activeActionRef and current action playing so the next sequence
-      // can crossFadeFrom it instead of snapping to bind pose.
+      timeoutIds.forEach((id) => window.clearTimeout(id))
+      activeActionRef.current = null
     }
   }, [actions, animationSequence])
 

@@ -118,6 +118,16 @@ export const DEFAULT_HDRI_ID = NO_HDRI_ID
 // L'option 'original-lighting' utilise preset: 'apartment' (pas de fichier HDRI)
 ```
 
+### `publicAssetManifestPlugin` (plugin custom)
+
+Défini lui aussi dans `vite.config.js`. Il scanne `public/textures/` et `public/models/compressed/`, puis expose un module virtuel `virtual:public-asset-manifest` contenant uniquement des listes d'URLs publiques.
+
+Objectif : éviter `import.meta.glob('/public/...')`, qui faisait générer un très grand nombre de modules d'assets dans le build client.
+
+Usage actuel :
+- `src/world/cabane/textureResolver.js` lit `publicAssetManifest.textureFiles`
+- `src/core/scene/SceneCharacters.jsx` lit `publicAssetManifest.compressedModelFiles`
+
 ---
 
 ## ESLint (`eslint.config.js`)

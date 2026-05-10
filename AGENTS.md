@@ -8,6 +8,7 @@ Apply these rules unless an explicit user instruction overrides them.
 - Language: JavaScript + JSX (ES modules)
 - Linting: ESLint flat config (`eslint.config.js`)
 - Build: Vite (`vite.config.js`)
+- Build helpers: local Vite virtual modules for HDRI options and public asset manifests
 - Tests: currently not configured
 
 ## 2) Branch and Commit Workflow

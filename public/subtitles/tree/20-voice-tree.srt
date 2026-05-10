@@ -1,0 +1,12 @@
+1
+00:00:00,000 --> 00:00:03,000
+Nous voici en haut de l'arbre.
+
+2
+00:00:03,000 --> 00:00:06,000
+Ce lieu est très précieux pour nous.
+
+3
+00:00:06,000 --> 00:00:12,000
+Ici, tu retrouves toutes les feuilles des savoirs actuels proposés par les Passeurs du quartier !
+

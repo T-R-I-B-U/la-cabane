@@ -34,10 +34,13 @@ export function SceneControls({
   introSpawn,
   storyCameraTransition,
   onStoryCameraTransitionComplete,
+  arbreStoryCameraTransition,
+  onArbreTransitionComplete,
   onIntroEvent,
   playerMode,
   flyMode,
   playerSpawn,
+  playerSpawnTarget,
   playerSpawnKey,
   movementLocked,
   postIntro,
@@ -45,8 +48,21 @@ export function SceneControls({
   pointerControlsRef,
   controlsRef,
   hutPosition,
+  cameraFixed,
 }) {
   const devSync = import.meta.env.DEV ? <CameraRegistrySync controlsRef={controlsRef} /> : null
+
+  if (arbreStoryCameraTransition) {
+    return (
+      <>
+        <StoryCameraTransition
+          transition={arbreStoryCameraTransition}
+          onComplete={onArbreTransitionComplete}
+        />
+        {devSync}
+      </>
+    )
+  }
 
   if (introActive) {
     return (
@@ -69,7 +85,7 @@ export function SceneControls({
           canMove={!movementLocked}
           flyMode={flyMode}
           spawnAt={playerSpawn}
-          lookAtTarget={null}
+          lookAtTarget={playerSpawnTarget}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
         />
@@ -81,14 +97,17 @@ export function SceneControls({
   if (postIntro) {
     return postIntroLocked ? (
       <>
-        <PlayerControls
-          canMove={!movementLocked}
-          flyMode={flyMode}
-          spawnAt={introSpawn?.position}
-          lookAtTarget={introSpawn?.target}
-          collisionObjects={collisionObjects}
-          controlsRef={pointerControlsRef}
-        />
+        {/* cameraFixed: skip PlayerControls/PointerLock during minigame so pointer events work */}
+        {!cameraFixed && (
+          <PlayerControls
+            canMove={!movementLocked}
+            flyMode={flyMode}
+            spawnAt={introSpawn?.position}
+            lookAtTarget={introSpawn?.target}
+            collisionObjects={collisionObjects}
+            controlsRef={pointerControlsRef}
+          />
+        )}
         <StoryCameraTransition
           transition={storyCameraTransition}
           onComplete={onStoryCameraTransitionComplete}

@@ -893,14 +893,9 @@
   transition: background 0.12s ease;
 }
 
-.crosshair--active .crosshair-dot {
-  background: rgba(255, 221, 60, 0.95);
-}
-
 .crosshair--active .crosshair-ring {
   width: 24px;
   height: 24px;
-  border-color: rgba(255, 221, 60, 0.7);
 }
 
 /* ── Responsive ──────────────────────────────────────────────────── */
@@ -952,4 +947,35 @@
   .pm-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* ── Arbre continue button ───────────────────────────────────────── */
+
+.arbre-continue-button {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  cursor: pointer;
+}
+
+.arbre-continue-button p {
+  padding: 14px 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 31, 43, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(20, 37, 49, 0.12);
+  font-size: 0.78rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  color: #0f1f2b;
+  letter-spacing: 0.05em;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+
+.arbre-continue-button:hover p {
+  background: rgba(255, 255, 255, 0.9);
 }

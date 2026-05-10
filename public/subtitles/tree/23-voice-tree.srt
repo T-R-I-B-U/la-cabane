@@ -1,0 +1,4 @@
+1
+00:00:00,000 --> 00:00:05,000
+Pour finir la visite, nous allons passer par le nid, notre salle commune.
+

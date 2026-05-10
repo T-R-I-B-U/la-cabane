@@ -1,0 +1,15 @@
+1
+00:00:00,000 --> 00:00:06,000
+Bienvenue dans le Nid, l'espace de vie commun et le lieu des rassemblements.
+
+2
+00:00:06,000 --> 00:00:11,600
+Marie, je suis ravie de te voir, voici un futur membre de la Cabane.
+
+3
+00:00:11,600 --> 00:00:16,800
+Je te présente Marie, une de nos plus ancienne membre, elle était là dès le début,
+
+4
+00:00:16,800 --> 00:00:19,800
+elle a tout de suite cru à fond à ce concept.

@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import { normalizeAssetName } from './assetNaming'
+import { publicAssetManifest } from 'virtual:public-asset-manifest'
 
 const TEXTURE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp']
-const textureModules = import.meta.glob('/public/textures/**/*.{png,jpg,jpeg,webp}')
+const textureFiles = publicAssetManifest.textureFiles
 const TEXTURE_SLOTS = [
   { suffix: 'color', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
   { suffix: 'basecolor', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
@@ -79,17 +80,16 @@ function registerTextureKey(key, url) {
 function registerAvailableTextures() {
   if (availableTextures.size > 0) return
 
-  for (const path of Object.keys(textureModules)) {
+  for (const path of textureFiles) {
     const fileName = path.split('/').at(-1)
     const ext = TEXTURE_EXTENSIONS.find((entry) => fileName.toLowerCase().endsWith(entry))
     if (!ext) continue
 
-    const resolvedUrl = path.replace('/public', '')
     const key = fileName.slice(0, -ext.length).toLowerCase()
-    registerTextureKey(key, resolvedUrl)
-    registerTextureKey(key.normalize('NFC'), resolvedUrl)
-    registerTextureKey(key.normalize('NFD'), resolvedUrl)
-    registerTextureKey(normalizeAssetName(key), resolvedUrl)
+    registerTextureKey(key, path)
+    registerTextureKey(key.normalize('NFC'), path)
+    registerTextureKey(key.normalize('NFD'), path)
+    registerTextureKey(normalizeAssetName(key), path)
   }
 }
 
