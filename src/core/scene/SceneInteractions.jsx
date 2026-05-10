@@ -5,6 +5,7 @@ import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableSerreCorridorDoor } from '../../world/entities/ClickableSerreCorridorDoor'
 import { ClickableLadder } from '../../world/entities/ClickableLadder'
+import { ClickableStairs } from '../../world/entities/ClickableStairs'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
 import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
@@ -43,6 +44,9 @@ export function SceneInteractions({
   exitSerrePhaseActive,
   ladderClickActive,
   onLadderClick,
+  stairsClickActive,
+  onStairsClick,
+  onStairsHover,
   onWorkbenchInteract,
   onIntroEvent,
   onReceptionInteract,
@@ -134,6 +138,13 @@ export function SceneInteractions({
         cabane={cabane}
         isInteractable={ladderClickActive}
         onInteract={onLadderClick}
+      />
+
+      <ClickableStairs
+        cabane={cabane}
+        isInteractable={stairsClickActive}
+        onInteract={onStairsClick}
+        onHover={onStairsHover}
       />
 
       {journalVisible && bookPosition && (

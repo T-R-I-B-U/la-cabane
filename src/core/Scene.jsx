@@ -100,7 +100,10 @@ export default function Scene({
     storyCameraTransition: arbreStoryCameraTransition,
     onTransitionComplete: onArbreTransitionComplete,
     ladderClickActive,
+    stairsClickActive,
     onLadderClick,
+    onStairsClick,
+    onStairsHover,
     growingFruitPlaying: arbreGrowingFruitPlaying,
     fruitsClickActive,
     onFruitClickDuringLeaves,
@@ -164,6 +167,9 @@ export default function Scene({
             exitSerrePhaseActive={exitSerrePhaseActive}
             ladderClickActive={ladderClickActive}
             onLadderClick={onLadderClick}
+            stairsClickActive={stairsClickActive}
+            onStairsClick={onStairsClick}
+            onStairsHover={onStairsHover}
             onGreenhouseDoorClick={onGreenhouseDoorClick}
             onExitSerreDoorClick={onExitSerreDoorClick}
             thomasEtabliPhaseActive={thomasEtabliPhaseActive}

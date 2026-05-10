@@ -42,6 +42,9 @@ export function CabaneScene({
   exitSerrePhaseActive,
   ladderClickActive,
   onLadderClick,
+  stairsClickActive,
+  onStairsClick,
+  onStairsHover,
   onGreenhouseDoorClick,
   onExitSerreDoorClick,
   thomasEtabliPhaseActive,
@@ -173,6 +176,9 @@ export function CabaneScene({
         exitSerrePhaseActive={exitSerrePhaseActive}
         ladderClickActive={ladderClickActive}
         onLadderClick={onLadderClick}
+        stairsClickActive={stairsClickActive}
+        onStairsClick={onStairsClick}
+        onStairsHover={onStairsHover}
         onGreenhouseDoorClick={onGreenhouseDoorClick}
         onExitSerreDoorClick={onExitSerreDoorClick}
         serreActive={serreActive}
