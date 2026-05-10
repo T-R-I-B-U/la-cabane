@@ -50,6 +50,7 @@ export function ViewerControls({
   onToggleInteractionsEnabled,
   onLeafMaterialChange,
   onTestArbre,
+  onGoToArbreBase,
 }) {
   const visibilityZones = useVisibilityZones()
 
@@ -197,6 +198,15 @@ export function ViewerControls({
           onClick={onTestArbre}
         >
           Test arbre ↑
+        </button>
+
+        <button
+          type="button"
+          className="camera-toggle"
+          disabled={!sceneReady}
+          onClick={onGoToArbreBase}
+        >
+          Arbre bas (escalier nid)
         </button>
 
         {playerMode && (
