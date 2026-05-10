@@ -61,6 +61,7 @@ export default function App() {
   const [isContactPanelOpen, setIsContactPanelOpen] = useState(false)
   const [isLeafHovered, setIsLeafHovered] = useState(false)
   const [isFruitHovered, setIsFruitHovered] = useState(false)
+  const [isStairsHovered, setIsStairsHovered] = useState(false)
   const [interactionsEnabled, setInteractionsEnabled] = useState(false)
   const [shouldRestorePointerLockAfterStoryUi, setShouldRestorePointerLockAfterStoryUi] =
     useState(false)
@@ -220,25 +221,46 @@ export default function App() {
     }, 10)
   }, [sceneLoadInfo?.platformPosition, setPostIntro])
 
+  // Respawn at ladderDown position after the arbre story ends.
+  // Camera is already there from the story transition — no visible teleport.
+  const spawnAtLadderDown = useCallback(() => {
+    setPlayerSpawn({ x: -3.8412, y: 4.0818, z: -0.9827 })
+    setPlayerSpawnTarget({ x: -3.9712, y: 4.444, z: -1.3019 })
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    setTimeout(() => {
+      const canvas = document.querySelector('canvas')
+      if (canvas) canvas.requestPointerLock()
+    }, 10)
+  }, [])
+
   const {
     arbreActive,
     arbreMovementLocked,
     arbreDialogueActive,
     arbreStoryCameraTransition,
     ladderClickActive,
+    stairsClickActive,
     ladderIsStoryMode,
     growingFruitPlaying: arbreGrowingFruitPlaying,
     fruitsClickActive,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
+    handleStairsClick,
     handleArbreTransitionComplete,
     handleFruitClickDuringLeaves,
     triggerArbre,
+    triggerArbreBase,
+    triggerNestDialogue25,
     activateLadderFromStory,
   } = useArbreFlow({
     platformPosition: sceneLoadInfo?.platformPosition,
     onLadderSpawn: spawnAtLadder,
     onPlatformSpawn: spawnAtPlatform,
+    onBackAtBase: spawnAtLadderDown,
+    onOutroComplete: handleDebugGoToIntroStart,
   })
 
   const openSavoirFromLeaf = useCallback(
@@ -376,6 +398,20 @@ export default function App() {
     setPostIntro(true)
     triggerArbre()
   }, [setPostIntro, triggerArbre])
+
+  const handleGoToArbreBase = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerArbreBase()
+  }, [setPostIntro, triggerArbreBase])
+
+  const handleGoToNestDialogue25 = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerNestDialogue25()
+  }, [setPostIntro, triggerNestDialogue25])
 
   const handleGoToPlatform = useCallback(() => {
     arbreStoryContinuityRef.current = false
@@ -629,7 +665,7 @@ export default function App() {
           !isJournalInteractionActive &&
           !raspberryPhaseActive
         }
-        active={interactionsEnabled && (isLeafHovered || isFruitHovered)}
+        active={(interactionsEnabled && (isLeafHovered || isFruitHovered)) || isStairsHovered}
       />
 
       <Scene
@@ -693,7 +729,8 @@ export default function App() {
           onMinigameStateChange: handleMinigameStateChange,
           onUnripeAttempt: handleUnripeAttempt,
           onJuiceInteract: handleJuiceInteract,
-          cameraFixed: raspberryPhaseActive || (arbreActive && !ladderClickActive),
+          cameraFixed:
+            raspberryPhaseActive || (arbreActive && !ladderClickActive && !stairsClickActive),
           serrePreview: isPlayerModeActive && !postIntro,
         }}
         arbre={{
@@ -701,8 +738,11 @@ export default function App() {
           storyCameraTransition: arbreStoryCameraTransition,
           onTransitionComplete: handleArbreTransitionComplete,
           ladderClickActive,
+          stairsClickActive,
           ladderIsStoryMode,
           onLadderClick: handleLadderClick,
+          onStairsClick: handleStairsClick,
+          onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
           fruitsClickActive,
           onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
@@ -766,6 +806,8 @@ export default function App() {
             onGoToSerre={jumpToSerre}
             onGoToMinijeu={jumpToMinijeu}
             onGoToPostMinigame={jumpToPostMinigame}
+            onGoToArbreBase={handleGoToArbreBase}
+            onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>
       )}
@@ -795,6 +837,7 @@ export default function App() {
             onTogglePlayerMode={toggleFreePlayerView}
             onGoToPlatform={handleGoToPlatform}
             onTestArbre={handleTestArbre}
+            onGoToArbreBase={handleGoToArbreBase}
             onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
             onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
             shaderEnabled={shaderEnabled}
