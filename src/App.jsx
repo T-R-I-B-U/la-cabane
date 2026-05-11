@@ -36,6 +36,7 @@ const PerfMonitor = lazy(() =>
   import('./core/PerfMonitor').then((mod) => ({ default: mod.PerfMonitor }))
 )
 export default function App() {
+  const isDevBuild = import.meta.env.DEV
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
   const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
@@ -47,7 +48,7 @@ export default function App() {
   const [shaderEnabled, setShaderEnabled] = useState(false)
   const [shaderRadius, setShaderRadius] = useState(3)
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
-  const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(true)
+  const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(isDevBuild)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnTarget, setPlayerSpawnTarget] = useState(null)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
@@ -617,7 +618,11 @@ export default function App() {
   }
 
   const explorationReady = false
-  const showDevOverlays = import.meta.env.DEV && !introPending && !introActive && !postIntro
+  const showDevOverlays =
+    !introPending &&
+    !introActive &&
+    !postIntro &&
+    (isDevBuild || isViewerControlsVisible || showCameraEditor || showStoryDebug)
 
   // Appelé par GameManager à chaque transition d'étape.
   // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
