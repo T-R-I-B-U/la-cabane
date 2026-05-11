@@ -20,6 +20,14 @@ const textureLoader = new THREE.TextureLoader()
 const textureCache = new Map()
 const availableTextures = new Map()
 
+function canonicalTextureKey(value = '') {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '')
+}
+
 const MESH_TEXTURE_ALIASES = {
   'platform-details': 'railling',
   'tour fenêtre': 'tour_fenêtre',
@@ -90,6 +98,7 @@ function registerAvailableTextures() {
     registerTextureKey(key.normalize('NFC'), path)
     registerTextureKey(key.normalize('NFD'), path)
     registerTextureKey(normalizeAssetName(key), path)
+    registerTextureKey(canonicalTextureKey(key), path)
   }
 }
 
@@ -106,6 +115,7 @@ function findTextureUrl(names, suffix, textureBasePaths) {
         ...(availableTextures.get(key.normalize('NFC')) ?? []),
         ...(availableTextures.get(key.normalize('NFD')) ?? []),
         ...(availableTextures.get(normalizeAssetName(key)) ?? []),
+        ...(availableTextures.get(canonicalTextureKey(key)) ?? []),
       ]
 
       const uniqueUrls = [...new Set(urls)]
