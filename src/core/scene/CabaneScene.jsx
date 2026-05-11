@@ -70,11 +70,15 @@ export function CabaneScene({
   serreActive,
   zoePhaseActive,
   raspberryPhaseActive,
+  juiceMachinePhaseActive,
+  juicePipePlaying,
   juicePhaseActive,
   zoeClip,
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
+  onJuiceMachineInteract,
+  onJuicePipeComplete,
   onJuiceInteract,
   serrePreview,
 }) {
@@ -184,11 +188,15 @@ export function CabaneScene({
         serreActive={serreActive}
         zoePhaseActive={zoePhaseActive}
         raspberryPhaseActive={raspberryPhaseActive}
+        juiceMachinePhaseActive={juiceMachinePhaseActive}
+        juicePipePlaying={juicePipePlaying}
         juicePhaseActive={juicePhaseActive}
         zoeClip={zoeClip}
         onZoeTalk={onZoeTalk}
         onMinigameStateChange={onMinigameStateChange}
         onUnripeAttempt={onUnripeAttempt}
+        onJuiceMachineInteract={onJuiceMachineInteract}
+        onJuicePipeComplete={onJuicePipeComplete}
         onJuiceInteract={onJuiceInteract}
         serrePreview={serrePreview}
         performanceMode={performanceMode}

@@ -2,6 +2,8 @@ import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
+import { ClickableJuiceMachine } from '../../world/entities/ClickableJuiceMachine'
+import { JuicePipeFill } from '../../world/entities/JuicePipeFill'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableSerreCorridorDoor } from '../../world/entities/ClickableSerreCorridorDoor'
 import { ClickableLadder } from '../../world/entities/ClickableLadder'
@@ -65,11 +67,15 @@ export function SceneInteractions({
   serreActive,
   zoePhaseActive,
   raspberryPhaseActive,
+  juiceMachinePhaseActive,
+  juicePipePlaying,
   juicePhaseActive,
   zoeClip,
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
+  onJuiceMachineInteract,
+  onJuicePipeComplete,
   onJuiceInteract,
   serrePreview,
   performanceMode,
@@ -165,6 +171,14 @@ export function SceneInteractions({
 
       <ClickableZoe isInteractable={zoePhaseActive} onZoeTalk={onZoeTalk} />
 
+      <ClickableJuiceMachine
+        cabane={cabane}
+        isInteractable={juiceMachinePhaseActive}
+        onInteract={onJuiceMachineInteract}
+      />
+
+      <JuicePipeFill scene={cabane} playing={juicePipePlaying} onComplete={onJuicePipeComplete} />
+
       <ClickableJuiceTable
         cabane={cabane}
         isInteractable={juicePhaseActive}
@@ -183,6 +197,7 @@ export function SceneInteractions({
       {(serreActive ||
         zoePhaseActive ||
         raspberryPhaseActive ||
+        juiceMachinePhaseActive ||
         juicePhaseActive ||
         serrePreview) && (
         <Suspense fallback={null}>
