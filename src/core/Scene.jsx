@@ -74,11 +74,13 @@ export default function Scene({
     serreActive,
     zoePhaseActive,
     raspberryPhaseActive,
+    juiceMachinePhaseActive,
     juicePhaseActive,
     zoeClip,
     onZoeTalk,
     onMinigameStateChange,
     onUnripeAttempt,
+    onJuiceMachineInteract,
     onJuiceInteract,
     cameraFixed,
     serrePreview,
@@ -183,11 +185,13 @@ export default function Scene({
             serreActive={serreActive}
             zoePhaseActive={zoePhaseActive}
             raspberryPhaseActive={raspberryPhaseActive}
+            juiceMachinePhaseActive={juiceMachinePhaseActive}
             juicePhaseActive={juicePhaseActive}
             zoeClip={zoeClip}
             onZoeTalk={onZoeTalk}
             onMinigameStateChange={onMinigameStateChange}
             onUnripeAttempt={onUnripeAttempt}
+            onJuiceMachineInteract={onJuiceMachineInteract}
             onJuiceInteract={onJuiceInteract}
             serrePreview={serrePreview}
             playerMode={playerMode}

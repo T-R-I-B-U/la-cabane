@@ -2,6 +2,7 @@ import { Suspense, useMemo } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
+import { ClickableJuiceMachine } from '../../world/entities/ClickableJuiceMachine'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableSerreCorridorDoor } from '../../world/entities/ClickableSerreCorridorDoor'
 import { ClickableLadder } from '../../world/entities/ClickableLadder'
@@ -65,11 +66,13 @@ export function SceneInteractions({
   serreActive,
   zoePhaseActive,
   raspberryPhaseActive,
+  juiceMachinePhaseActive,
   juicePhaseActive,
   zoeClip,
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
+  onJuiceMachineInteract,
   onJuiceInteract,
   serrePreview,
   performanceMode,
@@ -165,6 +168,12 @@ export function SceneInteractions({
 
       <ClickableZoe isInteractable={zoePhaseActive} onZoeTalk={onZoeTalk} />
 
+      <ClickableJuiceMachine
+        cabane={cabane}
+        isInteractable={juiceMachinePhaseActive}
+        onInteract={onJuiceMachineInteract}
+      />
+
       <ClickableJuiceTable
         cabane={cabane}
         isInteractable={juicePhaseActive}
@@ -183,6 +192,7 @@ export function SceneInteractions({
       {(serreActive ||
         zoePhaseActive ||
         raspberryPhaseActive ||
+        juiceMachinePhaseActive ||
         juicePhaseActive ||
         serrePreview) && (
         <Suspense fallback={null}>
