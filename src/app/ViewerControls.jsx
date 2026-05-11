@@ -40,7 +40,6 @@ export function ViewerControls({
   onTogglePerformanceMode,
   onLaunchIntro,
   onTogglePlayerMode,
-  onGoToPlatform,
   onToggleFlyMode,
   onToggleUserMovement,
   onToggleShader,
@@ -49,8 +48,6 @@ export function ViewerControls({
   onToggleDebugCollisions,
   onToggleInteractionsEnabled,
   onLeafMaterialChange,
-  onTestArbre,
-  onGoToArbreBase,
 }) {
   const visibilityZones = useVisibilityZones()
 
@@ -102,73 +99,6 @@ export function ViewerControls({
         </button>
       </PanelSection>
 
-      <PanelSection title="Feuilles" eyebrow="Matière">
-        <button
-          type="button"
-          className={`camera-toggle${interactionsEnabled ? ' camera-toggle--active' : ''}`}
-          aria-pressed={interactionsEnabled}
-          onClick={onToggleInteractionsEnabled}
-        >
-          <span className="camera-toggle-icon" aria-hidden="true">
-            {interactionsEnabled ? 'ON' : 'OFF'}
-          </span>
-          Interactions feuilles/fruits
-        </button>
-
-        {['standard', 'physical', 'emissive'].map((mode) => (
-          <button
-            key={mode}
-            type="button"
-            className={`camera-toggle${leafMaterialMode === mode ? ' camera-toggle--active' : ''}`}
-            aria-pressed={leafMaterialMode === mode}
-            onClick={() => onLeafMaterialChange(mode)}
-          >
-            <span className="camera-toggle-icon" aria-hidden="true">
-              {leafMaterialMode === mode ? 'ON' : 'OFF'}
-            </span>
-            {mode.charAt(0).toUpperCase() + mode.slice(1)}
-          </button>
-        ))}
-      </PanelSection>
-
-      <PanelSection title="Ambiance" eyebrow="HDRI">
-        <button
-          type="button"
-          className={`camera-toggle camera-toggle--compact${activeHdriId === noHdriId ? ' camera-toggle--active' : ''}`}
-          aria-pressed={activeHdriId === noHdriId}
-          onClick={() => onHdriChange(noHdriId)}
-        >
-          <span>Lumieres originales</span>
-          <span className="camera-toggle-icon" aria-hidden="true">
-            {activeHdriId === noHdriId ? 'ON' : 'OFF'}
-          </span>
-        </button>
-        {hdriOptions.length > 0 ? (
-          <div className="hdri-button-grid" role="list" aria-label="Choix de HDRI">
-            {hdriOptions.map((option) => {
-              const active = option.id === activeHdriId
-
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  className={`camera-toggle camera-toggle--compact${active ? ' camera-toggle--active' : ''}`}
-                  aria-pressed={active}
-                  onClick={() => onHdriChange(option.id)}
-                >
-                  <span>{option.label}</span>
-                  <span className="camera-toggle-icon" aria-hidden="true">
-                    {active ? 'ON' : 'HDR'}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        ) : (
-          <p className="controls-hint">Ajoutez des fichiers .hdr ou .exr dans public/hdri.</p>
-        )}
-      </PanelSection>
-
       <PanelSection title="Navigation" eyebrow="Camera">
         <button
           type="button"
@@ -180,33 +110,6 @@ export function ViewerControls({
             {playerMode ? 'FPS' : 'ORB'}
           </span>
           {playerMode ? 'Vue libre' : 'Vue joueur'}
-        </button>
-
-        <button
-          type="button"
-          className="camera-toggle"
-          disabled={!sceneReady}
-          onClick={onGoToPlatform}
-        >
-          Vue plateforme
-        </button>
-
-        <button
-          type="button"
-          className="camera-toggle"
-          disabled={!sceneReady}
-          onClick={onTestArbre}
-        >
-          Test arbre ↑
-        </button>
-
-        <button
-          type="button"
-          className="camera-toggle"
-          disabled={!sceneReady}
-          onClick={onGoToArbreBase}
-        >
-          Arbre bas (escalier nid)
         </button>
 
         {playerMode && (
@@ -258,6 +161,71 @@ export function ViewerControls({
               />
               <span className="controls-slider-value">{shaderRadius}</span>
             </label>
+          </DevSection>
+          <DevSection title="HDRI">
+            <button
+              type="button"
+              className={`camera-toggle camera-toggle--compact${activeHdriId === noHdriId ? ' camera-toggle--active' : ''}`}
+              aria-pressed={activeHdriId === noHdriId}
+              onClick={() => onHdriChange(noHdriId)}
+            >
+              <span>Lumieres originales</span>
+              <span className="camera-toggle-icon" aria-hidden="true">
+                {activeHdriId === noHdriId ? 'ON' : 'OFF'}
+              </span>
+            </button>
+            {hdriOptions.length > 0 ? (
+              <div className="hdri-button-grid" role="list" aria-label="Choix de HDRI">
+                {hdriOptions.map((option) => {
+                  const active = option.id === activeHdriId
+
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={`camera-toggle camera-toggle--compact${active ? ' camera-toggle--active' : ''}`}
+                      aria-pressed={active}
+                      onClick={() => onHdriChange(option.id)}
+                    >
+                      <span>{option.label}</span>
+                      <span className="camera-toggle-icon" aria-hidden="true">
+                        {active ? 'ON' : 'HDR'}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            ) : (
+              <p className="controls-hint">Ajoutez des fichiers .hdr ou .exr dans public/hdri.</p>
+            )}
+          </DevSection>
+          <DevSection title="Matière">
+            <button
+              type="button"
+              className={`camera-toggle${interactionsEnabled ? ' camera-toggle--active' : ''}`}
+              aria-pressed={interactionsEnabled}
+              onClick={onToggleInteractionsEnabled}
+            >
+              <span className="camera-toggle-icon" aria-hidden="true">
+                {interactionsEnabled ? 'ON' : 'OFF'}
+              </span>
+              Interactions feuilles/fruits
+            </button>
+
+            {['standard', 'physical', 'emissive'].map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                className={`camera-toggle${leafMaterialMode === mode ? ' camera-toggle--active' : ''}`}
+                aria-pressed={leafMaterialMode === mode}
+                onClick={() => onLeafMaterialChange(mode)}
+              >
+                <span className="camera-toggle-icon" aria-hidden="true">
+                  {leafMaterialMode === mode ? 'ON' : 'OFF'}
+                </span>
+                {mode.charAt(0).toUpperCase() + mode.slice(1)}
+              </button>
+            ))}
           </DevSection>
           <DevSection title="Visibilité">
             {VISIBILITY_ZONES.map((zone) => {

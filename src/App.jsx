@@ -252,7 +252,6 @@ export default function App() {
     handleStairsClick,
     handleArbreTransitionComplete,
     handleFruitClickDuringLeaves,
-    triggerArbre,
     triggerArbreBase,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
@@ -394,13 +393,6 @@ export default function App() {
     handleDebugGoToPostMinigame()
   }, [handleDebugGoToPostMinigame])
 
-  const handleTestArbre = useCallback(() => {
-    arbreStoryContinuityRef.current = true
-    setShouldRestorePointerLockAfterStoryUi(false)
-    setPostIntro(true)
-    triggerArbre()
-  }, [setPostIntro, triggerArbre])
-
   const handleGoToArbreBase = useCallback(() => {
     arbreStoryContinuityRef.current = true
     setShouldRestorePointerLockAfterStoryUi(false)
@@ -419,11 +411,6 @@ export default function App() {
     if (dialogueActive) skipIntroDialogue()
     else if (arbreDialogueActive) skipArbreDialogue()
   }, [dialogueActive, arbreDialogueActive, skipIntroDialogue, skipArbreDialogue])
-
-  const handleGoToPlatform = useCallback(() => {
-    arbreStoryContinuityRef.current = false
-    spawnAtPlatform()
-  }, [spawnAtPlatform])
 
   useEffect(() => {
     if (!arbreLadderPending) return
@@ -854,9 +841,6 @@ export default function App() {
             onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
             onLaunchIntro={launchIntro}
             onTogglePlayerMode={toggleFreePlayerView}
-            onGoToPlatform={handleGoToPlatform}
-            onTestArbre={handleTestArbre}
-            onGoToArbreBase={handleGoToArbreBase}
             onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
             onToggleUserMovement={() => setUserMovementLocked((locked) => !locked)}
             shaderEnabled={shaderEnabled}

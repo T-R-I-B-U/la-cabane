@@ -13,7 +13,7 @@ export function DevSection({ title, children }) {
       >
         <span className="dev-section-title">{title}</span>
         <span className="dev-section-arrow" aria-hidden="true">
-          {open ? 'Masquer' : 'Afficher'}
+          {open ? 'Reduire' : 'Deployer'}
         </span>
       </button>
       {open && <div className="dev-section-body">{children}</div>}

@@ -559,7 +559,8 @@
   text-align: left;
   transition:
     color 0.15s,
-    background 0.15s;
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .dev-section-header:hover {
@@ -568,11 +569,21 @@
 }
 
 .dev-section--open .dev-section-header {
+  color: #142533;
+  background: #efe7db;
   border-bottom: 1px solid rgba(74, 98, 112, 0.12);
 }
 
 .dev-section-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #e2dbcf;
   color: #667b88;
+  border: 1px solid rgba(74, 98, 112, 0.16);
   font-family: 'IBM Plex Mono', 'Courier New', monospace;
   font-size: 0.48rem;
   font-weight: 700;
@@ -580,6 +591,12 @@
   text-transform: uppercase;
   line-height: 1;
   flex-shrink: 0;
+}
+
+.dev-section--open .dev-section-arrow {
+  background: #dff2e5;
+  border-color: rgba(42, 135, 81, 0.3);
+  color: #1f5a38;
 }
 
 .dev-section-body {
