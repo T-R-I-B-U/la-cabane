@@ -37,6 +37,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const [zoePhaseActive, setZoePhaseActive] = useState(false)
   const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
   const [juiceMachinePhaseActive, setJuiceMachinePhaseActive] = useState(false)
+  const [juicePipePlaying, setJuicePipePlaying] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
   const [exitSerrePhaseActive, setExitSerrePhaseActive] = useState(false)
   const [arbreLadderPending, setArbreLadderPending] = useState(false)
@@ -521,10 +522,15 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   const handleJuiceMachineInteract = useCallback(() => {
     setJuiceMachinePhaseActive(false)
+    scheduleFlowTimeout(() => setJuicePipePlaying(true), 1000)
+  }, [scheduleFlowTimeout])
+
+  const handleJuicePipeComplete = useCallback(() => {
+    setJuicePipePlaying(false)
     setJuicePhaseActive(true)
     isSerreJuiceDrinkTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreJuiceDrink, duration: 1.5 })
-  }, [])
+  }, [setStoryCameraTransition])
 
   const handleJuiceInteract = useCallback(() => {
     setJuicePhaseActive(false)
@@ -709,6 +715,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     zoePhaseActive,
     raspberryPhaseActive,
     juiceMachinePhaseActive,
+    juicePipePlaying,
     juicePhaseActive,
     exitSerrePhaseActive,
     arbreLadderPending,
@@ -739,6 +746,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     handleMinigameStateChange,
     handleUnripeAttempt,
     handleJuiceMachineInteract,
+    handleJuicePipeComplete,
     handleJuiceInteract,
     handleJournalEnd,
     handleTreeInteract,

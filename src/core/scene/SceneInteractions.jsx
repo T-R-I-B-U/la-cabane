@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
 import { ClickableJuiceMachine } from '../../world/entities/ClickableJuiceMachine'
+import { JuicePipeFill } from '../../world/entities/JuicePipeFill'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableSerreCorridorDoor } from '../../world/entities/ClickableSerreCorridorDoor'
 import { ClickableLadder } from '../../world/entities/ClickableLadder'
@@ -67,12 +68,14 @@ export function SceneInteractions({
   zoePhaseActive,
   raspberryPhaseActive,
   juiceMachinePhaseActive,
+  juicePipePlaying,
   juicePhaseActive,
   zoeClip,
   onZoeTalk,
   onMinigameStateChange,
   onUnripeAttempt,
   onJuiceMachineInteract,
+  onJuicePipeComplete,
   onJuiceInteract,
   serrePreview,
   performanceMode,
@@ -173,6 +176,8 @@ export function SceneInteractions({
         isInteractable={juiceMachinePhaseActive}
         onInteract={onJuiceMachineInteract}
       />
+
+      <JuicePipeFill scene={cabane} playing={juicePipePlaying} onComplete={onJuicePipeComplete} />
 
       <ClickableJuiceTable
         cabane={cabane}
