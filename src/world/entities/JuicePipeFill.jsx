@@ -39,14 +39,12 @@ function buildFillMaterial(base, { mode = 'uvY', yMin = 0, yMax = 1, invertFill 
         shader.fragmentShader
     } else {
       shader.fragmentShader =
-        `uniform float fillAmount;\nuniform float fillStart;\nuniform vec3 fillColor;\n` + shader.fragmentShader
+        `uniform float fillAmount;\nuniform float fillStart;\nuniform vec3 fillColor;\n` +
+        shader.fragmentShader
     }
 
     const localYExpr = `(vFillY - fillYMin) / max(fillYMax - fillYMin, 0.001)`
-    const normExpr =
-      mode === 'localY'
-        ? (invertFill ? `1.0 - ${localYExpr}` : localYExpr)
-        : `vUv.y`
+    const normExpr = mode === 'localY' ? (invertFill ? `1.0 - ${localYExpr}` : localYExpr) : `vUv.y`
 
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <tonemapping_fragment>',
@@ -65,7 +63,7 @@ gl_FragColor.rgb = mix(gl_FragColor.rgb, fillColor * (_lum * 1.2 + 0.2), _filled
 function buildButtonMaterial(base, yMin, yMax) {
   const mat = base.clone()
   const uniforms = {
-    redOn:   { value: 1.0 },
+    redOn: { value: 1.0 },
     greenOn: { value: 0.0 },
     btnYMid: { value: (yMin + yMax) / 2 },
   }
@@ -97,8 +95,17 @@ gl_FragColor.rgb += _btnColor * 0.25;
 }
 
 const MESH_CONFIGS = [
-  { name: 'pipe', mode: 'uvY',    startAt: 0.0,                maxFill: 1.0, drains: true,  fillPhase: 'fill' },
-  { name: 'pot',  mode: 'localY', startAt: 0.3, fillWindow: 1.4, maxFill: 0.7, invertFill: false, drains: false, fillPhase: 'span' },
+  { name: 'pipe', mode: 'uvY', startAt: 0.0, maxFill: 1.0, drains: true, fillPhase: 'fill' },
+  {
+    name: 'pot',
+    mode: 'localY',
+    startAt: 0.3,
+    fillWindow: 1.4,
+    maxFill: 0.7,
+    invertFill: false,
+    drains: false,
+    fillPhase: 'span',
+  },
 ]
 
 export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_DURATION }) {
@@ -114,7 +121,16 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
     const allUniforms = []
     const originals = []
 
-    for (const { name, mode, startAt, fillWindow, maxFill, invertFill, drains, fillPhase } of MESH_CONFIGS) {
+    for (const {
+      name,
+      mode,
+      startAt,
+      fillWindow,
+      maxFill,
+      invertFill,
+      drains,
+      fillPhase,
+    } of MESH_CONFIGS) {
       const mesh = scene.getObjectByName(name)
       if (!mesh?.isMesh) continue
 
@@ -128,18 +144,28 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
       const { mat, uniforms } = buildFillMaterial(mesh.material, opts)
       originals.push({ mesh, original: mesh.material })
       mesh.material = mat
-      allUniforms.push({ uniforms, startAt: startAt ?? 0, fillWindow: fillWindow ?? 1.0, maxFill: maxFill ?? 1.0, drains: drains ?? false, fillPhase: fillPhase ?? 'fill' })
+      allUniforms.push({
+        uniforms,
+        startAt: startAt ?? 0,
+        fillWindow: fillWindow ?? 1.0,
+        maxFill: maxFill ?? 1.0,
+        drains: drains ?? false,
+        fillPhase: fillPhase ?? 'fill',
+      })
     }
 
     allUniformsRef.current = allUniforms
     originalsRef.current = originals
 
-    const buttonsNode = scene.getObjectByName('buttons')
     const buttonsMesh = scene.getObjectByName('buttons')
     if (buttonsMesh?.isMesh) {
       buttonsMesh.geometry.computeBoundingBox()
       const { min, max } = buttonsMesh.geometry.boundingBox
-      const { mat: btnMat, uniforms: btnUniforms } = buildButtonMaterial(buttonsMesh.material, min.y, max.y)
+      const { mat: btnMat, uniforms: btnUniforms } = buildButtonMaterial(
+        buttonsMesh.material,
+        min.y,
+        max.y
+      )
       originals.push({ mesh: buttonsMesh, original: buttonsMesh.material })
       buttonsMesh.material = btnMat
       buttonsRef.current = btnUniforms
@@ -186,9 +212,19 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
 
     if (phaseRef.current === 'filling' && gT >= 1) phaseRef.current = 'draining'
 
-    for (const { uniforms, startAt, fillWindow, maxFill, drains, fillPhase } of allUniformsRef.current) {
+    for (const {
+      uniforms,
+      startAt,
+      fillWindow,
+      maxFill,
+      drains,
+      fillPhase,
+    } of allUniformsRef.current) {
       if (fillPhase === 'fill') {
-        const local = fillEased < startAt ? 0 : Math.min((fillEased - startAt) / Math.max(1 - startAt, 0.001), 1)
+        const local =
+          fillEased < startAt
+            ? 0
+            : Math.min((fillEased - startAt) / Math.max(1 - startAt, 0.001), 1)
         uniforms.fillAmount.value = local * maxFill
       } else if (fillPhase === 'span') {
         const local = Math.max(0, Math.min((gT - startAt) / Math.max(fillWindow, 0.001), 1))
