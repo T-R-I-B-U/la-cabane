@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { loadModel } from '../../core/Loader'
 import { disposeObject3D } from '../../core/disposeObject3D'
 import { modelBaseName } from './assetNaming'
+import { applyAutoTextures } from './textureResolver'
 import { applyTransform, cloneMaterialWithTextures, warnMissingAsset } from './runtime'
 
 function getModelCandidates(baseName, modelBasePaths) {
@@ -15,7 +16,7 @@ function getInstanceCandidates(baseName, modelBasePaths) {
   return modelBasePaths.map((basePath) => `${basePath}${baseName}.bin`)
 }
 
-export async function buildInstancedMesh(node, { modelBasePaths }) {
+export async function buildInstancedMesh(node, { modelBasePaths, textureBasePaths = ['/textures/'] }) {
   const baseName = modelBaseName(node.name)
 
   let templateModel = null
@@ -24,6 +25,7 @@ export async function buildInstancedMesh(node, { modelBasePaths }) {
   for (const modelPath of templatePaths) {
     try {
       templateModel = await loadModel(modelPath)
+      await applyAutoTextures(templateModel, baseName, textureBasePaths)
       break
     } catch (error) {
       loadErrors.push(`${modelPath}: ${error.message ?? error}`)

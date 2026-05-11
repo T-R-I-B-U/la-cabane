@@ -39,7 +39,7 @@
   },
   {
     "name": "trunk",
-    "type": "Mesh",
+    "type": "InstancedMesh",
     "position": [
       -7.6254,
       -0.5431,
@@ -288,14 +288,14 @@
     "name": "ladder",
     "type": "Object3D",
     "position": [
-      -4.1025,
+      -4.362,
       0.1893,
-      -2.8149
+      -2.8915
     ],
     "rotation": [
-      3.0473,
-      -0.9666,
-      3.0703
+      3.0909,
+      -0.9679,
+      3.1062
     ],
     "scale": [
       1,
@@ -402,9 +402,9 @@
     "name": "railling",
     "type": "Object3D",
     "position": [
-      -7.6854,
-      21.1327,
-      -5.2758
+      -7.6951,
+      19.7307,
+      -5.2737
     ],
     "rotation": [
       -3.1416,
@@ -421,28 +421,9 @@
     "name": "platform",
     "type": "Mesh",
     "position": [
-      -7.6254,
-      21.0884,
-      -5.2885
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "platform-hut",
-    "type": "Mesh",
-    "position": [
-      -7.6254,
-      0,
-      -5.3587
+      -7.6797,
+      19.6673,
+      -5.1838
     ],
     "rotation": [
       0,
@@ -466,6 +447,25 @@
     "rotation": [
       0,
       -1.0603,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "platform-hut",
+    "type": "Mesh",
+    "position": [
+      -7.6254,
+      0,
+      -5.3587
+    ],
+    "rotation": [
+      0,
+      0,
       0
     ],
     "scale": [

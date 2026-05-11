@@ -14,7 +14,7 @@ function getModelCandidates(baseName, modelBasePaths) {
 
 export async function buildNode(node, { modelBasePaths, textureBasePaths }) {
   if (node.type === 'InstancedMesh') {
-    return buildInstancedMesh(node, { modelBasePaths })
+    return buildInstancedMesh(node, { modelBasePaths, textureBasePaths })
   }
 
   let object3d
