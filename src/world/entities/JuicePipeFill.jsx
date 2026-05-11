@@ -192,6 +192,7 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
     globalTimeRef.current = 0
     phaseRef.current = 'filling'
     for (const { uniforms } of allUniformsRef.current) {
+      // eslint-disable-next-line react-hooks/immutability
       uniforms.fillAmount.value = 0
       uniforms.fillStart.value = 0
     }
@@ -225,6 +226,7 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
           fillEased < startAt
             ? 0
             : Math.min((fillEased - startAt) / Math.max(1 - startAt, 0.001), 1)
+        // eslint-disable-next-line react-hooks/immutability
         uniforms.fillAmount.value = local * maxFill
       } else if (fillPhase === 'span') {
         const local = Math.max(0, Math.min((gT - startAt) / Math.max(fillWindow, 0.001), 1))
