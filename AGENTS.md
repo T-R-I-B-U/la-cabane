@@ -121,8 +121,12 @@ Keep code within existing structure:
 - `src/world/interactions/`: shared interaction hooks
 - `src/world/materials/`: reusable materials/shaders
 - `src/utils/`: shared helpers/utilities (audioStore, etc.)
+- `src/assets/`: static assets imported by Vite (SVG, images)
 - `public/models/`: .gltf/.glb assets; `public/models/compressed/` for Draco variants
-- `public/textures/`, `public/audio/`, `public/subtitles/`: static assets by type
+- `public/textures/`, `public/audio/`, `public/subtitles/`, `public/hdri/`: static assets by type
+- `public/cabane.json`: scene/world data
+- `public/contacts.json`: contacts data
+- `public/savoirs.json`: knowledge/savoir data
 
 Do not create new top-level folders without explicit rationale.
 

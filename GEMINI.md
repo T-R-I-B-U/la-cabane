@@ -28,11 +28,14 @@ public/
   textures/
   audio/
   subtitles/        → .srt subtitle tracks for dialogue
+  hdri/             → HDRI environment maps
   cabane.json       → scene/world data
+  contacts.json     → contacts data
   savoirs.json      → knowledge/savoir data
 
 src/
   App.jsx           → root component, wires canvas + UI
+  assets/           → static assets imported by Vite (SVG, images)
   app/              → intro state machine, NPC dialogue, UI hooks and components
   core/             → R3F canvas setup, player controls, loaders, diagnostics
     audio/          → AudioManager, Subtitles, audioConfig.json

@@ -12,9 +12,11 @@ Two developers working collaboratively.
 ## Tech stack
 
 - React Three Fiber (R3F) — Three.js via React JSX, primary rendering layer
-- React (UI overlaid on canvas, JSX components)
+- React 19 — UI overlaid on canvas, JSX components
 - @react-three/drei — helpers and abstractions for R3F (loaders, controls, etc.)
-- Vite + vite-plugin-glsl
+- Vite 7 + vite-plugin-glsl
+- JavaScript + JSX (ES modules, no TypeScript)
+- ESLint (flat config) + Prettier — enforced via pre-push hook
 - Assets exported from Cinema 4D as .gltf/.glb
 
 ## Folder structure
@@ -26,8 +28,13 @@ public/
   textures/
   audio/
   subtitles/        → .srt files for dialogue tracks
+  hdri/             → HDRI environment maps
+  cabane.json       → scene/world data
+  contacts.json     → contacts data
+  savoirs.json      → knowledge/savoir data
 
 src/
+  App.jsx           → root component, wires canvas + UI
   assets/           → static assets imported by Vite (SVG, images)
   app/              → intro state machine, NPC dialogue, UI-level hooks and components
   core/             → R3F canvas setup, player controls, loaders, diagnostics

@@ -54,7 +54,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const isSerreJuiceTransitionRef = useRef(false)
   const greenhouseTransitionStageRef = useRef(null)
   const scheduledTimeoutsRef = useRef(new Set())
-  const { dialogueActive, playDialogue, stopDialogue } = useNpcDialogue()
+  const { dialogueActive, playDialogue, stopDialogue, skipDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory, startStory } = useStoryFlow()
   const storyReady = currentStepId === 'intro.goToReception'
 
@@ -734,6 +734,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     handleStoryCameraTransitionComplete,
     launchIntro,
     playDialogue,
+    skipDialogue,
     setPostIntro,
   }
 }
