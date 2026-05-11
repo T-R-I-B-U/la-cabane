@@ -189,6 +189,7 @@ export default function App() {
     handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
+    skipDialogue: skipIntroDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady, arbreActiveRef })
 
@@ -254,6 +255,7 @@ export default function App() {
     triggerArbre,
     triggerArbreBase,
     triggerNestDialogue25,
+    skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
   } = useArbreFlow({
     platformPosition: sceneLoadInfo?.platformPosition,
@@ -413,6 +415,11 @@ export default function App() {
     triggerNestDialogue25()
   }, [setPostIntro, triggerNestDialogue25])
 
+  const handleSkipDialogue = useCallback(() => {
+    if (dialogueActive) skipIntroDialogue()
+    else if (arbreDialogueActive) skipArbreDialogue()
+  }, [dialogueActive, arbreDialogueActive, skipIntroDialogue, skipArbreDialogue])
+
   const handleGoToPlatform = useCallback(() => {
     arbreStoryContinuityRef.current = false
     spawnAtPlatform()
@@ -556,6 +563,18 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [])
+
+  useEffect(() => {
+    if (!dialogueActive && !arbreDialogueActive) return
+    const onKeyDown = (event) => {
+      if (event.code === 'Space') {
+        event.preventDefault()
+        handleSkipDialogue()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)

@@ -9,21 +9,34 @@ import {
 export function useNpcDialogue() {
   const [dialogueActive, setDialogueActive] = useState(false)
   const playbackTokenRef = useRef(0)
+  const pendingOnDoneRef = useRef(null)
 
   const stopDialogue = useCallback(() => {
     playbackTokenRef.current += 1
+    pendingOnDoneRef.current = null
     setDialogueActive(false)
     stopStoreDialogue()
+  }, [])
+
+  const skipDialogue = useCallback(() => {
+    const pending = pendingOnDoneRef.current
+    pendingOnDoneRef.current = null
+    playbackTokenRef.current += 1
+    stopStoreDialogue()
+    setDialogueActive(false)
+    pending?.()
   }, [])
 
   const playDialogue = useCallback((id, { onDone } = {}) => {
     const token = playbackTokenRef.current + 1
     playbackTokenRef.current = token
     setDialogueActive(true)
+    pendingOnDoneRef.current = onDone ?? null
 
     playStoreDialogue(id, {
       onDone: () => {
         if (playbackTokenRef.current !== token) return
+        pendingOnDoneRef.current = null
         setDialogueActive(false)
         onDone?.()
       },
@@ -34,5 +47,6 @@ export function useNpcDialogue() {
     dialogueActive,
     playDialogue,
     stopDialogue,
+    skipDialogue,
   }
 }

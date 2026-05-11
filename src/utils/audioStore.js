@@ -63,6 +63,10 @@ function _clearTextTimers() {
 function _stopCurrentDialogue() {
   _clearTextTimers()
   _clearDialogHideTimeout()
+  if (subtitleState.activeId) {
+    const track = _getAudioTrack(subtitleState.activeId)
+    if (track?.audio?.isPlaying) track.audio.stop()
+  }
   subtitleState.activeId = null
   if (subtitleState.rafId) {
     cancelAnimationFrame(subtitleState.rafId)

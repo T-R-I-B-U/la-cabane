@@ -105,7 +105,7 @@ export function useArbreFlow({
   const playedRef = useRef(false)
   const scheduledTimeoutsRef = useRef(new Set())
   const zone = useActiveZone()
-  const { playDialogue, stopDialogue } = useNpcDialogue()
+  const { playDialogue, stopDialogue, skipDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory } = useStoryFlow()
 
   const clearScheduledTimeouts = useCallback(() => {
@@ -414,6 +414,7 @@ export function useArbreFlow({
     handleFruitClickDuringLeaves,
     exitArbre,
     triggerArbre,
+    skipDialogue,
     activateLadderFromStory,
   }
 }
