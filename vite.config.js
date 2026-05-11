@@ -98,6 +98,24 @@ function publicAssetManifestPlugin() {
 
       return `export const publicAssetManifest = ${JSON.stringify(createPublicAssetManifest())}`
     },
+    configureServer(server) {
+      const rootDir = process.cwd()
+      const watchedDirectories = [
+        resolve(rootDir, 'public/textures'),
+        resolve(rootDir, 'public/models/compressed'),
+      ]
+
+      server.watcher.add(watchedDirectories)
+      server.watcher.on('all', (_event, filePath) => {
+        if (!watchedDirectories.some((directory) => filePath.startsWith(directory))) return
+
+        const manifestModule = server.moduleGraph.getModuleById(
+          RESOLVED_VIRTUAL_PUBLIC_ASSET_MANIFEST_MODULE_ID
+        )
+        if (manifestModule) server.moduleGraph.invalidateModule(manifestModule)
+        server.ws.send({ type: 'full-reload' })
+      })
+    },
   }
 }
 

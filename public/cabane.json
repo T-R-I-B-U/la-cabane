@@ -39,7 +39,7 @@
   },
   {
     "name": "trunk",
-    "type": "InstancedMesh",
+    "type": "In",
     "position": [
       -7.6254,
       -0.5431,
@@ -98,9 +98,9 @@
     "name": "workbench01",
     "type": "Object3D",
     "position": [
-      -4.5796,
+      -5.0465,
       0.6561,
-      -13.259
+      -12.7107
     ],
     "rotation": [
       0,
@@ -117,14 +117,128 @@
     "name": "stool",
     "type": "Object3D",
     "position": [
-      -4.6259,
+      -6.4967,
       0.3564,
-      -13.3561
+      -12.9681
     ],
     "rotation": [
       0,
       0,
       0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stool",
+    "type": "Object3D",
+    "position": [
+      -3.4899,
+      0.3564,
+      -12.9681
+    ],
+    "rotation": [
+      -3.1416,
+      0.1745,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stool",
+    "type": "Object3D",
+    "position": [
+      -5.7965,
+      0.3564,
+      -12.0033
+    ],
+    "rotation": [
+      0,
+      0.7898,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stool",
+    "type": "Object3D",
+    "position": [
+      -5.1129,
+      0.3564,
+      -11.8529
+    ],
+    "rotation": [
+      -3.1416,
+      1.152,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stool",
+    "type": "Object3D",
+    "position": [
+      -4.5719,
+      0.3564,
+      -12.2868
+    ],
+    "rotation": [
+      0,
+      1.1479,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stool",
+    "type": "Object3D",
+    "position": [
+      -4.5719,
+      0.3564,
+      -13.7879
+    ],
+    "rotation": [
+      0,
+      -0.7419,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "stool",
+    "type": "Object3D",
+    "position": [
+      -5.609,
+      0.3564,
+      -13.7879
+    ],
+    "rotation": [
+      3.1416,
+      -1.4352,
+      3.1416
     ],
     "scale": [
       1,
@@ -152,54 +266,16 @@
     ]
   },
   {
-    "name": "workbench01",
-    "type": "Object3D",
-    "position": [
-      31.636,
-      0.4111,
-      -13.259
-    ],
-    "rotation": [
-      0,
-      1.5708,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "workbench01",
-    "type": "Object3D",
-    "position": [
-      -18.5706,
-      10.6204,
-      22.6702
-    ],
-    "rotation": [
-      0,
-      1.5708,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "juicemachine",
     "type": "Object3D",
     "position": [
-      29.6079,
+      36.6515,
       0.4492,
-      -11.5233
+      -4.3332
     ],
     "rotation": [
       0,
-      0,
+      1.5152,
       0
     ],
     "scale": [
@@ -228,16 +304,35 @@
     ]
   },
   {
+    "name": "workbench01",
+    "type": "Object3D",
+    "position": [
+      37.3091,
+      0.4111,
+      -6.7281
+    ],
+    "rotation": [
+      -3.1416,
+      0.1218,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
     "name": "juiceglass",
     "type": "Object3D",
     "position": [
-      32.0221,
+      37.1782,
       0.8816,
-      -13.4381
+      -7.1332
     ],
     "rotation": [
       0,
-      0,
+      1.449,
       0
     ],
     "scale": [
@@ -250,13 +345,13 @@
     "name": "juiceglass",
     "type": "Object3D",
     "position": [
-      31.5995,
+      37.1269,
       0.8816,
-      -13.4381
+      -6.7137
     ],
     "rotation": [
       0,
-      0,
+      1.449,
       0
     ],
     "scale": [
@@ -269,13 +364,13 @@
     "name": "juiceglass",
     "type": "Object3D",
     "position": [
-      31.5995,
+      37.4348,
       0.8816,
-      -13.1279
+      -6.676
     ],
     "rotation": [
       0,
-      0,
+      1.449,
       0
     ],
     "scale": [
@@ -466,6 +561,253 @@
     "rotation": [
       0,
       0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "timeatm",
+    "type": "Mesh",
+    "position": [
+      -10.2607,
+      1.924,
+      -5.3403
+    ],
+    "rotation": [
+      -3.1416,
+      -0.0414,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plants01",
+    "type": "Mesh",
+    "position": [
+      -14.3796,
+      0.747,
+      -13.9897
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plants011",
+    "type": "Mesh",
+    "position": [
+      36.2615,
+      1.3397,
+      -9.415
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "workbench01",
+    "type": "Object3D",
+    "position": [
+      36.9405,
+      0.6179,
+      -2.2437
+    ],
+    "rotation": [
+      -3.1416,
+      0.4014,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "shelves",
+    "type": "Object3D",
+    "position": [
+      -2.5154,
+      1.4192,
+      -15.6329
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "shelves",
+    "type": "Object3D",
+    "position": [
+      -1.365,
+      1.4192,
+      -14.6267
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "shelves",
+    "type": "Object3D",
+    "position": [
+      -7.0004,
+      1.4192,
+      -16.17
+    ],
+    "rotation": [
+      0,
+      0.8254,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "cabinet",
+    "type": "Mesh",
+    "position": [
+      -5.4862,
+      0.1358,
+      -16.0019
+    ],
+    "rotation": [
+      -3.1416,
+      0.2495,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "cabinet",
+    "type": "Mesh",
+    "position": [
+      -4.8576,
+      0.1358,
+      -15.8642
+    ],
+    "rotation": [
+      3.1416,
+      0.2495,
+      3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "cabinet",
+    "type": "Mesh",
+    "position": [
+      -4.2555,
+      0.1358,
+      -15.6953
+    ],
+    "rotation": [
+      3.1416,
+      0.2495,
+      3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rug01",
+    "type": "Mesh",
+    "position": [
+      -4.9551,
+      0,
+      -12.8605
+    ],
+    "rotation": [
+      0,
+      -0.3461,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plants01",
+    "type": "Mesh",
+    "position": [
+      -22.2454,
+      1.3397,
+      -10.0529
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plants012",
+    "type": "Mesh",
+    "position": [
+      -22.2454,
+      1.3397,
+      -2.7043
+    ],
+    "rotation": [
+      0,
+      -0.9416,
       0
     ],
     "scale": [
