@@ -16,7 +16,10 @@ function getInstanceCandidates(baseName, modelBasePaths) {
   return modelBasePaths.map((basePath) => `${basePath}${baseName}.bin`)
 }
 
-export async function buildInstancedMesh(node, { modelBasePaths, textureBasePaths = ['/textures/'] }) {
+export async function buildInstancedMesh(
+  node,
+  { modelBasePaths, textureBasePaths = ['/textures/'] }
+) {
   const baseName = modelBaseName(node.name)
 
   let templateModel = null
