@@ -51,7 +51,7 @@ export function SceneCharacters({
           textureName="thomas"
           textureBasePaths={textureBasePaths}
           position={[-3.0, FLOOR_Y, -13.259]}
-          rotation={[0, (110 * Math.PI) / 180, 0]}
+          rotation={[0, (150 * Math.PI) / 180, 0]}
           scale={9}
         />
       </Suspense>

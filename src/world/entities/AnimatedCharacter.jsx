@@ -143,7 +143,6 @@ export function AnimatedCharacter({
     return () => {
       cancelled = true
       timeoutIds.forEach((id) => window.clearTimeout(id))
-      activeActionRef.current = null
     }
   }, [actions, animationSequence])
 
