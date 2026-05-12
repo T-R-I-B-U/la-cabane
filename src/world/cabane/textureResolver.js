@@ -29,6 +29,8 @@ function canonicalTextureKey(value = '') {
 }
 
 const MESH_TEXTURE_ALIASES = {
+  'page-img01_02': 'page-left',
+  'page-img03_04': 'page-right',
   'platform-details': 'railling',
   'tour fenêtre': 'tour_fenêtre',
   'tour-fenetre': 'tour_fenêtre',
