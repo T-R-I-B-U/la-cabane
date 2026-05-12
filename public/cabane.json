@@ -551,7 +551,7 @@
     ]
   },
   {
-    "name": "plant011",
+    "name": "plant01-1",
     "type": "Mesh",
     "position": [
       36.2615,
@@ -722,7 +722,7 @@
     ]
   },
   {
-    "name": "plant011",
+    "name": "plant01-1",
     "type": "Mesh",
     "position": [
       -22.2454,
@@ -741,7 +741,7 @@
     ]
   },
   {
-    "name": "plant011",
+    "name": "plant01-1",
     "type": "Mesh",
     "position": [
       -22.2454,
@@ -874,7 +874,7 @@
     ]
   },
   {
-    "name": "plant021",
+    "name": "plant02-1",
     "type": "Mesh",
     "position": [
       -0.4727,
@@ -893,7 +893,7 @@
     ]
   },
   {
-    "name": "plant021",
+    "name": "plant02-1",
     "type": "Mesh",
     "position": [
       -22.7411,
@@ -912,7 +912,7 @@
     ]
   },
   {
-    "name": "plant022",
+    "name": "plant02-1",
     "type": "Mesh",
     "position": [
       -15.6568,
@@ -969,7 +969,7 @@
     ]
   },
   {
-    "name": "plant011",
+    "name": "plant01-1",
     "type": "Mesh",
     "position": [
       -3.5781,
@@ -1026,7 +1026,7 @@
     ]
   },
   {
-    "name": "plant011",
+    "name": "plant01-1",
     "type": "Mesh",
     "position": [
       -18.2246,

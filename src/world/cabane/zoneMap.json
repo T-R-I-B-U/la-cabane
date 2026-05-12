@@ -32,11 +32,11 @@
       "shelves",
       "timeatm",
       "welcome01",
-      "plants01",
-      "plants011",
-      "plants012"
+      "plant01",
+      "plant01-1",
+      "plant02-1"
     ],
-    "serre": ["greenhouse", "growingfruit", "juicemachine", "juiceglass", "outsideplant02"],
+    "serre": ["greenhouse", "growingfruit", "juicemachine", "juiceglass", "outsideplant03"],
     "arbre": ["trunk", "leaf", "platform", "railling-hut", "railling", "ladder", "stairs02"]
   },
   "hidden": {

@@ -31,12 +31,12 @@ const BASKET_SLOTS = [
 const BASKET_SCALE_IN = 0.035
 const RIPE_COUNT = 8
 
-// World position of outsideplant02 GLTF scene root (node 0), from cabane.json.
+// World position of the outsideplant03 cluster root, from cabane.json.
 // Used as group anchor — never derived from the nodeBuilder wrapper (which is at y≈0).
 const GROUP_WORLD_POS = [32.8189, 1.5645, -5.6124]
 
 // Hardcoded berry positions in GROUP_WORLD_POS-local space.
-// 3 clusters matching the 3 outsideplant02 sub-instances in the GLTF
+// 3 clusters matching the 3 outsideplant03 sub-instances in the GLTF
 // (raspberry groups at offsets ~[-0.01,0.78,-0.24], [-0.23,0.78,0.12], [0.24,0.78,0.11]).
 const RASPBERRY_DEFS = [
   // cluster 1 — left stem, z≥0.20 to stay in front of leaves
@@ -61,7 +61,7 @@ const RASPBERRY_DEFS = [
 //   if (!cabane) return null
 //   let plant = null
 //   cabane.traverse((child) => {
-//     if (!plant && child.name === 'outsideplant02' && child.userData?.cabaneNode) {
+//     if (!plant && child.name === 'outsideplant03' && child.userData?.cabaneNode) {
 //       plant = child
 //     }
 //   })

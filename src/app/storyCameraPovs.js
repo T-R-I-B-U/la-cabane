@@ -44,7 +44,7 @@ export const STORY_CAMERA_POVS = {
     target: { x: -10, y: 1.461, z: -5.2966 },
   },
   // Calibrate in-game: camera.position / controls.target printed via CameraRegistrySync
-  // outsideplant02 world pos: [32.8189, 1.5645, -5.6124]
+  // outsideplant03 cluster world pos: [32.8189, 1.5645, -5.6124]
   serreZoe: {
     position: { x: 23.5, y: 1.6, z: -5.4 },
     target: { x: 26.0, y: 1.4, z: -5.4 },

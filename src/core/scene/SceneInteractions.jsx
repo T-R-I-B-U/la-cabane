@@ -19,7 +19,7 @@ import { publicAssetManifest } from 'virtual:public-asset-manifest'
 import { FLOOR_Y } from '../SceneConfig.js'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
-// outsideplant02 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
+// outsideplant03 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
 const BASKET_PREVIEW_POS = [32.7189, 1.1645, -5.4124]
 const JOURNAL_ROTATION_Y = 0.41
 const compressedModelFiles = new Set(publicAssetManifest.compressedModelFiles)
