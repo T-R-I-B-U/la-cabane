@@ -100,11 +100,15 @@ export function JournalBook({
 
     clone.traverse((object) => {
       if (!object.isMesh) return
-      meshList.push(object)
       object.geometry = object.geometry.clone()
       object.material = cloneMaterial(object.material)
+      if (object.name === 'page') {
+        object.visible = false
+        return
+      }
       object.castShadow = true
       object.receiveShadow = true
+      meshList.push(object)
     })
 
     leftObject.parent?.remove(leftObject)
