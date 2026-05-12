@@ -1293,16 +1293,16 @@
   },
   {
     "name": "outsideplant03",
-    "type": "Object3D",
+    "type": "Mesh",
     "position": [
       32.0945,
-      0.3502,
-      -2.1379
+      0.3108,
+      -4.9074
     ],
     "rotation": [
-      0,
-      0,
-      0
+      -0.2938,
+      -0.4445,
+      -0.3748
     ],
     "scale": [
       1,
@@ -1312,16 +1312,225 @@
   },
   {
     "name": "outsideplant03",
-    "type": "Object3D",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.4028,
+      -4.4017
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.3372,
+      -3.9278
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.3108,
+      -3.4111
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.4028,
+      -2.9053
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.3372,
+      -2.4314
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.3108,
+      -1.8551
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.4028,
+      -1.3493
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.3372,
+      -0.8754
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.3108,
+      -0.3587
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.4028,
+      0.147
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      32.0945,
+      0.3372,
+      0.621
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
     "position": [
       31.2463,
-      0.3502,
-      -2.1379
+      0.3108,
+      -4.9074
     ],
     "rotation": [
-      0,
-      0,
-      0
+      -0.2938,
+      -0.4445,
+      -0.3748
     ],
     "scale": [
       1,
@@ -1331,396 +1540,225 @@
   },
   {
     "name": "outsideplant03",
-    "type": "Object3D",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.4028,
+      -4.4017
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.3372,
+      -3.9278
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.3108,
+      -3.4111
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.4028,
+      -2.9053
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.3372,
+      -2.4314
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.3108,
+      -1.8551
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.4028,
+      -1.3493
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.3372,
+      -0.8754
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.3108,
+      -0.3587
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.4028,
+      0.147
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      31.2463,
+      0.3372,
+      0.621
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
     "position": [
       30.3983,
-      0.3502,
-      -2.1379
+      0.3108,
+      -4.9074
     ],
     "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      31.2425,
-      0.9116,
-      3.1374
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      0.1837
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      31.2425,
-      0.9116,
-      3.1374
-    ],
-    "rotation": [
-      0,
-      -0.1837,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      31.2425,
-      0.9116,
-      4.4599
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      -2.7881
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      31.2425,
-      0.9116,
-      4.4599
-    ],
-    "rotation": [
-      -3.1416,
-      0.3535,
-      -3.1416
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      31.4661,
-      0.9116,
-      6.9737
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      2.9804
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      31.4661,
-      0.9116,
-      6.9737
-    ],
-    "rotation": [
-      -3.1416,
-      -0.1612,
-      -3.1416
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      31.019,
-      0.9116,
-      5.7291
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      0.0086
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      31.019,
-      0.9116,
-      5.7291
-    ],
-    "rotation": [
-      0,
-      -0.0086,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      30.9994,
-      0.9116,
-      8.1772
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      0.0086
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      30.9994,
-      0.9116,
-      8.1772
-    ],
-    "rotation": [
-      0,
-      -0.0086,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      22.7554,
-      0.9116,
-      -4.7567
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      0.1837
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      22.7554,
-      0.9116,
-      -4.7567
-    ],
-    "rotation": [
-      0,
-      -0.1837,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      22.7554,
-      0.9116,
-      -3.4342
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      -2.7881
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      22.7554,
-      0.9116,
-      -3.4342
-    ],
-    "rotation": [
-      -3.1416,
-      0.3535,
-      -3.1416
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      22.9789,
-      0.9116,
-      -0.9204
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      2.9804
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      22.9789,
-      0.9116,
-      -0.9204
-    ],
-    "rotation": [
-      -3.1416,
-      -0.1612,
-      -3.1416
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      22.5318,
-      0.9116,
-      -2.165
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      0.0086
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      22.5318,
-      0.9116,
-      -2.165
-    ],
-    "rotation": [
-      0,
-      -0.0086,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "outsideplant02",
-    "type": "Mesh",
-    "position": [
-      22.5122,
-      0.9116,
-      0.2831
-    ],
-    "rotation": [
-      1.5708,
-      0,
-      0.0086
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "raspberry",
-    "type": "Object3D",
-    "position": [
-      22.5122,
-      0.9116,
-      0.2831
-    ],
-    "rotation": [
-      0,
-      -0.0086,
-      0
+      -0.2938,
+      -0.4445,
+      -0.3748
     ],
     "scale": [
       1,
@@ -1730,16 +1768,415 @@
   },
   {
     "name": "outsideplant03",
-    "type": "Object3D",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.4028,
+      -4.4017
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.3372,
+      -3.9278
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.3108,
+      -3.4111
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.4028,
+      -2.9053
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.3372,
+      -2.4314
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.3108,
+      -1.8551
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.4028,
+      -1.3493
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.3372,
+      -0.8754
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.3108,
+      -0.3587
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.4028,
+      0.147
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      30.3983,
+      0.3372,
+      0.621
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      31.2425,
+      0.9116,
+      3.1374
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      0.1837
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      31.2425,
+      0.9116,
+      4.4599
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      -2.7881
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      31.4661,
+      0.9116,
+      6.9737
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      2.9804
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      31.019,
+      0.9116,
+      5.7291
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      0.0086
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      30.9994,
+      0.9116,
+      8.1772
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      0.0086
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      22.7554,
+      0.9116,
+      -4.7567
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      0.1837
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      22.7554,
+      0.9116,
+      -3.4342
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      -2.7881
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      22.9789,
+      0.9116,
+      -0.9204
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      2.9804
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      22.5318,
+      0.9116,
+      -2.165
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      0.0086
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant02",
+    "type": "Mesh",
+    "position": [
+      22.5122,
+      0.9116,
+      0.2831
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      0.0086
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
     "position": [
       27.9461,
-      0.3502,
-      5.7793
+      0.3108,
+      3.0098
     ],
     "rotation": [
-      0,
-      0,
-      0
+      -0.2938,
+      -0.4445,
+      -0.3748
     ],
     "scale": [
       1,
@@ -1749,16 +2186,225 @@
   },
   {
     "name": "outsideplant03",
-    "type": "Object3D",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.4028,
+      3.5156
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.3372,
+      3.9895
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.3108,
+      4.5062
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.4028,
+      5.0119
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.3372,
+      5.4858
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.3108,
+      6.0621
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.4028,
+      6.5679
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.3372,
+      7.0418
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.3108,
+      7.5585
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.4028,
+      8.0643
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.9461,
+      0.3372,
+      8.5382
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
     "position": [
       27.0978,
-      0.3502,
-      5.7793
+      0.3108,
+      3.0098
     ],
     "rotation": [
-      0,
-      0,
-      0
+      -0.2938,
+      -0.4445,
+      -0.3748
     ],
     "scale": [
       1,
@@ -1768,16 +2414,434 @@
   },
   {
     "name": "outsideplant03",
-    "type": "Object3D",
+    "type": "Mesh",
     "position": [
-      26.2499,
-      0.3502,
-      5.7793
+      27.0978,
+      0.4028,
+      3.5156
     ],
     "rotation": [
-      0,
-      0,
-      0
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.3372,
+      3.9895
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.3108,
+      4.5062
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.4028,
+      5.0119
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.3372,
+      5.4858
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.3108,
+      6.0621
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.4028,
+      6.5679
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.3372,
+      7.0418
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.3108,
+      7.5585
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.4028,
+      8.0643
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      27.0978,
+      0.3372,
+      8.5382
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3108,
+      3.0098
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.4028,
+      3.5156
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3372,
+      3.9895
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3108,
+      4.5062
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.4028,
+      5.0119
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3372,
+      5.4858
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3108,
+      6.0621
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.4028,
+      6.5679
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3372,
+      7.0418
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3108,
+      7.5585
+    ],
+    "rotation": [
+      -0.2938,
+      -0.4445,
+      -0.3748
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.4028,
+      8.0643
+    ],
+    "rotation": [
+      -1.5372,
+      -1.2622,
+      -1.807
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Mesh",
+    "position": [
+      26.2499,
+      0.3372,
+      8.5382
+    ],
+    "rotation": [
+      -0.4257,
+      -0.3932,
+      -0.4285
     ],
     "scale": [
       1,
@@ -1797,6 +2861,44 @@
       0,
       -1.5708,
       0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rug02",
+    "type": "Mesh",
+    "position": [
+      -20.3933,
+      8.868,
+      31.1041
+    ],
+    "rotation": [
+      0.0093,
+      0,
+      0.0052
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "drawing",
+    "type": "Mesh",
+    "position": [
+      -5.1963,
+      1.0851,
+      -5.7254
+    ],
+    "rotation": [
+      -1.5708,
+      0,
+      0.2082
     ],
     "scale": [
       1,
