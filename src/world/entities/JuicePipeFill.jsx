@@ -4,7 +4,7 @@ import * as THREE from 'three'
 import { play, stop } from '../../utils/audioStore'
 
 const FILL_COLOR = new THREE.Color('#da4d79')
-const DEFAULT_DURATION = 7.5
+const DEFAULT_DURATION = 8.5
 
 function easeInOut(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
