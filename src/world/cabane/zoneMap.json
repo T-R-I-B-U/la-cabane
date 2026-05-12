@@ -25,7 +25,11 @@
       "plants011#39",
       "plants011#40",
       "plants011#55",
-      "plant021#48"
+      "plant021#48",
+      "greenhouse_ground",
+      "hearth",
+      "house",
+      "rug02"
     ],
     "cabane-interior": [
       "workbench01#4",
@@ -43,7 +47,8 @@
       "littletable",
       "plants011#52",
       "plant03",
-      "bikewheel"
+      "bikewheel",
+      "drawing"
     ],
     "all-fake": [
       "ground-hut",
