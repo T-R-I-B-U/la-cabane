@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { initKTX2Loader } from './ktx2Loader.js'
 import AudioManager from './audio/AudioManager'
 import { Floor } from './Floor'
 import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
@@ -137,6 +138,7 @@ export default function Scene({
         position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
       shadows
+      onCreated={({ gl }) => initKTX2Loader(gl)}
     >
       <StatsCollector onStats={onStats} />
       <AudioManager />

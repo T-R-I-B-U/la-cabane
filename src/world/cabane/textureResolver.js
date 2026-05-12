@@ -1,8 +1,9 @@
 import * as THREE from 'three'
 import { normalizeAssetName } from './assetNaming'
 import { publicAssetManifest } from 'virtual:public-asset-manifest'
+import { ktx2Loader, whenKTX2Ready } from '../../core/ktx2Loader.js'
 
-const TEXTURE_EXTENSIONS = ['.png', '.jpg', '.jpeg', '.webp']
+const TEXTURE_EXTENSIONS = ['.ktx2', '.png', '.jpg', '.jpeg', '.webp']
 const textureFiles = publicAssetManifest.textureFiles
 const TEXTURE_SLOTS = [
   { suffix: 'color', materialKey: 'map', colorSpace: THREE.SRGBColorSpace },
@@ -134,14 +135,20 @@ function findTextureUrl(names, suffix, textureBasePaths) {
 
 function loadTexture(url, colorSpace) {
   if (!textureCache.has(url)) {
-    const promise = textureLoader.loadAsync(url).then((texture) => {
-      texture.flipY = false
-      if (colorSpace) texture.colorSpace = colorSpace
-      texture.generateMipmaps = false
-      texture.minFilter = THREE.LinearFilter
-      texture.magFilter = THREE.LinearFilter
-      return texture
-    })
+    const isKtx2 = url.endsWith('.ktx2')
+    const promise = (isKtx2 ? whenKTX2Ready() : Promise.resolve())
+      .then(() => {
+        const loader = isKtx2 ? ktx2Loader : textureLoader
+        return loader.loadAsync(url)
+      })
+      .then((texture) => {
+        texture.flipY = false
+        if (colorSpace && !url.endsWith('.ktx2')) texture.colorSpace = colorSpace
+        texture.generateMipmaps = false
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        return texture
+      })
     textureCache.set(url, promise)
   }
 
@@ -219,6 +226,36 @@ function getTextureNames(object3d, obj, fallbackName) {
   }
 
   return fallbackName && fallbackName !== obj.name ? [obj.name, fallbackName] : [obj.name]
+}
+
+const standaloneCache = new Map()
+
+export function preferKtx2(pngUrl) {
+  const filename = pngUrl.split('/').at(-1)
+  const base = filename.replace(/\.(png|jpe?g|webp)$/i, '')
+  return textureFiles.find((f) => f.includes('/ktx2/') && f.endsWith(`/${base}.ktx2`)) ?? pngUrl
+}
+
+export function loadStandaloneTexture(url, { colorSpace, flipY = true } = {}) {
+  const cacheKey = `${url}|${flipY}|${colorSpace}`
+  if (!standaloneCache.has(cacheKey)) {
+    const isKtx2 = url.endsWith('.ktx2')
+    const promise = (isKtx2 ? whenKTX2Ready() : Promise.resolve())
+      .then(() => {
+        const loader = isKtx2 ? ktx2Loader : textureLoader
+        return loader.loadAsync(url)
+      })
+      .then((texture) => {
+        texture.flipY = flipY
+        if (colorSpace && !url.endsWith('.ktx2')) texture.colorSpace = colorSpace
+        texture.generateMipmaps = false
+        texture.minFilter = THREE.LinearFilter
+        texture.magFilter = THREE.LinearFilter
+        return texture
+      })
+    standaloneCache.set(cacheKey, promise)
+  }
+  return standaloneCache.get(cacheKey)
 }
 
 export async function applyAutoTextures(object3d, fallbackName, textureBasePaths = ['/textures/']) {

@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react'
-import { useTexture } from '@react-three/drei'
+import { use, useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { preferKtx2, loadStandaloneTexture } from '../cabane/textureResolver.js'
 
 const PLANES = [
   {
@@ -32,9 +32,21 @@ const PLANES = [
 
 export function BackgroundPlanes({ hutPosition }) {
   const planeRefs = useRef([])
-  const backgroundTexture1 = useTexture('/textures/background-1.png')
-  const backgroundTexture2 = useTexture('/textures/background-2.png')
-  const backgroundTexture3 = useTexture('/textures/background-3.png')
+  const backgroundTexture1 = use(
+    loadStandaloneTexture(preferKtx2('/textures/background-1.png'), {
+      colorSpace: THREE.SRGBColorSpace,
+    })
+  )
+  const backgroundTexture2 = use(
+    loadStandaloneTexture(preferKtx2('/textures/background-2.png'), {
+      colorSpace: THREE.SRGBColorSpace,
+    })
+  )
+  const backgroundTexture3 = use(
+    loadStandaloneTexture(preferKtx2('/textures/background-3.png'), {
+      colorSpace: THREE.SRGBColorSpace,
+    })
+  )
   const textures = useMemo(() => {
     return [backgroundTexture1, backgroundTexture2, backgroundTexture3].map((backgroundTexture) => {
       if (!backgroundTexture) return null

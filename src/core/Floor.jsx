@@ -1,12 +1,14 @@
-import { useEffect, useMemo } from 'react'
-import { useTexture } from '@react-three/drei'
+import { use, useEffect, useMemo } from 'react'
 import { DoubleSide, RepeatWrapping, SRGBColorSpace } from 'three'
 import { FLOOR_Y } from './SceneConfig'
+import { preferKtx2, loadStandaloneTexture } from '../world/cabane/textureResolver.js'
 
 const GROUND_SIZE = 400
 
 export function Floor({ mainFloorRef, hutPosition }) {
-  const grassTexture = useTexture('/textures/grass.png')
+  const grassTexture = use(
+    loadStandaloneTexture(preferKtx2('/textures/grass.png'), { colorSpace: SRGBColorSpace })
+  )
   const tiledGrassTexture = useMemo(() => {
     if (!grassTexture) return null
     const texture = grassTexture.clone()

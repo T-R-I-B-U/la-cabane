@@ -1,0 +1,214 @@
+.cp-root {
+  font-family: monospace;
+  font-size: 13px;
+  background: #111;
+  color: #ddd;
+  min-height: 100vh;
+}
+
+.cp-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #1a1a1a;
+  border-bottom: 1px solid #333;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cp-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 0;
+  color: #fff;
+}
+
+.cp-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cp-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #aaa;
+}
+
+.cp-select {
+  background: #222;
+  color: #ddd;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cp-select--sm {
+  padding: 2px 4px;
+  font-size: 11px;
+}
+
+.cp-btn {
+  background: #2a2a2a;
+  color: #ddd;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cp-btn:hover:not(:disabled) {
+  background: #333;
+  border-color: #777;
+}
+
+.cp-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.cp-btn--primary {
+  border-color: #5a8a5a;
+  color: #8fc88f;
+}
+
+.cp-btn--primary:hover:not(:disabled) {
+  background: #1e2e1e;
+}
+
+.cp-search {
+  background: #222;
+  color: #ddd;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-family: monospace;
+  font-size: 12px;
+  width: 200px;
+  outline: none;
+}
+
+.cp-search:focus {
+  border-color: #666;
+}
+
+.cp-count {
+  color: #888;
+  font-size: 11px;
+}
+
+.cp-msg {
+  padding: 2rem;
+  color: #888;
+}
+
+.cp-msg--error {
+  color: #e06060;
+}
+
+.cp-table-wrap {
+  overflow-x: auto;
+}
+
+.cp-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cp-table thead th {
+  position: sticky;
+  top: 0;
+  background: #1a1a1a;
+  text-align: left;
+  padding: 6px 8px;
+  color: #666;
+  font-weight: normal;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.cp-table tbody tr {
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.cp-table tbody tr:hover {
+  background: #181818;
+}
+
+.cp-row--running {
+  background: #141a14;
+}
+
+.cp-row--done {
+  background: #111811;
+}
+
+.cp-row--error {
+  background: #1a1111;
+}
+
+.cp-table td {
+  padding: 4px 8px;
+  vertical-align: middle;
+}
+
+.cp-thumb {
+  width: 48px;
+}
+
+.cp-thumb-img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  display: block;
+  border-radius: 2px;
+  background: #222;
+}
+
+.cp-name {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #ccc;
+}
+
+.cp-dims,
+.cp-size {
+  color: #777;
+  white-space: nowrap;
+}
+
+.cp-badge--done {
+  color: #6db86d;
+  font-size: 11px;
+}
+
+.cp-badge--none {
+  color: #444;
+}
+
+.cp-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.cp-log {
+  color: #777;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
+}

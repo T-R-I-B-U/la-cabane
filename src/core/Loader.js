@@ -1,6 +1,8 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { ktx2Loader } from './ktx2Loader.js'
 
 const _loader = new GLTFLoader()
+_loader.setKTX2Loader(ktx2Loader)
 
 // Promise cache — concurrent requests for the same path share one load.
 const _cache = new Map()

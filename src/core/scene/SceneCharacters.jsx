@@ -36,8 +36,8 @@ export function SceneCharacters({
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
   const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
   const textureBasePaths = performanceMode
-    ? ['/textures/compressed/', '/textures/']
-    : ['/textures/']
+    ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
+    : ['/textures/ktx2/', '/textures/']
   const sequence = THOMAS_SEQUENCES[thomasAnimPhase] ?? THOMAS_SEQUENCES.back
 
   return (
