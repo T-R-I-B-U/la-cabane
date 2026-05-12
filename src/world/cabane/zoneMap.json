@@ -29,7 +29,11 @@
       "greenhouse_ground",
       "hearth",
       "house",
-      "rug02"
+      "rug02",
+      "plant01",
+      "plant01-1",
+      "plant02-1",
+      "timeatm"
     ],
     "cabane-interior": [
       "workbench01#4",
