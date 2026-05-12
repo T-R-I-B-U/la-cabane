@@ -332,6 +332,22 @@
       "volume": 1,
       "autoplay": false,
       "subtitles": "zoe-unripe.srt"
+    },
+    {
+      "id": "juiceMachine",
+      "type": "sfx",
+      "src": "Juice-Machine.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
+    },
+    {
+      "id": "juicePouring",
+      "type": "sfx",
+      "src": "Juice-Pouring.mp3",
+      "loop": false,
+      "volume": 0.85,
+      "autoplay": false
     }
   ]
 }
