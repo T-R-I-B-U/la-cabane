@@ -12,6 +12,8 @@ const HIDDEN_NODES = zoneMap.hidden
 // Which React-managed features render per zone.
 export const ZONE_COMPONENTS = {
   all: { characters: true, leaves: true, journal: true },
+  world: { characters: true, leaves: true, journal: false },
+  'cabane-interior': { characters: true, leaves: false, journal: true },
   'all-fake': { characters: false, leaves: true, journal: false },
   nid: { characters: false, leaves: false, journal: false },
   cabane: { characters: true, leaves: true, journal: true },
@@ -21,7 +23,9 @@ export const ZONE_COMPONENTS = {
 
 export const VISIBILITY_ZONES = Object.keys(NODE_WHITELIST)
 
-let visibilityZonesSnapshot = ['all']
+export const DEFAULT_VISIBILITY_ZONES = ['world']
+
+let visibilityZonesSnapshot = [...DEFAULT_VISIBILITY_ZONES]
 const listeners = new Set()
 
 function subscribe(listener) {
@@ -44,6 +48,27 @@ function warnInvalidVisibilityZone(zone) {
 
 function notifyVisibilityZoneListeners() {
   listeners.forEach((listener) => listener())
+}
+
+export function showVisibilityZone(zone) {
+  if (!isValidVisibilityZone(zone)) {
+    warnInvalidVisibilityZone(zone)
+    return
+  }
+  if (visibilityZonesSnapshot.includes(zone)) return
+  visibilityZonesSnapshot = [...visibilityZonesSnapshot, zone]
+  notifyVisibilityZoneListeners()
+}
+
+export function hideVisibilityZone(zone) {
+  if (!isValidVisibilityZone(zone)) {
+    warnInvalidVisibilityZone(zone)
+    return
+  }
+  const next = visibilityZonesSnapshot.filter((entry) => entry !== zone)
+  if (next.length === visibilityZonesSnapshot.length) return
+  visibilityZonesSnapshot = next
+  notifyVisibilityZoneListeners()
 }
 
 export function toggleVisibilityZone(zone) {
@@ -121,7 +146,9 @@ export function applyVisibilityZone(cabaneGroup, zones) {
   const whitelist = showAll ? null : merged
 
   cabaneGroup.children.forEach((child) => {
-    const show = whitelist === null || whitelist.includes(child.name)
+    const visibilityId = child.userData.visibilityId
+    const show =
+      whitelist === null || whitelist.includes(visibilityId) || whitelist.includes(child.name)
     child.visible = show
     child.traverse((obj) => {
       if (!obj.isMesh) return

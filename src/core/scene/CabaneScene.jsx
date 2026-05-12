@@ -7,15 +7,8 @@ import { SlidingDoors } from '../../world/entities/SlidingDoors'
 import { CollisionDebug } from '../CollisionDebug'
 import { TriggerZone } from '../../world/interactions/TriggerZone'
 import { setZone } from '../../utils/gameManagerStore'
-import {
-  applyVisibilityZone,
-  getZoneComponents,
-  useVisibilityZones,
-} from '../../utils/visibilityZoneStore'
 import { PLATFORM_POS } from '../SceneConfig'
 
-// Radius around the tree platform that triggers the arbre zone.
-// Tune once the full arbre scene geometry is known.
 const ARBRE_TRIGGER_RADIUS = 10
 
 export function CabaneScene({
@@ -84,18 +77,12 @@ export function CabaneScene({
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
-  const visibilityZones = useVisibilityZones()
-  const { characters, leaves, journal } = getZoneComponents(visibilityZones)
 
   useEffect(() => {
     if (!cabaneGroup) return
     onCollisionReady?.([cabaneGroup])
     return () => onCollisionReady?.([])
   }, [cabaneGroup, onCollisionReady])
-
-  useEffect(() => {
-    applyVisibilityZone(cabaneGroup, visibilityZones)
-  }, [cabaneGroup, visibilityZones])
 
   const handleCabaneMapReady = useCallback(
     (sceneInfo) => {
@@ -116,6 +103,7 @@ export function CabaneScene({
       setLeafMesh(null)
       return
     }
+
     let leafInstancedMesh = null
     group.traverse((object) => {
       if (!leafInstancedMesh && object.isInstancedMesh && object.name === 'leaf') {
@@ -143,24 +131,20 @@ export function CabaneScene({
         onCabaneLoaded={handleCabaneGroupLoaded}
       />
 
-      {leaves && (
-        <TreeLeaves
-          leafMesh={leafMesh}
-          active={areCabaneInteractionsEnabled}
-          onLeafClick={onLeafClick}
-          onLeafHover={onLeafHover}
-          leafMaterialMode={leafMaterialMode}
-        />
-      )}
+      <TreeLeaves
+        leafMesh={leafMesh}
+        active={areCabaneInteractionsEnabled}
+        onLeafClick={onLeafClick}
+        onLeafHover={onLeafHover}
+        leafMaterialMode={leafMaterialMode}
+      />
 
-      {characters && (
-        <SceneCharacters
-          performanceMode={performanceMode}
-          thomasEtabliPhaseActive={thomasEtabliPhaseActive}
-          onThomasEtabliInteract={onThomasEtabliInteract}
-          thomasAnimPhase={thomasAnimPhase}
-        />
-      )}
+      <SceneCharacters
+        performanceMode={performanceMode}
+        thomasEtabliPhaseActive={thomasEtabliPhaseActive}
+        onThomasEtabliInteract={onThomasEtabliInteract}
+        thomasAnimPhase={thomasAnimPhase}
+      />
 
       <SceneInteractions
         cabane={cabaneGroup}
@@ -208,7 +192,6 @@ export function CabaneScene({
         journalAutoOpenToken={journalAutoOpenToken}
         journalCloseToken={journalCloseToken}
         journalPuzzleEnabled={journalPuzzleEnabled}
-        journalVisible={journal}
       />
 
       {debugCollisions && <CollisionDebug cabane={cabaneGroup} />}
@@ -226,6 +209,7 @@ export function CabaneScene({
         radius={ARBRE_TRIGGER_RADIUS}
         onEnter={() => setZone('arbre')}
       />
+
     </>
   )
 }

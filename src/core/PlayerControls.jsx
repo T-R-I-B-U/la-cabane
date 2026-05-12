@@ -6,6 +6,31 @@ import { FLOOR_Y, PLAYER_HEIGHT } from './SceneConfig'
 
 const COLLISION_DIST = 0.6
 const MOVE_SPEED = 5.4
+
+const _floorOrigin = new THREE.Vector3()
+const _forward = new THREE.Vector3()
+const _right = new THREE.Vector3()
+const _desiredMove = new THREE.Vector3()
+const _axisX = new THREE.Vector3()
+const _axisZ = new THREE.Vector3()
+const _wallDir = new THREE.Vector3()
+const _wallOrigin = new THREE.Vector3()
+
+const WALL_COLLIDER_NODES = new Set([
+  'hut01', 'greenhouse', 'greenhouse_ground', 'trunk', 'nest', 'house',
+  'timeatm', 'ground-hut', 'platform', 'platform-hut', 'ladder',
+  'stairs01', 'stairs02', 'railling', 'railling-hut', 'juicemachine',
+])
+
+function isWallCollider(mesh) {
+  if (mesh.userData.isNestWall || mesh.userData.isRailingCollider) return true
+  let node = mesh.parent
+  while (node) {
+    if (WALL_COLLIDER_NODES.has(node.name)) return true
+    node = node.parent
+  }
+  return false
+}
 const DESCEND_SMOOTHING = 0.3
 const ASCEND_SMOOTHING = 0.2
 const MAX_FRAME_DELTA = 0.05
@@ -39,6 +64,8 @@ export function PlayerControls({
   const wallRaycasterRef = useRef(new THREE.Raycaster())
   const floorRaycasterRef = useRef(new THREE.Raycaster())
   const verticalVelocity = useRef(0)
+  const floorMeshesRef = useRef([])
+  const wallMeshesRef = useRef([])
 
   // Apply scripted camera snaps when the active spawn/target changes.
   useEffect(() => {
@@ -83,6 +110,23 @@ export function PlayerControls({
   }, [controlsRef])
 
   useEffect(() => {
+    const floor = []
+    const wall = []
+    for (const obj of collisionObjects) {
+      obj.traverse((child) => {
+        if (!child.isMesh) return
+        if (child.userData.isFloor || child.userData.isStair) {
+          floor.push(child)
+        } else if (!child.isInstancedMesh && isWallCollider(child)) {
+          wall.push(child)
+        }
+      })
+    }
+    floorMeshesRef.current = floor
+    wallMeshesRef.current = wall
+  }, [collisionObjects])
+
+  useEffect(() => {
     const down = (e) => {
       pressedKeysRef.current[e.code] = true
     }
@@ -105,27 +149,20 @@ export function PlayerControls({
     const frameDelta = Math.min(delta, MAX_FRAME_DELTA)
 
     if (!flyMode) {
-      // --- Floor / stair following ---
-      // Cast a ray straight down from just above the player's head.
-      // The first walkable surface hit determines the target floor height.
-      const floorRayOrigin = camera.position.clone()
-      floorRayOrigin.y += 0.5
-      floorRaycasterRef.current.set(floorRayOrigin, DOWN)
-      const floorHits = floorRaycasterRef.current.intersectObjects(collisionObjects, true)
-      const walkable = floorHits.find(
-        (hit) => hit.object.userData.isFloor || hit.object.userData.isStair
-      )
+      _floorOrigin.copy(camera.position)
+      _floorOrigin.y += 0.5
+      floorRaycasterRef.current.set(_floorOrigin, DOWN)
+      const floorHits = floorRaycasterRef.current.intersectObjects(floorMeshesRef.current, false)
+      const walkable = floorHits.length > 0 ? floorHits[0] : null
       const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
       const targetCamY = targetFloorY + PLAYER_HEIGHT
 
       const cameraHeightDelta = targetCamY - camera.position.y
       if (cameraHeightDelta < 0 && Math.abs(cameraHeightDelta) <= MAX_SNAP_DOWN_DIST) {
-        // Descending — snap quickly so player doesn't float above steps
         const descendAlpha = 1 - Math.pow(1 - DESCEND_SMOOTHING, frameDelta * 60)
         camera.position.y += cameraHeightDelta * descendAlpha
         verticalVelocity.current = 0
       } else if (cameraHeightDelta > 0 && cameraHeightDelta < 0.6) {
-        // Ascending — smooth lerp, limited to realistic step height
         const ascendAlpha = 1 - Math.pow(1 - ASCEND_SMOOTHING, frameDelta * 60)
         camera.position.y += cameraHeightDelta * ascendAlpha
         verticalVelocity.current = 0
@@ -140,7 +177,6 @@ export function PlayerControls({
         )
         if (camera.position.y <= targetCamY) verticalVelocity.current = 0
       }
-      // Large upward deltas mean a wall is above — don't teleport upward.
     } else {
       verticalVelocity.current = 0
     }
@@ -154,48 +190,47 @@ export function PlayerControls({
     )
       return
 
-    const forward = new THREE.Vector3()
-    const right = new THREE.Vector3()
-    camera.getWorldDirection(forward)
-    forward.y = 0
-    forward.normalize()
-    right.crossVectors(forward, UP).normalize()
+    camera.getWorldDirection(_forward)
+    _forward.y = 0
+    _forward.normalize()
+    _right.crossVectors(_forward, UP).normalize()
 
-    const desiredMove = new THREE.Vector3()
     const moveStep = MOVE_SPEED * frameDelta
-    if (pressedKeys['KeyW']) desiredMove.add(forward)
-    if (pressedKeys['KeyS']) desiredMove.addScaledVector(forward, -1)
-    if (pressedKeys['KeyA']) desiredMove.addScaledVector(right, -1)
-    if (pressedKeys['KeyD']) desiredMove.add(right)
-    if (desiredMove.lengthSq() > 0) desiredMove.normalize().multiplyScalar(moveStep)
+    _desiredMove.set(0, 0, 0)
+    if (pressedKeys['KeyW']) _desiredMove.add(_forward)
+    if (pressedKeys['KeyS']) _desiredMove.addScaledVector(_forward, -1)
+    if (pressedKeys['KeyA']) _desiredMove.addScaledVector(_right, -1)
+    if (pressedKeys['KeyD']) _desiredMove.add(_right)
+    if (_desiredMove.lengthSq() > 0) _desiredMove.normalize().multiplyScalar(moveStep)
 
     if (flyMode) {
       const verticalStep = FLY_SPEED * frameDelta
-      if (pressedKeys['Space']) desiredMove.y += verticalStep
-      if (pressedKeys['ShiftLeft'] || pressedKeys['ShiftRight']) desiredMove.y -= verticalStep
-      camera.position.add(desiredMove)
+      if (pressedKeys['Space']) _desiredMove.y += verticalStep
+      if (pressedKeys['ShiftLeft'] || pressedKeys['ShiftRight']) _desiredMove.y -= verticalStep
+      camera.position.add(_desiredMove)
       return
     }
 
-    // Ray heights are relative to current camera Y so they stay correct on stairs
     const footY = camera.position.y - PLAYER_HEIGHT
-    const RAY_HEIGHTS = [footY + 0.3, footY + 0.8, camera.position.y]
+    const h0 = footY + 0.3
+    const h1 = footY + 0.9
+    const wallMeshes = wallMeshesRef.current
 
-    // Axis-split: test X and Z independently so the player slides along walls.
-    const axes = [new THREE.Vector3(desiredMove.x, 0, 0), new THREE.Vector3(0, 0, desiredMove.z)]
-    for (const step of axes) {
+    _axisX.set(_desiredMove.x, 0, 0)
+    _axisZ.set(0, 0, _desiredMove.z)
+
+    for (let a = 0; a < 2; a++) {
+      const step = a === 0 ? _axisX : _axisZ
       if (step.lengthSq() === 0) continue
-      const dir = step.clone().normalize()
+      _wallDir.copy(step).normalize()
       let blocked = false
 
-      for (const rayY of RAY_HEIGHTS) {
-        const origin = camera.position.clone()
-        origin.y = rayY
-        wallRaycasterRef.current.set(origin, dir)
+      for (let hi = 0; hi < 2; hi++) {
+        _wallOrigin.copy(camera.position)
+        _wallOrigin.y = hi === 0 ? h0 : h1
+        wallRaycasterRef.current.set(_wallOrigin, _wallDir)
         if (
-          wallRaycasterRef.current
-            .intersectObjects(collisionObjects, true)
-            .some(isBlockingCollisionHit)
+          wallRaycasterRef.current.intersectObjects(wallMeshes, false).some(isBlockingCollisionHit)
         ) {
           blocked = true
           break

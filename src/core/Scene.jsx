@@ -146,7 +146,7 @@ export default function Scene({
       <SceneLighting activeHdriId={activeHdriId} />
 
       <Floor mainFloorRef={setMainFloorCollider} hutPosition={hutPosition} />
-      <BackgroundPlanes hutPosition={hutPosition} />
+      {/* <BackgroundPlanes hutPosition={hutPosition} /> */}
 
       {(zone === 'cabane' || zone === 'arbre') && (
         <Suspense fallback={null}>

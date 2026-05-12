@@ -16,10 +16,10 @@ import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
+import { setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { GAME_STEPS } from './utils/gameStateStore'
-import { setVisibilityZones } from './utils/visibilityZoneStore'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
@@ -545,7 +545,11 @@ export default function App() {
         setIsViewerControlsVisible((current) => !current)
       } else if (event.code === 'F2') {
         event.preventDefault()
-        setShowCameraEditor((current) => !current)
+        setShowCameraEditor((current) => {
+          const next = !current
+          if (!next) setEditorFlyMode(false)
+          return next
+        })
       } else if (event.code === 'F3') {
         event.preventDefault()
         setShowStoryDebug((current) => !current)
@@ -582,6 +586,7 @@ export default function App() {
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible ||
+    showCameraEditor ||
     journalUnlocked ||
     raspberryPhaseActive ||
     (!introActive &&
@@ -605,7 +610,7 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(false)
     setIsPlayerModeActive(true)
-    setIsFlyModeActive(false)
+    setIsFlyModeActive(true)
   }
 
   const explorationReady = false
@@ -614,6 +619,12 @@ export default function App() {
     !introActive &&
     !postIntro &&
     (isDevBuild || isViewerControlsVisible || showCameraEditor || showStoryDebug)
+  const showCameraEditorOverlay = !introPending && !introActive && showCameraEditor
+
+  const closeCameraEditor = useCallback(() => {
+    setEditorFlyMode(false)
+    setShowCameraEditor(false)
+  }, [])
 
   // Appelé par GameManager à chaque transition d'étape.
   // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
@@ -638,9 +649,6 @@ export default function App() {
         break
 
       case GAME_STEPS.EXPLORATION:
-        // La visite scénarisée est finie, le joueur peut explorer librement.
-        setVisibilityZones(['all'])
-        // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
         break
 
       case GAME_STEPS.ARBRE_INTRO:
@@ -808,9 +816,9 @@ export default function App() {
         </Suspense>
       )}
 
-      {showDevOverlays && showCameraEditor && (
+      {showCameraEditorOverlay && (
         <Suspense fallback={null}>
-          <CameraEditorPanel />
+          <CameraEditorPanel onClose={closeCameraEditor} />
         </Suspense>
       )}
 

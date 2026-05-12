@@ -1,294 +1,687 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  addStoryPov,
-  captureIntroWaypoint,
-  captureStoryPov,
-  exportAsJS,
+  addCamera,
+  addSequenceStep,
+  captureCharacterFromCamera,
+  captureCamera,
+  duplicateCamera,
+  exportAsJSON,
+  getEditorFlyMode,
   getLiveCamera,
   getRegistry,
+  onEditorFlyModeChange,
   onLiveCameraChange,
   onRegistryChange,
-  removeStoryPov,
-  renameStoryPov,
+  moveSequenceStep,
+  removeCamera,
+  removeSequenceStep,
   requestTeleport,
+  resetCameraRegistry,
+  setEditorFlyMode,
+  updateCamera,
+  updateCharacter,
+  updateSequenceStep,
 } from './cameraRegistry'
 
-// ── Styles ───────────────────────────────────────────────────────────
+const GROUPS = ['intro', 'story', 'arbre', 'debug']
+const INITIAL_PANEL_POSITION = { x: 20, y: 20 }
+const PANEL_POSITION_KEY = 'lacabane:camera-editor-panel-position'
 
 const S = {
-  panel: {
+  shell: {
     position: 'fixed',
-    right: 16,
-    top: 16,
-    zIndex: 800,
-    width: 300,
-    maxHeight: 'calc(100vh - 32px)',
-    overflowY: 'auto',
-    background: 'rgba(10,12,16,0.92)',
-    backdropFilter: 'blur(8px)',
-    color: '#fff',
-    borderRadius: 10,
-    padding: '12px 14px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 10,
+    zIndex: 900,
+    width: 760,
+    height: 'min(760px, calc(100vh - 40px))',
+    maxHeight: 'calc(100vh - 40px)',
+    display: 'grid',
+    gridTemplateColumns: '230px 1fr',
+    gridTemplateRows: 'auto minmax(0, 1fr)',
+    background: 'rgba(7, 9, 13, 0.96)',
+    color: '#f4f7fb',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 16,
+    overflow: 'hidden',
+    boxShadow: '0 18px 60px rgba(0,0,0,0.45)',
+    fontFamily: 'Inter, system-ui, sans-serif',
     fontSize: 12,
-    fontFamily: 'system-ui, sans-serif',
-    boxShadow: '0 4px 24px rgba(0,0,0,0.5)',
-    userSelect: 'none',
   },
-  heading: { fontWeight: 700, fontSize: 13, color: '#7cf', marginBottom: 2 },
-  section: { display: 'flex', flexDirection: 'column', gap: 6 },
-  eyebrow: {
-    color: '#666',
-    fontSize: 10,
-    fontWeight: 700,
-    letterSpacing: '0.1em',
-    textTransform: 'uppercase',
-    marginBottom: 2,
-  },
-  liveBox: {
-    background: 'rgba(255,255,255,0.05)',
-    borderRadius: 6,
-    padding: '7px 10px',
-    fontFamily: 'monospace',
-    fontSize: 11,
-    color: '#ccc',
-    lineHeight: 1.6,
-  },
-  slot: (captured) => ({
-    background: captured ? 'rgba(120,220,140,0.07)' : 'rgba(255,255,255,0.03)',
-    border: `1px solid ${captured ? 'rgba(120,220,140,0.25)' : 'rgba(255,255,255,0.07)'}`,
-    borderRadius: 6,
-    padding: '7px 9px',
-  }),
-  slotHeader: {
+  header: {
+    gridColumn: '1 / -1',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 6,
-    marginBottom: 3,
+    gap: 12,
+    padding: '12px 14px',
+    borderBottom: '1px solid rgba(255,255,255,0.08)',
+    background: 'linear-gradient(90deg, rgba(46,124,173,0.22), rgba(255,255,255,0.03))',
+    cursor: 'grab',
+    userSelect: 'none',
   },
-  label: (captured) => ({ fontSize: 11, color: captured ? '#9de' : '#777', flex: 1 }),
-  actions: { display: 'flex', gap: 4 },
-  btn: (color) => ({
-    fontSize: 10,
-    padding: '2px 7px',
-    borderRadius: 4,
-    border: 'none',
-    background: color,
-    color: '#fff',
+  headerDragging: { cursor: 'grabbing' },
+  sidebar: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 10,
+    padding: 12,
+    borderRight: '1px solid rgba(255,255,255,0.08)',
+    background: 'rgba(255,255,255,0.03)',
+    minHeight: 0,
+    overflowY: 'auto',
+  },
+  main: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 12,
+    padding: 14,
+    overflowY: 'auto',
+    minHeight: 0,
+  },
+  title: { fontSize: 14, fontWeight: 800, color: '#9de3ff' },
+  subtitle: { color: '#a6b0bd', fontSize: 11 },
+  nav: { display: 'flex', gap: 6 },
+  navButton: (active) => ({
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 999,
+    padding: '7px 12px',
+    background: active ? 'rgba(124,255,194,0.14)' : 'rgba(255,255,255,0.055)',
+    color: active ? '#caffea' : '#c7d0dc',
     cursor: 'pointer',
-    fontWeight: 600,
-    whiteSpace: 'nowrap',
+    fontWeight: 800,
   }),
-  coords: { color: '#888', fontFamily: 'monospace', fontSize: 10, lineHeight: 1.5 },
-  addRow: { display: 'flex', gap: 6, marginTop: 2 },
-  input: {
-    flex: 1,
-    background: 'rgba(255,255,255,0.07)',
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 4,
-    color: '#fff',
-    fontSize: 11,
-    padding: '3px 7px',
-    outline: 'none',
-    fontFamily: 'system-ui, sans-serif',
-  },
-  exportBtn: (copied) => ({
-    padding: '7px 0',
-    borderRadius: 6,
-    border: 'none',
-    background: copied ? '#2a6' : '#335',
-    color: '#fff',
+  groupTabs: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 5 },
+  tab: (active) => ({
+    border: '1px solid rgba(255,255,255,0.09)',
+    borderRadius: 8,
+    padding: '6px 7px',
+    background: active ? 'rgba(96,190,255,0.22)' : 'rgba(255,255,255,0.045)',
+    color: active ? '#dff6ff' : '#a8b0ba',
+    cursor: 'pointer',
     fontWeight: 700,
-    cursor: 'pointer',
-    fontSize: 12,
-    transition: 'background 200ms',
-    marginTop: 2,
+    textTransform: 'capitalize',
   }),
+  list: { display: 'flex', flexDirection: 'column', gap: 5, overflowY: 'auto' },
+  row: (active) => ({
+    textAlign: 'left',
+    border: '1px solid rgba(255,255,255,0.07)',
+    borderRadius: 8,
+    padding: '7px 8px',
+    background: active ? 'rgba(124,255,194,0.13)' : 'rgba(255,255,255,0.035)',
+    color: active ? '#cbffe9' : '#d6dbe0',
+    cursor: 'pointer',
+  }),
+  rowId: { display: 'block', marginTop: 2, color: '#77808c', fontSize: 10 },
+  field: { display: 'flex', flexDirection: 'column', gap: 4 },
+  label: { color: '#8e99a8', fontSize: 10, fontWeight: 800, textTransform: 'uppercase' },
+  input: {
+    width: '100%',
+    boxSizing: 'border-box',
+    border: '1px solid rgba(255,255,255,0.12)',
+    borderRadius: 8,
+    background: 'rgba(255,255,255,0.055)',
+    color: '#fff',
+    padding: '7px 9px',
+    outline: 'none',
+    font: 'inherit',
+  },
+  btnRow: { display: 'flex', flexWrap: 'wrap', gap: 7 },
+  btn: (tone = 'default') => {
+    const tones = {
+      default: '#334055',
+      primary: '#1673a8',
+      good: '#247b54',
+      warn: '#8b5530',
+      danger: '#763441',
+    }
+    return {
+      border: 'none',
+      borderRadius: 8,
+      padding: '7px 9px',
+      background: tones[tone],
+      color: '#fff',
+      cursor: 'pointer',
+      fontWeight: 800,
+      fontSize: 11,
+    }
+  },
+  live: {
+    background: 'rgba(255,255,255,0.055)',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 10,
+    padding: 10,
+    color: '#c9d1d9',
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+    lineHeight: 1.6,
+  },
+  card: {
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 12,
+    background: 'rgba(255,255,255,0.035)',
+    padding: 12,
+  },
+  cardTitle: { fontSize: 12, fontWeight: 900, marginBottom: 9, color: '#e7edf5' },
+  grid2: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 },
+  step: {
+    display: 'grid',
+    gridTemplateColumns: '28px 1fr 72px 72px 86px 72px auto',
+    gap: 7,
+    alignItems: 'center',
+    padding: 8,
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 10,
+    background: 'rgba(255,255,255,0.035)',
+  },
+  smallInput: {
+    width: '100%',
+    boxSizing: 'border-box',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 7,
+    background: 'rgba(0,0,0,0.18)',
+    color: '#fff',
+    padding: '6px 7px',
+    outline: 'none',
+    font: 'inherit',
+  },
+  empty: { color: '#7c8490', padding: 10, textAlign: 'center' },
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────
-
 function fmt(v) {
-  if (!v) return '—'
+  if (!v) return 'non capturé'
   return `${v.x}, ${v.y}, ${v.z}`
 }
 
-// ── Sub-components ───────────────────────────────────────────────────
-
-function LiveBox({ live }) {
-  return (
-    <div style={S.liveBox}>
-      <div style={{ color: '#aaa', fontSize: 10, marginBottom: 3 }}>CAMÉRA ACTUELLE</div>
-      <div>pos: {fmt(live?.position)}</div>
-      <div>tgt: {fmt(live?.target)}</div>
-    </div>
-  )
-}
-
-function Slot({ label, captured, position, target, onCapture, onTeleport, onRename, onRemove }) {
-  const [editing, setEditing] = useState(false)
-  const [draft, setDraft] = useState(label)
-  const inputRef = useRef()
-
-  function commitRename() {
-    if (draft.trim()) onRename?.(draft.trim())
-    setEditing(false)
+function loadPanelPosition() {
+  try {
+    const raw = localStorage.getItem(PANEL_POSITION_KEY)
+    if (!raw) return INITIAL_PANEL_POSITION
+    const parsed = JSON.parse(raw)
+    if (typeof parsed.x !== 'number' || typeof parsed.y !== 'number') {
+      return INITIAL_PANEL_POSITION
+    }
+    return parsed
+  } catch {
+    return INITIAL_PANEL_POSITION
   }
-
-  useEffect(() => {
-    if (editing) inputRef.current?.focus()
-  }, [editing])
-
-  return (
-    <div style={S.slot(captured)}>
-      <div style={S.slotHeader}>
-        {editing ? (
-          <input
-            ref={inputRef}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onBlur={commitRename}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') commitRename()
-              if (e.key === 'Escape') setEditing(false)
-            }}
-            style={{ ...S.input, flex: 1 }}
-          />
-        ) : (
-          <span
-            style={S.label(captured)}
-            onDoubleClick={() => onRename && setEditing(true)}
-            title={onRename ? 'Double-clic pour renommer' : undefined}
-          >
-            {label}
-          </span>
-        )}
-        <div style={S.actions}>
-          {captured && (
-            <button style={S.btn('#27559a')} onClick={onTeleport} title="Téléporter ici">
-              →
-            </button>
-          )}
-          <button style={S.btn('#2a6')} onClick={onCapture} title="Capturer position actuelle">
-            ●
-          </button>
-          {onRemove && (
-            <button style={S.btn('#622')} onClick={onRemove} title="Supprimer">
-              ✕
-            </button>
-          )}
-        </div>
-      </div>
-      {captured && (
-        <div style={S.coords}>
-          <div>pos: {fmt(position)}</div>
-          <div>tgt: {fmt(target)}</div>
-        </div>
-      )}
-      {!captured && <div style={{ color: '#555', fontSize: 10 }}>non capturé</div>}
-    </div>
-  )
 }
 
-// ── Panel ─────────────────────────────────────────────────────────────
+function persistPanelPosition(position) {
+  try {
+    localStorage.setItem(PANEL_POSITION_KEY, JSON.stringify(position))
+  } catch {
+    // localStorage can be unavailable in private browsing.
+  }
+}
 
-export default function CameraEditorPanel() {
-  const [live, setLive] = useState(getLiveCamera)
+function stopScenePointerEvent(event) {
+  event.stopPropagation()
+}
+
+export default function CameraEditorPanel({ onClose }) {
+  const panelRef = useRef(null)
+  const dragRef = useRef(null)
   const [registry, setRegistry] = useState(getRegistry)
-  const [newPovLabel, setNewPovLabel] = useState('')
+  const [live, setLive] = useState(getLiveCamera)
+  const [panelPosition, setPanelPosition] = useState(loadPanelPosition)
+  const [isDragging, setIsDragging] = useState(false)
+  const [group, setGroup] = useState('intro')
+  const [selectedId, setSelectedId] = useState('intro.start')
+  const [view, setView] = useState('cameras')
+  const [newLabel, setNewLabel] = useState('Nouvelle caméra')
   const [copied, setCopied] = useState(false)
+  const [flyMode, setFlyModeState] = useState(getEditorFlyMode)
 
-  useEffect(() => onLiveCameraChange(setLive), [])
   useEffect(() => onRegistryChange(setRegistry), [])
+  useEffect(() => onLiveCameraChange(setLive), [])
+  useEffect(() => onEditorFlyModeChange(setFlyModeState), [])
 
-  function capture() {
-    return live ? { position: live.position, target: live.target } : null
-  }
+  const cameras = useMemo(
+    () => registry.cameras.filter((camera) => camera.group === group),
+    [group, registry.cameras]
+  )
+  const selected = cameras.find((camera) => camera.id === selectedId) ?? cameras[0] ?? null
+  const introSteps = registry.sequences?.intro ?? []
 
-  function handleCaptureIntro(index) {
-    const cam = capture()
-    if (cam) captureIntroWaypoint(index, cam.position, cam.target)
-  }
-
-  function handleCapturePov(id) {
-    const cam = capture()
-    if (cam) captureStoryPov(id, cam.position, cam.target)
-  }
-
-  function handleAddPov() {
-    const label = newPovLabel.trim()
-    if (!label) return
-    addStoryPov(label)
-    setNewPovLabel('')
+  function handleAddCamera() {
+    const camera = addCamera({ label: newLabel.trim() || 'Nouvelle caméra', group })
+    setSelectedId(camera.id)
   }
 
   function handleExport() {
-    navigator.clipboard.writeText(exportAsJS())
+    navigator.clipboard.writeText(exportAsJSON())
     setCopied(true)
-    setTimeout(() => setCopied(false), 1800)
+    setTimeout(() => setCopied(false), 1400)
   }
 
+  function handleFlyModeToggle() {
+    setEditorFlyMode(!flyMode)
+  }
+
+  function handleDragStart(event) {
+    if (event.button !== 0) return
+    if (event.target.closest('button, input, textarea, select')) return
+
+    const rect = panelRef.current?.getBoundingClientRect()
+    if (!rect) return
+
+    dragRef.current = {
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+    }
+    setIsDragging(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  function handleDragMove(event) {
+    if (!dragRef.current) return
+
+    const rect = panelRef.current?.getBoundingClientRect()
+    const width = rect?.width ?? 760
+    const height = rect?.height ?? 520
+    const maxX = Math.max(window.innerWidth - width, 0)
+    const maxY = Math.max(window.innerHeight - height, 0)
+
+    const nextPosition = {
+      x: Math.min(Math.max(event.clientX - dragRef.current.offsetX, 0), maxX),
+      y: Math.min(Math.max(event.clientY - dragRef.current.offsetY, 0), maxY),
+    }
+    setPanelPosition(nextPosition)
+    persistPanelPosition(nextPosition)
+  }
+
+  function handleDragEnd(event) {
+    if (!dragRef.current) return
+    dragRef.current = null
+    setIsDragging(false)
+    event.currentTarget.releasePointerCapture(event.pointerId)
+  }
+
+  function handleClose() {
+    setEditorFlyMode(false)
+    onClose?.()
+  }
+
+  useEffect(() => () => setEditorFlyMode(false), [])
+
   return (
-    <div style={S.panel}>
-      <div style={S.heading}>Éditeur caméra</div>
-
-      <LiveBox live={live} />
-
-      {/* Intro waypoints */}
-      <div style={S.section}>
-        <div style={S.eyebrow}>Intro cinématique</div>
-        {registry.introWaypoints.map((wp) => (
-          <Slot
-            key={wp.index}
-            label={`WP${wp.index} — ${wp.label}`}
-            captured={wp.position !== null}
-            position={wp.position}
-            target={wp.target}
-            onCapture={() => handleCaptureIntro(wp.index)}
-            onTeleport={() => requestTeleport(wp.position, wp.target)}
-          />
-        ))}
-      </div>
-
-      {/* Story POVs */}
-      <div style={S.section}>
-        <div style={S.eyebrow}>POV Story</div>
-        {registry.storyPovs.length === 0 && (
-          <div style={{ color: '#555', fontSize: 11 }}>Aucun POV — ajoute-en un ci-dessous</div>
-        )}
-        {registry.storyPovs.map((pov) => (
-          <Slot
-            key={pov.id}
-            label={pov.label}
-            captured={pov.position !== null}
-            position={pov.position}
-            target={pov.target}
-            onCapture={() => handleCapturePov(pov.id)}
-            onTeleport={() => requestTeleport(pov.position, pov.target)}
-            onRename={(label) => renameStoryPov(pov.id, label)}
-            onRemove={() => removeStoryPov(pov.id)}
-          />
-        ))}
-        <div style={S.addRow}>
-          <input
-            style={S.input}
-            placeholder="Nom du POV (ex: accueil)"
-            value={newPovLabel}
-            onChange={(e) => setNewPovLabel(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddPov()}
-          />
-          <button style={S.btn('#446')} onClick={handleAddPov}>
-            +
+    <div
+      ref={panelRef}
+      style={{ ...S.shell, left: panelPosition.x, top: panelPosition.y }}
+      onPointerDown={stopScenePointerEvent}
+      onPointerUp={stopScenePointerEvent}
+      onClick={stopScenePointerEvent}
+      onDoubleClick={stopScenePointerEvent}
+      onWheel={stopScenePointerEvent}
+    >
+      <header
+        style={{ ...S.header, ...(isDragging ? S.headerDragging : null) }}
+        onPointerDown={handleDragStart}
+        onPointerMove={handleDragMove}
+        onPointerUp={handleDragEnd}
+        onPointerCancel={handleDragEnd}
+      >
+        <div>
+          <div style={S.title}>F2 Camera Editor</div>
+          <div style={S.subtitle}>Création, fly mode, capture et caméras de scénario</div>
+        </div>
+        <div style={S.nav}>
+          <button
+            type="button"
+            style={S.navButton(view === 'cameras')}
+            onClick={() => setView('cameras')}
+          >
+            Caméras
+          </button>
+          <button
+            type="button"
+            style={S.navButton(view === 'scenario')}
+            onClick={() => setView('scenario')}
+          >
+            Scénario
+          </button>
+          <button
+            type="button"
+            style={S.navButton(view === 'characters')}
+            onClick={() => setView('characters')}
+          >
+            PNJ
+          </button>
+          <button type="button" style={S.btn()} onClick={handleClose}>
+            Fermer
           </button>
         </div>
-      </div>
+      </header>
 
-      <button style={S.exportBtn(copied)} onClick={handleExport}>
-        {copied ? '✓ Copié !' : 'Exporter en JS'}
-      </button>
+      <aside style={S.sidebar}>
+        <div>
+          <div style={S.title}>Bibliothèque</div>
+          <div style={S.subtitle}>{registry.cameras.length} caméras enregistrées</div>
+        </div>
+        <div style={S.groupTabs}>
+          {GROUPS.map((name) => (
+            <button
+              key={name}
+              type="button"
+              style={S.tab(group === name)}
+              onClick={() => setGroup(name)}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+        <div style={S.list}>
+          {cameras.map((camera) => (
+            <button
+              key={camera.id}
+              type="button"
+              style={S.row(selected?.id === camera.id)}
+              onClick={() => setSelectedId(camera.id)}
+            >
+              {camera.label}
+              <span style={S.rowId}>{camera.id}</span>
+            </button>
+          ))}
+          {cameras.length === 0 && <div style={S.empty}>Aucune caméra dans ce groupe</div>}
+        </div>
+        <div style={S.field}>
+          <span style={S.label}>Ajouter</span>
+          <input style={S.input} value={newLabel} onChange={(e) => setNewLabel(e.target.value)} />
+          <button type="button" style={S.btn('primary')} onClick={handleAddCamera}>
+            Ajouter caméra
+          </button>
+        </div>
+      </aside>
+
+      <section style={S.main}>
+        <div style={S.btnRow}>
+          <button
+            type="button"
+            style={S.btn(flyMode ? 'good' : 'default')}
+            onClick={handleFlyModeToggle}
+          >
+            Fly mode {flyMode ? 'ON' : 'OFF'}
+          </button>
+          <button type="button" style={S.btn()} onClick={handleExport}>
+            {copied ? 'JSON copié' : 'Exporter JSON'}
+          </button>
+          <button type="button" style={S.btn('warn')} onClick={resetCameraRegistry}>
+            Reset local
+          </button>
+        </div>
+
+        <div style={S.live}>
+          <strong>Caméra live</strong>
+          <div>pos: {fmt(live?.position)}</div>
+          <div>tgt: {fmt(live?.target)}</div>
+          <div>fov: {live?.fov ?? 'n/a'}</div>
+          <div>ZQSD + souris maintenue en fly mode, Echap pour sortir.</div>
+        </div>
+
+        {view === 'cameras' && selected && (
+          <>
+            <div style={S.card}>
+              <div style={S.cardTitle}>Caméra sélectionnée</div>
+              <div style={S.grid2}>
+                <div style={S.field}>
+                  <span style={S.label}>Label</span>
+                  <input
+                    style={S.input}
+                    value={selected.label}
+                    onChange={(e) => updateCamera(selected.id, { label: e.target.value })}
+                  />
+                </div>
+                <div style={S.field}>
+                  <span style={S.label}>Groupe</span>
+                  <select
+                    style={S.input}
+                    value={selected.group}
+                    onChange={(e) => {
+                      updateCamera(selected.id, { group: e.target.value })
+                      setGroup(e.target.value)
+                    }}
+                  >
+                    {GROUPS.map((name) => (
+                      <option key={name} value={name}>
+                        {name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div style={S.live}>
+              <strong>{selected.id}</strong>
+              <div>pos: {fmt(selected.position)}</div>
+              <div>tgt: {fmt(selected.target)}</div>
+              <div>fov: {selected.fov ?? 60}</div>
+            </div>
+            <div style={S.btnRow}>
+              <button
+                type="button"
+                style={S.btn('good')}
+                onClick={() => captureCamera(selected.id, live)}
+              >
+                Enregistrer position
+              </button>
+              <button
+                type="button"
+                style={S.btn('primary')}
+                onClick={() => requestTeleport(selected.position, selected.target, selected.fov)}
+              >
+                Aller à la caméra
+              </button>
+              <button type="button" style={S.btn()} onClick={() => duplicateCamera(selected.id)}>
+                Dupliquer
+              </button>
+              <button
+                type="button"
+                style={S.btn('danger')}
+                onClick={() => removeCamera(selected.id)}
+              >
+                Supprimer
+              </button>
+            </div>
+          </>
+        )}
+
+        {view === 'scenario' && (
+          <div style={S.card}>
+            <div style={S.cardTitle}>Séquence intro</div>
+            <div style={{ ...S.btnRow, marginBottom: 10 }}>
+              <button
+                type="button"
+                style={S.btn('primary')}
+                disabled={!selected}
+                onClick={() => selected && addSequenceStep('intro', selected.id)}
+              >
+                Ajouter la caméra sélectionnée
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+              {introSteps.map((step, index) => {
+                const camera = registry.cameras.find((item) => item.id === step.cameraId)
+                return (
+                  <div key={`${step.cameraId}-${index}`} style={S.step}>
+                    <strong>#{index + 1}</strong>
+                    <select
+                      style={S.smallInput}
+                      value={step.cameraId}
+                      onChange={(e) =>
+                        updateSequenceStep('intro', index, { cameraId: e.target.value })
+                      }
+                    >
+                      {registry.cameras.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      style={S.smallInput}
+                      type="number"
+                      step="0.1"
+                      value={step.duration ?? 1.2}
+                      title="Durée"
+                      onChange={(e) =>
+                        updateSequenceStep('intro', index, { duration: Number(e.target.value) })
+                      }
+                    />
+                    <input
+                      style={S.smallInput}
+                      type="number"
+                      step="0.1"
+                      value={step.delay ?? 0}
+                      title="Delay"
+                      onChange={(e) =>
+                        updateSequenceStep('intro', index, { delay: Number(e.target.value) })
+                      }
+                    />
+                    <input
+                      style={S.smallInput}
+                      value={step.event ?? ''}
+                      placeholder="event"
+                      onChange={(e) =>
+                        updateSequenceStep('intro', index, { event: e.target.value })
+                      }
+                    />
+                    <label
+                      style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#c7d0dc' }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={Boolean(step.waitForInput)}
+                        onChange={(e) =>
+                          updateSequenceStep('intro', index, { waitForInput: e.target.checked })
+                        }
+                      />
+                      wait
+                    </label>
+                    <div style={S.btnRow}>
+                      <button
+                        type="button"
+                        style={S.btn()}
+                        onClick={() => moveSequenceStep('intro', index, -1)}
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        style={S.btn()}
+                        onClick={() => moveSequenceStep('intro', index, 1)}
+                      >
+                        ↓
+                      </button>
+                      <button
+                        type="button"
+                        style={S.btn('danger')}
+                        onClick={() => removeSequenceStep('intro', index)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                    <span style={{ gridColumn: '2 / -1', color: '#7e8793', fontSize: 10 }}>
+                      {camera?.id ?? step.cameraId}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {view === 'characters' && (
+          <div style={S.card}>
+            <div style={S.cardTitle}>Positions PNJ</div>
+            <div style={{ color: '#9aa6b5', marginBottom: 10 }}>
+              Capturer depuis la caméra reprend X/Z, puis utilise la hauteur de sol propre au PNJ.
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+              {(registry.characters ?? []).map((character) => (
+                <div key={character.id} style={S.card}>
+                  <div style={{ ...S.btnRow, justifyContent: 'space-between', marginBottom: 10 }}>
+                    <strong>{character.label}</strong>
+                    <button
+                      type="button"
+                      style={S.btn('good')}
+                      onClick={() => captureCharacterFromCamera(character.id, live)}
+                    >
+                      Capturer X/Z
+                    </button>
+                  </div>
+                  <div style={S.grid2}>
+                    <div style={S.field}>
+                      <span style={S.label}>X</span>
+                      <input
+                        style={S.input}
+                        type="number"
+                        step="0.0001"
+                        value={character.position?.x ?? 0}
+                        onChange={(e) =>
+                          updateCharacter(character.id, {
+                            position: { ...character.position, x: Number(e.target.value) },
+                          })
+                        }
+                      />
+                    </div>
+                    <div style={S.field}>
+                      <span style={S.label}>Z</span>
+                      <input
+                        style={S.input}
+                        type="number"
+                        step="0.0001"
+                        value={character.position?.z ?? 0}
+                        onChange={(e) =>
+                          updateCharacter(character.id, {
+                            position: { ...character.position, z: Number(e.target.value) },
+                          })
+                        }
+                      />
+                    </div>
+                    <div style={S.field}>
+                      <span style={S.label}>Hauteur Y</span>
+                      <input
+                        style={S.input}
+                        type="number"
+                        step="0.0001"
+                        value={character.position?.y ?? character.floorY ?? 0}
+                        onChange={(e) =>
+                          updateCharacter(character.id, {
+                            position: { ...character.position, y: Number(e.target.value) },
+                          })
+                        }
+                      />
+                    </div>
+                    <div style={S.field}>
+                      <span style={S.label}>Sol PNJ</span>
+                      <input
+                        style={S.input}
+                        type="number"
+                        step="0.0001"
+                        value={character.floorY ?? character.position?.y ?? 0}
+                        onChange={(e) =>
+                          updateCharacter(character.id, { floorY: Number(e.target.value) })
+                        }
+                      />
+                    </div>
+                    <div style={S.field}>
+                      <span style={S.label}>Rotation Y</span>
+                      <input
+                        style={S.input}
+                        type="number"
+                        step="0.01"
+                        value={character.rotationY ?? 0}
+                        onChange={(e) =>
+                          updateCharacter(character.id, { rotationY: Number(e.target.value) })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   )
 }

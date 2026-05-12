@@ -9,6 +9,9 @@ const INSIDE_POV = {
   target: { x: -12.5066, y: 1.7137, z: -5.2008 },
 }
 
+const RASPBERRY_TEMP_COMPLETE_COUNT = 8
+const RASPBERRY_TEMP_AUTO_COMPLETE_DELAY = 2000
+
 export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
@@ -446,7 +449,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     if (completed) {
       isPostBookTransitionRef.current = true
-      setStoryCameraTransition({ ...INSIDE_POV, duration: 2.0 })
+      setStoryCameraTransition({ ...STORY_CAMERA_POVS.accueil, duration: 2.0 })
       return true
     }
 
@@ -515,6 +518,25 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     },
     [playDialogue, scheduleFlowTimeout]
   )
+
+  useEffect(() => {
+    if (!raspberryPhaseActive) return undefined
+
+    const scheduledTimeouts = scheduledTimeoutsRef.current
+
+    const timeoutId = scheduleFlowTimeout(() => {
+      handleMinigameStateChange({
+        active: true,
+        count: RASPBERRY_TEMP_COMPLETE_COUNT,
+        complete: true,
+      })
+    }, RASPBERRY_TEMP_AUTO_COMPLETE_DELAY)
+
+    return () => {
+      clearTimeout(timeoutId)
+      scheduledTimeouts.delete(timeoutId)
+    }
+  }, [handleMinigameStateChange, raspberryPhaseActive, scheduleFlowTimeout])
 
   const handleUnripeAttempt = useCallback(() => {
     playDialogue('zoeUnripe')

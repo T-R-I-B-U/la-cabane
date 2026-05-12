@@ -29,7 +29,7 @@ export function SceneLighting({ activeHdriId }) {
         <Environment preset={activeHdri.preset} />
       )}
       <ambientLight intensity={1} />
-      <directionalLight position={[10, 70, 10]} intensity={1.5} castShadow />
+      <directionalLight position={[10, 70, 10]} intensity={1.5} />
     </>
   )
 }

@@ -1,4 +1,4 @@
-import { Suspense, useMemo } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
@@ -17,6 +17,7 @@ import { Basket, RaspberryMinigame } from '../../world/entities/RaspberryMinigam
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 import { publicAssetManifest } from 'virtual:public-asset-manifest'
 import { FLOOR_Y } from '../SceneConfig.js'
+import { getRegistry, onRegistryChange } from '../cameraRegistry'
 
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
 // outsideplant03 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
@@ -31,6 +32,16 @@ function resolveCharacterUrl(fileName, performanceMode) {
   }
 
   return `/models/${fileName}`
+}
+
+function getCharacterConfig(id) {
+  return getRegistry().characters?.find((character) => character.id === id) ?? null
+}
+
+function toPositionArray(character, fallback) {
+  const position = character?.position
+  if (!position) return fallback
+  return [position.x, position.y, position.z]
 }
 
 export function SceneInteractions({
@@ -80,6 +91,7 @@ export function SceneInteractions({
   serrePreview,
   performanceMode,
 }) {
+  const [characters, setCharacters] = useState(() => getRegistry().characters ?? [])
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   // Keep Zoe's visible mesh on the source GLB and reuse the compressed GLB for animation clips,
   // matching the historical fix that restored her motion after model export changes.
@@ -87,6 +99,11 @@ export function SceneInteractions({
   const textureBasePaths = performanceMode
     ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
     : ['/textures/ktx2/', '/textures/']
+  const zoe = characters.find((character) => character.id === 'zoe') ?? getCharacterConfig('zoe')
+  const zoePosition = toPositionArray(zoe, [26.0, FLOOR_Y, -5.4])
+
+  useEffect(() => onRegistryChange((registry) => setCharacters(registry.characters ?? [])), [])
+
   const bookPosition = useMemo(() => {
     if (!cabane) return null
 
@@ -169,7 +186,7 @@ export function SceneInteractions({
         />
       )}
 
-      <ClickableZoe isInteractable={zoePhaseActive} onZoeTalk={onZoeTalk} />
+      <ClickableZoe isInteractable={zoePhaseActive} position={zoePosition} onZoeTalk={onZoeTalk} />
 
       <ClickableJuiceMachine
         cabane={cabane}
@@ -188,7 +205,6 @@ export function SceneInteractions({
       {raspberryPhaseActive && (
         <RaspberryMinigame
           isActive
-          cabane={cabane}
           onStateChange={onMinigameStateChange}
           onUnripeAttempt={onUnripeAttempt}
         />
@@ -208,9 +224,9 @@ export function SceneInteractions({
             clip={zoeClip}
             textureName="zoe-animated"
             textureBasePaths={textureBasePaths}
-            position={[26.0, FLOOR_Y, -5.4]}
-            rotation={[0, -Math.PI / 2, 0]}
-            scale={11}
+            position={zoePosition}
+            rotation={[0, zoe?.rotationY ?? -Math.PI / 2, 0]}
+            scale={zoe?.scale ?? 11}
           />
         </Suspense>
       )}
