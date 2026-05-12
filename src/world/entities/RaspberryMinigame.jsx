@@ -57,21 +57,21 @@ const RASPBERRY_DEFS = [
 ]
 
 // ── Hide static raspberry meshes in the cabane model during minigame ──────────
-function findStaticRaspberryMeshes(cabane) {
-  if (!cabane) return null
-  let plant = null
-  cabane.traverse((child) => {
-    if (!plant && child.name === 'outsideplant02' && child.userData?.cabaneNode) {
-      plant = child
-    }
-  })
-  if (!plant) return null
-  const meshes = []
-  plant.traverse((child) => {
-    if (child.isMesh && child.name === 'raspberry') meshes.push(child)
-  })
-  return meshes.length > 0 ? meshes : null
-}
+// function findStaticRaspberryMeshes(cabane) {
+//   if (!cabane) return null
+//   let plant = null
+//   cabane.traverse((child) => {
+//     if (!plant && child.name === 'outsideplant02' && child.userData?.cabaneNode) {
+//       plant = child
+//     }
+//   })
+//   if (!plant) return null
+//   const meshes = []
+//   plant.traverse((child) => {
+//     if (child.isMesh && child.name === 'raspberry') meshes.push(child)
+//   })
+//   return meshes.length > 0 ? meshes : null
+// }
 
 // ── Basket — exported for standalone preview in free exploration ──────────────
 export function Basket({ position = BASKET_ORIGIN }) {
@@ -147,17 +147,17 @@ function RaspberryInstance({ definition, onMeshRef, onPointerDown }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function RaspberryMinigame({ isActive, cabane = null, onStateChange, onUnripeAttempt }) {
+export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) {
   const { camera, gl } = useThree()
   const groupRef = useRef()
 
   // Hide the static raspberry meshes in the cabane model while minigame is active
-  useEffect(() => {
-    const meshes = findStaticRaspberryMeshes(cabane)
-    if (!meshes) return
-    meshes.forEach((m) => (m.visible = false))
-    return () => meshes.forEach((m) => (m.visible = true))
-  }, [cabane])
+  // useEffect(() => {
+  //   const meshes = findStaticRaspberryMeshes(cabane)
+  //   if (!meshes) return
+  //   meshes.forEach((m) => (m.visible = false))
+  //   return () => meshes.forEach((m) => (m.visible = true))
+  // }, [cabane])
 
   // Per-berry state — all refs, no setState in frame loop
   const meshRegistryRef = useRef([])

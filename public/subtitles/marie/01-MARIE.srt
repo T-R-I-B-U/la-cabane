@@ -1,107 +1,80 @@
 1
-00:00:00,000 --> 00:00:01,080
-Bienvenue à toi !
+00:00:00,000 --> 00:00:01,600
+Bienvenue à toi.
 
 2
-00:00:01,780 --> 00:00:04,120
-J'adore rencontrer les membres de mon quartier,
+00:00:01,600 --> 00:00:04,600
+J'adore rencontrer les membres de mon quartier.
 
 3
-00:00:04,780 --> 00:00:06,940
-je connais presque tous les membres du Cercle.
+00:00:04,600 --> 00:00:07,400
+Je connais presque tous les membres du cercle.
 
 4
-00:00:07,560 --> 00:00:09,840
-Forcément, je suis là depuis toujours !
+00:00:07,400 --> 00:00:10,800
+Forcément, je suis là depuis toujours.
 
 5
-00:00:10,920 --> 00:00:12,540
-J'ai connu bien des époques,
+00:00:10,800 --> 00:00:12,600
+J'ai connu bien des époques.
 
 6
-00:00:12,800 --> 00:00:14,180
-je suis née en 1975,
+00:00:12,600 --> 00:00:14,800
+Je suis née en 1975.
 
 7
-00:00:14,900 --> 00:00:16,560
-autant dire, il y a une éternité.
+00:00:14,800 --> 00:00:17,000
+Autant dire, il y a une éternité.
 
 8
-00:00:17,560 --> 00:00:19,500
-J'ai vu comment le monde a mal tourné,
+00:00:17,000 --> 00:00:19,400
+J'ai vu comment le monde a mal tourné.
 
 9
-00:00:20,300 --> 00:00:22,820
-j'ai vécu pleinement cette époque individualiste
-
-10
-00:00:22,820 --> 00:00:25,280
-au service du profit et des ultra riches.
-
-11
-00:00:26,020 --> 00:00:30,020
-Une des grandes leçons de la période révolutionnaire de 2039,
-
-12
-00:00:30,440 --> 00:00:33,860
-c'est la nécessité d'avoir une gouvernance locale
-
-13
-00:00:33,860 --> 00:00:35,580
-et intergénérationnelle.
-
-14
-00:00:36,340 --> 00:00:38,580
+00:00:19,400 --> 00:00:21,800
 Chaque mois, nous nous réunissons tous
 
-15
-00:00:38,580 --> 00:00:41,520
+10
+00:00:21,800 --> 00:00:25,400
 pour échanger sur le bien-être de notre communauté.
 
-16
-00:00:42,480 --> 00:00:43,680
+11
+00:00:25,400 --> 00:00:27,200
 Et à chaque nouvelle saison,
 
+12
+00:00:27,200 --> 00:00:31,000
+chaque cabane organise un sommet de gestion du savoir.
+
+13
+00:00:31,000 --> 00:00:34,800
+Tu sais, c'est un privilège de pouvoir venir apprendre dans ce lieu.
+
+14
+00:00:34,800 --> 00:00:38,200
+A l'époque, nous allions délaisser la vie en communauté.
+
+15
+00:00:38,200 --> 00:00:40,600
+Nous étions centrées sur nos intérêts personnels.
+
+16
+00:00:40,600 --> 00:00:43,600
+Je te partage mon expérience pour que tu pis à ton tour.
+
 17
-00:00:44,160 --> 00:00:47,360
-chaque Cabane organise un sommet de gestion du savoir.
+00:00:43,600 --> 00:00:45,200
+Transmettre ce message.
 
 18
-00:00:48,400 --> 00:00:50,200
-J'ai commencé le tri des savoirs
+00:00:45,200 --> 00:00:48,200
+Viens la semaine prochaine pour assister au sommet du quartier.
 
 19
-00:00:50,200 --> 00:00:52,420
-pour préparer le sommet d'été la semaine prochaine.
+00:00:48,200 --> 00:00:50,000
+Tu es le bienvenue, bien sûr.
 
 20
-00:00:53,180 --> 00:00:54,460
-Tu peux m'aider si tu le souhaites.
+00:00:50,000 --> 00:00:53,000
+Et merci à toi, l'arbre, de l'avoir guidé jusqu'à nous.
 
-21
-00:00:55,060 --> 00:00:58,160
-Les vertes tombées sont celles qui doivent retourner dans l'arbre.
-
-22
-00:00:58,960 --> 00:01:01,480
-Malheureusement, leurs créateurs sont partis
-
-23
-00:01:01,480 --> 00:01:03,060
-ou ne sont plus de ce monde.
-
-24
-00:01:04,020 --> 00:01:06,480
-Les oranges sont celles qui sont peu demandées,
-
-25
-00:01:06,820 --> 00:01:08,300
-il faut les remettre au goût du jour.
-
-26
-00:01:08,940 --> 00:01:11,720
-Et les rouges vont pouvoir rejoindre les racines
-
-27
-00:01:11,720 --> 00:01:14,020
-et enrichir l'arbre et l'histoire du quartier.

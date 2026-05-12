@@ -1,9 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
+import { play, stop } from '../../utils/audioStore'
 
 const FILL_COLOR = new THREE.Color('#da4d79')
-const DEFAULT_DURATION = 7.5
+const DEFAULT_DURATION = 8.5
 
 function easeInOut(t) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
@@ -108,12 +109,16 @@ const MESH_CONFIGS = [
   },
 ]
 
+// Pot fill starts at gT=0.3 (matches MESH_CONFIGS pot.startAt)
+const POT_FILL_START = 0.3
+
 export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_DURATION }) {
   const globalTimeRef = useRef(0)
   const phaseRef = useRef('idle')
   const allUniformsRef = useRef([])
   const originalsRef = useRef([])
   const buttonsRef = useRef(null)
+  const pouringTriggeredRef = useRef(false)
 
   useEffect(() => {
     if (!scene) return
@@ -181,8 +186,11 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
 
   useEffect(() => {
     if (!playing) {
+      stop('juiceMachine')
+      stop('juicePouring')
       phaseRef.current = 'idle'
       globalTimeRef.current = 0
+      pouringTriggeredRef.current = false
       if (buttonsRef.current) {
         buttonsRef.current.redOn.value = 1.0
         buttonsRef.current.greenOn.value = 0.0
@@ -191,6 +199,8 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
     }
     globalTimeRef.current = 0
     phaseRef.current = 'filling'
+    pouringTriggeredRef.current = false
+    play('juiceMachine')
     for (const { uniforms } of allUniformsRef.current) {
       // eslint-disable-next-line react-hooks/immutability
       uniforms.fillAmount.value = 0
@@ -235,8 +245,15 @@ export function JuicePipeFill({ scene, playing, onComplete, duration = DEFAULT_D
       if (drains) uniforms.fillStart.value = drainEased
     }
 
+    if (!pouringTriggeredRef.current && gT >= POT_FILL_START) {
+      pouringTriggeredRef.current = true
+      play('juicePouring')
+    }
+
     if (phaseRef.current === 'draining' && gT >= 2) {
       phaseRef.current = 'idle'
+      stop('juiceMachine')
+      stop('juicePouring')
       if (buttonsRef.current) {
         buttonsRef.current.redOn.value = 1.0
         buttonsRef.current.greenOn.value = 0.0

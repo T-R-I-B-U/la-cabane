@@ -1,9 +1,9 @@
 1
-00:00:00,000 --> 00:00:03,720
-Dans la Cabane, le fonctionnement est simple.
+00:00:00,000 --> 00:00:03,600
+Dans la cabane, le fonctionnement est simple.
 
 2
-00:00:03,720 --> 00:00:08,640
+00:00:03,600 --> 00:00:08,640
 Chaque membre du cercle d'un éco-quartier peut s'inscrire et profiter des services
 
 3
@@ -11,30 +11,22 @@ Chaque membre du cercle d'un éco-quartier peut s'inscrire et profiter des servi
 de ce lieu.
 
 4
-00:00:09,640 --> 00:00:16,540
-Tu peux soit donner du savoir, soit profiter du savoir des autres, et pourquoi pas être
+00:00:09,640 --> 00:00:14,800
+Tu peux soit donner du savoir, soit profiter du savoir des autres.
 
 5
-00:00:16,540 --> 00:00:17,540
-bénévole.
+00:00:14,800 --> 00:00:17,480
+Et pourquoi pas être bénévole ?
 
 6
-00:00:17,540 --> 00:00:23,400
+00:00:17,480 --> 00:00:23,400
 Nous avons mis en place une monnaie temporelle qui permet à chacun d'avoir la même somme
 
 7
-00:00:23,400 --> 00:00:26,400
+00:00:23,400 --> 00:00:26,480
 dans son porte-monnaie, 24 heures par jour.
 
 8
-00:00:27,000 --> 00:00:32,960
-Soit tu fais un crédit temporel pour profiter du savoir d'un autre membre, soit du troc
-
-9
-00:00:32,960 --> 00:00:36,480
-de savoir à valeur temporelle égale avec celui-ci.
-
-10
-00:00:36,480 --> 00:00:37,840
+00:00:26,480 --> 00:00:27,480
 Simple, non ?
 

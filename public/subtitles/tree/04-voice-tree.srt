@@ -1,4 +1,8 @@
 1
-00:00:00,000 --> 00:00:04,160
-Oui, super ! Je me doutais bien que tu étais intrigué.
+00:00:00,000 --> 00:00:04,420
+Oui, super ! Oh, je me doutais bien que tu étais intrigué.
+
+2
+00:00:04,420 --> 00:00:09,120
+Regarde dans ce livre, il retrace notre parcours.
 
