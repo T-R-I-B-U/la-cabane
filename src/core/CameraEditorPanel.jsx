@@ -22,7 +22,6 @@ import {
   updateCharacter,
   updateSequenceStep,
 } from './cameraRegistry'
-import { FLOOR_Y } from './SceneConfig'
 
 const GROUPS = ['intro', 'story', 'arbre', 'debug']
 const INITIAL_PANEL_POSITION = { x: 20, y: 20 }
@@ -325,13 +324,25 @@ export default function CameraEditorPanel({ onClose }) {
           <div style={S.subtitle}>Création, fly mode, capture et caméras de scénario</div>
         </div>
         <div style={S.nav}>
-          <button type="button" style={S.navButton(view === 'cameras')} onClick={() => setView('cameras')}>
+          <button
+            type="button"
+            style={S.navButton(view === 'cameras')}
+            onClick={() => setView('cameras')}
+          >
             Caméras
           </button>
-          <button type="button" style={S.navButton(view === 'scenario')} onClick={() => setView('scenario')}>
+          <button
+            type="button"
+            style={S.navButton(view === 'scenario')}
+            onClick={() => setView('scenario')}
+          >
             Scénario
           </button>
-          <button type="button" style={S.navButton(view === 'characters')} onClick={() => setView('characters')}>
+          <button
+            type="button"
+            style={S.navButton(view === 'characters')}
+            onClick={() => setView('characters')}
+          >
             PNJ
           </button>
           <button type="button" style={S.btn()} onClick={handleClose}>
@@ -347,7 +358,12 @@ export default function CameraEditorPanel({ onClose }) {
         </div>
         <div style={S.groupTabs}>
           {GROUPS.map((name) => (
-            <button key={name} type="button" style={S.tab(group === name)} onClick={() => setGroup(name)}>
+            <button
+              key={name}
+              type="button"
+              style={S.tab(group === name)}
+              onClick={() => setGroup(name)}
+            >
               {name}
             </button>
           ))}
@@ -377,7 +393,11 @@ export default function CameraEditorPanel({ onClose }) {
 
       <section style={S.main}>
         <div style={S.btnRow}>
-          <button type="button" style={S.btn(flyMode ? 'good' : 'default')} onClick={handleFlyModeToggle}>
+          <button
+            type="button"
+            style={S.btn(flyMode ? 'good' : 'default')}
+            onClick={handleFlyModeToggle}
+          >
             Fly mode {flyMode ? 'ON' : 'OFF'}
           </button>
           <button type="button" style={S.btn()} onClick={handleExport}>
@@ -435,7 +455,11 @@ export default function CameraEditorPanel({ onClose }) {
               <div>fov: {selected.fov ?? 60}</div>
             </div>
             <div style={S.btnRow}>
-              <button type="button" style={S.btn('good')} onClick={() => captureCamera(selected.id, live)}>
+              <button
+                type="button"
+                style={S.btn('good')}
+                onClick={() => captureCamera(selected.id, live)}
+              >
                 Enregistrer position
               </button>
               <button
@@ -448,7 +472,11 @@ export default function CameraEditorPanel({ onClose }) {
               <button type="button" style={S.btn()} onClick={() => duplicateCamera(selected.id)}>
                 Dupliquer
               </button>
-              <button type="button" style={S.btn('danger')} onClick={() => removeCamera(selected.id)}>
+              <button
+                type="button"
+                style={S.btn('danger')}
+                onClick={() => removeCamera(selected.id)}
+              >
                 Supprimer
               </button>
             </div>
@@ -478,7 +506,9 @@ export default function CameraEditorPanel({ onClose }) {
                     <select
                       style={S.smallInput}
                       value={step.cameraId}
-                      onChange={(e) => updateSequenceStep('intro', index, { cameraId: e.target.value })}
+                      onChange={(e) =>
+                        updateSequenceStep('intro', index, { cameraId: e.target.value })
+                      }
                     >
                       {registry.cameras.map((item) => (
                         <option key={item.id} value={item.id}>
@@ -510,9 +540,13 @@ export default function CameraEditorPanel({ onClose }) {
                       style={S.smallInput}
                       value={step.event ?? ''}
                       placeholder="event"
-                      onChange={(e) => updateSequenceStep('intro', index, { event: e.target.value })}
+                      onChange={(e) =>
+                        updateSequenceStep('intro', index, { event: e.target.value })
+                      }
                     />
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#c7d0dc' }}>
+                    <label
+                      style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#c7d0dc' }}
+                    >
                       <input
                         type="checkbox"
                         checked={Boolean(step.waitForInput)}
@@ -523,10 +557,18 @@ export default function CameraEditorPanel({ onClose }) {
                       wait
                     </label>
                     <div style={S.btnRow}>
-                      <button type="button" style={S.btn()} onClick={() => moveSequenceStep('intro', index, -1)}>
+                      <button
+                        type="button"
+                        style={S.btn()}
+                        onClick={() => moveSequenceStep('intro', index, -1)}
+                      >
                         ↑
                       </button>
-                      <button type="button" style={S.btn()} onClick={() => moveSequenceStep('intro', index, 1)}>
+                      <button
+                        type="button"
+                        style={S.btn()}
+                        onClick={() => moveSequenceStep('intro', index, 1)}
+                      >
                         ↓
                       </button>
                       <button
@@ -551,7 +593,7 @@ export default function CameraEditorPanel({ onClose }) {
           <div style={S.card}>
             <div style={S.cardTitle}>Positions PNJ</div>
             <div style={{ color: '#9aa6b5', marginBottom: 10 }}>
-              Capturer depuis la caméra reprend X/Z, puis place la hauteur sur le sol par défaut.
+              Capturer depuis la caméra reprend X/Z, puis utilise la hauteur de sol propre au PNJ.
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
               {(registry.characters ?? []).map((character) => (
@@ -561,9 +603,9 @@ export default function CameraEditorPanel({ onClose }) {
                     <button
                       type="button"
                       style={S.btn('good')}
-                      onClick={() => captureCharacterFromCamera(character.id, live, FLOOR_Y)}
+                      onClick={() => captureCharacterFromCamera(character.id, live)}
                     >
-                      Capturer X/Z au sol
+                      Capturer X/Z
                     </button>
                   </div>
                   <div style={S.grid2}>
@@ -601,11 +643,23 @@ export default function CameraEditorPanel({ onClose }) {
                         style={S.input}
                         type="number"
                         step="0.0001"
-                        value={character.position?.y ?? FLOOR_Y}
+                        value={character.position?.y ?? character.floorY ?? 0}
                         onChange={(e) =>
                           updateCharacter(character.id, {
                             position: { ...character.position, y: Number(e.target.value) },
                           })
+                        }
+                      />
+                    </div>
+                    <div style={S.field}>
+                      <span style={S.label}>Sol PNJ</span>
+                      <input
+                        style={S.input}
+                        type="number"
+                        step="0.0001"
+                        value={character.floorY ?? character.position?.y ?? 0}
+                        onChange={(e) =>
+                          updateCharacter(character.id, { floorY: Number(e.target.value) })
                         }
                       />
                     </div>
@@ -616,7 +670,9 @@ export default function CameraEditorPanel({ onClose }) {
                         type="number"
                         step="0.01"
                         value={character.rotationY ?? 0}
-                        onChange={(e) => updateCharacter(character.id, { rotationY: Number(e.target.value) })}
+                        onChange={(e) =>
+                          updateCharacter(character.id, { rotationY: Number(e.target.value) })
+                        }
                       />
                     </div>
                   </div>

@@ -39,6 +39,86 @@
       "position": { "x": -14.3667, "y": 1.3785, "z": -5.1169 },
       "target": { "x": -12.5066, "y": 1.7137, "z": -5.2008 },
       "fov": 60
+    },
+    {
+      "id": "arbre.ladderDown",
+      "label": "Arbre - bas échelle",
+      "group": "arbre",
+      "position": { "x": -3.8412, "y": 4.0818, "z": -0.9827 },
+      "target": { "x": -3.9712, "y": 4.444, "z": -1.3019 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.atPlatform",
+      "label": "Arbre - milieu plateforme haute",
+      "group": "arbre",
+      "position": { "x": -2.3079, "y": 23.7422, "z": 20.21005 },
+      "target": { "x": -2.3079, "y": 27.2422, "z": 19.21005 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.atFruitFocus",
+      "label": "Arbre - focus fruit plateforme",
+      "group": "arbre",
+      "position": { "x": 0.1921, "y": 23.7422, "z": 22.21005 },
+      "target": { "x": -2.3079, "y": 27.2422, "z": 19.21005 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.stairs02Down",
+      "label": "Arbre - escalier 02 bas",
+      "group": "arbre",
+      "position": { "x": -7.685, "y": 4.3005, "z": 2.2315 },
+      "target": { "x": -23.7066, "y": 6.2533, "z": 8.2345 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.stairs02Top",
+      "label": "Arbre - escalier 02 haut",
+      "group": "arbre",
+      "position": { "x": -15.5754, "y": 12.1331, "z": 13.8407 },
+      "target": { "x": -15.8063, "y": 12.0721, "z": 14.28 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.nest",
+      "label": "Arbre - nid",
+      "group": "arbre",
+      "position": { "x": -20.9313, "y": 12.1483, "z": 17.147 },
+      "target": { "x": -18.168, "y": 8.8642, "z": 32.0839 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.outroWP4",
+      "label": "Arbre fin - intérieur",
+      "group": "arbre",
+      "position": { "x": -14.3667, "y": 1.3785, "z": -5.1169 },
+      "target": { "x": -23.7944, "y": 1.5695, "z": -5.3764 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.outroWP3",
+      "label": "Arbre fin - porte",
+      "group": "arbre",
+      "position": { "x": -23.7944, "y": 1.5695, "z": -5.3764 },
+      "target": { "x": -12.4469, "y": 0.5678, "z": -5.3619 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.outroWP1",
+      "label": "Arbre fin - recul",
+      "group": "arbre",
+      "position": { "x": -39.8198, "y": 7.2813, "z": -8.6382 },
+      "target": { "x": -11.3697, "y": 0.642, "z": -1.0329 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.outroWP0",
+      "label": "Arbre fin - extérieur",
+      "group": "arbre",
+      "position": { "x": -84.2679, "y": 25.15, "z": -24.166 },
+      "target": { "x": -9.4607, "y": 7.3604, "z": -2.0887 },
+      "fov": 60
     }
   ],
   "sequences": {
@@ -55,6 +135,7 @@
       "id": "thomas",
       "label": "Thomas",
       "position": { "x": -3.0, "y": 0.04, "z": -13.259 },
+      "floorY": 0.04,
       "rotationY": 2.6179938779914944,
       "scale": 9
     },
@@ -62,6 +143,7 @@
       "id": "marie",
       "label": "Marie",
       "position": { "x": -20.0, "y": 9.15, "z": 24.0 },
+      "floorY": 9.15,
       "rotationY": 2.792526803190927,
       "scale": 9
     },
@@ -69,6 +151,7 @@
       "id": "zoe",
       "label": "Zoe",
       "position": { "x": 26.0, "y": 0.04, "z": -5.4 },
+      "floorY": 0.04,
       "rotationY": -1.5707963267948966,
       "scale": 11
     }
