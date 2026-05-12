@@ -1,0 +1,76 @@
+{
+  "cameras": [
+    {
+      "id": "intro.start",
+      "label": "Vue d'ensemble",
+      "group": "intro",
+      "position": { "x": -84.2679, "y": 25.15, "z": -24.166 },
+      "target": { "x": -9.4607, "y": 7.3604, "z": -2.0887 },
+      "fov": 60
+    },
+    {
+      "id": "intro.doorApproach",
+      "label": "Approche porte",
+      "group": "intro",
+      "position": { "x": -39.8198, "y": 7.2813, "z": -8.6382 },
+      "target": { "x": -11.3697, "y": 0.642, "z": -1.0329 },
+      "fov": 60
+    },
+    {
+      "id": "intro.doorWait",
+      "label": "Devant la porte",
+      "group": "intro",
+      "position": { "x": -31.6806, "y": 3.5464, "z": -6.5206 },
+      "target": { "x": -11.8577, "y": 0.6514, "z": 0.0448 },
+      "fov": 60
+    },
+    {
+      "id": "intro.doorOpen",
+      "label": "Porte s'ouvre",
+      "group": "intro",
+      "position": { "x": -23.7944, "y": 1.5695, "z": -5.3764 },
+      "target": { "x": -12.4469, "y": 0.5678, "z": -5.3619 },
+      "fov": 60
+    },
+    {
+      "id": "intro.inside",
+      "label": "Intérieur arrivée",
+      "group": "intro",
+      "position": { "x": -14.3667, "y": 1.3785, "z": -5.1169 },
+      "target": { "x": -12.5066, "y": 1.7137, "z": -5.2008 },
+      "fov": 60
+    }
+  ],
+  "sequences": {
+    "intro": [
+      { "cameraId": "intro.start", "duration": 0, "delay": 2 },
+      { "cameraId": "intro.doorApproach", "duration": 3.5 },
+      { "cameraId": "intro.doorWait", "duration": 2.5, "event": "wait:door", "waitForInput": true },
+      { "cameraId": "intro.doorOpen", "duration": 2.0, "event": "door:open" },
+      { "cameraId": "intro.inside", "duration": 2.5, "event": "inside" }
+    ]
+  },
+  "characters": [
+    {
+      "id": "thomas",
+      "label": "Thomas",
+      "position": { "x": -3.0, "y": 0.04, "z": -13.259 },
+      "rotationY": 2.6179938779914944,
+      "scale": 9
+    },
+    {
+      "id": "marie",
+      "label": "Marie",
+      "position": { "x": -20.0, "y": 9.15, "z": 24.0 },
+      "rotationY": 2.792526803190927,
+      "scale": 9
+    },
+    {
+      "id": "zoe",
+      "label": "Zoe",
+      "position": { "x": 26.0, "y": 0.04, "z": -5.4 },
+      "rotationY": -1.5707963267948966,
+      "scale": 11
+    }
+  ]
+}

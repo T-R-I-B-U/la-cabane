@@ -1,47 +1,28 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { FLOOR_Y, PLAYER_HEIGHT } from '../../core/SceneConfig'
+import { getIntroWaypoints, onRegistryChange } from '../../core/cameraRegistry'
 
 function easeInOut(t) {
   return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
 }
 
-const WAYPOINTS = [
-  {
-    position: new THREE.Vector3(-84.2679, 25.15, -24.166),
-    target: new THREE.Vector3(-9.4607, 7.3604, -2.0887),
-    duration: 0,
-    delay: 2,
-  },
-  {
-    position: new THREE.Vector3(-39.8198, 7.2813, -8.6382),
-    target: new THREE.Vector3(-11.3697, 0.642, -1.0329),
-    duration: 3.5,
-  },
-  {
-    position: new THREE.Vector3(-31.6806, 3.5464, -6.5206),
-    target: new THREE.Vector3(-11.8577, 0.6514, 0.0448),
-    duration: 2.5,
-    event: 'wait:door',
-    waitForInput: true,
-  },
-  {
-    position: new THREE.Vector3(-23.7944, 1.5695, -5.3764),
-    target: new THREE.Vector3(-12.4469, 0.5678, -5.3619),
-    duration: 2.0,
-    event: 'door:open',
-  },
-  {
-    position: new THREE.Vector3(-14.3667, 1.3785, -5.1169),
-    target: new THREE.Vector3(-12.5066, 1.7137, -5.2008),
-    duration: 2.5,
-    event: 'inside',
-  },
-]
+function toWaypoint(step) {
+  return {
+    ...step,
+    position: new THREE.Vector3(step.position.x, step.position.y, step.position.z),
+    target: new THREE.Vector3(step.target.x, step.target.y, step.target.z),
+  }
+}
+
+function loadWaypoints() {
+  return getIntroWaypoints().map(toWaypoint)
+}
 
 export default function IntroCamera({ active, shouldAdvance, onEvent }) {
   const { camera } = useThree()
+  const cameraRef = useRef(camera)
+  const [waypoints, setWaypoints] = useState(loadWaypoints)
   const stepRef = useRef(-1)
   const progressRef = useRef(0)
   const delayRef = useRef(0)
@@ -49,8 +30,14 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
   const advancedRef = useRef(false)
   const readyNotifiedRef = useRef(false)
 
+  useEffect(() => {
+    cameraRef.current = camera
+  }, [camera])
+
+  useEffect(() => onRegistryChange(() => setWaypoints(loadWaypoints())), [])
+
   useLayoutEffect(() => {
-    if (active) {
+    if (active && waypoints.length > 0) {
       stepRef.current = -1
       progressRef.current = 0
       delayRef.current = 0
@@ -60,8 +47,13 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
 
       // Place the intro camera before the first visible paint so the user
       // does not see the default orbit camera between the loader fade and intro start.
-      camera.position.copy(WAYPOINTS[0].position)
-      camera.lookAt(WAYPOINTS[0].target)
+      const introCamera = cameraRef.current
+      introCamera.position.copy(waypoints[0].position)
+      introCamera.lookAt(waypoints[0].target)
+      if (waypoints[0].fov && introCamera.fov !== waypoints[0].fov) {
+        introCamera.fov = waypoints[0].fov
+        introCamera.updateProjectionMatrix()
+      }
       stepRef.current = 0
 
       if (!readyNotifiedRef.current) {
@@ -69,7 +61,7 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
         onEvent?.('camera:ready')
       }
     }
-  }, [active, camera, onEvent])
+  }, [active, onEvent, waypoints])
 
   useEffect(() => {
     if (shouldAdvance && waitingRef.current && !advancedRef.current) {
@@ -78,18 +70,19 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     }
   }, [shouldAdvance])
 
-  useFrame((_, rawDelta) => {
-    if (!active) return
+  useFrame((state, rawDelta) => {
+    if (!active || waypoints.length === 0) return
 
+    const { camera: frameCamera } = state
     const delta = Math.min(rawDelta, 0.1)
 
     const step = stepRef.current
-    if (step >= WAYPOINTS.length - 1) return
+    if (step >= waypoints.length - 1) return
 
     if (waitingRef.current) return
 
-    const from = WAYPOINTS[step]
-    const to = WAYPOINTS[step + 1]
+    const from = waypoints[step]
+    const to = waypoints[step + 1]
 
     if (from.delay && delayRef.current < from.delay) {
       delayRef.current += delta
@@ -97,8 +90,12 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     }
 
     if (to.duration === 0) {
-      camera.position.copy(to.position)
-      camera.lookAt(to.target)
+      frameCamera.position.copy(to.position)
+      frameCamera.lookAt(to.target)
+      if (to.fov && frameCamera.fov !== to.fov) {
+        frameCamera.fov = to.fov
+        frameCamera.updateProjectionMatrix()
+      }
       stepRef.current += 1
       progressRef.current = 0
       delayRef.current = 0
@@ -110,9 +107,13 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     progressRef.current = Math.min(progressRef.current + delta / to.duration, 1)
     const t = easeInOut(progressRef.current)
 
-    camera.position.lerpVectors(from.position, to.position, t)
+    frameCamera.position.lerpVectors(from.position, to.position, t)
     const lookAt = new THREE.Vector3().lerpVectors(from.target, to.target, t)
-    camera.lookAt(lookAt)
+    frameCamera.lookAt(lookAt)
+    if (to.fov && frameCamera.fov !== to.fov) {
+      frameCamera.fov = THREE.MathUtils.lerp(from.fov ?? frameCamera.fov, to.fov, t)
+      frameCamera.updateProjectionMatrix()
+    }
 
     if (progressRef.current >= 1) {
       stepRef.current += 1

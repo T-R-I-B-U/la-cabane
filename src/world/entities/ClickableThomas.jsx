@@ -1,14 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { FLOOR_Y } from '../../core/SceneConfig'
 import { useStableInteractionCallback } from '../interactions/useStableInteractionCallback'
 
 const CENTER_NDC = new THREE.Vector2(0, 0)
-// Matches Thomas's absolute position in SceneCharacters.jsx.
-const THOMAS_POSITION = [-3.0, FLOOR_Y + 0.9, -13.259]
+const DEFAULT_THOMAS_POSITION = [-3.0, 0.04, -13.259]
 
-export function ClickableThomas({ active, onInteract }) {
+export function ClickableThomas({ active, position = DEFAULT_THOMAS_POSITION, onInteract }) {
   const { camera } = useThree()
   const hoveredRef = useRef(false)
   const meshRef = useRef()
@@ -35,7 +33,7 @@ export function ClickableThomas({ active, onInteract }) {
   })
 
   return (
-    <mesh ref={meshRef} position={THOMAS_POSITION}>
+    <mesh ref={meshRef} position={[position[0], position[1] + 0.9, position[2]]}>
       <boxGeometry args={[0.7, 1.8, 0.7]} />
       <meshBasicMaterial transparent opacity={0} />
     </mesh>

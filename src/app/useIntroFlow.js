@@ -446,7 +446,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     if (completed) {
       isPostBookTransitionRef.current = true
-      setStoryCameraTransition({ ...INSIDE_POV, duration: 2.0 })
+      setStoryCameraTransition({ ...STORY_CAMERA_POVS.accueil, duration: 2.0 })
       return true
     }
 

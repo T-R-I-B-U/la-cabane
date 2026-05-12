@@ -16,6 +16,7 @@ import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
 import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
+import { setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -544,7 +545,11 @@ export default function App() {
         setIsViewerControlsVisible((current) => !current)
       } else if (event.code === 'F2') {
         event.preventDefault()
-        setShowCameraEditor((current) => !current)
+        setShowCameraEditor((current) => {
+          const next = !current
+          if (!next) setEditorFlyMode(false)
+          return next
+        })
       } else if (event.code === 'F3') {
         event.preventDefault()
         setShowStoryDebug((current) => !current)
@@ -581,6 +586,7 @@ export default function App() {
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible ||
+    showCameraEditor ||
     journalUnlocked ||
     raspberryPhaseActive ||
     (!introActive &&
@@ -613,6 +619,12 @@ export default function App() {
     !introActive &&
     !postIntro &&
     (isDevBuild || isViewerControlsVisible || showCameraEditor || showStoryDebug)
+  const showCameraEditorOverlay = !introPending && !introActive && showCameraEditor
+
+  const closeCameraEditor = useCallback(() => {
+    setEditorFlyMode(false)
+    setShowCameraEditor(false)
+  }, [])
 
   // Appelé par GameManager à chaque transition d'étape.
   // C'est ici qu'on orchestre les sous-systèmes (audio, UI, etc.)
@@ -804,9 +816,9 @@ export default function App() {
         </Suspense>
       )}
 
-      {showDevOverlays && showCameraEditor && (
+      {showCameraEditorOverlay && (
         <Suspense fallback={null}>
-          <CameraEditorPanel />
+          <CameraEditorPanel onClose={closeCameraEditor} />
         </Suspense>
       )}
 

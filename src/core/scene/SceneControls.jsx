@@ -1,8 +1,10 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { OrbitControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import IntroCamera from '../../world/entities/IntroCamera'
+import CameraEditorFlyControls from '../CameraEditorFlyControls'
 import { CameraRegistrySync } from '../CameraRegistrySync'
+import { getEditorFlyMode, onEditorFlyModeChange } from '../cameraRegistry'
 import { PlayerControls } from '../PlayerControls'
 import { StoryCameraTransition } from '../StoryCameraTransition'
 
@@ -50,7 +52,16 @@ export function SceneControls({
   hutPosition,
   cameraFixed,
 }) {
-  const devSync = import.meta.env.DEV ? <CameraRegistrySync controlsRef={controlsRef} /> : null
+  const [editorFlyMode, setEditorFlyMode] = useState(getEditorFlyMode)
+
+  useEffect(() => onEditorFlyModeChange(setEditorFlyMode), [])
+
+  const devSync = import.meta.env.DEV ? (
+    <>
+      <CameraRegistrySync controlsRef={controlsRef} />
+      <CameraEditorFlyControls />
+    </>
+  ) : null
 
   if (arbreStoryCameraTransition) {
     return (
@@ -116,14 +127,18 @@ export function SceneControls({
       </>
     ) : (
       <>
-        <OrbitControls
-          ref={controlsRef}
-          enablePan
-          enableDamping
-          minDistance={0.5}
-          maxDistance={500}
-        />
-        <OrbitTargetSync controlsRef={controlsRef} />
+        {!editorFlyMode && (
+          <>
+            <OrbitControls
+              ref={controlsRef}
+              enablePan
+              enableDamping
+              minDistance={0.5}
+              maxDistance={500}
+            />
+            <OrbitTargetSync controlsRef={controlsRef} />
+          </>
+        )}
         {devSync}
       </>
     )
@@ -131,14 +146,18 @@ export function SceneControls({
 
   return (
     <>
-      <OrbitControls
-        ref={controlsRef}
-        enablePan
-        enableDamping
-        minDistance={0.5}
-        maxDistance={500}
-      />
-      <OrbitTargetSync controlsRef={controlsRef} target={hutPosition} />
+      {!editorFlyMode && (
+        <>
+          <OrbitControls
+            ref={controlsRef}
+            enablePan
+            enableDamping
+            minDistance={0.5}
+            maxDistance={500}
+          />
+          <OrbitTargetSync controlsRef={controlsRef} target={hutPosition} />
+        </>
+      )}
       {devSync}
     </>
   )
