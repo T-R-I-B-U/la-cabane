@@ -239,8 +239,8 @@ export async function buildCabane({
   root.name = 'cabane'
   const modelBasePaths = performanceMode ? ['/models/compressed/', '/models/'] : ['/models/']
   const textureBasePaths = performanceMode
-    ? ['/textures/compressed/', '/textures/']
-    : ['/textures/']
+    ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
+    : ['/textures/ktx2/', '/textures/']
 
   const nodes = Array.isArray(data) ? data : [data]
   root.userData.hutPosition = findNodePosition(nodes, 'hut01')

@@ -1,7 +1,7 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { use, useEffect, useRef, useMemo } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
-import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { preferKtx2, loadStandaloneTexture } from '../cabane/textureResolver.js'
 import {
   createOutlineGeometry,
   createOutlineMaterial,
@@ -52,8 +52,9 @@ export function TreeLeaves({
   const inRangeRef = useRef(null)
   const { gl } = useThree()
 
-  // Load alpha map for leaves
-  const alphaMap = useTexture('/textures/detailedleaf-alphamap.png')
+  const alphaMap = use(
+    loadStandaloneTexture(preferKtx2('/textures/detailedleaf-alphamap.png'), { flipY: false })
+  )
 
   // Cache original material values to restore them on unmount or mode change
   const originalProps = useMemo(() => {

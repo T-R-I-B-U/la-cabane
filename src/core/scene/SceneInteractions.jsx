@@ -85,8 +85,8 @@ export function SceneInteractions({
   // matching the historical fix that restored her motion after model export changes.
   const zoeUrl = resolveCharacterUrl('zoe-animated.glb', false)
   const textureBasePaths = performanceMode
-    ? ['/textures/compressed/', '/textures/']
-    : ['/textures/']
+    ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
+    : ['/textures/ktx2/', '/textures/']
   const bookPosition = useMemo(() => {
     if (!cabane) return null
 

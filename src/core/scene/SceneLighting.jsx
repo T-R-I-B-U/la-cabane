@@ -1,10 +1,13 @@
-import { Environment, useTexture } from '@react-three/drei'
-import { useEffect, useMemo } from 'react'
+import { Environment } from '@react-three/drei'
+import { use, useEffect, useMemo } from 'react'
 import * as THREE from 'three'
 import { getHdriOption } from './hdriOptions'
+import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureResolver.js'
 
 export function SceneLighting({ activeHdriId }) {
-  const skyTexture = useTexture('/textures/sky.png')
+  const skyTexture = use(
+    loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
+  )
   const activeHdri = getHdriOption(activeHdriId)
   const backgroundTexture = useMemo(() => {
     if (!skyTexture) return null
