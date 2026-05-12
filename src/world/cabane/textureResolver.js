@@ -30,6 +30,7 @@ function canonicalTextureKey(value = '') {
 }
 
 const MESH_TEXTURE_ALIASES = {
+  plant01: 'plants01',
   'page-img01_02': 'page-left',
   'page-img03_04': 'page-right',
   'platform-details': 'railling',
