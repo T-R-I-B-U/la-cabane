@@ -377,7 +377,8 @@
       1,
       1,
       1
-    ]
+    ],
+    "merge": true
   },
   {
     "name": "counter01",
@@ -415,7 +416,8 @@
       1,
       1,
       1
-    ]
+    ],
+    "merge": true
   },
   {
     "name": "stairs02",
@@ -434,7 +436,8 @@
       1,
       1,
       1
-    ]
+    ],
+    "merge": true
   },
   {
     "name": "welcome01",
@@ -472,7 +475,8 @@
       1,
       1,
       1
-    ]
+    ],
+    "merge": true
   },
   {
     "name": "platform",
@@ -510,7 +514,8 @@
       1,
       1,
       1
-    ]
+    ],
+    "merge": true
   },
   {
     "name": "platform-hut",

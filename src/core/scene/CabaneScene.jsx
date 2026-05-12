@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
+import * as THREE from 'three'
 import { CabaneMap } from './CabaneMap'
 import { TreeLeaves } from '../../world/entities/TreeLeaves'
 import { SceneCharacters } from './SceneCharacters'
@@ -10,6 +11,8 @@ import { setZone } from '../../utils/gameManagerStore'
 import {
   applyVisibilityZone,
   getZoneComponents,
+  hideVisibilityZone,
+  showVisibilityZone,
   useVisibilityZones,
 } from '../../utils/visibilityZoneStore'
 import { PLATFORM_POS } from '../SceneConfig'
@@ -17,6 +20,10 @@ import { PLATFORM_POS } from '../SceneConfig'
 // Radius around the tree platform that triggers the arbre zone.
 // Tune once the full arbre scene geometry is known.
 const ARBRE_TRIGGER_RADIUS = 10
+
+const _triggerBounds = new THREE.Box3()
+const _triggerCenter = new THREE.Vector3()
+const _triggerSize = new THREE.Vector3()
 
 export function CabaneScene({
   performanceMode,
@@ -84,8 +91,16 @@ export function CabaneScene({
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
+  const [interiorTrigger, setInteriorTrigger] = useState(null)
   const visibilityZones = useVisibilityZones()
   const { characters, leaves, journal } = getZoneComponents(visibilityZones)
+  const cabaneInteriorVisible = useMemo(
+    () =>
+      visibilityZones.some(
+        (zone) => zone === 'all' || zone === 'cabane' || zone === 'cabane-interior'
+      ),
+    [visibilityZones]
+  )
 
   useEffect(() => {
     if (!cabaneGroup) return
@@ -96,6 +111,8 @@ export function CabaneScene({
   useEffect(() => {
     applyVisibilityZone(cabaneGroup, visibilityZones)
   }, [cabaneGroup, visibilityZones])
+
+  useEffect(() => () => hideVisibilityZone('cabane-interior'), [])
 
   const handleCabaneMapReady = useCallback(
     (sceneInfo) => {
@@ -114,8 +131,24 @@ export function CabaneScene({
     setCabaneGroup(group)
     if (!group) {
       setLeafMesh(null)
+      setInteriorTrigger(null)
       return
     }
+
+    const hutObject = group.getObjectByName('hut01')
+    if (hutObject) {
+      hutObject.updateWorldMatrix(true, true)
+      _triggerBounds.setFromObject(hutObject)
+      _triggerBounds.getCenter(_triggerCenter)
+      _triggerBounds.getSize(_triggerSize)
+      setInteriorTrigger({
+        center: _triggerCenter.toArray(),
+        radius: Math.max(_triggerSize.x, _triggerSize.z) * 0.42,
+      })
+    } else {
+      setInteriorTrigger(null)
+    }
+
     let leafInstancedMesh = null
     group.traverse((object) => {
       if (!leafInstancedMesh && object.isInstancedMesh && object.name === 'leaf') {
@@ -159,6 +192,7 @@ export function CabaneScene({
           thomasEtabliPhaseActive={thomasEtabliPhaseActive}
           onThomasEtabliInteract={onThomasEtabliInteract}
           thomasAnimPhase={thomasAnimPhase}
+          showCabaneInterior={cabaneInteriorVisible}
         />
       )}
 
@@ -226,6 +260,16 @@ export function CabaneScene({
         radius={ARBRE_TRIGGER_RADIUS}
         onEnter={() => setZone('arbre')}
       />
+
+      {interiorTrigger && (
+        <TriggerZone
+          center={interiorTrigger.center}
+          radius={interiorTrigger.radius}
+          leaveRadius={interiorTrigger.radius * 1.25}
+          onEnter={() => showVisibilityZone('cabane-interior')}
+          onLeave={() => hideVisibilityZone('cabane-interior')}
+        />
+      )}
     </>
   )
 }

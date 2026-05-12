@@ -188,7 +188,6 @@ export function SceneInteractions({
       {raspberryPhaseActive && (
         <RaspberryMinigame
           isActive
-          cabane={cabane}
           onStateChange={onMinigameStateChange}
           onUnripeAttempt={onUnripeAttempt}
         />

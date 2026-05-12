@@ -19,7 +19,7 @@ import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/Sce
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { GAME_STEPS } from './utils/gameStateStore'
-import { setVisibilityZones } from './utils/visibilityZoneStore'
+import { DEFAULT_VISIBILITY_ZONES, setVisibilityZones } from './utils/visibilityZoneStore'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
@@ -93,6 +93,10 @@ export default function App() {
       }
       return !current
     })
+  }, [])
+
+  useEffect(() => {
+    setVisibilityZones(DEFAULT_VISIBILITY_ZONES)
   }, [])
 
   // Open panel only after pointer lock actually releases.
@@ -639,7 +643,7 @@ export default function App() {
 
       case GAME_STEPS.EXPLORATION:
         // La visite scénarisée est finie, le joueur peut explorer librement.
-        setVisibilityZones(['all'])
+        setVisibilityZones(['world'])
         // → Ajouter ici : play('ambient'), fade in musique d'ambiance, etc.
         break
 

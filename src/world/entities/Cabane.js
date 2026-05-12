@@ -1,7 +1,17 @@
 import * as THREE from 'three'
 import { buildNode } from '../cabane/nodeBuilder'
+import { buildGroupInstanced } from '../cabane/groupInstancing'
 import { findNodePosition } from '../cabane/runtime'
 export { clearTextureCache } from '../cabane/textureResolver'
+
+// Min geometry dimension (meters) for a mesh to cast shadows.
+// Excludes small props (stools, glasses, signs) while keeping large surfaces (walls, trunk, stairs).
+const SHADOW_CAST_MIN_DIM = 2.0
+
+// Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
+// Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
+// (e.g. workbench01 is found by getObjectByName for ClickableWorkbench).
+const SKIP_GROUPING = new Set(['workbench01'])
 
 const NEST_WALL_INSET = 2
 const NEST_DOOR_PADDING = 0.8
@@ -244,12 +254,62 @@ export async function buildCabane({
 
   const nodes = Array.isArray(data) ? data : [data]
   root.userData.hutPosition = findNodePosition(nodes, 'hut01')
-  const built = await Promise.all(
-    nodes.map((node) => buildNode(node, { modelBasePaths, textureBasePaths }))
-  )
-  for (const obj of built) {
-    if (obj) root.add(obj)
+
+  // Group same-name non-InstancedMesh nodes for auto-instancing.
+  // Nodes with ≥2 occurrences share one InstancedMesh group instead of N separate draw calls.
+  const groups = new Map()
+  const instancedNodes = []
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i]
+    if (node.type === 'InstancedMesh') {
+      instancedNodes.push({ node, index: i })
+    } else {
+      if (!groups.has(node.name)) groups.set(node.name, [])
+      groups.get(node.name).push({ node, index: i })
+    }
   }
+
+  const buildTasks = []
+  const taskMeta = []
+  for (const [groupName, entries] of groups) {
+    const groupNodes = entries.map((e) => e.node)
+    if (groupNodes.length >= 2 && !SKIP_GROUPING.has(groupName)) {
+      buildTasks.push(
+        buildGroupInstanced(groupName, groupNodes, { modelBasePaths, textureBasePaths })
+      )
+      taskMeta.push({ name: groupName, index: entries[0].index })
+    } else {
+      for (const { node, index } of entries) {
+        buildTasks.push(buildNode(node, { modelBasePaths, textureBasePaths }))
+        taskMeta.push({ name: node.name, index })
+      }
+    }
+  }
+  for (const { node, index } of instancedNodes) {
+    buildTasks.push(buildNode(node, { modelBasePaths, textureBasePaths }))
+    taskMeta.push({ name: node.name, index })
+  }
+
+  const built = await Promise.all(buildTasks)
+  for (let i = 0; i < built.length; i++) {
+    const obj = built[i]
+    if (!obj) continue
+    root.add(obj)
+    obj.userData.visibilityId = `${taskMeta[i].name}#${taskMeta[i].index}`
+  }
+
+  // Enable castShadow only on meshes whose geometry is large enough to produce visible shadows.
+  // Small props (stools, glasses, signs) are excluded to reduce shadow map draw calls.
+  root.traverse((obj) => {
+    if (!obj.isMesh || !obj.geometry) return
+    if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox()
+    const { max, min } = obj.geometry.boundingBox
+    const dim = Math.max(max.x - min.x, max.y - min.y, max.z - min.z)
+    if (dim >= SHADOW_CAST_MIN_DIM) {
+      obj.castShadow = true
+      obj.receiveShadow = true
+    }
+  })
 
   attachNestColliders(root.getObjectByName('nest'))
   attachRailingColliders(root.getObjectByName('railling'))

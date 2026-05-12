@@ -4,6 +4,7 @@ import { applyAutoTextures } from './textureResolver'
 import { buildInstancedMesh } from './instancing'
 import { modelBaseName } from './assetNaming'
 import { applyTransform, warnMissingAsset } from './runtime'
+import { mergeNodeMeshes } from './mergeUtils'
 
 function getModelCandidates(baseName, modelBasePaths) {
   return modelBasePaths.flatMap((basePath) => [
@@ -68,6 +69,11 @@ export async function buildNode(node, { modelBasePaths, textureBasePaths }) {
     for (const child of children) {
       if (child) object3d.add(child)
     }
+  }
+
+  if (node.merge) {
+    const merged = mergeNodeMeshes(object3d)
+    if (merged) return merged
   }
 
   return object3d

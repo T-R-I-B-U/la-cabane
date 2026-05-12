@@ -32,6 +32,7 @@ export function SceneCharacters({
   thomasEtabliPhaseActive,
   onThomasEtabliInteract,
   thomasAnimPhase = 'back',
+  showCabaneInterior = true,
 }) {
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
   const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
@@ -42,19 +43,23 @@ export function SceneCharacters({
 
   return (
     <>
-      <ClickableThomas active={thomasEtabliPhaseActive} onInteract={onThomasEtabliInteract} />
-      <Suspense fallback={null}>
-        <AnimatedCharacter
-          key={thomasUrl}
-          url={thomasUrl}
-          animationSequence={sequence}
-          textureName="thomas"
-          textureBasePaths={textureBasePaths}
-          position={[-3.0, FLOOR_Y, -13.259]}
-          rotation={[0, (150 * Math.PI) / 180, 0]}
-          scale={9}
-        />
-      </Suspense>
+      {showCabaneInterior && (
+        <>
+          <ClickableThomas active={thomasEtabliPhaseActive} onInteract={onThomasEtabliInteract} />
+          <Suspense fallback={null}>
+            <AnimatedCharacter
+              key={thomasUrl}
+              url={thomasUrl}
+              animationSequence={sequence}
+              textureName="thomas"
+              textureBasePaths={textureBasePaths}
+              position={[-3.0, FLOOR_Y, -13.259]}
+              rotation={[0, (150 * Math.PI) / 180, 0]}
+              scale={9}
+            />
+          </Suspense>
+        </>
+      )}
       <Suspense fallback={null}>
         <AnimatedCharacter
           key={marieUrl}
