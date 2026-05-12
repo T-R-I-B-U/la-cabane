@@ -39,7 +39,7 @@
   },
   {
     "name": "trunk",
-    "type": "In",
+    "type": "Mesh",
     "position": [
       -7.6254,
       -0.5431,
@@ -63,25 +63,6 @@
       -10.3286,
       2.3616,
       -3.77
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
-    "name": "growingfruit",
-    "type": "Mesh",
-    "position": [
-      -15.0032,
-      0.7183,
-      -8.4425
     ],
     "rotation": [
       0,
@@ -570,25 +551,6 @@
     ]
   },
   {
-    "name": "timeatm",
-    "type": "Mesh",
-    "position": [
-      -10.2607,
-      1.924,
-      -5.3403
-    ],
-    "rotation": [
-      -3.1416,
-      -0.0414,
-      -3.1416
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "plants01",
     "type": "Mesh",
     "position": [
@@ -649,13 +611,13 @@
     "name": "shelves",
     "type": "Object3D",
     "position": [
-      -2.5154,
+      -2.3699,
       1.4192,
-      -15.6329
+      -15.2585
     ],
     "rotation": [
       0,
-      0,
+      0.142,
       0
     ],
     "scale": [
@@ -668,13 +630,13 @@
     "name": "shelves",
     "type": "Object3D",
     "position": [
-      -1.365,
+      -1.0887,
       1.4192,
-      -14.6267
+      -14.4253
     ],
     "rotation": [
       0,
-      0,
+      0.142,
       0
     ],
     "scale": [
@@ -706,9 +668,9 @@
     "name": "cabinet",
     "type": "Mesh",
     "position": [
-      -5.4862,
+      -5.64,
       0.1358,
-      -16.0019
+      -16.0402
     ],
     "rotation": [
       -3.1416,
@@ -725,9 +687,9 @@
     "name": "cabinet",
     "type": "Mesh",
     "position": [
-      -4.8576,
+      -4.8543,
       0.1358,
-      -15.8642
+      -15.8681
     ],
     "rotation": [
       3.1416,
@@ -744,9 +706,9 @@
     "name": "cabinet",
     "type": "Mesh",
     "position": [
-      -4.2555,
+      -4.1017,
       0.1358,
-      -15.6953
+      -15.6569
     ],
     "rotation": [
       3.1416,
@@ -779,12 +741,12 @@
     ]
   },
   {
-    "name": "plants01",
+    "name": "plants011",
     "type": "Mesh",
     "position": [
       -22.2454,
       1.3397,
-      -10.0529
+      -8.423
     ],
     "rotation": [
       0,
@@ -798,7 +760,7 @@
     ]
   },
   {
-    "name": "plants012",
+    "name": "plants011",
     "type": "Mesh",
     "position": [
       -22.2454,
@@ -809,6 +771,386 @@
       0,
       -0.9416,
       0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "armchair",
+    "type": "Mesh",
+    "position": [
+      -14.1938,
+      0.351,
+      1.2141
+    ],
+    "rotation": [
+      0,
+      -0.3908,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "armchair",
+    "type": "Mesh",
+    "position": [
+      -13.72,
+      0.351,
+      -0.2957
+    ],
+    "rotation": [
+      0,
+      -0.1464,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "armchair",
+    "type": "Mesh",
+    "position": [
+      -16.3369,
+      0.351,
+      -1.155
+    ],
+    "rotation": [
+      -3.1416,
+      0.45,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "armchair",
+    "type": "Mesh",
+    "position": [
+      -16.8843,
+      0.351,
+      0.5756
+    ],
+    "rotation": [
+      -3.1416,
+      0.2056,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plant02",
+    "type": "Mesh",
+    "position": [
+      -15.301,
+      1.0372,
+      -8.5248
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plant02",
+    "type": "Mesh",
+    "position": [
+      -5.6403,
+      1.4018,
+      -16.1065
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plant021",
+    "type": "Mesh",
+    "position": [
+      -0.4727,
+      0.6701,
+      -12.816
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plant021",
+    "type": "Mesh",
+    "position": [
+      -22.7411,
+      0.6701,
+      -1.4154
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plant022",
+    "type": "Mesh",
+    "position": [
+      -15.6568,
+      0.6057,
+      0.8641
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "littletable",
+    "type": "Mesh",
+    "position": [
+      -15.3975,
+      0.2629,
+      0.2637
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "rug01",
+    "type": "Mesh",
+    "position": [
+      -15.3547,
+      0,
+      0.0332
+    ],
+    "rotation": [
+      0,
+      -1.4867,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plants011",
+    "type": "Mesh",
+    "position": [
+      -3.5781,
+      4.4678,
+      -13.1444
+    ],
+    "rotation": [
+      0,
+      -0.9416,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "armchair",
+    "type": "Mesh",
+    "position": [
+      0.0056,
+      3.3918,
+      -11.095
+    ],
+    "rotation": [
+      0,
+      0.7789,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plant03",
+    "type": "Mesh",
+    "position": [
+      -4.0264,
+      2.0091,
+      -15.7211
+    ],
+    "rotation": [
+      1.5708,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "plants011",
+    "type": "Mesh",
+    "position": [
+      -18.2246,
+      1.415,
+      -2.6976
+    ],
+    "rotation": [
+      -3.1416,
+      1.2998,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "bikewheel",
+    "type": "Mesh",
+    "position": [
+      -6.2671,
+      0.294,
+      -15.8065
+    ],
+    "rotation": [
+      -3.1416,
+      1.4219,
+      2.9884
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "bikewheel",
+    "type": "Mesh",
+    "position": [
+      -6.3465,
+      0.279,
+      -15.6965
+    ],
+    "rotation": [
+      -3.1416,
+      1.4219,
+      2.7564
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "bikewheel",
+    "type": "Mesh",
+    "position": [
+      -6.7054,
+      1.1962,
+      -16.1513
+    ],
+    "rotation": [
+      0.0311,
+      0.0794,
+      1.5683
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "bikewheel",
+    "type": "Mesh",
+    "position": [
+      -7.0243,
+      1.2232,
+      -16.1513
+    ],
+    "rotation": [
+      0.0311,
+      0.0794,
+      1.7064
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "bikewheel",
+    "type": "Mesh",
+    "position": [
+      -4.6029,
+      1.1007,
+      -12.8887
+    ],
+    "rotation": [
+      0,
+      0.0485,
+      -1.5708
     ],
     "scale": [
       1,
