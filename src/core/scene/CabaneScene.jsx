@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
-import * as THREE from 'three'
+import { useState, useEffect, useCallback } from 'react'
 import { CabaneMap } from './CabaneMap'
 import { TreeLeaves } from '../../world/entities/TreeLeaves'
 import { SceneCharacters } from './SceneCharacters'
@@ -8,22 +7,9 @@ import { SlidingDoors } from '../../world/entities/SlidingDoors'
 import { CollisionDebug } from '../CollisionDebug'
 import { TriggerZone } from '../../world/interactions/TriggerZone'
 import { setZone } from '../../utils/gameManagerStore'
-import {
-  applyVisibilityZone,
-  getZoneComponents,
-  hideVisibilityZone,
-  showVisibilityZone,
-  useVisibilityZones,
-} from '../../utils/visibilityZoneStore'
 import { PLATFORM_POS } from '../SceneConfig'
 
-// Radius around the tree platform that triggers the arbre zone.
-// Tune once the full arbre scene geometry is known.
 const ARBRE_TRIGGER_RADIUS = 10
-
-const _triggerBounds = new THREE.Box3()
-const _triggerCenter = new THREE.Vector3()
-const _triggerSize = new THREE.Vector3()
 
 export function CabaneScene({
   performanceMode,
@@ -91,28 +77,12 @@ export function CabaneScene({
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
   const [leafMesh, setLeafMesh] = useState(null)
-  const [interiorTrigger, setInteriorTrigger] = useState(null)
-  const visibilityZones = useVisibilityZones()
-  const { characters, leaves, journal } = getZoneComponents(visibilityZones)
-  const cabaneInteriorVisible = useMemo(
-    () =>
-      visibilityZones.some(
-        (zone) => zone === 'all' || zone === 'cabane' || zone === 'cabane-interior'
-      ),
-    [visibilityZones]
-  )
 
   useEffect(() => {
     if (!cabaneGroup) return
     onCollisionReady?.([cabaneGroup])
     return () => onCollisionReady?.([])
   }, [cabaneGroup, onCollisionReady])
-
-  useEffect(() => {
-    applyVisibilityZone(cabaneGroup, visibilityZones)
-  }, [cabaneGroup, visibilityZones])
-
-  useEffect(() => () => hideVisibilityZone('cabane-interior'), [])
 
   const handleCabaneMapReady = useCallback(
     (sceneInfo) => {
@@ -131,22 +101,7 @@ export function CabaneScene({
     setCabaneGroup(group)
     if (!group) {
       setLeafMesh(null)
-      setInteriorTrigger(null)
       return
-    }
-
-    const hutObject = group.getObjectByName('hut01')
-    if (hutObject) {
-      hutObject.updateWorldMatrix(true, true)
-      _triggerBounds.setFromObject(hutObject)
-      _triggerBounds.getCenter(_triggerCenter)
-      _triggerBounds.getSize(_triggerSize)
-      setInteriorTrigger({
-        center: _triggerCenter.toArray(),
-        radius: Math.max(_triggerSize.x, _triggerSize.z) * 0.42,
-      })
-    } else {
-      setInteriorTrigger(null)
     }
 
     let leafInstancedMesh = null
@@ -176,25 +131,20 @@ export function CabaneScene({
         onCabaneLoaded={handleCabaneGroupLoaded}
       />
 
-      {leaves && (
-        <TreeLeaves
-          leafMesh={leafMesh}
-          active={areCabaneInteractionsEnabled}
-          onLeafClick={onLeafClick}
-          onLeafHover={onLeafHover}
-          leafMaterialMode={leafMaterialMode}
-        />
-      )}
+      <TreeLeaves
+        leafMesh={leafMesh}
+        active={areCabaneInteractionsEnabled}
+        onLeafClick={onLeafClick}
+        onLeafHover={onLeafHover}
+        leafMaterialMode={leafMaterialMode}
+      />
 
-      {characters && (
-        <SceneCharacters
-          performanceMode={performanceMode}
-          thomasEtabliPhaseActive={thomasEtabliPhaseActive}
-          onThomasEtabliInteract={onThomasEtabliInteract}
-          thomasAnimPhase={thomasAnimPhase}
-          showCabaneInterior={cabaneInteriorVisible}
-        />
-      )}
+      <SceneCharacters
+        performanceMode={performanceMode}
+        thomasEtabliPhaseActive={thomasEtabliPhaseActive}
+        onThomasEtabliInteract={onThomasEtabliInteract}
+        thomasAnimPhase={thomasAnimPhase}
+      />
 
       <SceneInteractions
         cabane={cabaneGroup}
@@ -242,7 +192,6 @@ export function CabaneScene({
         journalAutoOpenToken={journalAutoOpenToken}
         journalCloseToken={journalCloseToken}
         journalPuzzleEnabled={journalPuzzleEnabled}
-        journalVisible={journal}
       />
 
       {debugCollisions && <CollisionDebug cabane={cabaneGroup} />}
@@ -261,15 +210,6 @@ export function CabaneScene({
         onEnter={() => setZone('arbre')}
       />
 
-      {interiorTrigger && (
-        <TriggerZone
-          center={interiorTrigger.center}
-          radius={interiorTrigger.radius}
-          leaveRadius={interiorTrigger.radius * 1.25}
-          onEnter={() => showVisibilityZone('cabane-interior')}
-          onLeave={() => hideVisibilityZone('cabane-interior')}
-        />
-      )}
     </>
   )
 }
