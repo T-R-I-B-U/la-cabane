@@ -151,17 +151,22 @@ export function TreeLeaves({
     _localCam.copy(state.camera.position).applyMatrix4(_inverseMatrix)
 
     const t = state.clock.elapsedTime
+    let hasAnimated = false
     for (let i = 0; i < leafMesh.count; i++) {
       const dx = basePositions[i * 3] - _localCam.x
       const dy = basePositions[i * 3 + 1] - _localCam.y
       const dz = basePositions[i * 3 + 2] - _localCam.z
 
       if (dx * dx + dy * dy + dz * dz > LOD_DISTANCE_SQ) {
-        inRangeRef.current[i] = 0
-        leafMesh.setMatrixAt(i, baseMatrices[i])
+        if (inRangeRef.current[i]) {
+          inRangeRef.current[i] = 0
+          leafMesh.setMatrixAt(i, baseMatrices[i])
+          hasAnimated = true
+        }
         continue
       }
       inRangeRef.current[i] = 1
+      hasAnimated = true
       const p = animProfiles[profileIndex[i]]
       _euler.set(
         Math.sin(t * p.freqX + p.phaseX) * p.ampRotX,
@@ -173,7 +178,7 @@ export function TreeLeaves({
       _final.multiplyMatrices(baseMatrices[i], _offset)
       leafMesh.setMatrixAt(i, _final)
     }
-    leafMesh.instanceMatrix.needsUpdate = true
+    if (hasAnimated) leafMesh.instanceMatrix.needsUpdate = true
   })
   /* eslint-enable react-hooks/immutability */
 
