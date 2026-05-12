@@ -1,12 +1,8 @@
 1
 00:00:00,000 --> 00:00:05,000
-Et oui, Altera est le berceau du concept de Cabane.
+Et oui, Alterra est le berceau du concept de cabane.
 
 2
 00:00:05,000 --> 00:00:10,500
-Incroyable non ? C'est le premier arbre du savoir dans la première Cabane.
-
-3
-00:00:10,500 --> 00:00:15,500
-Ensuite, chaque quartier a pu avoir sa propre Cabane.
+Incroyable, non ? C'est le premier arbre du savoir dans la première cabane !
 

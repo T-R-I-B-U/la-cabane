@@ -1,19 +1,12 @@
 1
 00:00:00,000 --> 00:00:03,960
-Évidemment, tout le monde n'a pas la main verte !
+Évidemment, tout le monde n'a pas la main verte.
 
 2
 00:00:03,960 --> 00:00:07,080
 Ici, ce sont les cerveaux qui poussent.
 
 3
-00:00:07,080 --> 00:00:12,480
-Ce lieu est idéal pour étudier, lire, coder, ou même dessiner !
+00:00:07,080 --> 00:00:12,400
+Ce lieu est idéal pour étudier, lire, coder ou même dessiner.
 
-4
-00:00:12,480 --> 00:00:19,760
-Certains membres du cercle, des Passeurs, proposent même des transmissions de savoir théorique en groupe !
-
-5
-00:00:19,760 --> 00:00:23,240
-Oups chuuutt… ils sont en plein atelier…

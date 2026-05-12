@@ -1,20 +1,8 @@
 1
-00:00:00,000 --> 00:00:08,720
-Ah ! Altera ! La ville leader de ce nouvel avenir, un avenir choisi et construit par
+00:00:00,000 --> 00:00:10,500
+Ah ! Altera ! La ville leader de ce nouvel avenir, un avenir choisi et construit par le peuple et pour le peuple !
 
 2
-00:00:08,720 --> 00:00:16,480
-le peuple et pour le peuple ! Oh ! Je suis plein d'émotion ! Oui ! C'était une grande
-
-3
-00:00:16,480 --> 00:00:22,280
-époque. Tous les systèmes capitalistes et productivistes furent enfin anéantis.
-
-4
-00:00:22,280 --> 00:00:28,200
-Chacun pouvait reprendre son souffle et retrouver l'espoir d'une vie équitable.
-
-5
-00:00:28,200 --> 00:00:31,600
-digne et humaine.
+00:00:10,500 --> 00:00:17,300
+Oh ! Je suis plein d'émotion ! Oui, c'était une grande époque !
 

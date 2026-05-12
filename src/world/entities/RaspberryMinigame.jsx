@@ -147,7 +147,7 @@ function RaspberryInstance({ definition, onMeshRef, onPointerDown }) {
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
-export function RaspberryMinigame({ isActive, cabane = null, onStateChange, onUnripeAttempt }) {
+export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) {
   const { camera, gl } = useThree()
   const groupRef = useRef()
 
