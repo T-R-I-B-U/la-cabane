@@ -437,25 +437,6 @@
     ]
   },
   {
-    "name": "outsideplant02",
-    "type": "Object3D",
-    "position": [
-      32.8189,
-      1.5645,
-      -5.6124
-    ],
-    "rotation": [
-      0,
-      0,
-      0
-    ],
-    "scale": [
-      1,
-      1,
-      1
-    ]
-  },
-  {
     "name": "welcome01",
     "type": "Mesh",
     "position": [
@@ -551,7 +532,7 @@
     ]
   },
   {
-    "name": "plants01",
+    "name": "plant01",
     "type": "Mesh",
     "position": [
       -14.3796,
@@ -570,7 +551,7 @@
     ]
   },
   {
-    "name": "plants011",
+    "name": "plant011",
     "type": "Mesh",
     "position": [
       36.2615,
@@ -741,7 +722,7 @@
     ]
   },
   {
-    "name": "plants011",
+    "name": "plant011",
     "type": "Mesh",
     "position": [
       -22.2454,
@@ -760,7 +741,7 @@
     ]
   },
   {
-    "name": "plants011",
+    "name": "plant011",
     "type": "Mesh",
     "position": [
       -22.2454,
@@ -988,7 +969,7 @@
     ]
   },
   {
-    "name": "plants011",
+    "name": "plant011",
     "type": "Mesh",
     "position": [
       -3.5781,
@@ -1045,7 +1026,7 @@
     ]
   },
   {
-    "name": "plants011",
+    "name": "plant011",
     "type": "Mesh",
     "position": [
       -18.2246,
@@ -1151,6 +1132,234 @@
       0,
       0.0485,
       -1.5708
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "timeatm",
+    "type": "Mesh",
+    "position": [
+      -10.2155,
+      0.85,
+      -3.5189
+    ],
+    "rotation": [
+      -3.1416,
+      -0.5168,
+      -3.1416
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "greenhouse_ground",
+    "type": "Mesh",
+    "position": [
+      27.6725,
+      0,
+      -5.3761
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hearth",
+    "type": "Mesh",
+    "position": [
+      -2.4655,
+      0.6539,
+      -1.5486
+    ],
+    "rotation": [
+      0,
+      -1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hearth",
+    "type": "Mesh",
+    "position": [
+      22.9434,
+      0.6539,
+      -8.8944
+    ],
+    "rotation": [
+      0,
+      -1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hearth",
+    "type": "Mesh",
+    "position": [
+      22.9054,
+      0.6539,
+      -1.0313
+    ],
+    "rotation": [
+      0,
+      -1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hearth",
+    "type": "Mesh",
+    "position": [
+      27.2185,
+      0.6539,
+      -8.8944
+    ],
+    "rotation": [
+      0,
+      -1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hearth",
+    "type": "Mesh",
+    "position": [
+      27.1806,
+      0.6539,
+      -1.0313
+    ],
+    "rotation": [
+      0,
+      -1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hearth",
+    "type": "Mesh",
+    "position": [
+      31.3734,
+      0.6539,
+      -8.8944
+    ],
+    "rotation": [
+      0,
+      -1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "hearth",
+    "type": "Mesh",
+    "position": [
+      31.3354,
+      0.6539,
+      -1.0313
+    ],
+    "rotation": [
+      0,
+      -1.5708,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Object3D",
+    "position": [
+      32.0945,
+      0.7633,
+      -0.967
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Object3D",
+    "position": [
+      31.2463,
+      0.7633,
+      -0.967
+    ],
+    "rotation": [
+      0,
+      0,
+      0
+    ],
+    "scale": [
+      1,
+      1,
+      1
+    ]
+  },
+  {
+    "name": "outsideplant03",
+    "type": "Object3D",
+    "position": [
+      30.3983,
+      0.7633,
+      -0.967
+    ],
+    "rotation": [
+      0,
+      0,
+      0
     ],
     "scale": [
       1,
