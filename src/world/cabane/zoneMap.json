@@ -26,9 +26,17 @@
       "platform-hut",
       "railling",
       "workbench01",
-      "stool"
+      "stool",
+      "cabinet",
+      "rug01",
+      "shelves",
+      "timeatm",
+      "welcome01",
+      "plants01",
+      "plants011",
+      "plants012"
     ],
-    "serre": ["greenhouse", "growingfruit", "juicemachine", "juiceglass"],
+    "serre": ["greenhouse", "growingfruit", "juicemachine", "juiceglass", "outsideplant02"],
     "arbre": ["trunk", "leaf", "platform", "railling-hut", "railling", "ladder", "stairs02"]
   },
   "hidden": {
