@@ -167,6 +167,7 @@ function resolveArbrePovs(platformPosition) {
 
 export function useArbreFlow({
   platformPosition,
+  flyMode = false,
   onLadderSpawn,
   onPlatformSpawn,
   onBackAtBase,
@@ -230,11 +231,17 @@ export function useArbreFlow({
     setGameStep(GAME_STEPS.EXPLORATION)
   }, [clearScheduledTimeouts, resetStory, stopDialogue])
 
+  const flyModeRef = useRef(flyMode)
+  useEffect(() => {
+    flyModeRef.current = flyMode
+  }, [flyMode])
+
   // Oneshot trigger when zone becomes 'arbre', or forced via arbreStartToken.
   // Player spawns at base of ladder in free-movement mode; locking happens on ladder click.
   useEffect(() => {
     if (zone !== 'arbre') return
     if (playedRef.current) return
+    if (flyModeRef.current) return
     playedRef.current = true
     setGrowingFruitPlaying(false)
     setArbreActive(true)

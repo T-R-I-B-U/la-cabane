@@ -2,7 +2,9 @@ import { getCameraPose } from '../core/cameraRegistry'
 
 const CAMERA_ID_BY_KEY = {
   accueil: 'story.accueil',
+  apresAccueil: 'story.apres.accueil',
   atelier: 'story.atelier',
+  atelierBetween: 'story.atelier.between',
   talkThomas: 'story.thomas',
   greenhouseFrontDoor: 'story.greenhouseFrontDoor',
   greenhouseCorridor: 'story.greenhouseCorridor',
