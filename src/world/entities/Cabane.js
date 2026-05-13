@@ -250,7 +250,7 @@ export async function buildCabane({
 
   const root = new THREE.Group()
   root.name = 'cabane'
-  const modelBasePaths = performanceMode ? ['/models/compressed/', '/models/'] : ['/models/']
+  const modelBasePaths = ['/models/compressed/', '/models/']
   const textureBasePaths = performanceMode
     ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
     : ['/textures/ktx2/', '/textures/']

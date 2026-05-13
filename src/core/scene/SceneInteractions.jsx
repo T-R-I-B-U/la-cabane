@@ -27,7 +27,7 @@ const compressedModelFiles = new Set(publicAssetManifest.compressedModelFiles)
 
 function resolveCharacterUrl(fileName, performanceMode) {
   const compressedUrl = `/models/compressed/${fileName}`
-  if (performanceMode && compressedModelFiles.has(compressedUrl)) {
+  if (compressedModelFiles.has(compressedUrl)) {
     return compressedUrl
   }
 

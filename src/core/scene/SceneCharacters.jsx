@@ -17,7 +17,7 @@ const THOMAS_SEQUENCES = {
 
 function resolveCharacterUrl(fileName, performanceMode) {
   const compressedUrl = `/models/compressed/${fileName}`
-  if (performanceMode && compressedModelFiles.has(compressedUrl)) {
+  if (compressedModelFiles.has(compressedUrl)) {
     return `/models/compressed/${fileName}`
   }
 
