@@ -599,22 +599,26 @@ export default function App() {
     setSceneLoadStatus('error')
   }, [])
 
-  const isCursorVisible =
+  // Custom overlay cursor — only shown when pointer lock is active and a UI is on top
+  const isCustomCursorVisible =
     introWaitingAtDoor ||
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible ||
-    showCameraEditor ||
     journalUnlocked ||
-    raspberryPhaseActive ||
+    raspberryPhaseActive
+
+  // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
+  const isNativeCursorVisible =
+    showCameraEditor ||
     (!introActive &&
       !postIntro &&
       (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked))
 
   // Keep ref in sync so the stable mousedown handler can read current visibility
   useEffect(() => {
-    isCursorVisibleRef.current = isCursorVisible
-  }, [isCursorVisible])
+    isCursorVisibleRef.current = isCustomCursorVisible
+  }, [isCustomCursorVisible])
 
   const isStoryCameraControlEnabled = postIntro
 
@@ -684,7 +688,7 @@ export default function App() {
   }, [])
 
   return (
-    <main className="viewer-page">
+    <main className={`viewer-page${isNativeCursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
       <GameManager
         sceneReady={sceneReady}
         introPending={introPending}
@@ -964,7 +968,7 @@ export default function App() {
 
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
-      <CustomCursor visible={isCursorVisible} />
+      <CustomCursor visible={isCustomCursorVisible} />
 
       {introPending && (
         <IntroLoader
