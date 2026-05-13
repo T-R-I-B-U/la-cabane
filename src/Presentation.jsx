@@ -75,7 +75,7 @@ const BRANCHES = [
 import { useState } from 'react'
 
 function TopBar() {
-  const [navOpen, setNavOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false)
   return (
     <header className="topbar">
       <div className="brandmark">
@@ -93,7 +93,11 @@ function TopBar() {
         <span style={{ color: 'var(--ink-mute)' }}>/</span>
         <span>gobelins · 2026</span>
       </div>
-      <button className="menu-toggle" onClick={() => setNavOpen(!navOpen)} aria-label="Toggle navigation">
+      <button
+        className="menu-toggle"
+        onClick={() => setNavOpen(!navOpen)}
+        aria-label="Toggle navigation"
+      >
         ☰
       </button>
       <nav className={navOpen ? 'nav open' : 'nav'}>

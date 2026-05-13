@@ -17,9 +17,22 @@ const _wallDir = new THREE.Vector3()
 const _wallOrigin = new THREE.Vector3()
 
 const WALL_COLLIDER_NODES = new Set([
-  'hut01', 'greenhouse', 'greenhouse_ground', 'trunk', 'nest', 'house',
-  'timeatm', 'ground-hut', 'platform', 'platform-hut', 'ladder',
-  'stairs01', 'stairs02', 'railling', 'railling-hut', 'juicemachine',
+  'hut01',
+  'greenhouse',
+  'greenhouse_ground',
+  'trunk',
+  'nest',
+  'house',
+  'timeatm',
+  'ground-hut',
+  'platform',
+  'platform-hut',
+  'ladder',
+  'stairs01',
+  'stairs02',
+  'railling',
+  'railling-hut',
+  'juicemachine',
 ])
 
 function isWallCollider(mesh) {

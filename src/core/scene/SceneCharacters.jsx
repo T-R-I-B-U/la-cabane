@@ -50,8 +50,10 @@ export function SceneCharacters({
     ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
     : ['/textures/ktx2/', '/textures/']
   const sequence = THOMAS_SEQUENCES[thomasAnimPhase] ?? THOMAS_SEQUENCES.back
-  const thomas = characters.find((character) => character.id === 'thomas') ?? getCharacterConfig('thomas')
-  const marie = characters.find((character) => character.id === 'marie') ?? getCharacterConfig('marie')
+  const thomas =
+    characters.find((character) => character.id === 'thomas') ?? getCharacterConfig('thomas')
+  const marie =
+    characters.find((character) => character.id === 'marie') ?? getCharacterConfig('marie')
   const thomasPosition = toPositionArray(thomas, [-3.0, FLOOR_Y, -13.259])
   const mariePosition = toPositionArray(marie, [-20.0, 9.15, 24.0])
 
