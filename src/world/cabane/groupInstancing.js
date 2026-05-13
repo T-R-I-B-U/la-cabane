@@ -77,11 +77,13 @@ export async function buildGroupInstanced(groupName, nodes, { modelBasePaths, te
     const instancedMesh = new THREE.InstancedMesh(geometry, material, count)
     instancedMesh.castShadow = false
     instancedMesh.receiveShadow = true
-    instancedMesh.frustumCulled = false
     for (let i = 0; i < count; i++) {
       instancedMesh.setMatrixAt(i, instanceMatrices[i])
     }
     instancedMesh.instanceMatrix.needsUpdate = true
+    instancedMesh.computeBoundingBox()
+    instancedMesh.computeBoundingSphere()
+    instancedMesh.frustumCulled = true
     group.add(instancedMesh)
   }
 

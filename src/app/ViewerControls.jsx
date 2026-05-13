@@ -109,7 +109,7 @@ export function ViewerControls({
           <span className="camera-toggle-icon" aria-hidden="true">
             {playerMode ? 'FPS' : 'ORB'}
           </span>
-          {playerMode ? 'Vue libre' : 'Vue joueur'}
+          {playerMode ? 'Vue joueur active' : 'Activer vue joueur'}
         </button>
 
         {playerMode && (

@@ -136,10 +136,12 @@ export async function buildInstancedMesh(
   } else {
     applyTransform(mesh, node)
   }
-  mesh.frustumCulled = false
   mesh.raycast = () => {}
   mesh.instanceMatrix.array.set(instanceMatrixArray)
   mesh.instanceMatrix.needsUpdate = true
+  mesh.computeBoundingBox()
+  mesh.computeBoundingSphere()
+  mesh.frustumCulled = true
   disposeObject3D(templateModel)
 
   return mesh

@@ -621,7 +621,7 @@ export default function App() {
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(false)
     setIsPlayerModeActive(true)
-    setIsFlyModeActive(true)
+    setIsFlyModeActive(false)
   }
 
   const explorationReady = false

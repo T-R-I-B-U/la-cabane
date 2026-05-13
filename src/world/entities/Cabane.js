@@ -14,6 +14,7 @@ const SHADOW_CAST_MIN_DIM = 2.0
 // (e.g. workbench01 is found by getObjectByName for ClickableWorkbench).
 const SKIP_GROUPING = new Set(['workbench01'])
 const FORCE_ASSET_GROUPING = new Set(['outsideplant03'])
+const MAIN_GROUND_Y_OFFSET = -0.02
 
 const NEST_WALL_INSET = 2
 const NEST_DOOR_PADDING = 0.8
@@ -301,6 +302,9 @@ export async function buildCabane({
     root.add(obj)
     obj.userData.visibilityId = `${taskMeta[i].name}#${taskMeta[i].index}`
   }
+
+  const mainGround = root.getObjectByName('mainGround')
+  if (mainGround) mainGround.position.y += MAIN_GROUND_Y_OFFSET
 
   // Enable castShadow only on meshes whose geometry is large enough to produce visible shadows.
   // Small props (stools, glasses, signs) are excluded to reduce shadow map draw calls.

@@ -5,10 +5,10 @@ import * as THREE from 'three'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-// Where the basket.glb scene origin is placed (group-local space).
+// Where the basket.gltf scene origin is placed (group-local space).
 const BASKET_ORIGIN = [-0.1, -0.4, 0.2]
 
-// basket.glb has FruitCrate2 at translation [-0.350, 0.109, 0.807] — scale 0.75 applied.
+// basket.gltf has FruitCrate2 at translation [-0.350, 0.109, 0.807] — scale 0.75 applied.
 // Snap zone must be at the visual center of the crate opening, not at the scene origin.
 const BASKET_SNAP = [
   BASKET_ORIGIN[0] + -0.35 * 0.75,
@@ -75,7 +75,7 @@ const RASPBERRY_DEFS = [
 
 // ── Basket — exported for standalone preview in free exploration ──────────────
 export function Basket({ position = BASKET_ORIGIN }) {
-  const { scene } = useGLTF('/models/basket.glb')
+  const { scene } = useGLTF('/models/basket.gltf')
   const cloned = useMemo(() => scene.clone(true), [scene])
   return <primitive object={cloned} position={position} scale={0.75} />
 }
@@ -364,7 +364,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
   )
 }
 
-useGLTF.preload('/models/basket.glb')
+useGLTF.preload('/models/basket.gltf')
 useGLTF.preload('/models/raspberry.gltf')
 useTexture.preload('/textures/raspberry-color.png')
 useTexture.preload('/textures/raspberry-roughness.png')
