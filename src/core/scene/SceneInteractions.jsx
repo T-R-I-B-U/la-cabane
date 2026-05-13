@@ -27,7 +27,7 @@ const compressedModelFiles = new Set(publicAssetManifest.compressedModelFiles)
 
 function resolveCharacterUrl(fileName, performanceMode) {
   const compressedUrl = `/models/compressed/${fileName}`
-  if (performanceMode && compressedModelFiles.has(compressedUrl)) {
+  if (compressedModelFiles.has(compressedUrl)) {
     return compressedUrl
   }
 
@@ -95,7 +95,7 @@ export function SceneInteractions({
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   // Keep Zoe's visible mesh on the source GLB and reuse the compressed GLB for animation clips,
   // matching the historical fix that restored her motion after model export changes.
-  const zoeUrl = resolveCharacterUrl('zoe-animated.glb', false)
+  const zoeUrl = '/models/zoe-animated.glb'
   const textureBasePaths = performanceMode
     ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
     : ['/textures/ktx2/', '/textures/']
@@ -220,7 +220,7 @@ export function SceneInteractions({
           <AnimatedCharacter
             key={zoeUrl}
             url={zoeUrl}
-            animationUrl="/models/compressed/zoe-animated.glb"
+            animationUrl={performanceMode ? '/models/zoe-animated.glb' : '/models/compressed/zoe-animated.glb'}
             clip={zoeClip}
             textureName="zoe-animated"
             textureBasePaths={textureBasePaths}
