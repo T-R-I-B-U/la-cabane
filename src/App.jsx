@@ -15,7 +15,12 @@ import { useContactAssignment } from './app/useContactAssignment'
 import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
-import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn, PLAYER_HEIGHT } from './core/SceneConfig'
+import {
+  getLadderBaseSpawn,
+  getPlatformSpawn,
+  getPlayerSpawn,
+  PLAYER_HEIGHT,
+} from './core/SceneConfig'
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
@@ -144,6 +149,7 @@ export default function App() {
     receptionChoiceVisible,
     returnHallVisible,
     treePhaseActive,
+    timeatmPhaseActive,
     workbenchPhaseActive,
     greenhousePhaseActive,
     thomasEtabliPhaseActive,
@@ -167,6 +173,7 @@ export default function App() {
     handleLoaderKeyDown,
     handleJournalEnd,
     handleTreeInteract,
+    handleTimeatmInteract,
     handleJournalInteractionStart,
     suspendPointerUnlockExit,
     handleJournalOpen,
@@ -274,6 +281,7 @@ export default function App() {
     activateLadderFromStory,
   } = useArbreFlow({
     platformPosition: sceneLoadInfo?.platformPosition,
+    flyMode: isFlyModeActive,
     onLadderSpawn: spawnAtLadder,
     onPlatformSpawn: spawnAtPlatform,
     onBackAtBase: spawnAtLadderDown,
@@ -733,6 +741,7 @@ export default function App() {
           postIntro,
           postIntroLocked: isStoryCameraControlEnabled,
           treePhaseActive,
+          timeatmPhaseActive,
           receptionActive:
             currentStoryStepId === 'intro.goToReception' &&
             postIntro &&
@@ -750,6 +759,7 @@ export default function App() {
           onEvent: handleIntroEvent,
           onReceptionInteract: handleReceptionInteract,
           onTreeInteract: handleTreeInteract,
+          onTimeatmInteract: handleTimeatmInteract,
           onWorkbenchInteract: handleWorkbenchInteract,
           onGreenhouseDoorClick: handleGreenhouseDoorClick,
           onExitSerreDoorClick: handleExitSerreDoorClick,
@@ -776,7 +786,7 @@ export default function App() {
           active: arbreActive,
           storyCameraTransition: arbreStoryCameraTransition,
           onTransitionComplete: handleArbreTransitionComplete,
-          ladderClickActive,
+          ladderClickActive: ladderClickActive && !isFlyModeActive,
           stairsClickActive,
           ladderIsStoryMode,
           onLadderClick: handleLadderClick,
