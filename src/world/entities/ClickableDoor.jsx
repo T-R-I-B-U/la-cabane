@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useStableInteractionCallback } from '../interactions/useStableInteractionCallback'
+import { cursorStore } from '../../utils/cursorStore'
 
 const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
@@ -145,8 +146,10 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     const onMouseMove = (e) => {
       mouseMovedRef.current = true
       const rect = canvas.getBoundingClientRect()
-      mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
-      mouseRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+      const cx = document.pointerLockElement ? cursorStore.x : e.clientX
+      const cy = document.pointerLockElement ? cursorStore.y : e.clientY
+      mouseRef.current.x = ((cx - rect.left) / rect.width) * 2 - 1
+      mouseRef.current.y = -((cy - rect.top) / rect.height) * 2 + 1
     }
 
     const onClick = () => {

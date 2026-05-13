@@ -684,7 +684,7 @@ export default function App() {
   }, [])
 
   return (
-    <main className={`viewer-page${isCursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
+    <main className="viewer-page">
       <GameManager
         sceneReady={sceneReady}
         introPending={introPending}
