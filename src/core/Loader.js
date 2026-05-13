@@ -1,8 +1,13 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { ktx2Loader } from './ktx2Loader.js'
+
+const _dracoLoader = new DRACOLoader()
+_dracoLoader.setDecoderPath('/draco/')
 
 const _loader = new GLTFLoader()
 _loader.setKTX2Loader(ktx2Loader)
+_loader.setDRACOLoader(_dracoLoader)
 
 // Promise cache — concurrent requests for the same path share one load.
 const _cache = new Map()

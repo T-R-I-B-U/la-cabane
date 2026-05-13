@@ -163,6 +163,15 @@ function compressApiPlugin() {
         copyFileSync(resolve(basisSrc, 'basis_transcoder.js'), resolve(basisDir, 'basis_transcoder.js'))
         copyFileSync(resolve(basisSrc, 'basis_transcoder.wasm'), resolve(basisDir, 'basis_transcoder.wasm'))
       }
+
+      const dracoDir = resolve(rootDir, 'public/draco')
+      if (!existsSync(dracoDir)) {
+        const dracoSrc = resolve(rootDir, 'node_modules/three/examples/jsm/libs/draco')
+        mkdirSync(dracoDir, { recursive: true })
+        copyFileSync(resolve(dracoSrc, 'draco_decoder.js'), resolve(dracoDir, 'draco_decoder.js'))
+        copyFileSync(resolve(dracoSrc, 'draco_decoder.wasm'), resolve(dracoDir, 'draco_decoder.wasm'))
+        copyFileSync(resolve(dracoSrc, 'draco_wasm_wrapper.js'), resolve(dracoDir, 'draco_wasm_wrapper.js'))
+      }
     },
     configureServer(server) {
       const rootDir = process.cwd()

@@ -254,9 +254,9 @@ export function ViewerControls({
               onClick={onTogglePerformanceMode}
             >
               <span className="camera-toggle-icon" aria-hidden="true">
-                {performanceMode ? 'PERF' : 'STD'}
+                {performanceMode ? 'RAW' : 'HD'}
               </span>
-              {performanceMode ? 'Mode performance actif' : 'Activer le mode performance'}
+              {performanceMode ? 'Mode haute qualité désactivé' : 'Activer le mode haute qualité'}
             </button>
             <button
               type="button"
