@@ -220,7 +220,7 @@ export function SceneInteractions({
           <AnimatedCharacter
             key={zoeUrl}
             url={zoeUrl}
-            animationUrl="/models/compressed/zoe-animated.glb"
+            animationUrl={performanceMode ? '/models/zoe-animated.glb' : '/models/compressed/zoe-animated.glb'}
             clip={zoeClip}
             textureName="zoe-animated"
             textureBasePaths={textureBasePaths}
