@@ -264,7 +264,7 @@ const DEFAULT_CONFIG = {
     {
       id: 'thomas',
       label: 'Thomas',
-      position: { x: -1.7125, y: 0.04, z: -6.758 },
+      position: { x: -68.5716, y: 0.04, z: -53.7935 },
       floorY: 0.04,
       rotationY: 2.6179938779914944,
       scale: 9,
@@ -272,7 +272,7 @@ const DEFAULT_CONFIG = {
     {
       id: 'marie',
       label: 'Marie',
-      position: { x: -18.9025, y: 9.15, z: 28.6229 },
+      position: { x: -87.0937, y: 9.15, z: -19.5386 },
       floorY: 9.15,
       rotationY: 2.792526803190927,
       scale: 9,
@@ -280,7 +280,7 @@ const DEFAULT_CONFIG = {
     {
       id: 'zoe',
       label: 'Zoe',
-      position: { x: 29.5056, y: 0.04, z: -0.0317 },
+      position: { x: -33.3146, y: 0.04, z: -45.1228 },
       floorY: 0.04,
       rotationY: -1.5707963267948966,
       scale: 11,
