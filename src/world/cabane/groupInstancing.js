@@ -1,14 +1,16 @@
 import * as THREE from 'three'
 import { loadModel } from '../../core/Loader'
 import { applyAutoTextures } from './textureResolver'
-import { modelBaseName } from './assetNaming'
+import { assetModelCandidates, modelBaseName } from './assetNaming'
 import { cloneMaterialWithTextures, warnMissingAsset } from './runtime'
 
 function getModelCandidates(baseName, modelBasePaths) {
-  return modelBasePaths.flatMap((basePath) => [
-    `${basePath}${baseName}.glb`,
-    `${basePath}${baseName}.gltf`,
-  ])
+  return modelBasePaths.flatMap((basePath) =>
+    assetModelCandidates(baseName).flatMap((candidate) => [
+      `${basePath}${candidate}.glb`,
+      `${basePath}${candidate}.gltf`,
+    ])
+  )
 }
 
 // Builds a Group of InstancedMeshes from multiple cabane.json nodes that share the same model.

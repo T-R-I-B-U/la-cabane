@@ -2,15 +2,17 @@ import * as THREE from 'three'
 import { loadModel } from '../../core/Loader'
 import { applyAutoTextures } from './textureResolver'
 import { buildInstancedMesh } from './instancing'
-import { modelBaseName } from './assetNaming'
+import { assetModelCandidates, modelBaseName } from './assetNaming'
 import { applyTransform, warnMissingAsset } from './runtime'
 import { mergeNodeMeshes } from './mergeUtils'
 
 function getModelCandidates(baseName, modelBasePaths) {
-  return modelBasePaths.flatMap((basePath) => [
-    `${basePath}${baseName}.glb`,
-    `${basePath}${baseName}.gltf`,
-  ])
+  return modelBasePaths.flatMap((basePath) =>
+    assetModelCandidates(baseName).flatMap((candidate) => [
+      `${basePath}${candidate}.glb`,
+      `${basePath}${candidate}.gltf`,
+    ])
+  )
 }
 
 export async function buildNode(node, { modelBasePaths, textureBasePaths }) {

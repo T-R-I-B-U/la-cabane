@@ -1,19 +1,23 @@
 import * as THREE from 'three'
 import { loadModel } from '../../core/Loader'
 import { disposeObject3D } from '../../core/disposeObject3D'
-import { modelBaseName } from './assetNaming'
+import { assetModelCandidates, modelBaseName } from './assetNaming'
 import { applyAutoTextures } from './textureResolver'
 import { applyTransform, cloneMaterialWithTextures, warnMissingAsset } from './runtime'
 
 function getModelCandidates(baseName, modelBasePaths) {
-  return modelBasePaths.flatMap((basePath) => [
-    `${basePath}${baseName}.glb`,
-    `${basePath}${baseName}.gltf`,
-  ])
+  return modelBasePaths.flatMap((basePath) =>
+    assetModelCandidates(baseName).flatMap((candidate) => [
+      `${basePath}${candidate}.glb`,
+      `${basePath}${candidate}.gltf`,
+    ])
+  )
 }
 
 function getInstanceCandidates(baseName, modelBasePaths) {
-  return modelBasePaths.map((basePath) => `${basePath}${baseName}.bin`)
+  return modelBasePaths.flatMap((basePath) =>
+    assetModelCandidates(baseName).map((candidate) => `${basePath}${candidate}.bin`)
+  )
 }
 
 export async function buildInstancedMesh(
