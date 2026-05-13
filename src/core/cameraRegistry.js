@@ -1,4 +1,4 @@
-import defaultConfig from '../../public/cameras.json'
+import defaultConfig from '../cameras.json'
 
 const STORAGE_KEY = 'lacabane:camera-registry:v2'
 
