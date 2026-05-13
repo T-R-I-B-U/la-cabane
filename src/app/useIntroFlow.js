@@ -31,6 +31,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const [journalPuzzleEnabled, setJournalPuzzleEnabled] = useState(false)
   const [returnHallVisible, setReturnHallVisible] = useState(false)
   const [treePhaseActive, setTreePhaseActive] = useState(false)
+  const [timeatmPhaseActive, setTimeatmPhaseActive] = useState(false)
   const [, setEtabliPhaseActive] = useState(false)
   const [workbenchPhaseActive, setWorkbenchPhaseActive] = useState(false)
   const [greenhousePhaseActive, setGreenhousePhaseActive] = useState(false)
@@ -52,8 +53,10 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const journalPlacedCountRef = useRef(0)
   const journalCompletedRef = useRef(false)
   const isPostBookTransitionRef = useRef(false)
+  const treeClickPhaseRef = useRef(1)
   const isEtabliTransitionRef = useRef(false)
   const isThomasTransitionRef = useRef(false)
+  const isAtelierBetweenTransitionRef = useRef(false)
   const isSerreZoeTransitionRef = useRef(false)
   const isSerreRaspberryTransitionRef = useRef(false)
   const isSerreJuiceTransitionRef = useRef(false)
@@ -259,6 +262,15 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
       return
     }
 
+    if (isAtelierBetweenTransitionRef.current) {
+      isAtelierBetweenTransitionRef.current = false
+      scheduleFlowTimeout(() => {
+        isThomasTransitionRef.current = true
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.talkThomas, duration: 1.5 })
+      }, 1000)
+      return
+    }
+
     if (isThomasTransitionRef.current) {
       isThomasTransitionRef.current = false
       playDialogue('thomasEtabliDialogue', {
@@ -449,33 +461,12 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     if (completed) {
       isPostBookTransitionRef.current = true
-      setStoryCameraTransition({ ...STORY_CAMERA_POVS.accueil, duration: 2.0 })
+      setStoryCameraTransition({ ...STORY_CAMERA_POVS.apresAccueil, duration: 2.0 })
       return true
     }
 
     return false
   }, [])
-
-  const playTreeDialogueSequence = useCallback(
-    (onComplete) => {
-      playDialogue('treeRacinesDialogue', {
-        onDone: () => {
-          playDialogue('treeBorneDialogue', {
-            onDone: () => {
-              playDialogue('treeArbreDialogue', {
-                onDone: () => {
-                  playDialogue('treeOutroDialogue', {
-                    onDone: onComplete,
-                  })
-                },
-              })
-            },
-          })
-        },
-      })
-    },
-    [playDialogue]
-  )
 
   const unlockWorkbenchPhase = useCallback(() => {
     setEtabliPhaseActive(true)
@@ -484,8 +475,37 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   const handleTreeInteract = useCallback(() => {
     setTreePhaseActive(false)
-    playTreeDialogueSequence(unlockWorkbenchPhase)
-  }, [playTreeDialogueSequence, unlockWorkbenchPhase])
+
+    if (treeClickPhaseRef.current === 1) {
+      playDialogue('treePiedDialogue', {
+        onDone: () => {
+          playDialogue('treeRacinesDialogue', {
+            onDone: () => {
+              setTimeatmPhaseActive(true)
+            },
+          })
+        },
+      })
+    } else {
+      playDialogue('treeArbreDialogue', {
+        onDone: () => {
+          playDialogue('treeOutroDialogue', {
+            onDone: unlockWorkbenchPhase,
+          })
+        },
+      })
+    }
+  }, [playDialogue, unlockWorkbenchPhase])
+
+  const handleTimeatmInteract = useCallback(() => {
+    setTimeatmPhaseActive(false)
+    playDialogue('treeBorneDialogue', {
+      onDone: () => {
+        treeClickPhaseRef.current = 2
+        setTreePhaseActive(true)
+      },
+    })
+  }, [playDialogue])
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
@@ -583,8 +603,8 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setThomasEtabliPhaseActive(false)
     setThomasAnimationPhase('talking')
     fade('ambianceWorkbench', 0, 1500)
-    isThomasTransitionRef.current = true
-    setStoryCameraTransition({ ...STORY_CAMERA_POVS.talkThomas, duration: 1.5 })
+    isAtelierBetweenTransitionRef.current = true
+    setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelierBetween, duration: 1.0 })
   }, [])
 
   const handleReturnToHall = useCallback(() => {
@@ -634,8 +654,9 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   const debugGoToTree = useCallback(() => {
     prepareDebugPostIntroState()
-    playTreeDialogueSequence(unlockWorkbenchPhase)
-  }, [playTreeDialogueSequence, prepareDebugPostIntroState, unlockWorkbenchPhase])
+    treeClickPhaseRef.current = 1
+    setTreePhaseActive(true)
+  }, [prepareDebugPostIntroState])
 
   const debugGoToEtabli = useCallback(() => {
     prepareDebugPostIntroState()
@@ -729,6 +750,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     receptionChoiceVisible,
     returnHallVisible,
     treePhaseActive,
+    timeatmPhaseActive,
     workbenchPhaseActive,
     thomasEtabliPhaseActive,
     greenhousePhaseActive,
@@ -772,6 +794,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     handleJuiceInteract,
     handleJournalEnd,
     handleTreeInteract,
+    handleTimeatmInteract,
     handleJournalInteractionStart,
     suspendPointerUnlockExit,
     handleJournalOpen,

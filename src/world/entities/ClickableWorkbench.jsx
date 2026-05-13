@@ -5,13 +5,16 @@ const HOVER_EMISSIVE = new THREE.Color(0xffefbf)
 const HOVER_EMISSIVE_INTENSITY = 0.35
 const WORKBENCH_NAME = 'workbench01'
 
+// Three workbench01 meshes exist in the scene: two in the serre (~x -29) and one
+// in the cabane atelier (~x -71). We target only the cabane one by world position.
 function findWorkbenchMeshes(cabaneGroup) {
   if (!cabaneGroup) return []
-  const parent = cabaneGroup.getObjectByName(WORKBENCH_NAME)
-  if (!parent) return []
   const meshes = []
-  parent.traverse((object) => {
-    if (object.isMesh) meshes.push(object)
+  cabaneGroup.traverse((object) => {
+    if (object.name === WORKBENCH_NAME && object.isMesh) {
+      const worldPos = object.getWorldPosition(new THREE.Vector3())
+      if (worldPos.x < -60) meshes.push(object)
+    }
   })
   return meshes
 }

@@ -28,7 +28,9 @@ export function CabaneScene({
   receptionActive,
   onReceptionInteract,
   treePhaseActive,
+  timeatmPhaseActive,
   onTreeInteract,
+  onTimeatmInteract,
   workbenchPhaseActive,
   onWorkbenchInteract,
   greenhousePhaseActive,
@@ -157,7 +159,9 @@ export function CabaneScene({
         onIntroEvent={onIntroEvent}
         onReceptionInteract={onReceptionInteract}
         treePhaseActive={treePhaseActive}
+        timeatmPhaseActive={timeatmPhaseActive}
         onTreeInteract={onTreeInteract}
+        onTimeatmInteract={onTimeatmInteract}
         workbenchPhaseActive={workbenchPhaseActive}
         onWorkbenchInteract={onWorkbenchInteract}
         greenhousePhaseActive={greenhousePhaseActive}
@@ -209,7 +213,6 @@ export function CabaneScene({
         radius={ARBRE_TRIGGER_RADIUS}
         onEnter={() => setZone('arbre')}
       />
-
     </>
   )
 }
