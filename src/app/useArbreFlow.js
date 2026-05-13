@@ -37,6 +37,12 @@ function resolveArbrePovs(platformPosition) {
       target: { x: -3.9712, y: 4.444, z: -1.3019 },
       duration: 2.0,
     },
+    ladderTop: {
+      cameraId: 'arbre.arbre.haut.echelle',
+      position: { x: -4.4295, y: 21.071, z: 3.6871 },
+      target: { x: -8.7355, y: 21.0986, z: 1.1458 },
+      duration: 1.4,
+    },
     stairs02Down: {
       cameraId: 'arbre.stairs02Down',
       position: { x: -7.685, y: 4.3005, z: 2.2315 },
@@ -282,8 +288,13 @@ export function useArbreFlow({
     } else if (currentStepId === 'arbre.ladderDown') {
       scheduleFlowTimeout(() => {
         completeStep('arbre.ladderDown')
-        setArbreStoryCameraTransition({ ...povs.atPlatform })
+        setArbreStoryCameraTransition({ ...povs.ladderTop })
       }, 1000)
+    } else if (currentStepId === 'arbre.toLadderTop') {
+      scheduleFlowTimeout(() => {
+        completeStep('arbre.toLadderTop')
+        setArbreStoryCameraTransition({ ...povs.atPlatform })
+      }, 300)
     } else if (currentStepId === 'arbre.toPlatform') {
       setArbreStoryCameraTransition(null)
       onPlatformSpawn?.()

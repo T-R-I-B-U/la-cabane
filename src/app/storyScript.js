@@ -31,6 +31,11 @@ export const STORY_SCRIPT = {
   'arbre.ladderDown': {
     id: 'arbre.ladderDown',
     type: 'cinematic',
+    next: 'arbre.toLadderTop',
+  },
+  'arbre.toLadderTop': {
+    id: 'arbre.toLadderTop',
+    type: 'cinematic',
     next: 'arbre.toPlatform',
   },
   'arbre.toPlatform': {
