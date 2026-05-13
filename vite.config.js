@@ -143,6 +143,14 @@ function getKtx2Flags(filename) {
   return flags
 }
 
+async function loadSharpOrNull() {
+  try {
+    return (await import('sharp')).default
+  } catch {
+    return null
+  }
+}
+
 function compressApiPlugin() {
   return {
     name: 'compress-api',
@@ -165,7 +173,17 @@ function compressApiPlugin() {
         res.setHeader('Access-Control-Allow-Origin', '*')
 
         if (req.method === 'GET' && req.url === '/textures') {
-          const sharp = (await import('sharp')).default
+          const sharp = await loadSharpOrNull()
+          if (!sharp) {
+            res.writeHead(503, { 'Content-Type': 'application/json' })
+            res.end(
+              JSON.stringify({
+                error:
+                  'sharp not found. Run "npm install" to restore dev dependencies before using the compress API.',
+              })
+            )
+            return
+          }
           const files = listPublicFiles(resolve(publicDir, 'textures'), /\.(png|jpe?g)$/i)
           const results = await Promise.all(
             files.map(async (file) => {
@@ -230,7 +248,15 @@ function compressApiPlugin() {
             const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`)
 
             try {
-              const sharp = (await import('sharp')).default
+              const sharp = await loadSharpOrNull()
+              if (!sharp) {
+                send({
+                  type: 'error',
+                  text: 'sharp not found. Run "npm install" to restore dev dependencies before using the compress API.',
+                })
+                res.end()
+                return
+              }
               const { mkdtemp, rm } = await import('node:fs/promises')
 
               const tmpDir = await mkdtemp(resolve(tmpdir(), 'ktx2-'))
