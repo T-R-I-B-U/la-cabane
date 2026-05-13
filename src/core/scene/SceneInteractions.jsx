@@ -15,7 +15,6 @@ import { ClickableZoe } from '../../world/entities/ClickableZoe'
 import { JournalBook } from '../../world/entities/JournalBook'
 import { Basket, RaspberryMinigame } from '../../world/entities/RaspberryMinigame'
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
-import { publicAssetManifest } from 'virtual:public-asset-manifest'
 import { FLOOR_Y } from '../SceneConfig.js'
 import { getRegistry, onRegistryChange } from '../cameraRegistry'
 
@@ -23,16 +22,6 @@ const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
 // outsideplant03 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
 const BASKET_PREVIEW_POS = [32.7189, 1.1645, -5.4124]
 const JOURNAL_ROTATION_Y = 0.41
-const compressedModelFiles = new Set(publicAssetManifest.compressedModelFiles)
-
-function resolveCharacterUrl(fileName, performanceMode) {
-  const compressedUrl = `/models/compressed/${fileName}`
-  if (compressedModelFiles.has(compressedUrl)) {
-    return compressedUrl
-  }
-
-  return `/models/${fileName}`
-}
 
 function getCharacterConfig(id) {
   return getRegistry().characters?.find((character) => character.id === id) ?? null
