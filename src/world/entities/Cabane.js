@@ -12,7 +12,22 @@ const SHADOW_CAST_MIN_DIM = 2.0
 // Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
 // (e.g. workbench01 is found by getObjectByName for ClickableWorkbench).
-const SKIP_GROUPING = new Set(['workbench01'])
+const SKIP_GROUPING = new Set(['workbench01', 'house'])
+
+const HOUSE_TEXTURES = ['house1', 'house2', 'house3', 'house4', 'house5', 'house6']
+
+function assignHouseTextures(nodes) {
+  const houseNodes = nodes.filter((n) => modelBaseName(n.name) === 'house')
+  const pool = [...HOUSE_TEXTURES]
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+  }
+  // If more houses than textures, pick a random one for the extra (avoids duplicating sequentially)
+  houseNodes.forEach((node, i) => {
+    node.textureName = pool[i % pool.length]
+  })
+}
 const FORCE_ASSET_GROUPING = new Set(['outsideplant03'])
 const MAIN_GROUND_Y_OFFSET = -0.02
 
@@ -259,6 +274,7 @@ export async function buildCabane({
 
   const nodes = Array.isArray(data) ? data : [data]
   root.userData.hutPosition = findNodePosition(nodes, 'hut01')
+  assignHouseTextures(nodes)
 
   // Group same-name non-InstancedMesh nodes for auto-instancing.
   // Nodes with ≥2 occurrences share one InstancedMesh group instead of N separate draw calls.

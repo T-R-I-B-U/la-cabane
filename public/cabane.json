@@ -1236,7 +1236,6 @@
   },
   {
     "name": "house",
-    "textureName": "house1",
     "type": "Mesh",
     "position": [
       -46.126,
@@ -1408,7 +1407,6 @@
   },
   {
     "name": "house",
-    "textureName": "house2",
     "type": "Mesh",
     "position": [
       -103.2608,
@@ -1428,7 +1426,6 @@
   },
   {
     "name": "house",
-    "textureName": "house3",
     "type": "Mesh",
     "position": [
       15.763,
@@ -1448,7 +1445,6 @@
   },
   {
     "name": "house",
-    "textureName": "house4",
     "type": "Mesh",
     "position": [
       15.763,
@@ -1468,7 +1464,6 @@
   },
   {
     "name": "house",
-    "textureName": "house5",
     "type": "Mesh",
     "position": [
       48.4115,
@@ -1488,7 +1483,6 @@
   },
   {
     "name": "house",
-    "textureName": "house6",
     "type": "Mesh",
     "position": [
       53.1348,
@@ -1508,7 +1502,6 @@
   },
   {
     "name": "house",
-    "textureName": "house1",
     "type": "Mesh",
     "position": [
       -120.0568,
