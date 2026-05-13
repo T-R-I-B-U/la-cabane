@@ -420,6 +420,17 @@ export default function App() {
     activateLadderFromStory()
   }, [arbreLadderPending, activateLadderFromStory])
 
+  // When entering story mode, re-confirm pointer lock so drei's PointerLockControls
+  // sets isLocked = true. Without this, PlayerControls mounts without ever seeing
+  // the lock event and ignores mousemove, requiring an extra click.
+  useEffect(() => {
+    if (!postIntro) return
+    const frameId = requestAnimationFrame(() => {
+      pointerControlsRef.current?.lock()
+    })
+    return () => cancelAnimationFrame(frameId)
+  }, [postIntro])
+
   // Track virtual cursor position from pointer lock movement deltas
   useEffect(() => {
     const onMove = (e) => cursorStore.move(e.movementX, e.movementY)
