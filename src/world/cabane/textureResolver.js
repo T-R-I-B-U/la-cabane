@@ -111,22 +111,36 @@ function findTextureUrl(names, suffix, textureBasePaths) {
 
   const normalizedBasePaths = textureBasePaths.map((basePath) => basePath.replace(/\/$/, ''))
 
+  function findPreferredUrl(keys) {
+    const urls = keys.flatMap((key) => [
+      ...(availableTextures.get(key) ?? []),
+      ...(availableTextures.get(key.normalize('NFC')) ?? []),
+      ...(availableTextures.get(key.normalize('NFD')) ?? []),
+      ...(availableTextures.get(normalizeAssetName(key)) ?? []),
+      ...(availableTextures.get(canonicalTextureKey(key)) ?? []),
+    ])
+
+    const uniqueUrls = [...new Set(urls)]
+
+    for (const basePath of normalizedBasePaths) {
+      const url = uniqueUrls.find((entry) => entry.startsWith(basePath))
+      if (url) return url
+    }
+
+    return null
+  }
+
   for (const name of names) {
     for (const candidate of textureNameCandidates(name)) {
       const key = `${candidate}-${suffix}`.toLowerCase()
-      const urls = [
-        ...(availableTextures.get(key) ?? []),
-        ...(availableTextures.get(key.normalize('NFC')) ?? []),
-        ...(availableTextures.get(key.normalize('NFD')) ?? []),
-        ...(availableTextures.get(normalizeAssetName(key)) ?? []),
-        ...(availableTextures.get(canonicalTextureKey(key)) ?? []),
-      ]
+      const suffixedUrl = findPreferredUrl([key])
+      if (suffixedUrl) return suffixedUrl
 
-      const uniqueUrls = [...new Set(urls)]
-
-      for (const basePath of normalizedBasePaths) {
-        const url = uniqueUrls.find((entry) => entry.startsWith(basePath))
-        if (url) return url
+      // Some assets still ship a single base color texture without the conventional
+      // `-color` suffix, such as `mainGround.png`.
+      if (suffix === 'color' || suffix === 'basecolor' || suffix === 'albedo') {
+        const bareUrl = findPreferredUrl([candidate])
+        if (bareUrl) return bareUrl
       }
     }
   }
