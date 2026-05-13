@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { buildNode } from '../cabane/nodeBuilder'
 import { buildGroupInstanced } from '../cabane/groupInstancing'
+import { modelBaseName } from '../cabane/assetNaming'
 import { findNodePosition } from '../cabane/runtime'
 export { clearTextureCache } from '../cabane/textureResolver'
 
@@ -12,6 +13,7 @@ const SHADOW_CAST_MIN_DIM = 2.0
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
 // (e.g. workbench01 is found by getObjectByName for ClickableWorkbench).
 const SKIP_GROUPING = new Set(['workbench01'])
+const FORCE_ASSET_GROUPING = new Set(['outsideplant03'])
 
 const NEST_WALL_INSET = 2
 const NEST_DOOR_PADDING = 0.8
@@ -264,8 +266,10 @@ export async function buildCabane({
     if (node.type === 'InstancedMesh') {
       instancedNodes.push({ node, index: i })
     } else {
-      if (!groups.has(node.name)) groups.set(node.name, [])
-      groups.get(node.name).push({ node, index: i })
+      const baseName = modelBaseName(node.name)
+      const groupKey = FORCE_ASSET_GROUPING.has(baseName) ? baseName : node.name
+      if (!groups.has(groupKey)) groups.set(groupKey, [])
+      groups.get(groupKey).push({ node, index: i })
     }
   }
 
