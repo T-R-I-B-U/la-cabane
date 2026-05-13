@@ -95,7 +95,7 @@ export function SceneInteractions({
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   // Keep Zoe's visible mesh on the source GLB and reuse the compressed GLB for animation clips,
   // matching the historical fix that restored her motion after model export changes.
-  const zoeUrl = resolveCharacterUrl('zoe-animated.glb', false)
+  const zoeUrl = '/models/zoe-animated.glb'
   const textureBasePaths = performanceMode
     ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
     : ['/textures/ktx2/', '/textures/']
