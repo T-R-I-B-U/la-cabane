@@ -27,7 +27,7 @@ export async function buildNode(node, { modelBasePaths, textureBasePaths }) {
   for (const modelPath of modelPaths) {
     try {
       object3d = await loadModel(modelPath)
-      await applyAutoTextures(object3d, baseName, textureBasePaths)
+      await applyAutoTextures(object3d, node.textureName ?? baseName, textureBasePaths)
       object3d.name = node.name
       break
     } catch (error) {
