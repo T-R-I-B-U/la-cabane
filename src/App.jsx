@@ -15,8 +15,8 @@ import { useContactAssignment } from './app/useContactAssignment'
 import { useArbreFlow } from './app/useArbreFlow'
 import Scene from './core/Scene'
 import { DEFAULT_HDRI_ID, HDRI_OPTIONS, NO_HDRI_ID } from './core/scene/hdriOptions'
-import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn } from './core/SceneConfig'
-import { setEditorFlyMode } from './core/cameraRegistry'
+import { getLadderBaseSpawn, getPlatformSpawn, getPlayerSpawn, PLAYER_HEIGHT } from './core/SceneConfig'
+import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -51,6 +51,7 @@ export default function App() {
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(isDevBuild)
   const [playerSpawn, setPlayerSpawn] = useState(null)
   const [playerSpawnTarget, setPlayerSpawnTarget] = useState(null)
+  const [playerEyeHeight, setPlayerEyeHeight] = useState(PLAYER_HEIGHT)
   const [playerSpawnKey, setPlayerSpawnKey] = useState(0)
   const [userMovementLocked, setUserMovementLocked] = useState(false)
   const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
@@ -203,6 +204,7 @@ export default function App() {
     if (!arbreStoryContinuityRef.current) setPostIntro(false)
     setPlayerSpawn(spawn.position)
     setPlayerSpawnTarget(spawn.target)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(false)
     setIsPlayerModeActive(true)
@@ -214,9 +216,16 @@ export default function App() {
   }, [sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition, setPostIntro])
 
   const spawnAtPlatform = useCallback(() => {
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    const platformFloorY = sceneLoadInfo?.platformPosition?.[1]
+    const cameraEyeHeight =
+      platformCamera?.position && Number.isFinite(platformFloorY)
+        ? Math.max(platformCamera.position.y - platformFloorY, 0.1)
+        : PLAYER_HEIGHT
     if (!arbreStoryContinuityRef.current) setPostIntro(false)
-    setPlayerSpawn(getPlatformSpawn(sceneLoadInfo?.platformPosition))
-    setPlayerSpawnTarget(null)
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(cameraEyeHeight)
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(true)
     setIsPlayerModeActive(true)
@@ -230,8 +239,10 @@ export default function App() {
   // Respawn at ladderDown position after the arbre story ends.
   // Camera is already there from the story transition — no visible teleport.
   const spawnAtLadderDown = useCallback(() => {
-    setPlayerSpawn({ x: -3.8412, y: 4.0818, z: -0.9827 })
-    setPlayerSpawnTarget({ x: -3.9712, y: 4.444, z: -1.3019 })
+    const ladderCamera = getCameraPose('arbre.ladderDown')
+    setPlayerSpawn(ladderCamera?.position ?? { x: -3.8412, y: 4.0818, z: -0.9827 })
+    setPlayerSpawnTarget(ladderCamera?.target ?? { x: -3.9712, y: 4.444, z: -1.3019 })
+    setPlayerEyeHeight(PLAYER_HEIGHT)
     setPlayerSpawnKey((k) => k + 1)
     setUserMovementLocked(false)
     setIsPlayerModeActive(true)
@@ -704,6 +715,7 @@ export default function App() {
           flyMode: isFlyModeActive,
           spawn: playerSpawn,
           spawnTarget: playerSpawnTarget,
+          eyeHeight: playerEyeHeight,
           spawnKey: playerSpawnKey,
           movementLocked: isPlayerInteractionLocked || userMovementLocked,
         }}

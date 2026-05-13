@@ -42,6 +42,7 @@ export default function Scene({
     flyMode,
     spawn: playerSpawn,
     spawnTarget: playerSpawnTarget,
+    eyeHeight: playerEyeHeight,
     spawnKey: playerSpawnKey,
     movementLocked,
   } = player
@@ -249,6 +250,7 @@ export default function Scene({
         flyMode={flyMode}
         playerSpawn={playerSpawn}
         playerSpawnTarget={playerSpawnTarget}
+        playerEyeHeight={playerEyeHeight}
         playerSpawnKey={playerSpawnKey}
         movementLocked={movementLocked}
         postIntro={postIntro}

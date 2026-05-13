@@ -71,7 +71,17 @@ export const STORY_SCRIPT = {
     id: 'arbre.outroDialogue',
     type: 'dialogue',
     dialogueId: 'arbreOutro',
-    next: null,
+    next: 'arbre.outroPlatformTop',
+  },
+  'arbre.outroPlatformTop': {
+    id: 'arbre.outroPlatformTop',
+    type: 'cinematic',
+    next: 'arbre.outroPlatformLadderTop',
+  },
+  'arbre.outroPlatformLadderTop': {
+    id: 'arbre.outroPlatformLadderTop',
+    type: 'cinematic',
+    next: 'arbre.backAtBase',
   },
   'arbre.backAtBase': {
     id: 'arbre.backAtBase',
