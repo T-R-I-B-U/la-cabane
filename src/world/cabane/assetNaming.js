@@ -13,3 +13,10 @@ export function normalizeAssetName(name) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
 }
+
+export function assetModelCandidates(name) {
+  const candidates = [name]
+  const normalized = normalizeAssetName(name).replaceAll('-', '')
+  if (normalized && !candidates.includes(normalized)) candidates.push(normalized)
+  return candidates
+}
