@@ -187,7 +187,8 @@ export function PlayerControls({
       !pressedKeys['KeyW'] &&
       !pressedKeys['KeyS'] &&
       !pressedKeys['KeyA'] &&
-      !pressedKeys['KeyD']
+      !pressedKeys['KeyD'] &&
+      !flyMode
     )
       return
 
