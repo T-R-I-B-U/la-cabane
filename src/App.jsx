@@ -24,7 +24,9 @@ import {
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
+import { cursorStore } from './utils/cursorStore'
 import { GAME_STEPS } from './utils/gameStateStore'
+import { CustomCursor } from './app/CustomCursor'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
@@ -75,6 +77,7 @@ export default function App() {
   const pointerControlsRef = useRef(null)
   const isJournalInteractionActiveRef = useRef(false)
   const arbreStoryContinuityRef = useRef(false)
+  const isCursorVisibleRef = useRef(false)
 
   const {
     selectedSavoirAssignment,
@@ -101,32 +104,16 @@ export default function App() {
     })
   }, [])
 
-  // Open panel only after pointer lock actually releases.
   useEffect(() => {
     if (!isSavoirInteractionActive) return
-
-    if (!document.pointerLockElement) {
-      const frameId = requestAnimationFrame(() => setIsSavoirPanelOpen(true))
-      return () => cancelAnimationFrame(frameId)
-    }
-    const onRelease = () => {
-      if (!document.pointerLockElement) setIsSavoirPanelOpen(true)
-    }
-    document.addEventListener('pointerlockchange', onRelease)
-    return () => document.removeEventListener('pointerlockchange', onRelease)
+    const frameId = requestAnimationFrame(() => setIsSavoirPanelOpen(true))
+    return () => cancelAnimationFrame(frameId)
   }, [isSavoirInteractionActive])
 
   useEffect(() => {
     if (!isContactInteractionActive) return
-    if (!document.pointerLockElement) {
-      const frameId = requestAnimationFrame(() => setIsContactPanelOpen(true))
-      return () => cancelAnimationFrame(frameId)
-    }
-    const onRelease = () => {
-      if (!document.pointerLockElement) setIsContactPanelOpen(true)
-    }
-    document.addEventListener('pointerlockchange', onRelease)
-    return () => document.removeEventListener('pointerlockchange', onRelease)
+    const frameId = requestAnimationFrame(() => setIsContactPanelOpen(true))
+    return () => cancelAnimationFrame(frameId)
   }, [isContactInteractionActive])
 
   const sceneReady = sceneLoadStatus === 'ok'
@@ -175,7 +162,6 @@ export default function App() {
     handleTreeInteract,
     handleTimeatmInteract,
     handleJournalInteractionStart,
-    suspendPointerUnlockExit,
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleNameSubmit: handleNameSubmitInternal,
@@ -293,12 +279,8 @@ export default function App() {
       const didOpen = openSavoirForLeaf(id)
       if (!didOpen) return
       setIsSavoirInteractionActive(true)
-      if (document.pointerLockElement) {
-        suspendPointerUnlockExit()
-        document.exitPointerLock()
-      }
     },
-    [openSavoirForLeaf, suspendPointerUnlockExit]
+    [openSavoirForLeaf]
   )
 
   const openContactFromFruit = useCallback(
@@ -306,12 +288,8 @@ export default function App() {
       const didOpen = openContactForFruit(fruitId)
       if (!didOpen) return
       setIsContactInteractionActive(true)
-      if (document.pointerLockElement) {
-        suspendPointerUnlockExit()
-        document.exitPointerLock()
-      }
     },
-    [openContactForFruit, suspendPointerUnlockExit]
+    [openContactForFruit]
   )
 
   const [showCameraEditor, setShowCameraEditor] = useState(false)
@@ -441,6 +419,27 @@ export default function App() {
     arbreStoryContinuityRef.current = true
     activateLadderFromStory()
   }, [arbreLadderPending, activateLadderFromStory])
+
+  // Track virtual cursor position from pointer lock movement deltas
+  useEffect(() => {
+    const onMove = (e) => cursorStore.move(e.movementX, e.movementY)
+    document.addEventListener('mousemove', onMove)
+    return () => document.removeEventListener('mousemove', onMove)
+  }, [])
+
+  // Synthetic click dispatch: forward canvas clicks to the DOM element under the virtual cursor
+  useEffect(() => {
+    const onDown = () => {
+      if (!isCursorVisibleRef.current) return
+      const canvas = document.querySelector('canvas')
+      const el = document.elementFromPoint(cursorStore.x, cursorStore.y)
+      if (el && el !== canvas) {
+        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [])
 
   const handleCloseSavoir = useCallback(() => {
     closeSavoirInternal()
@@ -611,6 +610,11 @@ export default function App() {
     (!introActive &&
       !postIntro &&
       (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked))
+
+  // Keep ref in sync so the stable mousedown handler can read current visibility
+  useEffect(() => {
+    isCursorVisibleRef.current = isCursorVisible
+  }, [isCursorVisible])
 
   const isStoryCameraControlEnabled = postIntro
 
@@ -809,7 +813,6 @@ export default function App() {
             handleJournalInteractionStart()
             isJournalInteractionActiveRef.current = true
             setIsJournalInteractionActive(true)
-            if (document.pointerLockElement) document.exitPointerLock()
           },
           onJournalOpenComplete: handleJournalOpen,
           onJournalCancel: () => {
@@ -961,11 +964,21 @@ export default function App() {
 
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
+      <CustomCursor visible={isCursorVisible} />
+
       {introPending && (
         <IntroLoader
           fading={loaderFading}
-          onClick={handleLoaderClick}
-          onKeyDown={handleLoaderKeyDown}
+          onClick={() => {
+            const canvas = document.querySelector('canvas')
+            if (canvas) canvas.requestPointerLock()
+            handleLoaderClick()
+          }}
+          onKeyDown={(e) => {
+            const canvas = document.querySelector('canvas')
+            if (canvas) canvas.requestPointerLock()
+            handleLoaderKeyDown(e)
+          }}
           onAnimationEnd={dismissLoader}
         />
       )}

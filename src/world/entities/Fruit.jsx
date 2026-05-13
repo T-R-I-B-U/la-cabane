@@ -111,7 +111,7 @@ export function Fruit({
           onPointerDown={(e) => {
             e.stopPropagation()
             if (!active) return
-            document.body.style.cursor = 'default'
+
             onFruitClick?.(fruitId)
           }}
         />

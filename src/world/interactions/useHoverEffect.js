@@ -1,20 +1,21 @@
 import { useCallback, useEffect } from 'react'
+import { cursorStore } from '../../utils/cursorStore'
 
 export function useHoverEffect({ onHover, onOut, active = true } = {}) {
   useEffect(() => {
     return () => {
-      document.body.style.cursor = 'default'
+      cursorStore.setType('default')
     }
   }, [])
 
   useEffect(() => {
-    if (!active) document.body.style.cursor = 'default'
+    if (!active) cursorStore.setType('default')
   }, [active])
 
   const onPointerOver = useCallback(
     (e) => {
       if (!active) return
-      document.body.style.cursor = 'pointer'
+      cursorStore.setType('pointer')
       onHover?.(e)
     },
     [active, onHover]
@@ -22,7 +23,7 @@ export function useHoverEffect({ onHover, onOut, active = true } = {}) {
 
   const onPointerOut = useCallback(
     (e) => {
-      document.body.style.cursor = 'default'
+      cursorStore.setType('default')
       onOut?.(e)
     },
     [onOut]

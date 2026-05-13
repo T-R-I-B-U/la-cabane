@@ -316,7 +316,7 @@ export function TreeLeaves({
             !onLeafClick
           )
             return
-          document.body.style.cursor = 'default'
+
           onLeafClick(e.instanceId)
         }}
       />
