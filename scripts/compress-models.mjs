@@ -6,8 +6,12 @@ const MODELS_DIR = 'public/models'
 const OUT_DIR = 'public/models/compressed'
 const FORCE = process.argv.includes('--force')
 
-const files = readdirSync(MODELS_DIR).filter((f) =>
-  ['.gltf', '.glb'].includes(extname(f))
+// Animated GLBs use skinned meshes — Draco only compresses static triangle geometry
+// and strips attributes needed for skinning. Exclude them from Draco compression.
+const ANIMATED_PATTERN = /-animated\.glb$/i
+
+const files = readdirSync(MODELS_DIR).filter(
+  (f) => ['.gltf', '.glb'].includes(extname(f)) && !ANIMATED_PATTERN.test(f)
 )
 
 if (files.length === 0) {
