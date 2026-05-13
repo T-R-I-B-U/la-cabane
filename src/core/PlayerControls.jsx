@@ -55,6 +55,7 @@ export function PlayerControls({
   flyMode = false,
   spawnAt,
   lookAtTarget,
+  eyeHeight = PLAYER_HEIGHT,
   collisionObjects = [],
   controlsRef,
   lockSelector,
@@ -155,7 +156,7 @@ export function PlayerControls({
       const floorHits = floorRaycasterRef.current.intersectObjects(floorMeshesRef.current, false)
       const walkable = floorHits.length > 0 ? floorHits[0] : null
       const targetFloorY = walkable ? walkable.point.y : FLOOR_Y
-      const targetCamY = targetFloorY + PLAYER_HEIGHT
+      const targetCamY = targetFloorY + eyeHeight
 
       const cameraHeightDelta = targetCamY - camera.position.y
       if (cameraHeightDelta < 0 && Math.abs(cameraHeightDelta) <= MAX_SNAP_DOWN_DIST) {
@@ -211,7 +212,7 @@ export function PlayerControls({
       return
     }
 
-    const footY = camera.position.y - PLAYER_HEIGHT
+    const footY = camera.position.y - eyeHeight
     const h0 = footY + 0.3
     const h1 = footY + 0.9
     const wallMeshes = wallMeshesRef.current
