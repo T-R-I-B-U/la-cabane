@@ -19,6 +19,26 @@ function getEditablePov(cameraId, fallback) {
   }
 }
 
+function getEditableReversePov(cameraId, fallback) {
+  const camera = getCameraPose(cameraId)
+  if (!camera?.position || !camera?.target) return fallback
+
+  return {
+    ...fallback,
+    position: camera.position,
+    target: getReverseTarget(camera.position, camera.target),
+    fov: camera.fov,
+  }
+}
+
+function getReverseTarget(position, target) {
+  return {
+    x: position.x * 2 - target.x,
+    y: position.y * 2 - target.y,
+    z: position.z * 2 - target.z,
+  }
+}
+
 function resolveArbrePovs(platformPosition) {
   const pos = platformPosition ?? PLATFORM_POS
   const [px, py, pz] = pos
@@ -36,6 +56,12 @@ function resolveArbrePovs(platformPosition) {
       position: { x: -3.8412, y: 4.0818, z: -0.9827 },
       target: { x: -3.9712, y: 4.444, z: -1.3019 },
       duration: 2.0,
+    },
+    ladderTop: {
+      cameraId: 'arbre.arbre.haut.echelle',
+      position: { x: -4.4295, y: 21.071, z: 3.6871 },
+      target: { x: -8.7355, y: 21.0986, z: 1.1458 },
+      duration: 1.4,
     },
     stairs02Down: {
       cameraId: 'arbre.stairs02Down',
@@ -58,14 +84,22 @@ function resolveArbrePovs(platformPosition) {
     // Outro reverse journey — mirrors the intro WP sequence
     outroStairs02Top: {
       cameraId: 'arbre.stairs02Top',
+      reverseCamera: true,
       position: { x: -15.5754, y: 12.1331, z: 13.8407 },
-      target: { x: -15.8063, y: 12.0721, z: 14.28 },
+      target: getReverseTarget(
+        { x: -15.5754, y: 12.1331, z: 13.8407 },
+        { x: -15.8063, y: 12.0721, z: 14.28 }
+      ),
       duration: 2.0,
     },
     outroStairs02Down: {
       cameraId: 'arbre.stairs02Down',
+      reverseCamera: true,
       position: { x: -7.685, y: 4.3005, z: 2.2315 },
-      target: { x: -23.7066, y: 6.2533, z: 8.2345 },
+      target: getReverseTarget(
+        { x: -7.685, y: 4.3005, z: 2.2315 },
+        { x: -23.7066, y: 6.2533, z: 8.2345 }
+      ),
       duration: 1.5,
     },
     // WP4 position, camera looking back out toward WP3
@@ -105,12 +139,28 @@ function resolveArbrePovs(platformPosition) {
       target: { x: px, y: spawnY, z: fruitZ },
       duration: 2.0,
     },
+    outroPlatformTop: {
+      cameraId: 'arbre.atPlatform',
+      position: { x: px, y: spawnY - 0.5, z: pz },
+      target: { x: px, y: spawnY, z: fruitZ },
+      duration: 1.8,
+    },
+    outroPlatformLadderTop: {
+      cameraId: 'arbre.arbre.haut.echelle',
+      position: { x: -4.4295, y: 21.071, z: 3.6871 },
+      target: { x: -8.7355, y: 21.0986, z: 1.1458 },
+      duration: 1.4,
+    },
   }
 
   return Object.fromEntries(
     Object.entries(povs).map(([key, pov]) => [
       key,
-      pov.cameraId ? getEditablePov(pov.cameraId, pov) : pov,
+      pov.reverseCamera
+        ? getEditableReversePov(pov.cameraId, pov)
+        : pov.cameraId
+          ? getEditablePov(pov.cameraId, pov)
+          : pov,
     ])
   )
 }
@@ -207,6 +257,12 @@ export function useArbreFlow({
       setArbreStoryCameraTransition(null)
       onBackAtBase?.()
       setStairsClickActive(true)
+    } else if (currentStepId === 'arbre.outroPlatformTop') {
+      completeStep('arbre.outroPlatformTop')
+      setArbreStoryCameraTransition({ ...povs.outroPlatformLadderTop })
+    } else if (currentStepId === 'arbre.outroPlatformLadderTop') {
+      completeStep('arbre.outroPlatformLadderTop')
+      setArbreStoryCameraTransition({ ...povs.ladderDown })
     } else if (currentStepId === 'arbre.toStairs02Down') {
       scheduleFlowTimeout(() => {
         completeStep('arbre.toStairs02Down')
@@ -282,8 +338,13 @@ export function useArbreFlow({
     } else if (currentStepId === 'arbre.ladderDown') {
       scheduleFlowTimeout(() => {
         completeStep('arbre.ladderDown')
-        setArbreStoryCameraTransition({ ...povs.atPlatform })
+        setArbreStoryCameraTransition({ ...povs.ladderTop })
       }, 1000)
+    } else if (currentStepId === 'arbre.toLadderTop') {
+      scheduleFlowTimeout(() => {
+        completeStep('arbre.toLadderTop')
+        setArbreStoryCameraTransition({ ...povs.atPlatform })
+      }, 300)
     } else if (currentStepId === 'arbre.toPlatform') {
       setArbreStoryCameraTransition(null)
       onPlatformSpawn?.()
@@ -314,8 +375,8 @@ export function useArbreFlow({
                 playDialogue('arbreOutro', {
                   onDone: () => {
                     setArbreDialogueActive(false)
-                    goToStep('arbre.backAtBase')
-                    setArbreStoryCameraTransition({ ...povs.ladderDown })
+                    goToStep('arbre.outroPlatformTop')
+                    setArbreStoryCameraTransition({ ...povs.outroPlatformTop })
                   },
                 })
               },

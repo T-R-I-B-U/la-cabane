@@ -49,6 +49,14 @@
       "fov": 60
     },
     {
+      "id": "arbre.arbre.haut.echelle",
+      "label": "Arbre - haut échelle",
+      "group": "arbre",
+      "position": { "x": -4.4295, "y": 21.071, "z": 3.6871 },
+      "target": { "x": -8.7355, "y": 21.0986, "z": 1.1458 },
+      "fov": 60
+    },
+    {
       "id": "arbre.atPlatform",
       "label": "Arbre - milieu plateforme haute",
       "group": "arbre",

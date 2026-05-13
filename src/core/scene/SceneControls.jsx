@@ -43,6 +43,7 @@ export function SceneControls({
   flyMode,
   playerSpawn,
   playerSpawnTarget,
+  playerEyeHeight,
   playerSpawnKey,
   movementLocked,
   postIntro,
@@ -97,6 +98,7 @@ export function SceneControls({
           flyMode={flyMode}
           spawnAt={playerSpawn}
           lookAtTarget={playerSpawnTarget}
+          eyeHeight={playerEyeHeight}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
         />

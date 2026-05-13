@@ -31,6 +31,11 @@ export const STORY_SCRIPT = {
   'arbre.ladderDown': {
     id: 'arbre.ladderDown',
     type: 'cinematic',
+    next: 'arbre.toLadderTop',
+  },
+  'arbre.toLadderTop': {
+    id: 'arbre.toLadderTop',
+    type: 'cinematic',
     next: 'arbre.toPlatform',
   },
   'arbre.toPlatform': {
@@ -66,7 +71,17 @@ export const STORY_SCRIPT = {
     id: 'arbre.outroDialogue',
     type: 'dialogue',
     dialogueId: 'arbreOutro',
-    next: null,
+    next: 'arbre.outroPlatformTop',
+  },
+  'arbre.outroPlatformTop': {
+    id: 'arbre.outroPlatformTop',
+    type: 'cinematic',
+    next: 'arbre.outroPlatformLadderTop',
+  },
+  'arbre.outroPlatformLadderTop': {
+    id: 'arbre.outroPlatformLadderTop',
+    type: 'cinematic',
+    next: 'arbre.backAtBase',
   },
   'arbre.backAtBase': {
     id: 'arbre.backAtBase',
