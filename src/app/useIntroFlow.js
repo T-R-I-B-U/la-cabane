@@ -48,7 +48,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const [zoeClip, setZoeClip] = useState(null)
   const [minigameCount, setMinigameCount] = useState(0)
   const [playerName, setPlayerName] = useState('')
-  const ignoreNextPointerUnlockRef = useRef(false)
   const raspberryPhaseActiveRef = useRef(false)
   const journalPlacedCountRef = useRef(0)
   const journalCompletedRef = useRef(false)
@@ -123,7 +122,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setPlayerName('')
     stop('ambianceWorkbench')
     stop('ambianceGreenhouse')
-    ignoreNextPointerUnlockRef.current = false
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
@@ -155,9 +153,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     let wasLocked = false
     const onPointerLockChange = () => {
       if (document.pointerLockElement) wasLocked = true
-      else if (ignoreNextPointerUnlockRef.current) {
-        ignoreNextPointerUnlockRef.current = false
-      } else if (raspberryPhaseActiveRef.current) {
+      else if (raspberryPhaseActiveRef.current) {
         // minigame owns the pointer — ignore spontaneous unlocks
       } else if (arbreActiveRef?.current) {
         // arbre sequence owns the pointer — ignore spontaneous unlocks
@@ -169,20 +165,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     document.addEventListener('pointerlockchange', onPointerLockChange)
     return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
   }, [postIntro, exitIntro, arbreActiveRef])
-
-  useEffect(() => {
-    if (!showNameInput || !document.pointerLockElement) return
-
-    ignoreNextPointerUnlockRef.current = true
-    document.exitPointerLock()
-  }, [showNameInput])
-
-  useEffect(() => {
-    if (!receptionChoiceVisible || !document.pointerLockElement) return
-
-    ignoreNextPointerUnlockRef.current = true
-    document.exitPointerLock()
-  }, [receptionChoiceVisible])
 
   const handleIntroEvent = useCallback(
     (event, payload) => {
@@ -201,10 +183,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
       if (event === 'inside') {
         if (payload) setIntroSpawn(payload)
-        if (document.pointerLockElement) {
-          ignoreNextPointerUnlockRef.current = true
-          document.exitPointerLock()
-        }
         setIntroDoorOpen(false)
         setIntroShouldAdvance(false)
         setIntroActive(false)
@@ -287,9 +265,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
       isSerreZoeTransitionRef.current = false
       playDialogue('zoeIntro', {
         onDone: () => {
-          // Release pointer lock before minigame — PointerLockControls won't do it on unmount
-          ignoreNextPointerUnlockRef.current = true
-          if (document.pointerLockElement) document.exitPointerLock()
           isSerreRaspberryTransitionRef.current = true
           setRaspberryPhaseActive(true)
           setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 1.0 })
@@ -446,13 +421,9 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     [playDialogue]
   )
 
-  const handleJournalInteractionStart = useCallback(() => {
-    ignoreNextPointerUnlockRef.current = true
-  }, [])
+  const handleJournalInteractionStart = useCallback(() => {}, [])
 
-  const suspendPointerUnlockExit = useCallback(() => {
-    ignoreNextPointerUnlockRef.current = true
-  }, [])
+  const suspendPointerUnlockExit = useCallback(() => {}, [])
 
   const handleJournalEnd = useCallback(() => {
     const completed = journalCompletedRef.current
@@ -584,9 +555,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const handleGreenhouseDoorClick = useCallback(() => {
     setGreenhousePhaseActive(false)
     setSerreActive(true)
-    // Release pointer lock at serre entry — entire serre sequence is scripted, no FPS needed
-    ignoreNextPointerUnlockRef.current = true
-    if (document.pointerLockElement) document.exitPointerLock()
     fade('ambianceWorkbench', 0, 1500)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
@@ -670,8 +638,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   const debugGoToMinijeu = useCallback(() => {
     prepareDebugPostIntroState()
-    ignoreNextPointerUnlockRef.current = true
-    if (document.pointerLockElement) document.exitPointerLock()
     // Mark transition so handleStoryCameraTransitionComplete knows to just clear and return
     isSerreRaspberryTransitionRef.current = true
     setSerreActive(true)
@@ -681,8 +647,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   const debugGoToPostMinigame = useCallback(() => {
     prepareDebugPostIntroState()
-    ignoreNextPointerUnlockRef.current = true
-    if (document.pointerLockElement) document.exitPointerLock()
     setSerreActive(true)
     setIntroSpawn({ ...STORY_CAMERA_POVS.greenhouseFrontDoorExit })
     scheduleFlowTimeout(() => {
@@ -701,7 +665,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     setPostIntro(false)
     setShowNameInput(false)
-    ignoreNextPointerUnlockRef.current = false
     resetStory()
     setIntroPending(true)
   }, [resetStory, sceneReady])

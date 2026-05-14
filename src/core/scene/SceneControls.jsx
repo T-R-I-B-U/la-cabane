@@ -64,18 +64,6 @@ export function SceneControls({
     </>
   ) : null
 
-  if (arbreStoryCameraTransition) {
-    return (
-      <>
-        <StoryCameraTransition
-          transition={arbreStoryCameraTransition}
-          onComplete={onArbreTransitionComplete}
-        />
-        {devSync}
-      </>
-    )
-  }
-
   if (introActive) {
     return (
       <>
@@ -93,7 +81,7 @@ export function SceneControls({
     return (
       <>
         <PlayerControls
-          key={playerSpawnKey}
+          spawnKey={playerSpawnKey}
           canMove={!movementLocked}
           flyMode={flyMode}
           spawnAt={playerSpawn}
@@ -102,6 +90,12 @@ export function SceneControls({
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
         />
+        {arbreStoryCameraTransition && (
+          <StoryCameraTransition
+            transition={arbreStoryCameraTransition}
+            onComplete={onArbreTransitionComplete}
+          />
+        )}
         {devSync}
       </>
     )
@@ -125,6 +119,12 @@ export function SceneControls({
           transition={storyCameraTransition}
           onComplete={onStoryCameraTransitionComplete}
         />
+        {arbreStoryCameraTransition && (
+          <StoryCameraTransition
+            transition={arbreStoryCameraTransition}
+            onComplete={onArbreTransitionComplete}
+          />
+        )}
         {devSync}
       </>
     ) : (
