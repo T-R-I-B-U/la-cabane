@@ -418,12 +418,12 @@ export function JournalBook({
       }
     }
 
-    canvas.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('pointermove', onPointerMove)
     document.addEventListener('pointerup', onPointerUp)
 
     return () => {
-      canvas.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerup', onPointerUp)
     }
@@ -443,9 +443,8 @@ export function JournalBook({
     const state = bookStateRef.current
 
     if (active && state === 'CLOSED') {
-      const rect = gl.domElement.getBoundingClientRect()
-      pointerNdcRef.current.x = ((cursorStore.x - rect.left) / rect.width) * 2 - 1
-      pointerNdcRef.current.y = -((cursorStore.y - rect.top) / rect.height) * 2 + 1
+      // FPS mode: book is targeted via the crosshair at screen center, not the virtual cursor.
+      pointerNdcRef.current.set(0, 0)
       const ndc = pointerNdcRef.current
 
       if (ndc) {
