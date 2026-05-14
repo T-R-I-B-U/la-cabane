@@ -755,6 +755,8 @@ export default function App() {
         visible={
           (isPlayerModeActive || isStoryCameraControlEnabled) &&
           !showNameInput &&
+          !receptionChoiceVisible &&
+          !returnHallVisible &&
           !selectedSavoirAssignment &&
           !isSavoirInteractionActive &&
           !selectedContactAssignment &&
