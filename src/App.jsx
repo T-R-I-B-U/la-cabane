@@ -78,6 +78,7 @@ export default function App() {
   const isJournalInteractionActiveRef = useRef(false)
   const arbreStoryContinuityRef = useRef(false)
   const isCursorVisibleRef = useRef(false)
+  const isCameraBlockedRef = useRef(false)
 
   const {
     selectedSavoirAssignment,
@@ -202,10 +203,12 @@ export default function App() {
     setUserMovementLocked(false)
     setIsPlayerModeActive(true)
     setIsFlyModeActive(false)
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas')
-      if (canvas) canvas.requestPointerLock()
-    }, 10)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
   }, [sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition, setPostIntro])
 
   const spawnAtPlatform = useCallback(() => {
@@ -223,10 +226,12 @@ export default function App() {
     setUserMovementLocked(true)
     setIsPlayerModeActive(true)
     setIsFlyModeActive(false)
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas')
-      if (canvas) canvas.requestPointerLock()
-    }, 10)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
   }, [sceneLoadInfo?.platformPosition, setPostIntro])
 
   // Respawn at ladderDown position after the arbre story ends.
@@ -240,10 +245,12 @@ export default function App() {
     setUserMovementLocked(false)
     setIsPlayerModeActive(true)
     setIsFlyModeActive(false)
-    setTimeout(() => {
-      const canvas = document.querySelector('canvas')
-      if (canvas) canvas.requestPointerLock()
-    }, 10)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
   }, [])
 
   const {
@@ -279,6 +286,7 @@ export default function App() {
       const didOpen = openSavoirForLeaf(id)
       if (!didOpen) return
       setIsSavoirInteractionActive(true)
+      setShouldRestorePointerLockAfterStoryUi(true)
     },
     [openSavoirForLeaf]
   )
@@ -288,6 +296,7 @@ export default function App() {
       const didOpen = openContactForFruit(fruitId)
       if (!didOpen) return
       setIsContactInteractionActive(true)
+      setShouldRestorePointerLockAfterStoryUi(true)
     },
     [openContactForFruit]
   )
@@ -431,11 +440,16 @@ export default function App() {
     return () => cancelAnimationFrame(frameId)
   }, [postIntro])
 
-  // Track virtual cursor position from pointer lock movement deltas
+  // window capture: update virtual cursor + block camera rotation during modal states.
+  // 3D hover (leaves, fruits, book) uses manual useFrame raycasting from screen center —
+  // R3F's event system doesn't work under pointer lock (clientX/Y=0, isTrusted=false).
   useEffect(() => {
-    const onMove = (e) => cursorStore.move(e.movementX, e.movementY)
-    document.addEventListener('mousemove', onMove)
-    return () => document.removeEventListener('mousemove', onMove)
+    const onMouseMove = (e) => {
+      cursorStore.move(e.movementX, e.movementY)
+      if (isCameraBlockedRef.current) e.stopPropagation()
+    }
+    window.addEventListener('mousemove', onMouseMove, { capture: true })
+    return () => window.removeEventListener('mousemove', onMouseMove, { capture: true })
   }, [])
 
   // Synthetic click dispatch: forward canvas clicks to the DOM element under the virtual cursor
@@ -456,15 +470,17 @@ export default function App() {
     closeSavoirInternal()
     setIsSavoirInteractionActive(false)
     setIsSavoirPanelOpen(false)
-    requestPointerLockIfSceneControlAllowed()
-  }, [closeSavoirInternal, requestPointerLockIfSceneControlAllowed])
+    // ContactPanel/SavoirPanel stop click propagation so Drei's document.click
+    // handler never fires. Call lock() directly — we're still in the user gesture.
+    pointerControlsRef.current?.lock()
+  }, [closeSavoirInternal])
 
   const handleCloseContact = useCallback(() => {
     closeContactInternal()
     setIsContactInteractionActive(false)
     setIsContactPanelOpen(false)
-    requestPointerLockIfSceneControlAllowed()
-  }, [closeContactInternal, requestPointerLockIfSceneControlAllowed])
+    pointerControlsRef.current?.lock()
+  }, [closeContactInternal])
 
   const isStoryBlockingPlayer =
     dialogueActive ||
@@ -558,11 +574,12 @@ export default function App() {
       event.stopImmediatePropagation()
     }
 
-    document.addEventListener('pointerdown', blockOutsideChoice, { capture: true })
+    // Only block the native click (fires on canvas during pointer lock — harmless).
+    // Do NOT block pointerdown: preventDefault() on pointerdown suppresses mousedown,
+    // which would prevent our synthetic click dispatch from firing.
     document.addEventListener('click', blockOutsideChoice, { capture: true })
 
     return () => {
-      document.removeEventListener('pointerdown', blockOutsideChoice, { capture: true })
       document.removeEventListener('click', blockOutsideChoice, { capture: true })
     }
   }, [receptionChoiceVisible])
@@ -610,13 +627,15 @@ export default function App() {
     setSceneLoadStatus('error')
   }, [])
 
-  // Custom overlay cursor — only shown when pointer lock is active and a UI is on top
+  // Custom overlay cursor — only shown when pointer lock is active and a UI is on top.
+  // journalUnlocked is excluded: the user is in free camera mode looking for the book.
+  // isJournalInteractionActive covers the puzzle drag phase that needs the cursor.
   const isCustomCursorVisible =
     introWaitingAtDoor ||
     showNameInput ||
     receptionChoiceVisible ||
     returnHallVisible ||
-    journalUnlocked ||
+    isJournalInteractionActive ||
     raspberryPhaseActive
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
@@ -626,10 +645,27 @@ export default function App() {
       !postIntro &&
       (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked))
 
-  // Keep ref in sync so the stable mousedown handler can read current visibility
+  // Keep refs in sync for stable event handlers.
+  // isCursorVisibleRef: used by mousedown dispatch.
+  // isCameraBlockedRef: true only when PointerLockControls is mounted (postIntro) AND a UI
+  // overlay is active — guards the mousemove stopPropagation so intro hover still works.
   useEffect(() => {
     isCursorVisibleRef.current = isCustomCursorVisible
+    if (isCustomCursorVisible) cursorStore.reset()
   }, [isCustomCursorVisible])
+
+  // Block camera rotation for modal states and journal puzzle (cursor-driven interaction).
+  useEffect(() => {
+    isCameraBlockedRef.current =
+      postIntro &&
+      (showNameInput || receptionChoiceVisible || returnHallVisible || isJournalInteractionActive)
+  }, [
+    postIntro,
+    showNameInput,
+    receptionChoiceVisible,
+    returnHallVisible,
+    isJournalInteractionActive,
+  ])
 
   const isStoryCameraControlEnabled = postIntro
 
@@ -797,8 +833,7 @@ export default function App() {
           onJuiceMachineInteract: handleJuiceMachineInteract,
           onJuicePipeComplete: handleJuicePipeComplete,
           onJuiceInteract: handleJuiceInteract,
-          cameraFixed:
-            raspberryPhaseActive || (arbreActive && !ladderClickActive && !stairsClickActive),
+          cameraFixed: raspberryPhaseActive,
           serrePreview: isPlayerModeActive && !postIntro,
         }}
         arbre={{

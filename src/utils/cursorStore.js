@@ -39,5 +39,6 @@ export const cursorStore = {
   reset() {
     _x = window.innerWidth / 2
     _y = window.innerHeight / 2
+    _posListeners.forEach((fn) => fn(_x, _y))
   },
 }

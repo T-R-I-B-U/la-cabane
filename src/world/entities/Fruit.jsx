@@ -99,6 +99,28 @@ export function Fruit({
     },
   })
 
+  // Pointer lock makes R3F events unreliable — raycast from screen center every frame.
+  const _centerNdc = useMemo(() => new THREE.Vector2(0, 0), [])
+  const _fruitRaycaster = useMemo(() => new THREE.Raycaster(), [])
+  const _fruitHoveredRef = useRef(false)
+  useFrame(({ camera }) => {
+    if (!cloned?.root || !active || !document.pointerLockElement) {
+      if (_fruitHoveredRef.current) {
+        _fruitHoveredRef.current = false
+        if (proxyRef.current) proxyRef.current.visible = false
+        onFruitHover?.(false, fruitId)
+      }
+      return
+    }
+    _fruitRaycaster.setFromCamera(_centerNdc, camera)
+    const hit = _fruitRaycaster.intersectObject(cloned.root, true).length > 0
+    if (hit !== _fruitHoveredRef.current) {
+      _fruitHoveredRef.current = hit
+      if (proxyRef.current) proxyRef.current.visible = hit
+      onFruitHover?.(hit, fruitId)
+    }
+  })
+
   if (!edgesGeometry) return null
 
   return (
