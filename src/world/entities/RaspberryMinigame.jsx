@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { cursorStore } from '../../utils/cursorStore'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -196,25 +197,21 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
     []
   )
 
-  // Release pointer lock when minigame becomes active
   useEffect(() => {
     if (!isActive) return
-    if (document.pointerLockElement) document.exitPointerLock()
-    document.body.style.cursor = 'auto'
+    cursorStore.setType('default')
     return () => {
-      document.body.style.cursor = ''
+      cursorStore.setType('default')
     }
   }, [isActive])
 
   const toNDC = useCallback(
     (e) => {
-      if (document.pointerLockElement) {
-        pointerNdcRef.current.set(0, 0)
-        return pointerNdcRef.current
-      }
       const rect = gl.domElement.getBoundingClientRect()
-      pointerNdcRef.current.x = ((e.clientX - rect.left) / rect.width) * 2 - 1
-      pointerNdcRef.current.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
+      const cx = document.pointerLockElement ? cursorStore.x : e.clientX
+      const cy = document.pointerLockElement ? cursorStore.y : e.clientY
+      pointerNdcRef.current.x = ((cx - rect.left) / rect.width) * 2 - 1
+      pointerNdcRef.current.y = -((cy - rect.top) / rect.height) * 2 + 1
       return pointerNdcRef.current
     },
     [gl]
@@ -234,7 +231,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       camera.getWorldDirection(camDir)
       dragPlane.current.setFromNormalAndCoplanarPoint(camDir.negate(), e.point)
       draggedIndexRef.current = index
-      document.body.style.cursor = 'grabbing'
+      cursorStore.setType('grabbing')
     },
     [isActive, camera]
   )
@@ -261,7 +258,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       const idx = draggedIndexRef.current
       if (idx === null) return
       draggedIndexRef.current = null
-      document.body.style.cursor = 'auto'
+      cursorStore.setType('default')
       toNDC(e)
 
       const basketNdc = _basketWorldPos.clone().project(camera)
@@ -292,7 +289,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
     return () => {
       document.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerup', onPointerUp)
-      document.body.style.cursor = 'auto'
+      cursorStore.setType('default')
     }
   }, [
     isActive,
@@ -316,7 +313,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
         (m, i) => m && collectedSlots.current[i] === null
       )
       const hits = pickable.length ? raycaster.intersectObjects(pickable, true) : []
-      document.body.style.cursor = hits.length ? 'grab' : 'auto'
+      cursorStore.setType(hits.length ? 'grab' : 'default')
     }
 
     for (let i = 0; i < RASPBERRY_DEFS.length; i++) {

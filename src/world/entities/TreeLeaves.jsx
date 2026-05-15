@@ -128,6 +128,27 @@ export function TreeLeaves({
     onOut: () => onLeafHover?.(false),
   })
 
+  // Pointer lock makes R3F events unreliable (clientX/Y = 0). Raycast from screen
+  // center every frame so the crosshair activates when looking at a leaf.
+  const _centerNdc = useMemo(() => new THREE.Vector2(0, 0), [])
+  const _leafRaycaster = useMemo(() => new THREE.Raycaster(), [])
+  const _leafHoveredRef = useRef(false)
+  useFrame(({ camera }) => {
+    if (!leafMesh || !active || !document.pointerLockElement) {
+      if (_leafHoveredRef.current) {
+        _leafHoveredRef.current = false
+        onLeafHover?.(false)
+      }
+      return
+    }
+    _leafRaycaster.setFromCamera(_centerNdc, camera)
+    const hit = _leafRaycaster.intersectObject(leafMesh, false).length > 0
+    if (hit !== _leafHoveredRef.current) {
+      _leafHoveredRef.current = hit
+      onLeafHover?.(hit)
+    }
+  })
+
   useEffect(() => {
     if (!leafMesh) return
     const rand = mulberry32(TINT_SEED)
@@ -316,7 +337,7 @@ export function TreeLeaves({
             !onLeafClick
           )
             return
-          document.body.style.cursor = 'default'
+
           onLeafClick(e.instanceId)
         }}
       />

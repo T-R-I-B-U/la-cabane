@@ -4,6 +4,7 @@ import { useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
 import { applyAutoTextures } from '../cabane/textureResolver'
 import { playOnce } from '../../utils/audioStore'
+import { cursorStore } from '../../utils/cursorStore'
 import { disposeObject3D } from '../../core/disposeObject3D'
 
 const MODEL_URL = '/models/book01.gltf'
@@ -153,12 +154,12 @@ export function JournalBook({
 
   useEffect(() => {
     return () => {
-      document.body.style.cursor = 'default'
+      cursorStore.setType('default')
     }
   }, [])
 
   useEffect(() => {
-    if (!active) document.body.style.cursor = 'default'
+    if (!active) cursorStore.setType('default')
   }, [active])
 
   useEffect(() => {
@@ -340,16 +341,18 @@ export function JournalBook({
     requestClose()
   }, [closeToken])
 
-  // Puzzle drag-and-drop — native events (pointer lock is off when book is open)
+  // Puzzle drag-and-drop
   useEffect(() => {
     const canvas = gl.domElement
 
     const raycaster = new THREE.Raycaster()
     const toNDC = (e) => {
       const rect = canvas.getBoundingClientRect()
+      const cx = document.pointerLockElement ? cursorStore.x : e.clientX
+      const cy = document.pointerLockElement ? cursorStore.y : e.clientY
       return new THREE.Vector2(
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        -((e.clientY - rect.top) / rect.height) * 2 + 1
+        ((cx - rect.left) / rect.width) * 2 - 1,
+        -((cy - rect.top) / rect.height) * 2 + 1
       )
     }
 
@@ -415,12 +418,12 @@ export function JournalBook({
       }
     }
 
-    canvas.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('pointermove', onPointerMove)
     document.addEventListener('pointerup', onPointerUp)
 
     return () => {
-      canvas.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerup', onPointerUp)
     }
@@ -440,11 +443,9 @@ export function JournalBook({
     const state = bookStateRef.current
 
     if (active && state === 'CLOSED') {
-      const ndc = document.pointerLockElement
-        ? pointerNdcRef.current.set(0, 0)
-        : pointerMovedRef.current
-          ? pointerNdcRef.current
-          : null
+      // FPS mode: book is targeted via the crosshair at screen center, not the virtual cursor.
+      pointerNdcRef.current.set(0, 0)
+      const ndc = pointerNdcRef.current
 
       if (ndc) {
         interactRaycasterRef.current.setFromCamera(ndc, camera)
@@ -474,7 +475,7 @@ export function JournalBook({
           : original.emissiveIntensity
       })
 
-      document.body.style.cursor = hoveredRef.current ? 'pointer' : 'default'
+      cursorStore.setType(hoveredRef.current ? 'pointer' : 'default')
     } else {
       hoveredRef.current = false
       debugStateRef.current.hitCount = 0
@@ -485,7 +486,7 @@ export function JournalBook({
         material.emissiveIntensity = original.emissiveIntensity
       })
 
-      document.body.style.cursor = 'default'
+      cursorStore.setType('default')
     }
 
     if (state === 'CLOSED') {
