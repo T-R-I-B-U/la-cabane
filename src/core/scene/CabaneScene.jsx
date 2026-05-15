@@ -128,7 +128,6 @@ export function CabaneScene({
     <>
       <CabaneMap
         modelQuality={modelQuality}
-        modelQuality={modelQuality}
         onReady={handleCabaneMapReady}
         onError={onError}
         onCabaneLoaded={handleCabaneGroupLoaded}
