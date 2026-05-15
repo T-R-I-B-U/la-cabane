@@ -19,7 +19,7 @@ const WatercolorPass = lazy(() =>
 )
 
 export default function Scene({
-  performanceMode,
+  modelQuality,
   activeHdriId,
   sceneState,
   player,
@@ -154,7 +154,7 @@ export default function Scene({
       {(zone === 'cabane' || zone === 'arbre') && (
         <Suspense fallback={null}>
           <CabaneScene
-            performanceMode={performanceMode}
+            modelQuality={modelQuality}
             onError={onError}
             onSceneReady={onReady}
             leafMaterialMode={leafMaterialMode}

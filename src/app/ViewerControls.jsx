@@ -17,11 +17,17 @@ function PanelSection({ title, eyebrow, children }) {
   )
 }
 
+const MODEL_QUALITY_LEVELS = [
+  { value: 'compressed2', label: 'Optimisé' },
+  { value: 'compressed', label: 'Compressé' },
+  { value: 'raw', label: 'Brut' },
+]
+
 export function ViewerControls({
   status,
   info,
   sceneReady,
-  performanceMode,
+  modelQuality,
   introPending,
   introActive,
   playerMode,
@@ -37,7 +43,7 @@ export function ViewerControls({
   shaderRadius,
   leafMaterialMode,
   onHdriChange,
-  onTogglePerformanceMode,
+  onModelQualityChange,
   onLaunchIntro,
   onTogglePlayerMode,
   onToggleFlyMode,
@@ -247,17 +253,20 @@ export function ViewerControls({
             })}
           </DevSection>
           <DevSection title="Scène">
-            <button
-              type="button"
-              className={`camera-toggle${performanceMode ? ' camera-toggle--active' : ''}`}
-              aria-pressed={performanceMode}
-              onClick={onTogglePerformanceMode}
-            >
-              <span className="camera-toggle-icon" aria-hidden="true">
-                {performanceMode ? 'RAW' : 'HD'}
-              </span>
-              {performanceMode ? 'Mode haute qualité désactivé' : 'Activer le mode haute qualité'}
-            </button>
+            {MODEL_QUALITY_LEVELS.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                className={`camera-toggle${modelQuality === value ? ' camera-toggle--active' : ''}`}
+                aria-pressed={modelQuality === value}
+                onClick={() => onModelQualityChange(value)}
+              >
+                <span className="camera-toggle-icon" aria-hidden="true">
+                  {modelQuality === value ? 'ON' : 'OFF'}
+                </span>
+                Modèles {label}
+              </button>
+            ))}
             <button
               type="button"
               className={`camera-toggle${debugDoors ? ' camera-toggle--active' : ''}`}

@@ -1,5 +1,6 @@
 const N = new Intl.NumberFormat('fr-FR')
 
+
 function Row({ label, value, unit, emphasis = false }) {
   return (
     <div className={`pm-row${emphasis ? ' pm-row--emphasis' : ''}`}>
@@ -63,6 +64,7 @@ export function PerfMonitor({ stats, scene, status }) {
         <Row label="Meshes" value={scene ? N.format(scene.meshes) : '—'} />
         <Row label="Pivots vides" value={scene ? N.format(scene.pivots) : '—'} />
       </Section>
+
     </aside>
   )
 }

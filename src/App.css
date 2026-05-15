@@ -380,6 +380,30 @@
   color: #e0443a;
 }
 
+.pm-quality-toggle {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.pm-quality-btn {
+  flex: 1;
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  border: 1px solid #c8c3b8;
+  border-radius: 4px;
+  background: transparent;
+  color: #6b6560;
+  cursor: pointer;
+}
+
+.pm-quality-btn--active {
+  background: #3a3530;
+  color: #f5f0eb;
+  border-color: #3a3530;
+}
+
 /* ── Info panel — top right ──────────────────────────────────────── */
 
 .viewer-controls {

@@ -81,16 +81,14 @@ export function SceneInteractions({
   onJuicePipeComplete,
   onJuiceInteract,
   serrePreview,
-  performanceMode,
+  modelQuality,
 }) {
   const [characters, setCharacters] = useState(() => getRegistry().characters ?? [])
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   // Keep Zoe's visible mesh on the source GLB and reuse the compressed GLB for animation clips,
   // matching the historical fix that restored her motion after model export changes.
   const zoeUrl = '/models/zoe-animated.glb'
-  const textureBasePaths = performanceMode
-    ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
-    : ['/textures/ktx2/', '/textures/']
+  const textureBasePaths = ['/textures/ktx2/', '/textures/compressed/', '/textures/']
   const zoe = characters.find((character) => character.id === 'zoe') ?? getCharacterConfig('zoe')
   const zoePosition = toPositionArray(zoe, [26.0, FLOOR_Y, -5.4])
 
@@ -219,7 +217,7 @@ export function SceneInteractions({
             key={zoeUrl}
             url={zoeUrl}
             animationUrl={
-              performanceMode ? '/models/zoe-animated.glb' : '/models/compressed/zoe-animated.glb'
+              modelQuality === 'raw' ? '/models/zoe-animated.glb' : '/models/compressed/zoe-animated.glb'
             }
             clip={zoeClip}
             textureName="zoe-animated"

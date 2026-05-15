@@ -22,13 +22,7 @@ function createLoadError(path, error) {
 }
 
 function cloneSingleMaterial(material) {
-  const clone = material.clone()
-
-  for (const [key, value] of Object.entries(clone)) {
-    if (value?.isTexture) clone[key] = value.clone()
-  }
-
-  return clone
+  return material.clone()
 }
 
 function cloneMaterial(material) {

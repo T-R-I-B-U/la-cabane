@@ -292,7 +292,8 @@ export async function applyAutoTextures(object3d, fallbackName, textureBasePaths
             if (!url) return
 
             const sourceTexture = await loadTexture(url, colorSpace)
-            const texture = cloneTexture(sourceTexture)
+            const needsTransform = textureNames.some((name) => TEXTURE_TRANSFORMS[name])
+            const texture = needsTransform ? cloneTexture(sourceTexture) : sourceTexture
             applyTextureTransform(texture, textureNames)
             material[materialKey] = texture
             resetMaterialTint(material)
