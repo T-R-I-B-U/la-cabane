@@ -12,7 +12,7 @@ import { PLATFORM_POS } from '../SceneConfig'
 const ARBRE_TRIGGER_RADIUS = 10
 
 export function CabaneScene({
-  performanceMode,
+  modelQuality,
   onError,
   onSceneReady,
   leafMaterialMode,
@@ -127,7 +127,8 @@ export function CabaneScene({
   return (
     <>
       <CabaneMap
-        performanceMode={performanceMode}
+        modelQuality={modelQuality}
+        modelQuality={modelQuality}
         onReady={handleCabaneMapReady}
         onError={onError}
         onCabaneLoaded={handleCabaneGroupLoaded}
@@ -142,7 +143,7 @@ export function CabaneScene({
       />
 
       <SceneCharacters
-        performanceMode={performanceMode}
+        modelQuality={modelQuality}
         thomasEtabliPhaseActive={thomasEtabliPhaseActive}
         onThomasEtabliInteract={onThomasEtabliInteract}
         thomasAnimPhase={thomasAnimPhase}
@@ -187,7 +188,7 @@ export function CabaneScene({
         onJuicePipeComplete={onJuicePipeComplete}
         onJuiceInteract={onJuiceInteract}
         serrePreview={serrePreview}
-        performanceMode={performanceMode}
+        modelQuality={modelQuality}
         onJournalStart={onJournalStart}
         onJournalEnd={onJournalEnd}
         onJournalOpenComplete={onJournalOpenComplete}

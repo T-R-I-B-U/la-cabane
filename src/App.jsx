@@ -47,7 +47,7 @@ export default function App() {
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
   const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
-  const [performanceMode, setPerformanceMode] = useState(false)
+  const [modelQuality, setModelQuality] = useState('compressed2')
   const [isPlayerModeActive, setIsPlayerModeActive] = useState(false)
   const [isFlyModeActive, setIsFlyModeActive] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
@@ -768,7 +768,7 @@ export default function App() {
       />
 
       <Scene
-        performanceMode={performanceMode}
+        modelQuality={modelQuality}
         activeHdriId={activeHdriId}
         sceneState={{
           onStats: setStats,
@@ -922,7 +922,7 @@ export default function App() {
             status={sceneLoadStatus}
             info={sceneLoadInfo}
             sceneReady={sceneReady}
-            performanceMode={performanceMode}
+            modelQuality={modelQuality}
             introPending={introPending}
             introActive={introActive}
             playerMode={isPlayerModeActive}
@@ -936,7 +936,7 @@ export default function App() {
             noHdriId={NO_HDRI_ID}
             activeHdriId={activeHdriId}
             onHdriChange={setActiveHdriId}
-            onTogglePerformanceMode={() => setPerformanceMode((current) => !current)}
+            onModelQualityChange={setModelQuality}
             onLaunchIntro={launchIntro}
             onTogglePlayerMode={toggleFreePlayerView}
             onToggleFlyMode={() => setIsFlyModeActive((current) => !current)}
