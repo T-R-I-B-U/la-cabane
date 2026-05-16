@@ -163,6 +163,7 @@ export function JournalBook({
     window.__bookDebug__ = {
       setPos: (i, x, y, z) => PARKING_POSITIONS[i]?.set(x, y, z),
       getPos: () => PARKING_POSITIONS.map((v) => ({ x: v.x, y: v.y, z: v.z })),
+      onPositionsUpdate: null,
     }
     return () => {
       delete window.__bookDebug__
@@ -314,6 +315,18 @@ export function JournalBook({
 
   useEffect(() => {
     const onKeyDown = (event) => {
+      if (event.code === 'Enter' && import.meta.env.DEV) {
+        if (bookStateRef.current !== 'OPEN') return
+        const pieces = puzzlePiecesRef.current
+        if (!pieces) return
+        pieces.forEach((piece, i) => {
+          PARKING_POSITIONS[i]?.copy(piece.mesh.position)
+          if (piece.state === 'dragging') piece.state = 'parking'
+        })
+        window.__bookDebug__?.onPositionsUpdate?.()
+        return
+      }
+
       if (event.code !== 'Escape') return
 
       const state = bookStateRef.current

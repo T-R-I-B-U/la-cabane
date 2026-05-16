@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 const PIECE_NAMES = ['img01', 'img02', 'img03', 'img04']
 
@@ -15,7 +15,7 @@ const S = {
     bottom: 20,
     right: 20,
     zIndex: 900,
-    width: 340,
+    width: 300,
     background: 'rgba(7, 9, 13, 0.96)',
     color: '#f4f7fb',
     border: '1px solid rgba(255,255,255,0.1)',
@@ -25,30 +25,28 @@ const S = {
     fontSize: 12,
     boxShadow: '0 8px 32px rgba(0,0,0,0.45)',
     userSelect: 'none',
+    pointerEvents: 'none',
   },
-  title: { fontSize: 13, fontWeight: 800, color: '#9de3ff', marginBottom: 12 },
+  title: { fontSize: 13, fontWeight: 800, color: '#9de3ff', marginBottom: 4 },
+  hint: { color: '#8e99a8', fontSize: 10, marginBottom: 12 },
   row: {
     display: 'grid',
     gridTemplateColumns: '40px 1fr 1fr 1fr',
     gap: 6,
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   label: { color: '#8e99a8', fontSize: 10, fontWeight: 800 },
-  input: {
-    width: '100%',
-    boxSizing: 'border-box',
-    border: '1px solid rgba(255,255,255,0.12)',
-    borderRadius: 6,
+  val: {
     background: 'rgba(255,255,255,0.055)',
-    color: '#fff',
+    border: '1px solid rgba(255,255,255,0.08)',
+    borderRadius: 6,
     padding: '5px 7px',
-    outline: 'none',
-    font: 'inherit',
     fontSize: 11,
-    cursor: 'text',
+    color: '#fff',
+    textAlign: 'right',
   },
-  btnRow: { display: 'flex', gap: 7, marginTop: 10 },
+  btnRow: { display: 'flex', gap: 7, marginTop: 10, pointerEvents: 'auto' },
   btn: (tone) => ({
     border: 'none',
     borderRadius: 8,
@@ -62,44 +60,30 @@ const S = {
   copied: { color: '#7cffb2', fontSize: 11, alignSelf: 'center' },
 }
 
-function stopNative(e) {
-  e.stopPropagation()
-  e.nativeEvent?.stopImmediatePropagation()
+function fmt(n) {
+  return n.toFixed(4)
 }
 
 export function BookParkingDebugPanel() {
-  const shellRef = useRef(null)
   const [positions, setPositions] = useState(DEFAULT_POSITIONS)
   const [copied, setCopied] = useState(false)
 
-  // Stop events from bubbling to document-level handlers (JournalBook puzzle drag, etc.)
-  // Using bubble phase so child inputs still receive the events first.
   useEffect(() => {
-    const el = shellRef.current
-    if (!el) return
-    const stop = (e) => e.stopPropagation()
-    el.addEventListener('pointerdown', stop, false)
-    el.addEventListener('pointerup', stop, false)
-    el.addEventListener('pointermove', stop, false)
+    const sync = () => {
+      const pos = window.__bookDebug__?.getPos()
+      if (!pos) return
+      setPositions(pos.map((p) => ({ x: p.x, y: p.y, z: p.z })))
+    }
+    if (window.__bookDebug__) window.__bookDebug__.onPositionsUpdate = sync
     return () => {
-      el.removeEventListener('pointerdown', stop, false)
-      el.removeEventListener('pointerup', stop, false)
-      el.removeEventListener('pointermove', stop, false)
+      if (window.__bookDebug__) window.__bookDebug__.onPositionsUpdate = null
     }
   }, [])
 
-  const handleChange = useCallback((index, axis, rawValue) => {
-    const value = parseFloat(rawValue)
-    if (isNaN(value)) return
-    setPositions((prev) => {
-      const next = prev.map((p, i) => (i === index ? { ...p, [axis]: value } : p))
-      window.__bookDebug__?.setPos(index, next[index].x, next[index].y, next[index].z)
-      return next
-    })
-  }, [])
-
   const handleCopy = useCallback(() => {
-    const lines = positions.map((p) => `  new THREE.Vector3(${p.x}, ${p.y}, ${p.z}),`).join('\n')
+    const lines = positions
+      .map((p) => `  new THREE.Vector3(${fmt(p.x)}, ${fmt(p.y)}, ${fmt(p.z)}),`)
+      .join('\n')
     navigator.clipboard.writeText(`const PARKING_POSITIONS = [\n${lines}\n]`).then(() => {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
@@ -107,27 +91,23 @@ export function BookParkingDebugPanel() {
   }, [positions])
 
   const handleReset = useCallback(() => {
-    setPositions(DEFAULT_POSITIONS)
     DEFAULT_POSITIONS.forEach((p, i) => {
       window.__bookDebug__?.setPos(i, p.x, p.y, p.z)
     })
+    setPositions(DEFAULT_POSITIONS)
   }, [])
 
   return (
-    <div ref={shellRef} style={S.shell} onPointerDown={stopNative}>
+    <div style={S.shell}>
       <div style={S.title}>Livre — positions puzzle</div>
+      <div style={S.hint}>Glisse une pièce → Entrée pour sauver</div>
       {PIECE_NAMES.map((name, i) => (
         <div key={name} style={S.row}>
           <span style={S.label}>{name}</span>
           {['x', 'y', 'z'].map((axis) => (
-            <input
-              key={axis}
-              type="number"
-              step="0.001"
-              style={S.input}
-              value={positions[i][axis]}
-              onChange={(e) => handleChange(i, axis, e.target.value)}
-            />
+            <div key={axis} style={S.val}>
+              {fmt(positions[i][axis])}
+            </div>
           ))}
         </div>
       ))}
