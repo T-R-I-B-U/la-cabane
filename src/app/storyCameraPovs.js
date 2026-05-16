@@ -1,4 +1,4 @@
-import { getCameraPose } from '../core/cameraRegistry'
+import { getCameraPose, getDefaultCameraPose } from '../core/cameraRegistry'
 
 const CAMERA_ID_BY_KEY = {
   accueil: 'story.accueil',
@@ -40,6 +40,22 @@ export const STORY_CAMERA_POVS = new Proxy(FALLBACK_POVS, {
     const cameraId = CAMERA_ID_BY_KEY[key]
     if (!cameraId) return target[key]
     const camera = getCameraPose(cameraId)
+    if (!camera?.position || !camera?.target) return target[key]
+    return {
+      position: camera.position,
+      target: camera.target,
+      fov: camera.fov,
+    }
+  },
+})
+
+// Reads positions from cameras.json only — never from localStorage.
+// Use this for debug/dev shortcuts that must work out of the box on any machine.
+export const DEFAULT_STORY_CAMERA_POVS = new Proxy(FALLBACK_POVS, {
+  get(target, key) {
+    const cameraId = CAMERA_ID_BY_KEY[key]
+    if (!cameraId) return target[key]
+    const camera = getDefaultCameraPose(cameraId)
     if (!camera?.position || !camera?.target) return target[key]
     return {
       position: camera.position,

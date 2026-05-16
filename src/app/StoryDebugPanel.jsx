@@ -1,12 +1,16 @@
 export function StoryDebugPanel({
   onGoToIntroStart,
-  onGoToDoorPassage,
-  onGoToReception,
-  onGoToTree,
+  onGoToBienvenue,
+  onGoToAccueil,
+  onGoToJournal,
+  onGoToArbreApresJournal,
   onGoToEtabli,
+  onGoToThomasEtabli,
   onGoToSerre,
+  onGoToZoeSerre,
   onGoToMinijeu,
-  onGoToPostMinigame,
+  onGoToJuiceMachine,
+  onGoToSortieSerre,
   onGoToArbreBase,
   onGoToNestDialogue25,
 }) {
@@ -15,34 +19,46 @@ export function StoryDebugPanel({
       <span className="story-debug-eyebrow">Debug story</span>
       <div className="story-debug-actions">
         <button type="button" className="camera-toggle" onClick={onGoToIntroStart}>
-          Intro (debut)
+          Intro (début)
         </button>
-        <button type="button" className="camera-toggle" onClick={onGoToDoorPassage}>
-          Passage porte
+        <button type="button" className="camera-toggle" onClick={onGoToBienvenue}>
+          Bienvenue (arbre)
         </button>
-        <button type="button" className="camera-toggle" onClick={onGoToReception}>
+        <button type="button" className="camera-toggle" onClick={onGoToAccueil}>
           Accueil
         </button>
-        <button type="button" className="camera-toggle" onClick={onGoToTree}>
-          Arbre (dialogues)
+        <button type="button" className="camera-toggle" onClick={onGoToJournal}>
+          Journal (livre)
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToArbreApresJournal}>
+          Arbre (après journal)
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToEtabli}>
           Établi
         </button>
+        <button type="button" className="camera-toggle" onClick={onGoToThomasEtabli}>
+          Thomas établi
+        </button>
         <button type="button" className="camera-toggle" onClick={onGoToSerre}>
-          Serre (porte)
+          Serre (entrée)
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToZoeSerre}>
+          Serre (Zoé)
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToMinijeu}>
           Mini-jeu framboise
         </button>
-        <button type="button" className="camera-toggle" onClick={onGoToPostMinigame}>
-          Fin mini-jeu (serre exit)
+        <button type="button" className="camera-toggle" onClick={onGoToJuiceMachine}>
+          Machine à jus
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToSortieSerre}>
+          Sortie serre
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToArbreBase}>
-          Arbre bas → escalier nid
+          Escalier arbre
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToNestDialogue25}>
-          Nid → dialogue 25
+          Nid (dialogue 25)
         </button>
       </div>
     </aside>
