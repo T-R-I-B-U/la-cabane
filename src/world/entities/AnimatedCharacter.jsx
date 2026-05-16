@@ -1,10 +1,18 @@
 /* eslint-disable react-hooks/immutability */
 import { useEffect, useMemo, useRef } from 'react'
 import { useAnimations, useGLTF } from '@react-three/drei'
-import { LoopOnce, LoopRepeat } from 'three'
+import { Color, LoopOnce, LoopRepeat } from 'three'
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js'
 import { applyAutoTextures } from '../cabane/textureResolver'
 import { disposeObject3D } from '../../core/disposeObject3D'
+import {
+  forEachMeshMaterial,
+  cloneMeshMaterialShallow,
+} from '../interactions/useCenterScreenMeshInteraction'
+import { useFrame } from '@react-three/fiber'
+
+const HOVER_EMISSIVE = new Color(0xffefbf)
+const HOVER_EMISSIVE_INTENSITY = 0.35
 
 const NO_RAYCAST = () => {}
 const CROSSFADE_DURATION = 0.2
@@ -26,6 +34,7 @@ export function AnimatedCharacter({
   animationSequence,
   textureName,
   textureBasePaths,
+  hoveredRef,
   ...props
 }) {
   const group = useRef()
@@ -34,20 +43,68 @@ export function AnimatedCharacter({
   const { animations } = useGLTF(animationUrl ?? url)
   const clonedScene = useMemo(() => clone(scene), [scene])
   const { actions, names } = useAnimations(animations, group)
+  const hoverMaterialsRef = useRef(null)
 
   useEffect(() => {
+    const characterMeshes = []
     clonedScene.traverse((obj) => {
       if (!obj.isMesh) return
       obj.raycast = NO_RAYCAST
       // Skinned meshes need frustum culling disabled — rest-pose bbox desync causes invisible characters
       obj.frustumCulled = false
       obj.userData.isCharacter = true
+      characterMeshes.push(obj)
     })
 
+    if (hoveredRef) {
+      const materialStates = new Map()
+      const clonedMaterials = new Map()
+      characterMeshes.forEach((mesh) => {
+        if (!mesh.material) return
+        const cloned = cloneMeshMaterialShallow(mesh.material)
+        clonedMaterials.set(mesh, { original: mesh.material, cloned })
+        mesh.material = cloned
+        forEachMeshMaterial(cloned, (mat) => {
+          if (!mat.emissive) return
+          materialStates.set(mat, {
+            emissive: mat.emissive.clone(),
+            emissiveIntensity: mat.emissiveIntensity ?? 0,
+          })
+        })
+      })
+      hoverMaterialsRef.current = { materialStates, clonedMaterials, meshes: characterMeshes }
+    }
+
     return () => {
+      if (hoverMaterialsRef.current) {
+        hoverMaterialsRef.current.clonedMaterials.forEach(({ original, cloned }, mesh) => {
+          mesh.material = original
+          forEachMeshMaterial(cloned, (mat) => mat.dispose())
+        })
+        hoverMaterialsRef.current = null
+      }
       disposeObject3D(clonedScene)
     }
-  }, [clonedScene])
+  }, [clonedScene, hoveredRef])
+
+  useFrame(() => {
+    if (!hoveredRef || !hoverMaterialsRef.current) return
+    const { materialStates, meshes } = hoverMaterialsRef.current
+    const isHovered = hoveredRef.current
+    meshes.forEach((mesh) => {
+      forEachMeshMaterial(mesh.material, (mat) => {
+        const original = materialStates.get(mat)
+        if (!original || !mat.emissive) return
+        if (isHovered) {
+          mat.emissive.copy(HOVER_EMISSIVE)
+          mat.emissiveIntensity = HOVER_EMISSIVE_INTENSITY
+        } else {
+          mat.emissive.copy(original.emissive)
+          mat.emissiveIntensity = original.emissiveIntensity
+        }
+      })
+    })
+  })
 
   useEffect(() => {
     if (!textureName) return
