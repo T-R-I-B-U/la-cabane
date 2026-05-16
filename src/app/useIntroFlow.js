@@ -587,15 +587,18 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setLoaderFading(true)
   }, [resetFlowState, stopDialogue])
 
-  const prepareDebugPostIntroState = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
-  }, [resetFlowState, stopDialogue])
+  const prepareDebugPostIntroState = useCallback(
+    (lockMovement = true) => {
+      stopDialogue()
+      resetFlowState()
+      setLoaderFading(false)
+      setPostIntro(true)
+      setIntroSpawn(INSIDE_POV)
+      setIntroMovementLocked(lockMovement)
+      setPlayerName('Debug')
+    },
+    [resetFlowState, stopDialogue]
+  )
 
   const debugGoToIntroStart = useCallback(() => {
     prepareDebugStoryState()
@@ -626,7 +629,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   // 4. Journal unlocked, auto-opens so the puzzle is immediately available
   const debugGoToJournal = useCallback(() => {
-    prepareDebugPostIntroState()
+    prepareDebugPostIntroState(false)
     const pov = DEFAULT_STORY_CAMERA_POVS.accueil
     if (pov?.position) setIntroSpawn(pov)
     setJournalUnlocked(true)
