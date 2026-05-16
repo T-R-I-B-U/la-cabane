@@ -19,7 +19,7 @@ const WatercolorPass = lazy(() =>
 )
 
 export default function Scene({
-  performanceMode,
+  modelQuality,
   activeHdriId,
   sceneState,
   player,
@@ -59,6 +59,7 @@ export default function Scene({
     postIntroLocked,
     receptionActive,
     treePhaseActive,
+    timeatmPhaseActive,
     workbenchPhaseActive,
     greenhousePhaseActive,
     exitSerrePhaseActive,
@@ -68,6 +69,7 @@ export default function Scene({
     onEvent: onIntroEvent,
     onReceptionInteract,
     onTreeInteract,
+    onTimeatmInteract,
     onWorkbenchInteract,
     onGreenhouseDoorClick,
     onExitSerreDoorClick,
@@ -152,7 +154,7 @@ export default function Scene({
       {(zone === 'cabane' || zone === 'arbre') && (
         <Suspense fallback={null}>
           <CabaneScene
-            performanceMode={performanceMode}
+            modelQuality={modelQuality}
             onError={onError}
             onSceneReady={onReady}
             leafMaterialMode={leafMaterialMode}
@@ -169,6 +171,7 @@ export default function Scene({
             onIntroEvent={onIntroEvent}
             receptionActive={receptionActive}
             treePhaseActive={treePhaseActive}
+            timeatmPhaseActive={timeatmPhaseActive}
             workbenchPhaseActive={workbenchPhaseActive}
             greenhousePhaseActive={greenhousePhaseActive}
             exitSerrePhaseActive={exitSerrePhaseActive}
@@ -184,6 +187,7 @@ export default function Scene({
             onWorkbenchInteract={onWorkbenchInteract}
             onThomasEtabliInteract={onThomasEtabliInteract}
             onTreeInteract={onTreeInteract}
+            onTimeatmInteract={onTimeatmInteract}
             onReceptionInteract={onReceptionInteract}
             introWaitingAtDoor={introWaitingAtDoor}
             journalUnlocked={journalUnlocked}

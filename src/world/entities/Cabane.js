@@ -14,8 +14,8 @@ const SHADOW_CAST_MIN_DIM = 2.0
 // (e.g. workbench01 is found by getObjectByName for ClickableWorkbench).
 const SKIP_GROUPING = new Set(['workbench01', 'house', 'poster'])
 
-const HOUSE_TEXTURES = ['house1', 'house2', 'house3', 'house4', 'house5', 'house6']
-const POSTER_TEXTURES = ['poster1', 'poster2', 'poster3', 'poster4']
+const HOUSE_TEXTURES = ['house1', 'house2', 'house3', 'house4', 'house5', 'house6', 'house7']
+const POSTER_TEXTURES = ['poster1', 'poster2', 'poster3', 'poster4', 'poster5', 'poster6']
 
 function shuffle(arr) {
   const a = [...arr]
@@ -259,7 +259,7 @@ function attachNestColliders(nestObject) {
  * Missing models become empty pivots — the hierarchy still places correctly.
  */
 export async function buildCabane({
-  performanceMode = false,
+  modelQuality = 'compressed2',
   jsonPath = '/cabane.json',
   jsonData = null,
 } = {}) {
@@ -272,12 +272,13 @@ export async function buildCabane({
 
   const root = new THREE.Group()
   root.name = 'cabane'
-  const modelBasePaths = performanceMode
-    ? ['/models/']
-    : ['/models/compressed/', '/models/']
-  const textureBasePaths = performanceMode
-    ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
-    : ['/textures/ktx2/', '/textures/']
+  const modelBasePaths =
+    modelQuality === 'compressed2'
+      ? ['/models/compressed2/', '/models/compressed/', '/models/']
+      : modelQuality === 'compressed'
+        ? ['/models/compressed/', '/models/']
+        : ['/models/']
+  const textureBasePaths = ['/textures/ktx2/', '/textures/compressed/', '/textures/']
 
   const nodes = Array.isArray(data) ? data : [data]
   root.userData.hutPosition = findNodePosition(nodes, 'hut01')

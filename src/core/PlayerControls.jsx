@@ -17,9 +17,22 @@ const _wallDir = new THREE.Vector3()
 const _wallOrigin = new THREE.Vector3()
 
 const WALL_COLLIDER_NODES = new Set([
-  'hut01', 'greenhouse', 'greenhouse_ground', 'trunk', 'nest', 'house',
-  'timeatm', 'ground-hut', 'platform', 'platform-hut', 'ladder',
-  'stairs01', 'stairs02', 'railling', 'railling-hut', 'juicemachine',
+  'hut01',
+  'greenhouse',
+  'greenhouse_ground',
+  'trunk',
+  'nest',
+  'house',
+  'timeatm',
+  'ground-hut',
+  'platform',
+  'platform-hut',
+  'ladder',
+  'stairs01',
+  'stairs02',
+  'railling',
+  'railling-hut',
+  'juicemachine',
 ])
 
 function isWallCollider(mesh) {
@@ -54,6 +67,7 @@ export function PlayerControls({
   canMove = true,
   flyMode = false,
   spawnAt,
+  spawnKey,
   lookAtTarget,
   eyeHeight = PLAYER_HEIGHT,
   collisionObjects = [],
@@ -69,6 +83,7 @@ export function PlayerControls({
   const wallMeshesRef = useRef([])
 
   // Apply scripted camera snaps when the active spawn/target changes.
+  // spawnKey increments on every spawn so this fires even when position object is the same ref.
   useEffect(() => {
     if (spawnAt) {
       camera.position.set(spawnAt.x, spawnAt.y, spawnAt.z)
@@ -79,7 +94,7 @@ export function PlayerControls({
     }
 
     verticalVelocity.current = 0
-  }, [camera, lookAtTarget, spawnAt])
+  }, [camera, lookAtTarget, spawnAt, spawnKey])
 
   // If pointer lock is already active when this mounts (acquired on door click),
   // THREE.PointerLockControls won't know until the next pointerlockchange event.
@@ -187,7 +202,8 @@ export function PlayerControls({
       !pressedKeys['KeyW'] &&
       !pressedKeys['KeyS'] &&
       !pressedKeys['KeyA'] &&
-      !pressedKeys['KeyD']
+      !pressedKeys['KeyD'] &&
+      !flyMode
     )
       return
 

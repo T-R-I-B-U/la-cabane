@@ -19,6 +19,49 @@
   cursor: auto !important;
 }
 
+/* ── Custom cursor ───────────────────────────────────────────────── */
+
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform;
+  width: 0;
+  height: 0;
+  overflow: visible;
+}
+
+.custom-cursor::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  transition:
+    width 0.1s ease,
+    height 0.1s ease;
+}
+
+.custom-cursor--pointer::after {
+  width: 20px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.custom-cursor--grabbing::after {
+  width: 16px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.25);
+  border-style: dashed;
+}
+
 /* ── App loader ──────────────────────────────────────────────────── */
 
 .app-loader {
@@ -335,6 +378,30 @@
 
 .pm-fps--bad {
   color: #e0443a;
+}
+
+.pm-quality-toggle {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.pm-quality-btn {
+  flex: 1;
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  border: 1px solid #c8c3b8;
+  border-radius: 4px;
+  background: transparent;
+  color: #6b6560;
+  cursor: pointer;
+}
+
+.pm-quality-btn--active {
+  background: #3a3530;
+  color: #f5f0eb;
+  border-color: #3a3530;
 }
 
 /* ── Info panel — top right ──────────────────────────────────────── */

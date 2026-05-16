@@ -10,6 +10,7 @@ import { ClickableLadder } from '../../world/entities/ClickableLadder'
 import { ClickableStairs } from '../../world/entities/ClickableStairs'
 import { ClickableReception } from '../../world/entities/ClickableReception'
 import { ClickableTree } from '../../world/entities/ClickableTree'
+import { ClickableTimeatm } from '../../world/entities/ClickableTimeatm'
 import { ClickableWorkbench } from '../../world/entities/ClickableWorkbench'
 import { ClickableZoe } from '../../world/entities/ClickableZoe'
 import { JournalBook } from '../../world/entities/JournalBook'
@@ -41,6 +42,7 @@ export function SceneInteractions({
   journalUnlocked,
   receptionActive,
   treePhaseActive,
+  timeatmPhaseActive,
   workbenchPhaseActive,
   greenhousePhaseActive,
   exitSerrePhaseActive,
@@ -53,6 +55,7 @@ export function SceneInteractions({
   onIntroEvent,
   onReceptionInteract,
   onTreeInteract,
+  onTimeatmInteract,
   onGreenhouseDoorClick,
   onExitSerreDoorClick,
   onJournalStart,
@@ -78,16 +81,14 @@ export function SceneInteractions({
   onJuicePipeComplete,
   onJuiceInteract,
   serrePreview,
-  performanceMode,
+  modelQuality,
 }) {
   const [characters, setCharacters] = useState(() => getRegistry().characters ?? [])
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   // Keep Zoe's visible mesh on the source GLB and reuse the compressed GLB for animation clips,
   // matching the historical fix that restored her motion after model export changes.
   const zoeUrl = '/models/zoe-animated.glb'
-  const textureBasePaths = performanceMode
-    ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
-    : ['/textures/ktx2/', '/textures/']
+  const textureBasePaths = ['/textures/ktx2/', '/textures/compressed/', '/textures/']
   const zoe = characters.find((character) => character.id === 'zoe') ?? getCharacterConfig('zoe')
   const zoePosition = toPositionArray(zoe, [26.0, FLOOR_Y, -5.4])
 
@@ -127,6 +128,12 @@ export function SceneInteractions({
       />
 
       <ClickableTree cabane={cabane} isInteractable={treePhaseActive} onInteract={onTreeInteract} />
+
+      <ClickableTimeatm
+        cabane={cabane}
+        isInteractable={timeatmPhaseActive}
+        onInteract={onTimeatmInteract}
+      />
 
       <ClickableWorkbench
         cabane={cabane}
@@ -209,7 +216,11 @@ export function SceneInteractions({
           <AnimatedCharacter
             key={zoeUrl}
             url={zoeUrl}
-            animationUrl={performanceMode ? '/models/zoe-animated.glb' : '/models/compressed/zoe-animated.glb'}
+            animationUrl={
+              modelQuality === 'raw'
+                ? '/models/zoe-animated.glb'
+                : '/models/compressed/zoe-animated.glb'
+            }
             clip={zoeClip}
             textureName="zoe-animated"
             textureBasePaths={textureBasePaths}

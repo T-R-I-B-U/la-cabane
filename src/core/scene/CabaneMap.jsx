@@ -3,14 +3,14 @@ import * as THREE from 'three'
 import { clearTextureCache, buildCabane } from '../../world/entities/Cabane'
 import { disposeObject3D } from '../disposeObject3D'
 
-export function CabaneMap({ performanceMode, onReady, onError, onCabaneLoaded }) {
+export function CabaneMap({ modelQuality, onReady, onError, onCabaneLoaded }) {
   const [cabane, setCabane] = useState(null)
 
   useEffect(() => {
     let cancelled = false
     let loadedCabaneGroup = null
 
-    buildCabane({ performanceMode })
+    buildCabane({ modelQuality })
       .then((group) => {
         if (cancelled) {
           disposeObject3D(group)
@@ -57,7 +57,7 @@ export function CabaneMap({ performanceMode, onReady, onError, onCabaneLoaded })
       }
       onCabaneLoaded(null)
     }
-  }, [performanceMode, onReady, onError, onCabaneLoaded])
+  }, [modelQuality, onReady, onError, onCabaneLoaded])
 
   if (!cabane) return null
   return <primitive object={cabane} />

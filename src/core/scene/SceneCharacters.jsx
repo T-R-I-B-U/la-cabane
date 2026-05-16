@@ -15,8 +15,8 @@ const THOMAS_SEQUENCES = {
   ],
 }
 
-function resolveCharacterUrl(fileName, performanceMode) {
-  if (performanceMode) return `/models/${fileName}`
+function resolveCharacterUrl(fileName, modelQuality) {
+  if (modelQuality === 'raw') return `/models/${fileName}`
   const compressedUrl = `/models/compressed/${fileName}`
   if (compressedModelFiles.has(compressedUrl)) return compressedUrl
   return `/models/${fileName}`
@@ -37,21 +37,21 @@ function toPositionArray(character, fallback) {
 }
 
 export function SceneCharacters({
-  performanceMode,
+  modelQuality,
   thomasEtabliPhaseActive,
   onThomasEtabliInteract,
   thomasAnimPhase = 'back',
   showCabaneInterior = true,
 }) {
   const [characters, setCharacters] = useState(() => getRegistry().characters ?? [])
-  const thomasUrl = resolveCharacterUrl('thomas-animated.glb', performanceMode)
-  const marieUrl = resolveCharacterUrl('marie-animated.glb', performanceMode)
-  const textureBasePaths = performanceMode
-    ? ['/textures/ktx2/', '/textures/compressed/', '/textures/']
-    : ['/textures/ktx2/', '/textures/']
+  const thomasUrl = resolveCharacterUrl('thomas-animated.glb', modelQuality)
+  const marieUrl = resolveCharacterUrl('marie-animated.glb', modelQuality)
+  const textureBasePaths = ['/textures/ktx2/', '/textures/compressed/', '/textures/']
   const sequence = THOMAS_SEQUENCES[thomasAnimPhase] ?? THOMAS_SEQUENCES.back
-  const thomas = characters.find((character) => character.id === 'thomas') ?? getCharacterConfig('thomas')
-  const marie = characters.find((character) => character.id === 'marie') ?? getCharacterConfig('marie')
+  const thomas =
+    characters.find((character) => character.id === 'thomas') ?? getCharacterConfig('thomas')
+  const marie =
+    characters.find((character) => character.id === 'marie') ?? getCharacterConfig('marie')
   const thomasPosition = toPositionArray(thomas, [-3.0, FLOOR_Y, -13.259])
   const mariePosition = toPositionArray(marie, [-20.0, 9.15, 24.0])
 
