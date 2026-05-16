@@ -211,6 +211,8 @@ export function JournalBook({
 
     if (state === 'OPEN' || state === 'CLOSING') {
       restoreCameraAfterCloseRef.current = true
+      cameraReturnStartPosRef.current.copy(camera.position)
+      cameraReturnStartQuatRef.current.copy(camera.quaternion)
       bookStateRef.current = 'CLOSING'
       transitionElapsedRef.current = 0
       playOnce('book')
@@ -558,19 +560,31 @@ export function JournalBook({
     }
 
     if (state === 'CLOSING') {
-      const t = ease(Math.min(elapsed / DUR_CLOSE, 1))
-      leftPivot.rotation.z = OPEN_ROTATION_Z * (1 - t)
+      const tClose = ease(Math.min(elapsed / DUR_CLOSE, 1))
+      leftPivot.rotation.z = OPEN_ROTATION_Z * (1 - tClose)
 
-      if (elapsed >= DUR_CLOSE) {
+      if (restoreCameraAfterCloseRef.current) {
+        const tCam = ease(Math.min(elapsed / DUR_CAMERA, 1))
+        camera.position.lerpVectors(cameraReturnStartPosRef.current, cameraInitPosRef.current, tCam)
+        camera.quaternion.slerpQuaternions(
+          cameraReturnStartQuatRef.current,
+          cameraInitQuatRef.current,
+          tCam
+        )
+      }
+
+      const totalDur = restoreCameraAfterCloseRef.current
+        ? Math.max(DUR_CLOSE, DUR_CAMERA)
+        : DUR_CLOSE
+
+      if (elapsed >= totalDur) {
         leftPivot.rotation.z = 0
         transitionElapsedRef.current = 0
-
         if (restoreCameraAfterCloseRef.current) {
           restoreCameraAfterCloseRef.current = false
-          startCameraReturn()
-          return
+          camera.position.copy(cameraInitPosRef.current)
+          camera.quaternion.copy(cameraInitQuatRef.current)
         }
-
         bookStateRef.current = 'CLOSED'
         onInteractionEnd?.()
       }
