@@ -217,7 +217,9 @@ export function SceneInteractions({
             key={zoeUrl}
             url={zoeUrl}
             animationUrl={
-              modelQuality === 'raw' ? '/models/zoe-animated.glb' : '/models/compressed/zoe-animated.glb'
+              modelQuality === 'raw'
+                ? '/models/zoe-animated.glb'
+                : '/models/compressed/zoe-animated.glb'
             }
             clip={zoeClip}
             textureName="zoe-animated"
