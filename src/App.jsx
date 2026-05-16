@@ -166,14 +166,18 @@ export default function App() {
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleNameSubmit: handleNameSubmitInternal,
-    handleDebugGoToDoorPassage,
     handleDebugGoToIntroStart,
-    handleDebugGoToReception,
-    handleDebugGoToTree,
+    handleDebugGoToBienvenue,
+    handleDebugGoToAccueil,
+    handleDebugGoToJournal,
+    handleDebugGoToArbreApresJournal,
     handleDebugGoToEtabli,
+    handleDebugGoToThomasEtabli,
     handleDebugGoToSerre,
+    handleDebugGoToZoeSerre,
     handleDebugGoToMinijeu,
-    handleDebugGoToPostMinigame,
+    handleDebugGoToJuiceMachine,
+    handleDebugGoToSortieSerre,
     handleWorkbenchInteract,
     handleGreenhouseDoorClick,
     handleExitSerreDoorClick,
@@ -369,40 +373,60 @@ export default function App() {
     handleDebugGoToIntroStart()
   }, [handleDebugGoToIntroStart])
 
-  const jumpToDoorPassage = useCallback(() => {
+  const jumpToBienvenue = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
-    handleDebugGoToDoorPassage()
-  }, [handleDebugGoToDoorPassage])
+    handleDebugGoToBienvenue()
+  }, [handleDebugGoToBienvenue])
 
-  const jumpToReception = useCallback(() => {
+  const jumpToAccueil = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(true)
-    handleDebugGoToReception()
-  }, [handleDebugGoToReception])
+    handleDebugGoToAccueil()
+  }, [handleDebugGoToAccueil])
 
-  const jumpToTree = useCallback(() => {
+  const jumpToJournal = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(true)
-    handleDebugGoToTree()
-  }, [handleDebugGoToTree])
+    handleDebugGoToJournal()
+  }, [handleDebugGoToJournal])
+
+  const jumpToArbreApresJournal = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(true)
+    handleDebugGoToArbreApresJournal()
+  }, [handleDebugGoToArbreApresJournal])
 
   const jumpToEtabli = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(true)
     handleDebugGoToEtabli()
   }, [handleDebugGoToEtabli])
 
+  const jumpToThomasEtabli = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(true)
+    handleDebugGoToThomasEtabli()
+  }, [handleDebugGoToThomasEtabli])
+
   const jumpToSerre = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToSerre()
   }, [handleDebugGoToSerre])
+
+  const jumpToZoeSerre = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handleDebugGoToZoeSerre()
+  }, [handleDebugGoToZoeSerre])
 
   const jumpToMinijeu = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToMinijeu()
   }, [handleDebugGoToMinijeu])
 
-  const jumpToPostMinigame = useCallback(() => {
+  const jumpToJuiceMachine = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
-    handleDebugGoToPostMinigame()
-  }, [handleDebugGoToPostMinigame])
+    handleDebugGoToJuiceMachine()
+  }, [handleDebugGoToJuiceMachine])
+
+  const jumpToSortieSerre = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handleDebugGoToSortieSerre()
+  }, [handleDebugGoToSortieSerre])
 
   const handleGoToArbreBase = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -903,13 +927,17 @@ export default function App() {
         <Suspense fallback={null}>
           <StoryDebugPanel
             onGoToIntroStart={jumpToIntroStart}
-            onGoToDoorPassage={jumpToDoorPassage}
-            onGoToReception={jumpToReception}
-            onGoToTree={jumpToTree}
+            onGoToBienvenue={jumpToBienvenue}
+            onGoToAccueil={jumpToAccueil}
+            onGoToJournal={jumpToJournal}
+            onGoToArbreApresJournal={jumpToArbreApresJournal}
             onGoToEtabli={jumpToEtabli}
+            onGoToThomasEtabli={jumpToThomasEtabli}
             onGoToSerre={jumpToSerre}
+            onGoToZoeSerre={jumpToZoeSerre}
             onGoToMinijeu={jumpToMinijeu}
-            onGoToPostMinigame={jumpToPostMinigame}
+            onGoToJuiceMachine={jumpToJuiceMachine}
+            onGoToSortieSerre={jumpToSortieSerre}
             onGoToArbreBase={handleGoToArbreBase}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />

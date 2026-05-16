@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
-import { STORY_CAMERA_POVS } from './storyCameraPovs'
+import { DEFAULT_STORY_CAMERA_POVS, STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
 import { fade, stop } from '../utils/audioStore'
 
@@ -603,7 +603,8 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setIntroActive(true)
   }, [prepareDebugStoryState, resetStory])
 
-  const debugGoToDoorPassage = useCallback(() => {
+  // 2. Player just entered the cabin — tree welcome dialogue, movement locked
+  const debugGoToBienvenue = useCallback(() => {
     prepareDebugPostIntroState()
     setPlayerName('')
     startStory('intro.treeWelcome')
@@ -615,47 +616,98 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     })
   }, [completeStep, playDialogue, prepareDebugPostIntroState, startStory])
 
-  const debugGoToReception = useCallback(() => {
+  // 3. At the reception desk
+  const debugGoToAccueil = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.accueil
+    if (pov?.position) setIntroSpawn(pov)
     goToStep('intro.goToReception')
   }, [goToStep, prepareDebugPostIntroState])
 
-  const debugGoToTree = useCallback(() => {
+  // 4. Journal unlocked, auto-opens so the puzzle is immediately available
+  const debugGoToJournal = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.accueil
+    if (pov?.position) setIntroSpawn(pov)
+    setJournalUnlocked(true)
+    setJournalPuzzleEnabled(true)
+    setJournalAutoOpenToken((t) => t + 1)
+  }, [prepareDebugPostIntroState])
+
+  // 5. Tree dialogues phase 1, after the journal
+  const debugGoToArbreApresJournal = useCallback(() => {
+    prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.apresAccueil
+    if (pov?.position) setIntroSpawn(pov)
     treeClickPhaseRef.current = 1
     setTreePhaseActive(true)
   }, [prepareDebugPostIntroState])
 
+  // 6. Workbench interactable
   const debugGoToEtabli = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.atelier
+    if (pov?.position) setIntroSpawn(pov)
     unlockWorkbenchPhase()
   }, [prepareDebugPostIntroState, unlockWorkbenchPhase])
 
+  // 7. Thomas at the workbench, ready to be talked to
+  const debugGoToThomasEtabli = useCallback(() => {
+    prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.atelier
+    if (pov?.position) setIntroSpawn(pov)
+    setThomasEtabliPhaseActive(true)
+  }, [prepareDebugPostIntroState])
+
+  // 8. Greenhouse front door, ready to enter
   const debugGoToSerre = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.greenhouseFrontDoor
+    if (pov?.position) setIntroSpawn(pov)
+    setSerreActive(true)
     setGreenhousePhaseActive(true)
   }, [prepareDebugPostIntroState])
 
-  const debugGoToMinijeu = useCallback(() => {
+  // 9. Inside greenhouse, Zoé ready to talk
+  const debugGoToZoeSerre = useCallback(() => {
     prepareDebugPostIntroState()
-    // Mark transition so handleStoryCameraTransitionComplete knows to just clear and return
-    isSerreRaspberryTransitionRef.current = true
+    const pov = DEFAULT_STORY_CAMERA_POVS.serreZoe
+    if (pov?.position) setIntroSpawn(pov)
     setSerreActive(true)
-    setRaspberryPhaseActive(true)
-    setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 0.01 })
+    setZoePhaseActive(true)
   }, [prepareDebugPostIntroState])
 
-  const debugGoToPostMinigame = useCallback(() => {
+  // 10. Raspberry minigame
+  const debugGoToMinijeu = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.serreRaspberry
+    if (pov?.position) setIntroSpawn(pov)
     setSerreActive(true)
-    setIntroSpawn({ ...STORY_CAMERA_POVS.greenhouseFrontDoorExit })
+    setRaspberryPhaseActive(true)
+  }, [prepareDebugPostIntroState])
+
+  // 11. Juice machine interaction
+  const debugGoToJuiceMachine = useCallback(() => {
+    prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.serreJuice
+    if (pov?.position) setIntroSpawn(pov)
+    setSerreActive(true)
+    setJuiceMachinePhaseActive(true)
+  }, [prepareDebugPostIntroState])
+
+  // 12. Exiting greenhouse, heading to the tree
+  const debugGoToSortieSerre = useCallback(() => {
+    prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.greenhouseFrontDoorExit
+    if (pov?.position) setIntroSpawn(pov)
+    setSerreActive(true)
     scheduleFlowTimeout(() => {
       playDialogue('18-voice-tree', {
         onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
       })
       scheduleFlowTimeout(() => {
         greenhouseTransitionStageRef.current = 'arbreStairs1'
-        setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
+        setStoryCameraTransition({ ...DEFAULT_STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
       }, 2000)
     }, 500)
   }, [prepareDebugPostIntroState, playDialogue, scheduleFlowTimeout])
@@ -737,14 +789,18 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     handleLoaderClick,
     handleLoaderKeyDown,
     handleNameSubmit,
-    handleDebugGoToDoorPassage: debugGoToDoorPassage,
     handleDebugGoToIntroStart: debugGoToIntroStart,
-    handleDebugGoToReception: debugGoToReception,
-    handleDebugGoToTree: debugGoToTree,
+    handleDebugGoToBienvenue: debugGoToBienvenue,
+    handleDebugGoToAccueil: debugGoToAccueil,
+    handleDebugGoToJournal: debugGoToJournal,
+    handleDebugGoToArbreApresJournal: debugGoToArbreApresJournal,
     handleDebugGoToEtabli: debugGoToEtabli,
+    handleDebugGoToThomasEtabli: debugGoToThomasEtabli,
     handleDebugGoToSerre: debugGoToSerre,
+    handleDebugGoToZoeSerre: debugGoToZoeSerre,
     handleDebugGoToMinijeu: debugGoToMinijeu,
-    handleDebugGoToPostMinigame: debugGoToPostMinigame,
+    handleDebugGoToJuiceMachine: debugGoToJuiceMachine,
+    handleDebugGoToSortieSerre: debugGoToSortieSerre,
     handleWorkbenchInteract,
     handleThomasEtabliInteract,
     handleGreenhouseDoorClick,
