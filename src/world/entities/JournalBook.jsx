@@ -24,10 +24,10 @@ const HOVER_EMISSIVE_INTENSITY = 0.18
 // Puzzle
 const PIECE_NAMES = ['img01', 'img02', 'img03', 'img04']
 const PARKING_POSITIONS = [
-  new THREE.Vector3(-0.09, 0.015, 0.16),
-  new THREE.Vector3(-0.03, 0.015, 0.16),
-  new THREE.Vector3(0.03, 0.015, 0.16),
-  new THREE.Vector3(0.09, 0.015, 0.16),
+  new THREE.Vector3(-0.3233, -0.0501, -0.0132),
+  new THREE.Vector3(0.1839, -0.0501, 0.0216),
+  new THREE.Vector3(-0.3044, -0.0499, 0.0813),
+  new THREE.Vector3(0.2051, -0.0499, -0.093),
 ]
 const DROP_THRESHOLD = 0.03
 const PIECE_LERP = 3
@@ -155,18 +155,6 @@ export function JournalBook({
   useEffect(() => {
     return () => {
       cursorStore.setType('default')
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!import.meta.env.DEV) return
-    window.__bookDebug__ = {
-      setPos: (i, x, y, z) => PARKING_POSITIONS[i]?.set(x, y, z),
-      getPos: () => PARKING_POSITIONS.map((v) => ({ x: v.x, y: v.y, z: v.z })),
-      onPositionsUpdate: null,
-    }
-    return () => {
-      delete window.__bookDebug__
     }
   }, [])
 
@@ -315,18 +303,6 @@ export function JournalBook({
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.code === 'Enter' && import.meta.env.DEV) {
-        if (bookStateRef.current !== 'OPEN') return
-        const pieces = puzzlePiecesRef.current
-        if (!pieces) return
-        pieces.forEach((piece, i) => {
-          PARKING_POSITIONS[i]?.copy(piece.mesh.position)
-          if (piece.state === 'dragging') piece.state = 'parking'
-        })
-        window.__bookDebug__?.onPositionsUpdate?.()
-        return
-      }
-
       if (event.code !== 'Escape') return
 
       const state = bookStateRef.current
