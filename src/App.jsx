@@ -36,6 +36,9 @@ const ViewerControls = lazy(() =>
 const StoryDebugPanel = lazy(() =>
   import('./app/StoryDebugPanel').then((mod) => ({ default: mod.StoryDebugPanel }))
 )
+const BookParkingDebugPanel = lazy(() =>
+  import('./app/BookParkingDebugPanel').then((mod) => ({ default: mod.BookParkingDebugPanel }))
+)
 const CameraEditorPanel = lazy(() =>
   import('./core/CameraEditorPanel').then((mod) => ({ default: mod.default }))
 )
@@ -941,6 +944,12 @@ export default function App() {
             onGoToArbreBase={handleGoToArbreBase}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
+        </Suspense>
+      )}
+
+      {isDevBuild && showStoryDebug && (
+        <Suspense fallback={null}>
+          <BookParkingDebugPanel />
         </Suspense>
       )}
 

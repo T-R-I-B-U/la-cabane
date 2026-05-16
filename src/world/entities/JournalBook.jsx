@@ -13,11 +13,11 @@ const DUR_OPEN = 0.9
 const DUR_CLOSE = 0.7
 const OPEN_ROTATION_Z = Math.PI
 const MODEL_SCALE = 1.8
-const TOP_CAMERA_DISTANCE = 1.1
 const LEFT_HINGE_X = -0.0688
 const LEFT_HINGE_Y = 0.013614202849566936
 const LEFT_CLOSED_X = -0.06768058240413666
-const CAMERA_TOP_DIRECTION = new THREE.Vector3(0, 0.98, 0.2).normalize()
+const BOOK_CAM_POSITION = new THREE.Vector3(-80.1664, 1.3962, -48.9429)
+const BOOK_CAM_TARGET = new THREE.Vector3(-80.5838, -3.4207, -50.2167)
 const HOVER_EMISSIVE = new THREE.Color(0xffefbf)
 const HOVER_EMISSIVE_INTENSITY = 0.18
 
@@ -159,6 +159,17 @@ export function JournalBook({
   }, [])
 
   useEffect(() => {
+    if (!import.meta.env.DEV) return
+    window.__bookDebug__ = {
+      setPos: (i, x, y, z) => PARKING_POSITIONS[i]?.set(x, y, z),
+      getPos: () => PARKING_POSITIONS.map((v) => ({ x: v.x, y: v.y, z: v.z })),
+    }
+    return () => {
+      delete window.__bookDebug__
+    }
+  }, [])
+
+  useEffect(() => {
     if (!active) cursorStore.setType('default')
   }, [active])
 
@@ -220,15 +231,8 @@ export function JournalBook({
   const openBook = useCallback(() => {
     if (!active || bookStateRef.current !== 'CLOSED') return
 
-    const bookPosition = groupRef.current.getWorldPosition(new THREE.Vector3())
-    cameraTargetPosRef.current
-      .copy(bookPosition)
-      .addScaledVector(CAMERA_TOP_DIRECTION, TOP_CAMERA_DISTANCE)
-    const lookAtMatrix = new THREE.Matrix4().lookAt(
-      cameraTargetPosRef.current,
-      bookPosition,
-      camera.up
-    )
+    cameraTargetPosRef.current.copy(BOOK_CAM_POSITION)
+    const lookAtMatrix = new THREE.Matrix4().lookAt(BOOK_CAM_POSITION, BOOK_CAM_TARGET, camera.up)
 
     cameraInitPosRef.current.copy(camera.position)
     cameraInitQuatRef.current.copy(camera.quaternion)
