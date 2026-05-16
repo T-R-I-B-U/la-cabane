@@ -135,6 +135,7 @@ export function SceneControls({
               ref={controlsRef}
               enablePan
               enableDamping
+              enableZoom={false}
               minDistance={0.5}
               maxDistance={500}
             />
@@ -154,6 +155,7 @@ export function SceneControls({
             ref={controlsRef}
             enablePan
             enableDamping
+            enableZoom={false}
             minDistance={0.5}
             maxDistance={500}
           />
