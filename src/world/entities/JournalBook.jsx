@@ -382,8 +382,6 @@ export function JournalBook({
         bookStateRef.current !== 'OPEN'
       )
         return
-      if (e.target !== canvas && !canvas.contains(e.target)) return
-
       raycaster.setFromCamera(toNDC(e), camera)
       const pickable = pieces.filter((p) => p.state !== 'placed').map((p) => p.mesh)
       const hits = raycaster.intersectObjects(pickable, true)
