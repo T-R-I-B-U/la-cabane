@@ -72,18 +72,19 @@ export function BookParkingDebugPanel() {
   const [positions, setPositions] = useState(DEFAULT_POSITIONS)
   const [copied, setCopied] = useState(false)
 
-  // Block all native pointer events from reaching the canvas/document handlers
+  // Stop events from bubbling to document-level handlers (JournalBook puzzle drag, etc.)
+  // Using bubble phase so child inputs still receive the events first.
   useEffect(() => {
     const el = shellRef.current
     if (!el) return
     const stop = (e) => e.stopPropagation()
-    el.addEventListener('pointerdown', stop, true)
-    el.addEventListener('pointerup', stop, true)
-    el.addEventListener('pointermove', stop, true)
+    el.addEventListener('pointerdown', stop, false)
+    el.addEventListener('pointerup', stop, false)
+    el.addEventListener('pointermove', stop, false)
     return () => {
-      el.removeEventListener('pointerdown', stop, true)
-      el.removeEventListener('pointerup', stop, true)
-      el.removeEventListener('pointermove', stop, true)
+      el.removeEventListener('pointerdown', stop, false)
+      el.removeEventListener('pointerup', stop, false)
+      el.removeEventListener('pointermove', stop, false)
     }
   }, [])
 
