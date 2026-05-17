@@ -79,6 +79,7 @@ export default function App() {
   const arbreStoryContinuityRef = useRef(false)
   const isCursorVisibleRef = useRef(false)
   const isCameraBlockedRef = useRef(false)
+  const isModalOpenRef = useRef(false)
 
   const {
     selectedSavoirAssignment,
@@ -195,7 +196,7 @@ export default function App() {
     launchIntro,
     skipDialogue: skipIntroDialogue,
     setPostIntro,
-  } = useIntroFlow({ sceneReady, arbreActiveRef })
+  } = useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef: isModalOpenRef })
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
@@ -272,6 +273,7 @@ export default function App() {
     handleStairsClick,
     handleArbreTransitionComplete,
     handleFruitClickDuringLeaves,
+    handleLeafSavoirClosed,
     triggerArbreBase,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
@@ -289,6 +291,7 @@ export default function App() {
     (id) => {
       const didOpen = openSavoirForLeaf(id)
       if (!didOpen) return
+      isModalOpenRef.current = true
       setIsSavoirInteractionActive(true)
       setShouldRestorePointerLockAfterStoryUi(true)
       pointerControlsRef.current?.unlock()
@@ -492,15 +495,18 @@ export default function App() {
   }, [])
 
   const handleCloseSavoir = useCallback(() => {
+    isModalOpenRef.current = false
     closeSavoirInternal()
     setIsSavoirInteractionActive(false)
     setIsSavoirPanelOpen(false)
+    handleLeafSavoirClosed()
     // ContactPanel/SavoirPanel stop click propagation so Drei's document.click
     // handler never fires. Call lock() directly — we're still in the user gesture.
     pointerControlsRef.current?.lock()
-  }, [closeSavoirInternal])
+  }, [closeSavoirInternal, handleLeafSavoirClosed])
 
   const handleCloseContact = useCallback(() => {
+    isModalOpenRef.current = false
     closeContactInternal()
     setIsContactInteractionActive(false)
     setIsContactPanelOpen(false)
@@ -508,15 +514,14 @@ export default function App() {
   }, [closeContactInternal])
 
   useEffect(() => {
-    if (!isSavoirInteractionActive && !isContactInteractionActive) return
+    if (!isContactInteractionActive) return
     const onKeyDown = (e) => {
       if (e.code !== 'Escape') return
-      if (isSavoirInteractionActive) handleCloseSavoir()
-      else handleCloseContact()
+      handleCloseContact()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [isSavoirInteractionActive, isContactInteractionActive, handleCloseSavoir, handleCloseContact])
+  }, [isContactInteractionActive, handleCloseContact])
 
   const isStoryBlockingPlayer =
     dialogueActive ||
@@ -672,7 +677,9 @@ export default function App() {
     receptionChoiceVisible ||
     returnHallVisible ||
     isJournalInteractionActive ||
-    raspberryPhaseActive
+    raspberryPhaseActive ||
+    isSavoirInteractionActive ||
+    isContactInteractionActive
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
@@ -702,6 +709,10 @@ export default function App() {
     returnHallVisible,
     isJournalInteractionActive,
   ])
+
+  useEffect(() => {
+    isModalOpenRef.current = isSavoirInteractionActive || isContactInteractionActive
+  }, [isSavoirInteractionActive, isContactInteractionActive])
 
   const isStoryCameraControlEnabled = postIntro
 

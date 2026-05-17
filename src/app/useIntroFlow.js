@@ -12,7 +12,7 @@ const INSIDE_POV = {
 const RASPBERRY_TEMP_COMPLETE_COUNT = 8
 const RASPBERRY_TEMP_AUTO_COMPLETE_DELAY = 2000
 
-export function useIntroFlow({ sceneReady, arbreActiveRef }) {
+export function useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
   const [introWaitingAtDoor, setIntroWaitingAtDoor] = useState(false)
@@ -140,12 +140,12 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.code === 'Escape') exitIntro()
+      if (event.code === 'Escape' && !modalActiveRef?.current) exitIntro()
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [exitIntro])
+  }, [exitIntro, modalActiveRef])
 
   useEffect(() => {
     if (!postIntro) return
@@ -157,6 +157,8 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
         // minigame owns the pointer — ignore spontaneous unlocks
       } else if (arbreActiveRef?.current) {
         // arbre sequence owns the pointer — ignore spontaneous unlocks
+      } else if (modalActiveRef?.current) {
+        // savoir/contact panel owns the pointer — ignore spontaneous unlocks
       } else if (wasLocked) {
         exitIntro()
       }
@@ -164,7 +166,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     document.addEventListener('pointerlockchange', onPointerLockChange)
     return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
-  }, [postIntro, exitIntro, arbreActiveRef])
+  }, [postIntro, exitIntro, arbreActiveRef, modalActiveRef])
 
   const handleIntroEvent = useCallback(
     (event, payload) => {

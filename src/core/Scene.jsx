@@ -115,6 +115,7 @@ export default function Scene({
     growingFruitPlaying: arbreGrowingFruitPlaying,
     fruitsClickActive,
     onFruitClickDuringLeaves,
+    leafInteractionsEnabled: arbreLeafInteractionsEnabled,
   } = arbre
 
   const zone = useActiveZone()
@@ -157,7 +158,9 @@ export default function Scene({
             onError={onError}
             onSceneReady={onReady}
             leafMaterialMode={leafMaterialMode}
-            interactionsEnabled={zone === 'cabane' ? interactionsEnabled : true}
+            interactionsEnabled={
+              zone === 'cabane' ? interactionsEnabled : arbreLeafInteractionsEnabled
+            }
             onLeafClick={onLeafClick}
             onLeafHover={onLeafHover}
             onJournalStart={onJournalStart}

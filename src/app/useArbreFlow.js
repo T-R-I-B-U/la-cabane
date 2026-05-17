@@ -181,6 +181,7 @@ export function useArbreFlow({
   const [stairsClickActive, setStairsClickActive] = useState(false)
   const [growingFruitPlaying, setGrowingFruitPlaying] = useState(false)
   const [fruitsClickActive, setFruitsClickActive] = useState(false)
+  const [arbreExploreSecondPhase, setArbreExploreSecondPhase] = useState(false)
   // Token to force re-trigger when zone is already 'arbre'
   const [arbreStartToken, setArbreStartToken] = useState(0)
   const [ladderIsStoryMode, setLadderIsStoryMode] = useState(false)
@@ -362,41 +363,17 @@ export function useArbreFlow({
           setArbreDialogueActive(false)
           completeStep('arbre.platformDialogue')
           setArbreMovementLocked(false)
-          setFruitsClickActive(true)
         },
       })
-    } else if (currentStepId === 'arbre.leavesDialogue') {
-      setGrowingFruitPlaying(true)
-      scheduleFlowTimeout(() => {
-        setArbreDialogueActive(true)
-        playDialogue('arbreFeuilles', {
-          onDone: () => {
-            setArbreDialogueActive(false)
-            completeStep('arbre.leavesDialogue')
-            setArbreDialogueActive(true)
-            playDialogue('arbreFinal', {
-              onDone: () => {
-                setArbreDialogueActive(false)
-                completeStep('arbre.finalDialogue')
-                setArbreDialogueActive(true)
-                playDialogue('arbreOutro', {
-                  onDone: () => {
-                    setArbreDialogueActive(false)
-                    goToStep('arbre.outroPlatformTop')
-                    setArbreStoryCameraTransition({ ...povs.outroPlatformTop })
-                  },
-                })
-              },
-            })
-          },
-        })
-      }, 1000)
+    } else if (currentStepId === 'arbre.finalDialogue') {
+      setArbreMovementLocked(false)
+      setArbreExploreSecondPhase(true)
+      setFruitsClickActive(true)
     }
   }, [
     currentStepId,
     completeStep,
     exitArbre,
-    goToStep,
     onBackAtBase,
     onOutroComplete,
     onPlatformSpawn,
@@ -408,12 +385,42 @@ export function useArbreFlow({
   const handleFruitClickDuringLeaves = useCallback(() => {
     if (!fruitsClickActive) return
     setFruitsClickActive(false)
+    setArbreExploreSecondPhase(false)
     setArbreMovementLocked(true)
-    completeStep('arbre.exploreLeaves')
-    setArbreStoryCameraTransition({ ...povs.atFruitFocus })
-  }, [fruitsClickActive, completeStep, povs])
+    setArbreDialogueActive(true)
+    playDialogue('arbreFinal', {
+      onDone: () => {
+        setArbreDialogueActive(false)
+        completeStep('arbre.finalDialogue')
+        setArbreDialogueActive(true)
+        playDialogue('arbreOutro', {
+          onDone: () => {
+            setArbreDialogueActive(false)
+            goToStep('arbre.outroPlatformTop')
+            setArbreStoryCameraTransition({ ...povs.outroPlatformTop })
+          },
+        })
+      },
+    })
+  }, [fruitsClickActive, completeStep, playDialogue, goToStep, povs])
 
-  const arbreLeafInteractionsEnabled = currentStepId === 'arbre.exploreLeaves'
+  const arbreLeafInteractionsEnabled =
+    currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase
+
+  const handleLeafSavoirClosed = useCallback(() => {
+    if (currentStepId !== 'arbre.exploreLeaves') return
+    completeStep('arbre.exploreLeaves')
+    setArbreMovementLocked(true)
+    setArbreDialogueActive(true)
+    playDialogue('arbreFeuilles', {
+      onDone: () => {
+        setArbreDialogueActive(false)
+        completeStep('arbre.leavesDialogue')
+        setGrowingFruitPlaying(true)
+        setArbreStoryCameraTransition({ ...povs.atFruitFocus })
+      },
+    })
+  }, [currentStepId, completeStep, playDialogue, povs])
 
   const activateLadderFromStory = useCallback(() => {
     // Mark as played so the zone effect doesn't re-run the init sequence when zone → 'arbre'
@@ -514,6 +521,7 @@ export function useArbreFlow({
     triggerNestDialogue25,
     triggerArbreBase,
     handleFruitClickDuringLeaves,
+    handleLeafSavoirClosed,
     exitArbre,
     triggerArbre,
     skipDialogue,
