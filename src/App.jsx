@@ -291,6 +291,7 @@ export default function App() {
       if (!didOpen) return
       setIsSavoirInteractionActive(true)
       setShouldRestorePointerLockAfterStoryUi(true)
+      pointerControlsRef.current?.unlock()
     },
     [openSavoirForLeaf]
   )
@@ -505,6 +506,17 @@ export default function App() {
     setIsContactPanelOpen(false)
     pointerControlsRef.current?.lock()
   }, [closeContactInternal])
+
+  useEffect(() => {
+    if (!isSavoirInteractionActive && !isContactInteractionActive) return
+    const onKeyDown = (e) => {
+      if (e.code !== 'Escape') return
+      if (isSavoirInteractionActive) handleCloseSavoir()
+      else handleCloseContact()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isSavoirInteractionActive, isContactInteractionActive, handleCloseSavoir, handleCloseContact])
 
   const isStoryBlockingPlayer =
     dialogueActive ||
