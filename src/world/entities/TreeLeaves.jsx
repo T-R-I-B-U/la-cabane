@@ -133,16 +133,31 @@ export function TreeLeaves({
   const _centerNdc = useMemo(() => new THREE.Vector2(0, 0), [])
   const _leafRaycaster = useMemo(() => new THREE.Raycaster(), [])
   const _leafHoveredRef = useRef(false)
+  const _lastHoveredIdRef = useRef(-1)
   useFrame(({ camera }) => {
     if (!leafMesh || !active || !document.pointerLockElement) {
       if (_leafHoveredRef.current) {
         _leafHoveredRef.current = false
+        _lastHoveredIdRef.current = -1
+        if (proxyRef.current) proxyRef.current.visible = false
         onLeafHover?.(false)
       }
       return
     }
     _leafRaycaster.setFromCamera(_centerNdc, camera)
-    const hit = _leafRaycaster.intersectObject(leafMesh, false).length > 0
+    const hits = _leafRaycaster.intersectObject(leafMesh, false)
+    const hit = hits.length > 0 && !!inRangeRef.current?.[hits[0].instanceId]
+    if (hit) {
+      const hoveredId = hits[0].instanceId
+      if (_lastHoveredIdRef.current !== hoveredId) {
+        _lastHoveredIdRef.current = hoveredId
+        syncProxy(hoveredId)
+        if (proxyRef.current) proxyRef.current.visible = true
+      }
+    } else if (_lastHoveredIdRef.current !== -1) {
+      _lastHoveredIdRef.current = -1
+      if (proxyRef.current) proxyRef.current.visible = false
+    }
     if (hit !== _leafHoveredRef.current) {
       _leafHoveredRef.current = hit
       onLeafHover?.(hit)
@@ -330,15 +345,12 @@ export function TreeLeaves({
         }}
         onPointerDown={(e) => {
           e.stopPropagation()
-          if (
-            !active ||
-            e.instanceId === undefined ||
-            !inRangeRef.current?.[e.instanceId] ||
-            !onLeafClick
-          )
-            return
-
-          onLeafClick(e.instanceId)
+          if (!active || !onLeafClick) return
+          // Under pointer lock R3F events cast from clientX/Y=0 (top-left, not center).
+          // Use the id tracked by the manual center raycaster instead.
+          const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId
+          if (id === undefined || id < 0 || !inRangeRef.current?.[id]) return
+          onLeafClick(id)
         }}
       />
 
