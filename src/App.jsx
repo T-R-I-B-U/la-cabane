@@ -1070,7 +1070,7 @@ export default function App() {
 
       <CustomCursor visible={isCustomCursorVisible} />
 
-      {!showWelcome && (sceneLoadStatus !== 'ok' || !loadingMinTimerDone) && (
+      {(welcomeFading || !showWelcome) && (sceneLoadStatus !== 'ok' || !loadingMinTimerDone) && (
         <LoadingScreen
           status={sceneLoadStatus}
           error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
