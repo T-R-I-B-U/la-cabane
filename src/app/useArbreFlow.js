@@ -375,6 +375,7 @@ export function useArbreFlow({
           setArbreDialogueActive(false)
           completeStep('arbre.platformDialogue')
           setArbreMovementLocked(false)
+          setGrowingFruitClickable(true)
         },
       })
     } else if (currentStepId === 'arbre.finalDialogue') {
@@ -416,9 +417,7 @@ export function useArbreFlow({
     })
   }, [fruitsClickActive, completeStep, playDialogue, goToStep, povs])
 
-  const handleGrowingFruitComplete = useCallback(() => {
-    setGrowingFruitClickable(true)
-  }, [])
+  const handleGrowingFruitComplete = useCallback(() => {}, [])
 
   const arbreLeafInteractionsEnabled =
     currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase
