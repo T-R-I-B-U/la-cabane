@@ -203,7 +203,7 @@ export default function App() {
     startIntro,
     skipDialogue: skipIntroDialogue,
     setPostIntro,
-  } = useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef: isModalOpenRef })
+  } = useIntroFlow({ sceneReady })
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
