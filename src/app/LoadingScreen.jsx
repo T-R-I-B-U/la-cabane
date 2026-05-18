@@ -23,6 +23,14 @@ export function LoadingScreen({ status, error }) {
               alt="Altera 2050"
             />
           </div>
+          <img
+            className="loading-screen__sablier"
+            src="/welcome/sablier.png"
+            width={148}
+            height={185}
+            alt=""
+            aria-hidden="true"
+          />
         </div>
       )}
     </div>
