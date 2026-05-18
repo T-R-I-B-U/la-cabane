@@ -6,6 +6,7 @@ import {
   IntroLoader,
   NameInput,
   SavoirPanel,
+  WelcomeScreen,
   useIntroFlow,
   useSavoirAssignment,
 } from './app/index'
@@ -44,6 +45,8 @@ const PerfMonitor = lazy(() =>
 )
 export default function App() {
   const isDevBuild = import.meta.env.DEV
+  const [showWelcome, setShowWelcome] = useState(true)
+  const [welcomeFading, setWelcomeFading] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
   const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
@@ -1068,6 +1071,14 @@ export default function App() {
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
       <CustomCursor visible={isCustomCursorVisible} />
+
+      {showWelcome && (
+        <WelcomeScreen
+          fading={welcomeFading}
+          onStart={() => setWelcomeFading(true)}
+          onAnimationEnd={() => setShowWelcome(false)}
+        />
+      )}
 
       {introPending && (
         <IntroLoader

@@ -1,4 +1,5 @@
 export { AppLoader } from './AppLoader'
+export { WelcomeScreen } from './WelcomeScreen'
 export { Crosshair } from './Crosshair'
 export { DevSection } from './DevSection'
 export { GameManager } from './GameManager'
