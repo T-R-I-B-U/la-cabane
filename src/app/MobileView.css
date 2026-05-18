@@ -362,7 +362,7 @@
 .mv-s1-card {
   flex: 1;
   min-height: 0;
-  background: #3b5866;
+  background: rgba(255, 255, 255, 0.95);
   border: none;
   border-radius: 18px;
   cursor: pointer;
@@ -371,25 +371,27 @@
   justify-content: center;
   padding: 20px 40px;
   box-sizing: border-box;
-  transition: background 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .mv-s1-card--selected {
-  background: rgba(255, 255, 255, 0.95);
+  background: #3b5866;
 }
 
 .mv-s1-card span {
   font-family: 'citrus-gothic-rough', serif;
   font-size: 32px;
   font-weight: 400;
-  color: #eeded0;
+  color: #3b5866;
   text-transform: uppercase;
   white-space: nowrap;
   transition: color 0.12s;
 }
 
 .mv-s1-card--selected span {
-  color: #3b5866;
+  color: #eeded0;
 }
 
 /* Figma : pill cream bg, Albert Sans 24px #3b5866 */
