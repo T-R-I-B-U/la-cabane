@@ -133,15 +133,15 @@
 }
 
 /* ── Écran 0 : Landing ── */
-/* Figma : frame 390×844, position relative */
 .mv-s0-root {
-  position: relative;
+  min-height: 100dvh;
   width: 100%;
-  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
   overflow: hidden;
 }
 
-/* Background full-cover */
 .mv-s0-bg {
   position: absolute;
   inset: 0;
@@ -151,41 +151,43 @@
   pointer-events: none;
 }
 
-/* Figma : absolute top-54 h-790 w-390, flex-col, justify-between, px-20 py-40 */
+/* Layout flex : s'adapte à la vraie hauteur viewport */
 .mv-s0-content {
-  position: absolute;
-  top: 54px;
-  left: 0;
-  width: 100%;
-  height: calc(100% - 54px);
+  position: relative;
+  z-index: 1;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
   box-sizing: border-box;
+  width: 100%;
 }
 
-/* Figma : flex h-408 items-center justify-center shrink-0 w-218.736 */
+/* Zone feuille : prend l'espace restant, clip si trop petite */
 .mv-s0-leaf-wrap {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  height: 408px;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   width: 218.736px;
+  overflow: hidden;
 }
 
-/* Figma : -rotate-90 flex-none */
+/* -rotate-90 sur l'image landscape → apparaît portrait */
 .mv-s0-leaf-rotate {
   transform: rotate(-90deg);
   flex-shrink: 0;
 }
 
-/* Figma : h-218.736 w-408 relative */
+/* Image landscape 408×218, tourne pour donner la feuille portrait */
 .mv-s0-leaf-img-box {
   width: 408px;
   height: 218.736px;
+  flex-shrink: 0;
   position: relative;
 }
 
@@ -198,7 +200,7 @@
   pointer-events: none;
 }
 
-/* Figma : flex flex-col gap-40 items-center shrink-0 w-full */
+/* Bas : titre + bouton */
 .mv-s0-bottom {
   display: flex;
   flex-direction: column;
@@ -208,7 +210,7 @@
   flex-shrink: 0;
 }
 
-/* Figma : citrus-gothic-rough 32px #33330f text-center w-230 */
+/* citrus-gothic-rough 32px #33330f, w-230 centré */
 .mv-s0-title {
   font-family: 'citrus-gothic-rough', serif;
   font-size: 32px;
@@ -222,7 +224,7 @@
   word-break: break-word;
 }
 
-/* Figma : flex items-center justify-center px-40 py-20 relative rounded-360 shrink-0 w-full */
+/* Bouton pill avec image Figma en fond */
 .mv-s0-btn {
   position: relative;
   display: flex;
@@ -248,7 +250,7 @@
   pointer-events: none;
 }
 
-/* Figma : Albert Sans Regular 24px #eeded0 */
+/* Albert Sans 24px #eeded0 */
 .mv-s0-btn span {
   font-family: 'Albert Sans', sans-serif;
   font-size: 24px;
