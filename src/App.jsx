@@ -1106,6 +1106,8 @@ export default function App() {
           onStart={() => {
             setWelcomeFading(true)
             setTimeout(() => setLoadingMinTimerDone(true), 5000)
+            const canvas = document.querySelector('canvas')
+            if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
           onAnimationEnd={() => setShowWelcome(false)}
         />
