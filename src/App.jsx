@@ -4,6 +4,7 @@ import {
   Crosshair,
   GameManager,
   IntroLoader,
+  LoadingScreen,
   NameInput,
   SavoirPanel,
   WelcomeScreen,
@@ -795,10 +796,12 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      <AppLoader
-        status={sceneLoadStatus}
-        error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
-      />
+      {!showWelcome && (
+        <LoadingScreen
+          status={sceneLoadStatus}
+          error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
+        />
+      )}
       <Subtitles />
 
       <Crosshair
