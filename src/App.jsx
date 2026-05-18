@@ -9,6 +9,7 @@ import {
   LoadingScreen,
   NameInput,
   SavoirPanel,
+  SettingsMenu,
   WelcomeScreen,
   useIntroFlow,
   useSavoirAssignment,
@@ -57,6 +58,7 @@ export default function App() {
   const [hasSentSavoir, setHasSentSavoir] = useState(false)
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
@@ -1290,8 +1292,11 @@ export default function App() {
             if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
           onAnimationEnd={() => setShowWelcome(false)}
+          onOpenSettings={() => setShowSettings(true)}
         />
       )}
+
+      <SettingsMenu open={showSettings} onClose={() => setShowSettings(false)} />
     </main>
   )
 }

@@ -1,11 +1,15 @@
 import './WelcomeScreen.css'
+import { GearIcon } from './GearIcon'
 
-export function WelcomeScreen({ fading, onStart, onAnimationEnd }) {
+export function WelcomeScreen({ fading, onStart, onAnimationEnd, onOpenSettings }) {
   return (
     <div
       className={`welcome-screen${fading ? ' welcome-screen--fading' : ''}`}
       onAnimationEnd={fading ? onAnimationEnd : undefined}
     >
+      <div className="welcome-screen__top-right">
+        <GearIcon variant="solid" onClick={onOpenSettings} ariaLabel="Ouvrir les réglages" />
+      </div>
       <img className="welcome-screen__bg" src="/welcome/bg.webp" alt="" aria-hidden="true" />
       <div className="welcome-screen__footer">
         <div className="welcome-screen__logo-group">
