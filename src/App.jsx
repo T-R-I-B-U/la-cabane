@@ -3,7 +3,6 @@ import {
   AppLoader,
   Crosshair,
   GameManager,
-  IntroLoader,
   LoadingScreen,
   NameInput,
   SavoirPanel,
@@ -49,6 +48,7 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(true)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [loadingMinTimerDone, setLoadingMinTimerDone] = useState(false)
+  const [readyToShow, setReadyToShow] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
   const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
@@ -138,7 +138,6 @@ export default function App() {
     journalCloseToken,
     journalPuzzleEnabled,
     journalUnlocked,
-    loaderFading,
     postIntro,
     receptionChoiceVisible,
     returnHallVisible,
@@ -161,10 +160,7 @@ export default function App() {
     showNameInput,
     storyReady,
     currentStoryStepId,
-    dismissLoader,
     handleIntroEvent,
-    handleLoaderClick,
-    handleLoaderKeyDown,
     handleJournalEnd,
     handleTreeInteract,
     handleTimeatmInteract,
@@ -665,9 +661,12 @@ export default function App() {
   }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
 
   // Auto-launch story once loading screen min-timer and scene load are both done.
+  // 500ms delay before showing the scene avoids a camera teleport on first frame.
   useEffect(() => {
     if (showWelcome || !loadingMinTimerDone || sceneLoadStatus !== 'ok') return
     launchIntro()
+    const t = setTimeout(() => setReadyToShow(true), 500)
+    return () => clearTimeout(t)
   }, [showWelcome, loadingMinTimerDone, sceneLoadStatus, launchIntro])
 
   const handleSceneReady = useCallback((data) => {
@@ -1076,7 +1075,7 @@ export default function App() {
 
       <CustomCursor visible={isCustomCursorVisible} />
 
-      {(welcomeFading || !showWelcome) && (sceneLoadStatus !== 'ok' || !loadingMinTimerDone) && (
+      {(welcomeFading || !showWelcome) && !readyToShow && (
         <LoadingScreen
           status={sceneLoadStatus}
           error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
@@ -1094,22 +1093,6 @@ export default function App() {
         />
       )}
 
-      {introPending && (
-        <IntroLoader
-          fading={loaderFading}
-          onClick={() => {
-            const canvas = document.querySelector('canvas')
-            if (canvas) canvas.requestPointerLock()
-            handleLoaderClick()
-          }}
-          onKeyDown={(e) => {
-            const canvas = document.querySelector('canvas')
-            if (canvas) canvas.requestPointerLock()
-            handleLoaderKeyDown(e)
-          }}
-          onAnimationEnd={dismissLoader}
-        />
-      )}
     </main>
   )
 }
