@@ -1,8 +1,6 @@
 import './LoadingScreen.css'
 
 export function LoadingScreen({ status, error }) {
-  if (status === 'ok') return null
-
   return (
     <div className="loading-screen">
       <img className="loading-screen__bg" src="/welcome/loading-bg.jpg" alt="" aria-hidden="true" />

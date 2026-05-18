@@ -48,6 +48,7 @@ export default function App() {
   const isDevBuild = import.meta.env.DEV
   const [showWelcome, setShowWelcome] = useState(true)
   const [welcomeFading, setWelcomeFading] = useState(false)
+  const [loadingMinTimerDone, setLoadingMinTimerDone] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
   const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
@@ -796,12 +797,6 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      {!showWelcome && (
-        <LoadingScreen
-          status={sceneLoadStatus}
-          error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
-        />
-      )}
       <Subtitles />
 
       <Crosshair
@@ -1075,10 +1070,20 @@ export default function App() {
 
       <CustomCursor visible={isCustomCursorVisible} />
 
+      {!showWelcome && (sceneLoadStatus !== 'ok' || !loadingMinTimerDone) && (
+        <LoadingScreen
+          status={sceneLoadStatus}
+          error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
+        />
+      )}
+
       {showWelcome && (
         <WelcomeScreen
           fading={welcomeFading}
-          onStart={() => setWelcomeFading(true)}
+          onStart={() => {
+            setWelcomeFading(true)
+            setTimeout(() => setLoadingMinTimerDone(true), 5000)
+          }}
           onAnimationEnd={() => setShowWelcome(false)}
         />
       )}
