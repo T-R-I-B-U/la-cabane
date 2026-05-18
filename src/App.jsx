@@ -357,6 +357,7 @@ export default function App() {
 
   const requestPointerLockIfSceneControlAllowed = useCallback(() => {
     if (
+      showSettings ||
       dialogueActive ||
       introMovementLocked ||
       showNameInput ||
@@ -384,6 +385,7 @@ export default function App() {
     }
     pointerControlsRef.current?.lock()
   }, [
+    showSettings,
     currentStoryStepId,
     dialogueActive,
     introMovementLocked,
@@ -640,7 +642,7 @@ export default function App() {
     isStoryBlockingPlayer || isModalBlockingPlayer || isJournalBlockingPlayer
 
   useEffect(() => {
-    if (!shouldRestorePointerLockAfterStoryUi || showNameInput || !postIntro) return
+    if (!shouldRestorePointerLockAfterStoryUi || showNameInput || !postIntro || showSettings) return
 
     let cancelled = false
     let frameId = 0
@@ -682,6 +684,7 @@ export default function App() {
     postIntro,
     requestPointerLockIfSceneControlAllowed,
     showNameInput,
+    showSettings,
   ])
 
   useEffect(() => {
@@ -693,6 +696,10 @@ export default function App() {
   }, [arbreActive])
 
   useEffect(() => {
+    isInGameplayRef.current = isPlayerModeActive || postIntro
+  }, [isPlayerModeActive, postIntro])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -700,6 +707,38 @@ export default function App() {
     document.addEventListener('click', blockPointerLock, { capture: true })
     return () => document.removeEventListener('click', blockPointerLock, { capture: true })
   }, [])
+
+  // Intercept Escape while pointer-locked: open settings instead of just exiting.
+  // Capture phase fires before Drei's own keydown handlers.
+  // Guards: don't intercept when another UI (journal, modal, minigame) already owns Escape.
+  useEffect(() => {
+    const onEscapeWhileLocked = (e) => {
+      if (e.key !== 'Escape') return
+      if (!document.pointerLockElement) return
+      if (!isInGameplayRef.current) return
+      if (
+        isModalOpenRef.current ||
+        isJournalInteractionActiveRef.current ||
+        isMinigameActiveRef.current
+      )
+        return
+      e.stopImmediatePropagation()
+      setShowSettings(true)
+      setShouldRestorePointerLockAfterStoryUi(true)
+    }
+    document.addEventListener('keydown', onEscapeWhileLocked, { capture: true })
+    return () => document.removeEventListener('keydown', onEscapeWhileLocked, { capture: true })
+  }, [])
+
+  useEffect(() => {
+    if (!showSettings) return
+    const onEscapeClose = (e) => {
+      if (e.key !== 'Escape') return
+      setShowSettings(false)
+    }
+    window.addEventListener('keydown', onEscapeClose)
+    return () => window.removeEventListener('keydown', onEscapeClose)
+  }, [showSettings])
 
   useEffect(() => {
     if (!receptionChoiceVisible) return
@@ -837,7 +876,8 @@ export default function App() {
     isSavoirInteractionActive ||
     isContactInteractionActive ||
     isPlayerFruitPanelOpen ||
-    !!incomingSavoir
+    !!incomingSavoir ||
+    showSettings
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
