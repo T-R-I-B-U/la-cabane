@@ -375,9 +375,7 @@
 }
 
 .mv-s1-card--selected {
-  background: rgba(255, 255, 255, 1);
-  outline: 3px solid #3b5866;
-  outline-offset: -3px;
+  background: #3b5866;
 }
 
 /* Figma : citrus-gothic-rough 32px #3b5866 */
@@ -388,6 +386,11 @@
   color: #3b5866;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: color 0.12s;
+}
+
+.mv-s1-card--selected span {
+  color: #eeded0;
 }
 
 /* Figma : pill cream bg, Albert Sans 24px #3b5866 */
