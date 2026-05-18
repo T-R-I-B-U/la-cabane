@@ -121,7 +121,6 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
       delayRef.current = 0
 
       if (to.event) {
-        console.log('[IntroCamera] event:', to.event)
         onEvent?.(to.event, { position: to.position.clone(), target: to.target.clone() })
       }
 
