@@ -12,10 +12,14 @@ export function LoadingScreen({ status, error }) {
       ) : (
         <div className="loading-screen__center">
           <div className="loading-screen__logo-group">
-            <img className="loading-screen__logo-main" src="/welcome/logo.png" alt="La Cabane" />
+            <img
+              className="loading-screen__logo-main"
+              src="/welcome/loading-logo.png"
+              alt="La Cabane"
+            />
             <img
               className="loading-screen__logo-subtitle"
-              src="/welcome/subtitle.svg"
+              src="/welcome/loading-subtitle.svg"
               width={266}
               height={37}
               alt="Altera 2050"
