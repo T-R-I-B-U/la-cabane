@@ -726,6 +726,21 @@ export function useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef }) {
     setIntroPending(true)
   }, [resetStory, sceneReady])
 
+  // Combined auto-start: prepares state AND activates the camera sequence without
+  // waiting for a user click (no loaderFading guard needed since there is no IntroLoader).
+  const startIntro = useCallback(() => {
+    if (!sceneReady) return
+
+    setPostIntro(false)
+    setShowNameInput(false)
+    resetStory()
+    setIntroPending(true)
+    setIntroDoorOpen(false)
+    setIntroWaitingAtDoor(false)
+    setIntroShouldAdvance(false)
+    setIntroActive(true)
+  }, [resetStory, sceneReady])
+
   const handleLoaderClick = useCallback(() => {
     if (!sceneReady || loaderFading) return
 
@@ -828,6 +843,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef }) {
     handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
+    startIntro,
     playDialogue,
     skipDialogue,
     setPostIntro,

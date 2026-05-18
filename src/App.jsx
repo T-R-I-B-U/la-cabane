@@ -198,7 +198,7 @@ export default function App() {
     handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
-    handleLoaderClick,
+    startIntro,
     skipDialogue: skipIntroDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef: isModalOpenRef })
@@ -677,15 +677,15 @@ export default function App() {
   }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
 
   // Auto-launch story once loading screen min-timer and scene load are both done.
-  // launchIntro() sets introPending; handleLoaderClick() sets introActive (starts camera sequence).
+  // startIntro() sets both introPending and introActive in one stable callback so
+  // the effect never re-runs mid-story due to a stale reference.
   // 500ms delay before showing the scene avoids a camera teleport on first frame.
   useEffect(() => {
     if (showWelcome || !loadingMinTimerDone || sceneLoadStatus !== 'ok') return
-    launchIntro()
-    handleLoaderClick()
+    startIntro()
     const t = setTimeout(() => setReadyToShow(true), 500)
     return () => clearTimeout(t)
-  }, [showWelcome, loadingMinTimerDone, sceneLoadStatus, launchIntro, handleLoaderClick])
+  }, [showWelcome, loadingMinTimerDone, sceneLoadStatus, startIntro])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
