@@ -64,7 +64,7 @@ export function MobileView() {
       leafImgRef.current = img
       if (canvasRef.current) drawLeafImg(canvasRef.current.getContext('2d'), img)
     }
-    img.src = '/phone/leaf.png'
+    img.src = '/phone/leaf.webp'
   }, [step])
 
   // ── Drawing handlers ─────────────────────────────────────────────
@@ -153,13 +153,13 @@ export function MobileView() {
   if (step === 0) {
     return (
       <div className="mv-s0-root">
-        <img className="mv-s0-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <img className="mv-s0-bg" src="/phone/bg-light.webp" alt="" aria-hidden="true" />
         <div className="mv-s0-content">
           {/* Feuille : container portrait 218×408, image landscape 408×218 tournée -90° */}
           <div className="mv-s0-leaf-wrap">
             <div className="mv-s0-leaf-rotate">
               <div className="mv-s0-leaf-img-box">
-                <img src="/phone/leaf.png" alt="" aria-hidden="true" />
+                <img src="/phone/leaf.webp" alt="" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -167,7 +167,7 @@ export function MobileView() {
           <div className="mv-s0-bottom">
             <p className="mv-s0-title">Créer mon savoir dans l'arbre</p>
             <button className="mv-s0-btn" onClick={() => setStep(1)}>
-              <img className="mv-s0-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+              <img className="mv-s0-btn-bg" src="/phone/btn-dark.webp" alt="" aria-hidden="true" />
               <span>Je commence</span>
             </button>
           </div>
@@ -179,7 +179,7 @@ export function MobileView() {
   if (step === 1) {
     return (
       <div className="mv-s1-root">
-        <img className="mv-s1-bg" src="/phone/bg-dark.png" alt="" aria-hidden="true" />
+        <img className="mv-s1-bg" src="/phone/bg-dark.webp" alt="" aria-hidden="true" />
         <div className="mv-s1-content">
           <div className="mv-s1-top">
             <p className="mv-s1-title">Thème de mon savoir</p>
@@ -196,7 +196,7 @@ export function MobileView() {
             </div>
           </div>
           <button className="mv-s1-btn" onClick={() => setStep(2)} disabled={!theme}>
-            <img className="mv-s1-btn-bg" src="/phone/btn-cream.png" alt="" aria-hidden="true" />
+            <img className="mv-s1-btn-bg" src="/phone/btn-cream.webp" alt="" aria-hidden="true" />
             <span>Suivant</span>
           </button>
         </div>
@@ -207,7 +207,7 @@ export function MobileView() {
   if (step === 2) {
     return (
       <div className="mv-s2-root">
-        <img className="mv-s2-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <img className="mv-s2-bg" src="/phone/bg-light.webp" alt="" aria-hidden="true" />
         <div className="mv-s2-content">
           <div className="mv-s2-top">
             <p className="mv-s2-title">Résumé de mon savoir</p>
@@ -221,7 +221,7 @@ export function MobileView() {
             </div>
           </div>
           <button className="mv-s2-btn" onClick={() => setStep(3)} disabled={!summary.trim()}>
-            <img className="mv-s2-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+            <img className="mv-s2-btn-bg" src="/phone/btn-dark.webp" alt="" aria-hidden="true" />
             <span>Suivant</span>
           </button>
         </div>
@@ -232,7 +232,7 @@ export function MobileView() {
   if (step === 3) {
     return (
       <div className="mv-s1-root">
-        <img className="mv-s1-bg" src="/phone/bg-dark.png" alt="" aria-hidden="true" />
+        <img className="mv-s1-bg" src="/phone/bg-dark.webp" alt="" aria-hidden="true" />
         <div className="mv-s1-content">
           <div className="mv-s1-top">
             <p className="mv-s1-title">Lieu de l&apos;apprentissage</p>
@@ -253,7 +253,7 @@ export function MobileView() {
             </div>
           </div>
           <button className="mv-s1-btn" onClick={() => setStep(4)} disabled={!location}>
-            <img className="mv-s1-btn-bg" src="/phone/btn-cream.png" alt="" aria-hidden="true" />
+            <img className="mv-s1-btn-bg" src="/phone/btn-cream.webp" alt="" aria-hidden="true" />
             <span>Suivant</span>
           </button>
         </div>
@@ -264,7 +264,7 @@ export function MobileView() {
   if (step === 4) {
     return (
       <div className="mv-s4-root">
-        <img className="mv-s4-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <img className="mv-s4-bg" src="/phone/bg-light.webp" alt="" aria-hidden="true" />
         <div className="mv-s4-content">
           <div className="mv-s4-top">
             <p className="mv-s4-title">Mes disponibilités</p>
@@ -272,7 +272,7 @@ export function MobileView() {
               {DAYS.map((day) => (
                 <div key={day} className="mv-s4-row">
                   <div className="mv-s4-day">
-                    <img className="mv-s4-chip-bg" src="/phone/chip-dark.png" alt="" aria-hidden="true" />
+                    <img className="mv-s4-chip-bg" src="/phone/chip-dark.webp" alt="" aria-hidden="true" />
                     <span>{day}</span>
                   </div>
                   {SLOTS.map((slot) => {
@@ -286,7 +286,7 @@ export function MobileView() {
                       >
                         <img
                           className="mv-s4-chip-bg"
-                          src={selected ? '/phone/chip-selected.png' : '/phone/chip-cream.png'}
+                          src={selected ? '/phone/chip-selected.webp' : '/phone/chip-cream.webp'}
                           alt=""
                           aria-hidden="true"
                         />
@@ -299,7 +299,7 @@ export function MobileView() {
             </div>
           </div>
           <button className="mv-s4-btn" onClick={() => setStep(5)}>
-            <img className="mv-s4-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+            <img className="mv-s4-btn-bg" src="/phone/btn-dark.webp" alt="" aria-hidden="true" />
             <span>Suivant</span>
           </button>
         </div>
@@ -310,7 +310,7 @@ export function MobileView() {
   if (step === 5) {
     return (
       <div className="mv-s5-root">
-        <img className="mv-s5-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <img className="mv-s5-bg" src="/phone/bg-light.webp" alt="" aria-hidden="true" />
         <div className="mv-s5-content">
           <div className="mv-s5-top">
             <p className="mv-s5-title">Personnalisation</p>
@@ -343,7 +343,7 @@ export function MobileView() {
             <p className="mv-s5-subtitle">Donne un aspect unique à ton savoir&nbsp;!</p>
           </div>
           <button className="mv-s5-btn" onClick={submit}>
-            <img className="mv-s5-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+            <img className="mv-s5-btn-bg" src="/phone/btn-dark.webp" alt="" aria-hidden="true" />
             <span>Je valide mon savoir</span>
           </button>
         </div>
@@ -365,12 +365,12 @@ export function MobileView() {
           if (dy < -80) sendLeaf()
         }}
       >
-        <img className="mv-s6-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <img className="mv-s6-bg" src="/phone/bg-light.webp" alt="" aria-hidden="true" />
         <div className="mv-s6-content">
           <div className={`mv-s6-leaf-outer ${flying ? 'mv-s6-leaf--flying' : ''}`}>
             <div className="mv-s6-leaf-rotate">
               <div className="mv-s6-leaf-img-box">
-                <img src="/phone/leaf.png" alt="" aria-hidden="true" />
+                <img src="/phone/leaf.webp" alt="" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -388,7 +388,7 @@ export function MobileView() {
   // step === 7 — Bravo
   return (
     <div className="mv-s7-root">
-      <img className="mv-s7-bg" src="/phone/bravo-bg.png" alt="" aria-hidden="true" />
+      <img className="mv-s7-bg" src="/phone/bravo-bg.webp" alt="" aria-hidden="true" />
       <div className="mv-s7-content">
         <p className="mv-s7-title">Bravo poursuis ta visite&nbsp;!</p>
       </div>

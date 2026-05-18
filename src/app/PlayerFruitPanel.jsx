@@ -21,7 +21,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
               <div className="pfp-top-section">
                 <img
                   className="pfp-fruit-img"
-                  src="/player-panel/fruit.png"
+                  src="/player-panel/fruit.webp"
                   alt="Fruit du joueur"
                   aria-hidden="true"
                 />
@@ -86,7 +86,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                   <div className="pfp-leaf-slot">
                     <img
                       className="pfp-leaf-img"
-                      src="/player-panel/leaf.png"
+                      src="/player-panel/leaf.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -94,7 +94,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                   <div className="pfp-leaf-slot">
                     <img
                       className="pfp-leaf-img"
-                      src="/player-panel/leaf.png"
+                      src="/player-panel/leaf.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -102,7 +102,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                   <div className="pfp-leaf-slot">
                     <img
                       className="pfp-leaf-img"
-                      src="/player-panel/leaf.png"
+                      src="/player-panel/leaf.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -130,7 +130,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                   <div className="pfp-leaf-slot pfp-leaf-slot--flex">
                     <img
                       className="pfp-leaf-img"
-                      src="/player-panel/leaf.png"
+                      src="/player-panel/leaf.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -138,7 +138,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                   <div className="pfp-leaf-slot pfp-leaf-slot--flex">
                     <img
                       className="pfp-leaf-img"
-                      src="/player-panel/leaf.png"
+                      src="/player-panel/leaf.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -146,7 +146,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                   <div className="pfp-leaf-slot pfp-leaf-slot--flex">
                     <img
                       className="pfp-leaf-img"
-                      src="/player-panel/leaf.png"
+                      src="/player-panel/leaf.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -158,7 +158,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
               <div className="pfp-card pfp-card--cabane">
                 <div
                   className="pfp-cabane-bg"
-                  style={{ backgroundImage: 'url(/player-panel/cabane-bg.png)' }}
+                  style={{ backgroundImage: 'url(/player-panel/cabane-bg.webp)' }}
                   aria-hidden="true"
                 />
                 <div className="pfp-cabane-text">

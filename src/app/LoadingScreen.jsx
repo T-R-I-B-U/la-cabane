@@ -3,7 +3,7 @@ import './LoadingScreen.css'
 export function LoadingScreen({ status, error }) {
   return (
     <div className="loading-screen">
-      <img className="loading-screen__bg" src="/welcome/loading-bg.jpg" alt="" aria-hidden="true" />
+      <img className="loading-screen__bg" src="/welcome/loading-bg.webp" alt="" aria-hidden="true" />
 
       {status === 'error' ? (
         <p className="loading-screen__error" role="alert">
@@ -14,7 +14,7 @@ export function LoadingScreen({ status, error }) {
           <div className="loading-screen__logo-group">
             <img
               className="loading-screen__logo-main"
-              src="/welcome/loading-logo.png"
+              src="/welcome/loading-logo.webp"
               alt="La Cabane"
             />
             <img
@@ -27,7 +27,7 @@ export function LoadingScreen({ status, error }) {
           </div>
           <img
             className="loading-screen__sablier"
-            src="/welcome/sablier.png"
+            src="/welcome/sablier.webp"
             width={148}
             height={185}
             alt=""

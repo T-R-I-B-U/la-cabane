@@ -6,10 +6,10 @@ export function WelcomeScreen({ fading, onStart, onAnimationEnd }) {
       className={`welcome-screen${fading ? ' welcome-screen--fading' : ''}`}
       onAnimationEnd={fading ? onAnimationEnd : undefined}
     >
-      <img className="welcome-screen__bg" src="/welcome/bg.jpg" alt="" aria-hidden="true" />
+      <img className="welcome-screen__bg" src="/welcome/bg.webp" alt="" aria-hidden="true" />
       <div className="welcome-screen__footer">
         <div className="welcome-screen__logo-group">
-          <img className="welcome-screen__logo-main" src="/welcome/logo.png" alt="La Cabane" />
+          <img className="welcome-screen__logo-main" src="/welcome/logo.webp" alt="La Cabane" />
           <img
             className="welcome-screen__logo-subtitle"
             src="/welcome/subtitle.svg"
@@ -25,7 +25,7 @@ export function WelcomeScreen({ fading, onStart, onAnimationEnd }) {
         >
           <img
             className="welcome-screen__btn-bg"
-            src="/welcome/button-bg.png"
+            src="/welcome/button-bg.webp"
             alt=""
             aria-hidden="true"
           />

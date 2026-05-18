@@ -14,7 +14,7 @@ export function SavoirPanel({ savoir, onClose }) {
 
         <div className="savoir-body">
           <div className="savoir-leaf-col">
-            <img className="savoir-leaf-img" src="/savoir-leaf.png" alt="" aria-hidden="true" />
+            <img className="savoir-leaf-img" src="/savoir-leaf.webp" alt="" aria-hidden="true" />
           </div>
 
           <div className="savoir-content">

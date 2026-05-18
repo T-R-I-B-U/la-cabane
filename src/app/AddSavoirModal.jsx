@@ -13,7 +13,7 @@ export function AddSavoirModal({ onClose }) {
       onClick={(e) => e.stopPropagation()}
     >
       <div className="asm-card">
-        <img className="asm-bg" src="/player-panel/add-savoir-bg.png" alt="" aria-hidden="true" />
+        <img className="asm-bg" src="/player-panel/add-savoir-bg.webp" alt="" aria-hidden="true" />
 
         <button type="button" className="asm-close" onClick={onClose} aria-label="Fermer">
           ✕
@@ -40,7 +40,7 @@ export function AddSavoirModal({ onClose }) {
             <div className="asm-leaf-img-wrap">
               <img
                 className="asm-leaf"
-                src="/player-panel/add-savoir-leaf.png"
+                src="/player-panel/add-savoir-leaf.webp"
                 alt=""
                 aria-hidden="true"
               />
