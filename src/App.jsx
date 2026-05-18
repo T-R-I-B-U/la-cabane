@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
 import {
   AppLoader,
   Crosshair,
+  FinalScreen,
   GameManager,
   LoadingScreen,
   NameInput,
@@ -46,6 +47,7 @@ const PerfMonitor = lazy(() =>
 export default function App() {
   const isDevBuild = import.meta.env.DEV
   const [showWelcome, setShowWelcome] = useState(true)
+  const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [loadingMinTimerDone, setLoadingMinTimerDone] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
@@ -289,7 +291,13 @@ export default function App() {
     onLadderSpawn: spawnAtLadder,
     onPlatformSpawn: spawnAtPlatform,
     onBackAtBase: spawnAtLadderDown,
-    onOutroComplete: handleDebugGoToIntroStart,
+    onOutroComplete: useCallback(() => {
+      setShowFinal(true)
+      setIsPlayerModeActive(false)
+      setIsFlyModeActive(false)
+      exitIntro()
+      document.exitPointerLock()
+    }, [exitIntro]),
   })
 
   const openSavoirFromLeaf = useCallback(
@@ -1092,6 +1100,8 @@ export default function App() {
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
       <CustomCursor visible={isCustomCursorVisible} />
+
+      {showFinal && <FinalScreen />}
 
       {(welcomeFading || !showWelcome) && !readyToShow && (
         <LoadingScreen
