@@ -12,6 +12,7 @@ import {
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
+import { PlayerFruitPanel } from './app/PlayerFruitPanel'
 import { RaspberryCounter } from './app/RaspberryCounter'
 import { useContactAssignment } from './app/useContactAssignment'
 import { useArbreFlow } from './app/useArbreFlow'
@@ -49,7 +50,6 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(true)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
-  const [loadingMinTimerDone, setLoadingMinTimerDone] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
@@ -75,6 +75,7 @@ export default function App() {
   const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
   const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
   const [isContactPanelOpen, setIsContactPanelOpen] = useState(false)
+  const [isPlayerFruitPanelOpen, setIsPlayerFruitPanelOpen] = useState(false)
   const [isLeafHovered, setIsLeafHovered] = useState(false)
   const [isFruitHovered, setIsFruitHovered] = useState(false)
   const [isStairsHovered, setIsStairsHovered] = useState(false)
@@ -161,6 +162,7 @@ export default function App() {
     arbreLadderPending,
     zoeClip,
     minigameCount,
+    playerName,
     showNameInput,
     storyReady,
     currentStoryStepId,
@@ -274,6 +276,8 @@ export default function App() {
     stairsClickActive,
     ladderIsStoryMode,
     growingFruitPlaying: arbreGrowingFruitPlaying,
+    growingFruitClickable: arbreGrowingFruitClickable,
+    handleGrowingFruitComplete,
     fruitsClickActive,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
@@ -314,6 +318,12 @@ export default function App() {
 
   const openContactFromFruit = useCallback(
     (fruitId) => {
+      if (fruitId === 'fruit_player') {
+        setIsPlayerFruitPanelOpen(true)
+        setShouldRestorePointerLockAfterStoryUi(true)
+        pointerControlsRef.current?.unlock()
+        return
+      }
       const didOpen = openContactForFruit(fruitId)
       if (!didOpen) return
       setIsContactInteractionActive(true)
@@ -337,6 +347,7 @@ export default function App() {
       isSavoirInteractionActive ||
       selectedContactAssignment ||
       isContactInteractionActive ||
+      isPlayerFruitPanelOpen ||
       isJournalInteractionActive ||
       raspberryPhaseActive
     ) {
@@ -357,6 +368,7 @@ export default function App() {
     dialogueActive,
     introMovementLocked,
     isContactInteractionActive,
+    isPlayerFruitPanelOpen,
     isJournalInteractionActive,
     isPlayerModeActive,
     isSavoirInteractionActive,
@@ -536,6 +548,21 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [isContactInteractionActive, handleCloseContact])
 
+  const handleClosePlayerFruitPanel = useCallback(() => {
+    setIsPlayerFruitPanelOpen(false)
+    requestPointerLockIfSceneControlAllowed()
+  }, [requestPointerLockIfSceneControlAllowed])
+
+  useEffect(() => {
+    if (!isPlayerFruitPanelOpen) return
+    const onKeyDown = (e) => {
+      if (e.code !== 'Escape') return
+      handleClosePlayerFruitPanel()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isPlayerFruitPanelOpen, handleClosePlayerFruitPanel])
+
   const isStoryBlockingPlayer =
     dialogueActive ||
     arbreDialogueActive ||
@@ -689,11 +716,11 @@ export default function App() {
   // the effect never re-runs mid-story due to a stale reference.
   // 500ms delay before showing the scene avoids a camera teleport on first frame.
   useEffect(() => {
-    if (showWelcome || !loadingMinTimerDone || sceneLoadStatus !== 'ok') return
+    if (showWelcome || sceneLoadStatus !== 'ok') return
     startIntro()
     const t = setTimeout(() => setReadyToShow(true), 500)
     return () => clearTimeout(t)
-  }, [showWelcome, loadingMinTimerDone, sceneLoadStatus, startIntro])
+  }, [showWelcome, sceneLoadStatus, startIntro])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
@@ -715,7 +742,8 @@ export default function App() {
     isJournalInteractionActive ||
     raspberryPhaseActive ||
     isSavoirInteractionActive ||
-    isContactInteractionActive
+    isContactInteractionActive ||
+    isPlayerFruitPanelOpen
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
@@ -772,6 +800,7 @@ export default function App() {
 
   const explorationReady = false
   const showDevOverlays =
+    !showWelcome &&
     !introPending &&
     !introActive &&
     !postIntro &&
@@ -841,9 +870,10 @@ export default function App() {
           !selectedContactAssignment &&
           !isContactInteractionActive &&
           !isJournalInteractionActive &&
-          !raspberryPhaseActive
+          !raspberryPhaseActive &&
+          !isPlayerFruitPanelOpen
         }
-        active={(interactionsEnabled && (isLeafHovered || isFruitHovered)) || isStairsHovered}
+        active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
       />
 
       <Scene
@@ -928,6 +958,8 @@ export default function App() {
           onStairsClick: handleStairsClick,
           onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
+          growingFruitClickable: arbreGrowingFruitClickable,
+          onGrowingFruitComplete: handleGrowingFruitComplete,
           fruitsClickActive,
           onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
@@ -1097,6 +1129,10 @@ export default function App() {
         <ContactPanel contact={selectedContactAssignment.contact} onClose={handleCloseContact} />
       )}
 
+      {isPlayerFruitPanelOpen && (
+        <PlayerFruitPanel playerName={playerName} onClose={handleClosePlayerFruitPanel} />
+      )}
+
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
       <CustomCursor visible={isCustomCursorVisible} />
@@ -1115,7 +1151,6 @@ export default function App() {
           fading={welcomeFading}
           onStart={() => {
             setWelcomeFading(true)
-            setTimeout(() => setLoadingMinTimerDone(true), 5000)
             const canvas = document.querySelector('canvas')
             if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}

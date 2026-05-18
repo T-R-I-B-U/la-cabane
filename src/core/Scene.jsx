@@ -113,6 +113,8 @@ export default function Scene({
     onStairsClick,
     onStairsHover,
     growingFruitPlaying: arbreGrowingFruitPlaying,
+    growingFruitClickable: arbreGrowingFruitClickable,
+    onGrowingFruitComplete,
     fruitsClickActive,
     onFruitClickDuringLeaves,
     leafInteractionsEnabled: arbreLeafInteractionsEnabled,
@@ -231,6 +233,8 @@ export default function Scene({
             platformPosition={platformPosition}
             arbreActive={arbreActive}
             growingFruitPlaying={arbreGrowingFruitPlaying}
+            growingFruitClickable={arbreGrowingFruitClickable}
+            onGrowingFruitComplete={onGrowingFruitComplete}
             fruitsClickActive={fruitsClickActive}
             onFruitClickDuringLeaves={onFruitClickDuringLeaves}
             onFruitClick={onFruitClick}

@@ -5,5 +5,12 @@
     "name": "Prénom Nom",
     "role": "Rôle exemple",
     "email": "contact@exemple.fr"
+  },
+  {
+    "id": "c_player",
+    "fruitId": "fruit_player",
+    "name": "Ton prénom",
+    "role": "Visiteur·se de La Cabane",
+    "email": ""
   }
 ]

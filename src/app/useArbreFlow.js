@@ -43,7 +43,8 @@ function resolveArbrePovs(platformPosition) {
   const pos = platformPosition ?? PLATFORM_POS
   const [px, py, pz] = pos
   const spawnY = py + PLAYER_HEIGHT + 3
-  const fruitZ = pz - 1
+  const fruitX = px - 2.5
+  const fruitZ = pz - 2
 
   const povs = {
     atLadder: {
@@ -136,7 +137,7 @@ function resolveArbrePovs(platformPosition) {
     atFruitFocus: {
       cameraId: 'arbre.atFruitFocus',
       position: { x: px + 2.5, y: spawnY - 0.5, z: pz + 2 },
-      target: { x: px, y: spawnY, z: fruitZ },
+      target: { x: fruitX, y: spawnY + 1.5, z: fruitZ },
       duration: 2.0,
     },
     outroPlatformTop: {
@@ -180,6 +181,7 @@ export function useArbreFlow({
   const [ladderClickActive, setLadderClickActive] = useState(false)
   const [stairsClickActive, setStairsClickActive] = useState(false)
   const [growingFruitPlaying, setGrowingFruitPlaying] = useState(false)
+  const [growingFruitClickable, setGrowingFruitClickable] = useState(false)
   const [fruitsClickActive, setFruitsClickActive] = useState(false)
   const [arbreExploreSecondPhase, setArbreExploreSecondPhase] = useState(false)
   // Token to force re-trigger when zone is already 'arbre'
@@ -226,6 +228,7 @@ export function useArbreFlow({
     setLadderClickActive(false)
     setStairsClickActive(false)
     setFruitsClickActive(false)
+    setGrowingFruitClickable(false)
     setLadderIsStoryMode(false)
     resetStory()
     stopDialogue()
@@ -261,7 +264,16 @@ export function useArbreFlow({
   }, [completeStep, povs])
 
   const handleArbreTransitionComplete = useCallback(() => {
-    if (currentStepId === 'arbre.backAtBase') {
+    if (currentStepId === 'arbre.leavesDialogue') {
+      setGrowingFruitPlaying(true)
+      setArbreDialogueActive(true)
+      playDialogue('arbreFeuilles', {
+        onDone: () => {
+          setArbreDialogueActive(false)
+          completeStep('arbre.leavesDialogue')
+        },
+      })
+    } else if (currentStepId === 'arbre.backAtBase') {
       setArbreStoryCameraTransition(null)
       onBackAtBase?.()
       setStairsClickActive(true)
@@ -404,6 +416,10 @@ export function useArbreFlow({
     })
   }, [fruitsClickActive, completeStep, playDialogue, goToStep, povs])
 
+  const handleGrowingFruitComplete = useCallback(() => {
+    setGrowingFruitClickable(true)
+  }, [])
+
   const arbreLeafInteractionsEnabled =
     currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase
 
@@ -411,16 +427,8 @@ export function useArbreFlow({
     if (currentStepId !== 'arbre.exploreLeaves') return
     completeStep('arbre.exploreLeaves')
     setArbreMovementLocked(true)
-    setArbreDialogueActive(true)
-    playDialogue('arbreFeuilles', {
-      onDone: () => {
-        setArbreDialogueActive(false)
-        completeStep('arbre.leavesDialogue')
-        setGrowingFruitPlaying(true)
-        setArbreStoryCameraTransition({ ...povs.atFruitFocus })
-      },
-    })
-  }, [currentStepId, completeStep, playDialogue, povs])
+    setArbreStoryCameraTransition({ ...povs.atFruitFocus })
+  }, [currentStepId, completeStep, povs])
 
   const activateLadderFromStory = useCallback(() => {
     // Mark as played so the zone effect doesn't re-run the init sequence when zone → 'arbre'
@@ -512,6 +520,8 @@ export function useArbreFlow({
     stairsClickActive,
     ladderIsStoryMode,
     growingFruitPlaying,
+    growingFruitClickable,
+    handleGrowingFruitComplete,
     fruitsClickActive,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
