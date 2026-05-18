@@ -664,6 +664,14 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
 
+  // Auto-launch story once loading screen min-timer and scene load are both done.
+  // Bypasses IntroLoader so the user doesn't need a second click.
+  useEffect(() => {
+    if (showWelcome || !loadingMinTimerDone || sceneLoadStatus !== 'ok') return
+    if (!introPending) return
+    handleLoaderClick()
+  }, [showWelcome, loadingMinTimerDone, sceneLoadStatus, introPending, handleLoaderClick])
+
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
     setSceneLoadStatus('ok')
