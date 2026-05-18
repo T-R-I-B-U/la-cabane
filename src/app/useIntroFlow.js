@@ -138,7 +138,6 @@ export function useIntroFlow({ sceneReady }) {
     stopDialogue()
   }, [resetFlowState, resetStory, stopDialogue])
 
-
   const handleIntroEvent = useCallback(
     (event, payload) => {
       if (event === 'camera:ready') {

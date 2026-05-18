@@ -1,0 +1,197 @@
+.savoir-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.savoir-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  padding: 40px;
+  width: calc(100vw - 120px);
+  max-width: 1392px;
+  height: calc(100vh - 120px);
+  max-height: 801px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.savoir-back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.savoir-back img {
+  display: block;
+  height: 50px;
+  width: auto;
+}
+
+.savoir-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  flex: 1;
+  min-height: 0;
+}
+
+.savoir-leaf-col {
+  flex: 0 0 37%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+}
+
+.savoir-leaf-img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.savoir-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  height: 100%;
+}
+
+.savoir-info-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.savoir-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 70px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+}
+
+.savoir-person {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+}
+
+.savoir-desc-label {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+}
+
+.savoir-text {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  font-style: italic;
+  color: #33330f;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.savoir-avail-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-self: stretch;
+}
+
+.savoir-avail-label {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.savoir-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  flex: 1;
+}
+
+.savoir-slot {
+  background: #eeded0;
+  border-radius: 6px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #33330f;
+  line-height: 1;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .savoir-card {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
+    max-height: none;
+    padding: 24px;
+    border-radius: 12px;
+    gap: 16px;
+  }
+
+  .savoir-leaf-col {
+    display: none;
+  }
+
+  .savoir-body {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .savoir-content {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .savoir-title {
+    font-size: 40px;
+  }
+
+  .savoir-person {
+    font-size: 28px;
+  }
+
+  .savoir-desc-label,
+  .savoir-avail-label {
+    font-size: 22px;
+  }
+
+  .savoir-avail-col {
+    align-self: auto;
+  }
+}
