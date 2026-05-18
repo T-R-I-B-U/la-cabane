@@ -211,17 +211,16 @@ export function MobileView() {
 
   if (step === 1) {
     return (
-      <div className="mv-root mv-root--dark">
-        <div className="mv-inner">
-          <div
-            style={{ display: 'flex', flexDirection: 'column', gap: 40, width: '100%', flex: 1 }}
-          >
-            <p className="mv-title mv-title--light">Thème de mon savoir</p>
-            <div className="mv-choices">
+      <div className="mv-s1-root">
+        <img className="mv-s1-bg" src="/phone/bg-dark.png" alt="" aria-hidden="true" />
+        <div className="mv-s1-content">
+          <div className="mv-s1-top">
+            <p className="mv-s1-title">Thème de mon savoir</p>
+            <div className="mv-s1-cards">
               {['artisanat', 'connaissance', 'vivant'].map((t) => (
                 <button
                   key={t}
-                  className={`mv-choice-btn ${theme === t ? 'mv-choice-btn--selected' : ''}`}
+                  className={`mv-s1-card ${theme === t ? 'mv-s1-card--selected' : ''}`}
                   onClick={() => setTheme(t)}
                 >
                   <span>{t}</span>
@@ -229,12 +228,9 @@ export function MobileView() {
               ))}
             </div>
           </div>
-          <button
-            className="mv-btn-pill mv-btn-pill--cream"
-            onClick={() => setStep(2)}
-            disabled={!theme}
-          >
-            Suivant
+          <button className="mv-s1-btn" onClick={() => setStep(2)} disabled={!theme}>
+            <img className="mv-s1-btn-bg" src="/phone/btn-cream.png" alt="" aria-hidden="true" />
+            <span>Suivant</span>
           </button>
         </div>
       </div>
