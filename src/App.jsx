@@ -286,6 +286,7 @@ export default function App() {
     handleFruitClickDuringLeaves,
     handleLeafSavoirClosed,
     triggerArbreBase,
+    triggerArbreTop,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
@@ -463,6 +464,28 @@ export default function App() {
     setPostIntro(true)
     triggerArbreBase()
   }, [setPostIntro, triggerArbreBase])
+
+  const handleGoToArbreTop = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    // Spawn libre : mouvement non verrouillé, pointer lock demandé normalement
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+    triggerArbreTop()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
 
   const handleGoToNestDialogue25 = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -765,13 +788,18 @@ export default function App() {
   useEffect(() => {
     isCameraBlockedRef.current =
       postIntro &&
-      (showNameInput || receptionChoiceVisible || returnHallVisible || isJournalInteractionActive)
+      (showNameInput ||
+        receptionChoiceVisible ||
+        returnHallVisible ||
+        isJournalInteractionActive ||
+        isPlayerFruitPanelOpen)
   }, [
     postIntro,
     showNameInput,
     receptionChoiceVisible,
     returnHallVisible,
     isJournalInteractionActive,
+    isPlayerFruitPanelOpen,
   ])
 
   useEffect(() => {
@@ -1026,6 +1054,7 @@ export default function App() {
             onGoToJuiceMachine={jumpToJuiceMachine}
             onGoToSortieSerre={jumpToSortieSerre}
             onGoToArbreBase={handleGoToArbreBase}
+            onGoToArbreTop={handleGoToArbreTop}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>

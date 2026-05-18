@@ -486,6 +486,25 @@ export function useArbreFlow({
     onBackAtBase?.()
   }, [clearScheduledTimeouts, goToStep, onBackAtBase, stopDialogue])
 
+  const triggerArbreTop = useCallback(() => {
+    playedRef.current = true
+    clearScheduledTimeouts()
+    stopDialogue()
+    setArbreActive(true)
+    setArbreMovementLocked(false)
+    setArbreDialogueActive(false)
+    setArbreStoryCameraTransition(null)
+    setLadderClickActive(false)
+    setStairsClickActive(false)
+    setGrowingFruitPlaying(true)
+    setGrowingFruitClickable(true)
+    setFruitsClickActive(true)
+    setArbreExploreSecondPhase(true)
+    setLadderIsStoryMode(false)
+    setZone('arbre')
+    setGameStep(GAME_STEPS.ARBRE_INTRO)
+  }, [clearScheduledTimeouts, stopDialogue])
+
   const handleNestInteractionComplete = useCallback(() => {
     completeStep('arbre.nestInteraction')
     setArbreDialogueActive(true)
@@ -530,6 +549,7 @@ export function useArbreFlow({
     handleArbreTransitionComplete,
     triggerNestDialogue25,
     triggerArbreBase,
+    triggerArbreTop,
     handleFruitClickDuringLeaves,
     handleLeafSavoirClosed,
     exitArbre,

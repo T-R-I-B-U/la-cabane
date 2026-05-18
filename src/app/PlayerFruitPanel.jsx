@@ -1,7 +1,11 @@
+import { useState } from 'react'
 import './PlayerFruitPanel.css'
+import { AddSavoirModal } from './AddSavoirModal'
 
 export function PlayerFruitPanel({ playerName, onClose }) {
+  const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   return (
+    <>
     <div
       className="pfp-overlay"
       onPointerDown={(e) => e.stopPropagation()}
@@ -54,10 +58,14 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                   <p className="pfp-card-subtitle">Mes savoirs</p>
                 </div>
               </div>
-              <div className="pfp-add-savoir">
+              <button
+                type="button"
+                className="pfp-add-savoir"
+                onClick={() => setIsAddSavoirOpen(true)}
+              >
                 <span className="pfp-add-icon">+</span>
                 <span className="pfp-add-label">Ajouter un savoir</span>
-              </div>
+              </button>
             </div>
 
             {/* Apprenti card */}
@@ -162,5 +170,8 @@ export function PlayerFruitPanel({ playerName, onClose }) {
         </div>
       </div>
     </div>
+
+    {isAddSavoirOpen && <AddSavoirModal onClose={() => setIsAddSavoirOpen(false)} />}
+    </>
   )
 }
