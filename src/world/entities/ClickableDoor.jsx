@@ -138,6 +138,7 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     // Reset the "mouse has moved" flag only when active transitions false → true.
     if (active && !prevActiveRef.current) mouseMovedRef.current = false
     prevActiveRef.current = active
+    console.log('[ClickableDoor] active:', active, 'doorMeshes:', doorMeshes.length)
 
     if (!active || !doorMeshes.length) return
 
