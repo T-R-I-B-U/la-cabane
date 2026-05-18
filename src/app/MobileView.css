@@ -261,14 +261,78 @@
 }
 
 /* ── Écran 2 : Résumé ── */
-.mv-textarea-wrap {
-  flex: 1;
+.mv-s2-root {
+  min-height: 100dvh;
   width: 100%;
   display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
-.mv-textarea {
+.mv-s2-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Figma : flex-col gap-40, justify-between, px-20 py-40 */
+.mv-s2-content {
+  position: relative;
+  z-index: 1;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Figma : flex-[1_0_0] flex-col gap-40 items-center min-h-0 w-full */
+.mv-s2-top {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Figma : citrus-gothic-rough 32px #33330f text-center w-full */
+.mv-s2-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Figma : flex-[1_0_0] flex-col items-start min-h-0 w-full */
+.mv-s2-card-wrap {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Figma : bg-white/95 rounded-18 px-40 py-20 flex-[1_0_0] — textarea en remplacement */
+.mv-s2-textarea {
+  flex: 1;
+  min-height: 0;
   width: 100%;
   background: rgba(255, 255, 255, 0.95);
   border: none;
@@ -284,9 +348,53 @@
   touch-action: pan-y;
 }
 
-.mv-textarea:focus {
-  outline: 2px solid #3b5866;
-  outline-offset: -2px;
+.mv-s2-textarea:focus {
+  outline: none;
+}
+
+.mv-s2-textarea::placeholder {
+  color: rgba(59, 88, 102, 0.4);
+}
+
+/* Figma : pill dark bg, Albert Sans 24px #eeded0 */
+.mv-s2-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.mv-s2-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mv-s2-btn-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 360px;
+  pointer-events: none;
+}
+
+.mv-s2-btn span {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #eeded0;
+  position: relative;
+  white-space: nowrap;
 }
 
 /* ── Écran 1 : Thème ── */

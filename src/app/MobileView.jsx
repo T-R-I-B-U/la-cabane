@@ -239,27 +239,23 @@ export function MobileView() {
 
   if (step === 2) {
     return (
-      <div className="mv-root mv-root--light">
-        <div className="mv-inner">
-          <div
-            style={{ display: 'flex', flexDirection: 'column', gap: 40, flex: 1, width: '100%' }}
-          >
-            <p className="mv-title mv-title--dark">Résumé de mon savoir</p>
-            <div className="mv-textarea-wrap">
+      <div className="mv-s2-root">
+        <img className="mv-s2-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <div className="mv-s2-content">
+          <div className="mv-s2-top">
+            <p className="mv-s2-title">Résumé de mon savoir</p>
+            <div className="mv-s2-card-wrap">
               <textarea
-                className="mv-textarea"
+                className="mv-s2-textarea"
                 placeholder="Décris ton savoir…"
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
               />
             </div>
           </div>
-          <button
-            className="mv-btn-pill mv-btn-pill--dark"
-            onClick={() => setStep(3)}
-            disabled={!summary.trim()}
-          >
-            Suivant
+          <button className="mv-s2-btn" onClick={() => setStep(3)} disabled={!summary.trim()}>
+            <img className="mv-s2-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+            <span>Suivant</span>
           </button>
         </div>
       </div>
