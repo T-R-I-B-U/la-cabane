@@ -264,13 +264,12 @@ export function MobileView() {
 
   if (step === 3) {
     return (
-      <div className="mv-root mv-root--dark">
-        <div className="mv-inner">
-          <div
-            style={{ display: 'flex', flexDirection: 'column', gap: 40, width: '100%', flex: 1 }}
-          >
-            <p className="mv-title mv-title--light">Lieu de l'apprentissage</p>
-            <div className="mv-choices">
+      <div className="mv-s1-root">
+        <img className="mv-s1-bg" src="/phone/bg-dark.png" alt="" aria-hidden="true" />
+        <div className="mv-s1-content">
+          <div className="mv-s1-top">
+            <p className="mv-s1-title">Lieu de l&apos;apprentissage</p>
+            <div className="mv-s1-cards">
               {[
                 { id: 'la-cabane', label: 'La Cabane' },
                 { id: 'domicile', label: 'Domicile' },
@@ -278,7 +277,7 @@ export function MobileView() {
               ].map(({ id, label }) => (
                 <button
                   key={id}
-                  className={`mv-choice-btn ${location === id ? 'mv-choice-btn--selected' : ''}`}
+                  className={`mv-s1-card ${location === id ? 'mv-s1-card--selected' : ''}`}
                   onClick={() => setLocation(id)}
                 >
                   <span>{label}</span>
@@ -286,12 +285,9 @@ export function MobileView() {
               ))}
             </div>
           </div>
-          <button
-            className="mv-btn-pill mv-btn-pill--cream"
-            onClick={() => setStep(4)}
-            disabled={!location}
-          >
-            Suivant
+          <button className="mv-s1-btn" onClick={() => setStep(4)} disabled={!location}>
+            <img className="mv-s1-btn-bg" src="/phone/btn-cream.png" alt="" aria-hidden="true" />
+            <span>Suivant</span>
           </button>
         </div>
       </div>
