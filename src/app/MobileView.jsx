@@ -17,61 +17,15 @@ const DRAW_COLORS = [
 // ── Canvas leaf ──────────────────────────────────────────────────────
 const CW = 300
 const CH = 340
-const CX = CW / 2
-const LEAF_TOP = 4
-const LEAF_BOT = CH - 4
 
-function applyLeafPath(ctx) {
-  ctx.beginPath()
-  ctx.moveTo(CX, LEAF_TOP)
-  ctx.bezierCurveTo(CX + 200, LEAF_TOP + 8, CX + 200, LEAF_BOT - 70, CX, LEAF_BOT)
-  ctx.bezierCurveTo(CX - 200, LEAF_BOT - 70, CX - 200, LEAF_TOP + 8, CX, LEAF_TOP)
-  ctx.closePath()
-}
-
-function drawLeafBackground(ctx) {
+function drawLeafImg(ctx, img) {
   ctx.clearRect(0, 0, CW, CH)
-
   ctx.save()
-  applyLeafPath(ctx)
-  ctx.fillStyle = '#e8f5e9'
-  ctx.fill()
-  ctx.restore()
-
-  ctx.save()
-  applyLeafPath(ctx)
-  ctx.strokeStyle = '#3a7d44'
-  ctx.lineWidth = 2
-  ctx.stroke()
-  ctx.restore()
-
-  ctx.save()
-  applyLeafPath(ctx)
-  ctx.clip()
-  ctx.strokeStyle = '#a5d6a7'
-  ctx.lineWidth = 1.5
-  ctx.beginPath()
-  ctx.moveTo(CX, LEAF_BOT - 4)
-  ctx.lineTo(CX, LEAF_TOP + 4)
-  ctx.stroke()
-
-  const veins = [
-    { y: LEAF_TOP + 30, spread: 45, dy: 22 },
-    { y: LEAF_TOP + 80, spread: 65, dy: 20 },
-    { y: LEAF_TOP + 140, spread: 79, dy: 18 },
-    { y: LEAF_TOP + 200, spread: 83, dy: 18 },
-    { y: LEAF_TOP + 256, spread: 68, dy: 18 },
-  ]
-  ctx.strokeStyle = '#b2dfb8'
-  ctx.lineWidth = 1
-  for (const { y, spread, dy } of veins) {
-    for (const side of [-1, 1]) {
-      ctx.beginPath()
-      ctx.moveTo(CX, y)
-      ctx.lineTo(CX + side * spread, y + dy)
-      ctx.stroke()
-    }
-  }
+  ctx.translate(CW / 2, CH / 2)
+  ctx.rotate(-Math.PI / 2)
+  // leaf.png is landscape (408×218) — rotate -90° to get portrait, then contain in canvas
+  const scale = Math.min(CW / img.height, CH / img.width)
+  ctx.drawImage(img, -(img.width * scale) / 2, -(img.height * scale) / 2, img.width * scale, img.height * scale)
   ctx.restore()
 }
 
@@ -89,6 +43,9 @@ export function MobileView() {
   const canvasRef = useRef(null)
   const drawingRef = useRef(false)
   const lastPosRef = useRef(null)
+  const leafImgRef = useRef(null)
+  const swipeStartYRef = useRef(null)
+  const flyingRef = useRef(false)
 
   useEffect(() => {
     const socket = io(SOCKET_URL)
@@ -97,9 +54,17 @@ export function MobileView() {
   }, [])
 
   useEffect(() => {
-    if (step === 5 && canvasRef.current) {
-      drawLeafBackground(canvasRef.current.getContext('2d'))
+    if (step !== 5 || !canvasRef.current) return
+    if (leafImgRef.current) {
+      drawLeafImg(canvasRef.current.getContext('2d'), leafImgRef.current)
+      return
     }
+    const img = new Image()
+    img.onload = () => {
+      leafImgRef.current = img
+      if (canvasRef.current) drawLeafImg(canvasRef.current.getContext('2d'), img)
+    }
+    img.src = '/phone/leaf.png'
   }, [step])
 
   // ── Drawing handlers ─────────────────────────────────────────────
@@ -128,9 +93,6 @@ export function MobileView() {
       const ctx = canvas.getContext('2d')
       const pos = getPos(e, canvas)
       const last = lastPosRef.current
-      ctx.save()
-      applyLeafPath(ctx)
-      ctx.clip()
       ctx.beginPath()
       ctx.moveTo(last.x, last.y)
       ctx.lineTo(pos.x, pos.y)
@@ -139,7 +101,6 @@ export function MobileView() {
       ctx.lineCap = 'round'
       ctx.lineJoin = 'round'
       ctx.stroke()
-      ctx.restore()
       lastPosRef.current = pos
     },
     [drawColor]
@@ -151,10 +112,13 @@ export function MobileView() {
   }, [])
 
   const clearCanvas = () => {
-    drawLeafBackground(canvasRef.current.getContext('2d'))
+    if (leafImgRef.current && canvasRef.current) {
+      drawLeafImg(canvasRef.current.getContext('2d'), leafImgRef.current)
+    }
   }
 
   // ── Submit ───────────────────────────────────────────────────────
+  // Appelé depuis step 5 : collecte les données, émet, passe à l'écran d'envoi
   const submit = () => {
     const drawingData = canvasRef.current?.toDataURL('image/png') ?? null
     socketRef.current?.emit('savoir-submit', {
@@ -164,12 +128,15 @@ export function MobileView() {
       availability: [...availability],
       drawingData,
     })
+    setStep(6)
+  }
+
+  // Appelé depuis step 6 sur swipe up : anime la feuille puis passe à Bravo
+  const sendLeaf = () => {
+    if (flyingRef.current) return
+    flyingRef.current = true
     setFlying(true)
-    setTimeout(() => {
-      setFlying(false)
-      setStep(6)
-      setTimeout(() => setStep(7), 1500)
-    }, 900)
+    setTimeout(() => setStep(7), 900)
   }
 
   const toggleSlot = (day, slot) => {
@@ -296,25 +263,34 @@ export function MobileView() {
 
   if (step === 4) {
     return (
-      <div className="mv-root mv-root--light">
-        <div className="mv-inner">
-          <div
-            style={{ display: 'flex', flexDirection: 'column', gap: 40, flex: 1, width: '100%' }}
-          >
-            <p className="mv-title mv-title--dark">Mes disponibilités</p>
-            <div className="mv-avail-grid">
+      <div className="mv-s4-root">
+        <img className="mv-s4-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <div className="mv-s4-content">
+          <div className="mv-s4-top">
+            <p className="mv-s4-title">Mes disponibilités</p>
+            <div className="mv-s4-grid">
               {DAYS.map((day) => (
-                <div key={day} className="mv-avail-row">
-                  <div className="mv-avail-day">{day}</div>
+                <div key={day} className="mv-s4-row">
+                  <div className="mv-s4-day">
+                    <img className="mv-s4-chip-bg" src="/phone/chip-dark.png" alt="" aria-hidden="true" />
+                    <span>{day}</span>
+                  </div>
                   {SLOTS.map((slot) => {
                     const key = `${day}-${slot}`
+                    const selected = availability.has(key)
                     return (
                       <button
                         key={slot}
-                        className={`mv-avail-slot ${availability.has(key) ? 'mv-avail-slot--selected' : ''}`}
+                        className={`mv-s4-slot ${selected ? 'mv-s4-slot--selected' : ''}`}
                         onClick={() => toggleSlot(day, slot)}
                       >
-                        {slot}
+                        <img
+                          className="mv-s4-chip-bg"
+                          src={selected ? '/phone/chip-selected.png' : '/phone/chip-cream.png'}
+                          alt=""
+                          aria-hidden="true"
+                        />
+                        <span>{slot}</span>
                       </button>
                     )
                   })}
@@ -322,8 +298,9 @@ export function MobileView() {
               ))}
             </div>
           </div>
-          <button className="mv-btn-pill mv-btn-pill--dark" onClick={() => setStep(5)}>
-            Suivant
+          <button className="mv-s4-btn" onClick={() => setStep(5)}>
+            <img className="mv-s4-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+            <span>Suivant</span>
           </button>
         </div>
       </div>
@@ -332,51 +309,43 @@ export function MobileView() {
 
   if (step === 5) {
     return (
-      <div className="mv-root mv-root--light">
-        <div className="mv-inner">
-          <p className="mv-title mv-title--dark">Personnalisation</p>
-          <div className="mv-draw-wrap">
-            <canvas
-              ref={canvasRef}
-              width={CW}
-              height={CH}
-              className={`mv-canvas ${flying ? 'mv-canvas--flying' : ''}`}
-              onMouseDown={startDraw}
-              onMouseMove={draw}
-              onMouseUp={stopDraw}
-              onMouseLeave={stopDraw}
-              onTouchStart={startDraw}
-              onTouchMove={draw}
-              onTouchEnd={stopDraw}
-            />
-            <div className="mv-palette">
-              {DRAW_COLORS.map((c) => (
-                <button
-                  key={c.id}
-                  className={`mv-color-btn ${drawColor === c.value ? 'mv-color-btn--selected' : ''}`}
-                  style={{
-                    background: c.value,
-                    boxShadow:
-                      drawColor === c.value ? `0 0 0 3px white, 0 0 0 5px ${c.value}` : 'none',
-                  }}
-                  onClick={() => setDrawColor(c.value)}
-                  aria-label={c.id}
-                />
-              ))}
+      <div className="mv-s5-root">
+        <img className="mv-s5-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <div className="mv-s5-content">
+          <div className="mv-s5-top">
+            <p className="mv-s5-title">Personnalisation</p>
+            <div className="mv-s5-draw-area">
+              <canvas
+                ref={canvasRef}
+                width={CW}
+                height={CH}
+                className={`mv-s5-canvas ${flying ? 'mv-canvas--flying' : ''}`}
+                onMouseDown={startDraw}
+                onMouseMove={draw}
+                onMouseUp={stopDraw}
+                onMouseLeave={stopDraw}
+                onTouchStart={startDraw}
+                onTouchMove={draw}
+                onTouchEnd={stopDraw}
+              />
+              <div className="mv-s5-palette">
+                {DRAW_COLORS.map((c) => (
+                  <button
+                    key={c.id}
+                    className={`mv-s5-color-btn ${drawColor === c.value ? 'mv-s5-color-btn--active' : ''}`}
+                    style={{ background: c.value }}
+                    onClick={() => setDrawColor(c.value)}
+                    aria-label={c.id}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="mv-draw-actions">
-              <button className="mv-btn-clear" onClick={clearCanvas}>
-                Effacer
-              </button>
-              <button
-                className="mv-btn-pill mv-btn-pill--dark"
-                style={{ flex: 2 }}
-                onClick={submit}
-              >
-                Je valide mon savoir
-              </button>
-            </div>
+            <p className="mv-s5-subtitle">Donne un aspect unique à ton savoir&nbsp;!</p>
           </div>
+          <button className="mv-s5-btn" onClick={submit}>
+            <img className="mv-s5-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+            <span>Je valide mon savoir</span>
+          </button>
         </div>
       </div>
     )
@@ -384,10 +353,33 @@ export function MobileView() {
 
   if (step === 6) {
     return (
-      <div className="mv-root mv-root--light">
-        <div className="mv-inner" style={{ justifyContent: 'center', gap: 20 }}>
-          <p className="mv-title mv-title--dark">J'envoi mon savoir</p>
-          <div className="mv-arrow">↑</div>
+      <div
+        className="mv-s6-root"
+        onTouchStart={(e) => {
+          swipeStartYRef.current = e.touches[0].clientY
+        }}
+        onTouchMove={(e) => {
+          e.preventDefault()
+          if (flyingRef.current) return
+          const dy = e.touches[0].clientY - swipeStartYRef.current
+          if (dy < -80) sendLeaf()
+        }}
+      >
+        <img className="mv-s6-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <div className="mv-s6-content">
+          <div className={`mv-s6-leaf-outer ${flying ? 'mv-s6-leaf--flying' : ''}`}>
+            <div className="mv-s6-leaf-rotate">
+              <div className="mv-s6-leaf-img-box">
+                <img src="/phone/leaf.png" alt="" aria-hidden="true" />
+              </div>
+            </div>
+          </div>
+          <div className="mv-s6-bottom">
+            <p className="mv-s6-title">J&apos;envoi mon savoir</p>
+            <div className="mv-s6-arrow-wrap">
+              <img className="mv-s6-arrow" src="/phone/arrow-up.svg" alt="" aria-hidden="true" />
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -395,10 +387,10 @@ export function MobileView() {
 
   // step === 7 — Bravo
   return (
-    <div className="mv-root mv-root--bravo">
-      <div className="mv-bravo-bg" aria-hidden="true" />
-      <div className="mv-bravo-text">
-        <p className="mv-title mv-title--dark mv-title--xl">Bravo poursuis ta visite&nbsp;!</p>
+    <div className="mv-s7-root">
+      <img className="mv-s7-bg" src="/phone/bravo-bg.png" alt="" aria-hidden="true" />
+      <div className="mv-s7-content">
+        <p className="mv-s7-title">Bravo poursuis ta visite&nbsp;!</p>
       </div>
     </div>
   )
