@@ -80,6 +80,8 @@ export default function App() {
   const [shouldRestorePointerLockAfterStoryUi, setShouldRestorePointerLockAfterStoryUi] =
     useState(false)
   const pointerControlsRef = useRef(null)
+  const f1CountRef = useRef(0)
+  const f1TimerRef = useRef(null)
   const isJournalInteractionActiveRef = useRef(false)
   const arbreStoryContinuityRef = useRef(false)
   const isCursorVisibleRef = useRef(false)
@@ -160,6 +162,7 @@ export default function App() {
     showNameInput,
     storyReady,
     currentStoryStepId,
+    exitIntro,
     handleIntroEvent,
     handleJournalEnd,
     handleTreeInteract,
@@ -630,7 +633,19 @@ export default function App() {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
-        setIsViewerControlsVisible((current) => !current)
+        f1CountRef.current += 1
+        clearTimeout(f1TimerRef.current)
+        if (f1CountRef.current >= 3) {
+          f1CountRef.current = 0
+          exitIntro()
+          setReadyToShow(true)
+          setIsViewerControlsVisible(true)
+        } else {
+          setIsViewerControlsVisible((current) => !current)
+          f1TimerRef.current = setTimeout(() => {
+            f1CountRef.current = 0
+          }, 600)
+        }
       } else if (event.code === 'F2') {
         event.preventDefault()
         setShowCameraEditor((current) => {
@@ -646,7 +661,7 @@ export default function App() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
+  }, [exitIntro, setReadyToShow])
 
   useEffect(() => {
     if (!dialogueActive && !arbreDialogueActive) return
@@ -1092,7 +1107,6 @@ export default function App() {
           onAnimationEnd={() => setShowWelcome(false)}
         />
       )}
-
     </main>
   )
 }
