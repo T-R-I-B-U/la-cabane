@@ -1293,6 +1293,7 @@ export default function App() {
           }}
           onAnimationEnd={() => setShowWelcome(false)}
           onOpenSettings={() => setShowSettings(true)}
+          settingsOpen={showSettings}
         />
       )}
 

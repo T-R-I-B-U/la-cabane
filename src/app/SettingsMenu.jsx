@@ -1,7 +1,31 @@
+import { useState } from 'react'
 import './SettingsMenu.css'
 import { GearIcon } from './GearIcon'
 
+function RadioPills({ options, value, onChange }) {
+  return (
+    <div className="settings-card__pills">
+      {options.map((opt) => (
+        <button
+          key={opt}
+          type="button"
+          className={`settings-pill${value === opt ? ' settings-pill--active' : ''}`}
+          onClick={() => onChange(opt)}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export function SettingsMenu({ open, onClose }) {
+  const [quality, setQuality] = useState('Normal')
+  const [volume, setVolume] = useState(0)
+  const [ao, setAo] = useState('Non')
+  const [shaders, setShaders] = useState('Oui')
+  const [ombres, setOmbres] = useState('Non')
+
   if (!open) return null
 
   return (
@@ -18,65 +42,42 @@ export function SettingsMenu({ open, onClose }) {
 
         <div className="settings-card__section">
           <p className="settings-card__label">Qualité graphique</p>
-          <div className="settings-card__pills">
-            <button type="button" className="settings-pill">
-              Faible
-            </button>
-            <button type="button" className="settings-pill settings-pill--active">
-              Normal
-            </button>
-            <button type="button" className="settings-pill">
-              Élevée
-            </button>
-          </div>
+          <RadioPills
+            options={['Faible', 'Normal', 'Élevée']}
+            value={quality}
+            onChange={setQuality}
+          />
         </div>
 
         <div className="settings-card__section">
           <div className="settings-card__label-row">
             <p className="settings-card__label">Son</p>
-            <p className="settings-card__value">0%</p>
+            <p className="settings-card__value">{volume}%</p>
           </div>
-          <div className="settings-card__slider">
-            <div className="settings-card__knob">
-              <img src="/welcome/sound-knob.png" alt="" aria-hidden="true" />
-            </div>
-          </div>
+          <input
+            type="range"
+            className="settings-range"
+            min={0}
+            max={100}
+            value={volume}
+            onChange={(e) => setVolume(Number(e.target.value))}
+            aria-label="Volume principal"
+          />
         </div>
 
         <div className="settings-card__section">
           <p className="settings-card__label">Occlusion ambiante</p>
-          <div className="settings-card__pills">
-            <button type="button" className="settings-pill">
-              Oui
-            </button>
-            <button type="button" className="settings-pill settings-pill--active">
-              Non
-            </button>
-          </div>
+          <RadioPills options={['Oui', 'Non']} value={ao} onChange={setAo} />
         </div>
 
         <div className="settings-card__section">
           <p className="settings-card__label">Shaders</p>
-          <div className="settings-card__pills">
-            <button type="button" className="settings-pill settings-pill--active">
-              Oui
-            </button>
-            <button type="button" className="settings-pill">
-              Non
-            </button>
-          </div>
+          <RadioPills options={['Oui', 'Non']} value={shaders} onChange={setShaders} />
         </div>
 
         <div className="settings-card__section">
           <p className="settings-card__label">Ombres</p>
-          <div className="settings-card__pills">
-            <button type="button" className="settings-pill">
-              Oui
-            </button>
-            <button type="button" className="settings-pill settings-pill--active">
-              Non
-            </button>
-          </div>
+          <RadioPills options={['Oui', 'Non']} value={ombres} onChange={setOmbres} />
         </div>
       </div>
     </div>
