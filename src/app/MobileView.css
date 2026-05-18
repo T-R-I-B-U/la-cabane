@@ -1,0 +1,359 @@
+.mv-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  font-family: 'Albert Sans', sans-serif;
+  touch-action: manipulation;
+  user-select: none;
+  position: relative;
+}
+
+/* ── Fonds ── */
+.mv-root--light {
+  background: url('/player-panel/add-savoir-bg.png') center / cover no-repeat;
+}
+
+.mv-root--dark {
+  background: radial-gradient(ellipse at 50% 30%, #2d4f63 0%, #1a3340 60%, #111f29 100%);
+}
+
+.mv-root--bravo {
+  background: linear-gradient(180deg, #b5cc6a 0%, #d4e083 50%, #e8f0a0 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Layout interne commun ── */
+.mv-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 390px;
+  flex: 1;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+/* ── Typographie ── */
+.mv-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.15;
+  text-align: center;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.mv-title--dark {
+  color: #33330f;
+}
+.mv-title--light {
+  color: #eeded0;
+}
+
+.mv-title--xl {
+  font-size: 44px;
+}
+
+/* ── Boutons principaux (pill) ── */
+.mv-btn-pill {
+  width: 100%;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  text-align: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.mv-btn-pill:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mv-btn-pill--dark {
+  background: #33330f;
+  color: #eeded0;
+}
+
+.mv-btn-pill--cream {
+  background: #eeded0;
+  color: #3b5866;
+}
+
+/* ── Cards de sélection ── */
+.mv-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+}
+
+.mv-choice-btn {
+  flex: 1;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  box-sizing: border-box;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+}
+
+.mv-choice-btn--selected {
+  background: rgba(255, 255, 255, 1);
+  outline: 3px solid #3b5866;
+  outline-offset: -3px;
+}
+
+.mv-choice-btn span {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #3b5866;
+  text-transform: uppercase;
+}
+
+/* ── Écran 0 : Landing ── */
+.mv-landing-leaf {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mv-landing-leaf img {
+  width: 220px;
+  height: auto;
+  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.2));
+}
+
+.mv-landing-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+}
+
+/* ── Écran 2 : Résumé ── */
+.mv-textarea-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+}
+
+.mv-textarea {
+  flex: 1;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 18px;
+  padding: 20px 40px;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #3b5866;
+  line-height: 1.5;
+  resize: none;
+  box-sizing: border-box;
+  touch-action: pan-y;
+}
+
+.mv-textarea:focus {
+  outline: 2px solid #3b5866;
+  outline-offset: -2px;
+}
+
+/* ── Écran 4 : Disponibilités ── */
+.mv-avail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.mv-avail-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.mv-avail-day {
+  flex: 1;
+  padding: 12px 8px;
+  border-radius: 6px;
+  background: #2a3d4d;
+  border: none;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #eeded0;
+  text-align: center;
+  cursor: default;
+  min-width: 0;
+}
+
+.mv-avail-slot {
+  flex: 1;
+  padding: 12px 4px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.85);
+  border: none;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #3b5866;
+  text-align: center;
+  cursor: pointer;
+  min-width: 0;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.mv-avail-slot--selected {
+  background: #d4e157;
+  color: #33330f;
+}
+
+/* ── Écran 5 : Dessin ── */
+.mv-draw-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.mv-canvas {
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+  max-width: 80vw;
+  height: auto;
+  filter: drop-shadow(0 8px 20px rgba(42, 92, 50, 0.25));
+}
+
+.mv-canvas--flying {
+  animation: mv-fly-up 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes mv-fly-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-50px) scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-110vh) scale(0.45);
+  }
+}
+
+.mv-palette {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.mv-color-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.mv-color-btn--selected {
+  transform: scale(1.2);
+}
+
+.mv-draw-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.mv-btn-clear {
+  flex: 1;
+  padding: 16px;
+  border-radius: 360px;
+  border: 2px solid #3b5866;
+  background: transparent;
+  color: #3b5866;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* ── Écran 6 : Envoi ── */
+.mv-send-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  justify-content: flex-end;
+  padding-bottom: 40px;
+}
+
+.mv-arrow {
+  font-size: 80px;
+  color: #3b5866;
+  opacity: 0.4;
+  animation: mv-bounce 1s ease-in-out infinite;
+  line-height: 1;
+}
+
+@keyframes mv-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* ── Écran 7 : Bravo ── */
+.mv-bravo-bg {
+  position: absolute;
+  inset: 0;
+  background: url('/player-panel/cabane-bg.png') center top / cover no-repeat;
+  opacity: 0.7;
+}
+
+.mv-bravo-text {
+  position: absolute;
+  bottom: 60px;
+  left: 20px;
+  right: 20px;
+  text-align: center;
+}
