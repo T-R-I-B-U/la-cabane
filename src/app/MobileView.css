@@ -133,25 +133,129 @@
 }
 
 /* ── Écran 0 : Landing ── */
-.mv-landing-leaf {
-  flex: 1;
+/* Figma : frame 390×844, position relative */
+.mv-s0-root {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Background full-cover */
+.mv-s0-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Figma : absolute top-54 h-790 w-390, flex-col, justify-between, px-20 py-40 */
+.mv-s0-content {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  width: 100%;
+  height: calc(100% - 54px);
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+/* Figma : flex h-408 items-center justify-center shrink-0 w-218.736 */
+.mv-s0-leaf-wrap {
+  display: flex;
+  height: 408px;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  width: 218.736px;
 }
 
-.mv-landing-leaf img {
-  width: 220px;
-  height: auto;
-  filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.2));
+/* Figma : -rotate-90 flex-none */
+.mv-s0-leaf-rotate {
+  transform: rotate(-90deg);
+  flex-shrink: 0;
 }
 
-.mv-landing-bottom {
+/* Figma : h-218.736 w-408 relative */
+.mv-s0-leaf-img-box {
+  width: 408px;
+  height: 218.736px;
+  position: relative;
+}
+
+.mv-s0-leaf-img-box img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Figma : flex flex-col gap-40 items-center shrink-0 w-full */
+.mv-s0-bottom {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 40px;
   width: 100%;
+  flex-shrink: 0;
+}
+
+/* Figma : citrus-gothic-rough 32px #33330f text-center w-230 */
+.mv-s0-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  width: 230px;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Figma : flex items-center justify-center px-40 py-20 relative rounded-360 shrink-0 w-full */
+.mv-s0-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.mv-s0-btn-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 360px;
+  pointer-events: none;
+}
+
+/* Figma : Albert Sans Regular 24px #eeded0 */
+.mv-s0-btn span {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #eeded0;
+  position: relative;
+  white-space: nowrap;
 }
 
 /* ── Écran 2 : Résumé ── */

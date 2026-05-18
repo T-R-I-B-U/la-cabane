@@ -185,15 +185,23 @@ export function MobileView() {
   // ── Screens ──────────────────────────────────────────────────────
   if (step === 0) {
     return (
-      <div className="mv-root mv-root--light">
-        <div className="mv-inner">
-          <div className="mv-landing-leaf">
-            <img src="/player-panel/leaf.png" alt="" aria-hidden="true" />
+      <div className="mv-s0-root">
+        <img className="mv-s0-bg" src="/phone/bg-light.png" alt="" aria-hidden="true" />
+        <div className="mv-s0-content">
+          {/* Feuille : container portrait 218×408, image landscape 408×218 tournée -90° */}
+          <div className="mv-s0-leaf-wrap">
+            <div className="mv-s0-leaf-rotate">
+              <div className="mv-s0-leaf-img-box">
+                <img src="/phone/leaf.png" alt="" aria-hidden="true" />
+              </div>
+            </div>
           </div>
-          <div className="mv-landing-bottom">
-            <p className="mv-title mv-title--dark">Créer mon savoir dans l'arbre</p>
-            <button className="mv-btn-pill mv-btn-pill--dark" onClick={() => setStep(1)}>
-              Je commence
+          {/* Bas : titre + bouton */}
+          <div className="mv-s0-bottom">
+            <p className="mv-s0-title">Créer mon savoir dans l'arbre</p>
+            <button className="mv-s0-btn" onClick={() => setStep(1)}>
+              <img className="mv-s0-btn-bg" src="/phone/btn-dark.png" alt="" aria-hidden="true" />
+              <span>Je commence</span>
             </button>
           </div>
         </div>
