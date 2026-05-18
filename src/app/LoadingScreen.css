@@ -1,0 +1,97 @@
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  overflow: hidden;
+  background-color: #cdd4d9;
+}
+
+.loading-screen__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Column layout: logo + sablier, centered, gap 59px (Figma) */
+.loading-screen__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 59px;
+  padding: 60px;
+}
+
+/* Logo group — 335×100px in Figma */
+.loading-screen__logo-group {
+  display: flex;
+  flex-direction: column;
+  width: clamp(200px, 22%, 335px);
+}
+
+.loading-screen__logo-main {
+  display: block;
+  width: 97.64%;
+  height: auto;
+}
+
+/* Altera 2050 — mêmes proportions que welcome */
+.loading-screen__logo-subtitle {
+  display: block;
+  width: 29.67%;
+  height: auto;
+  aspect-ratio: 266.131 / 36.5021;
+  margin-left: 68.87%;
+  margin-top: 25px;
+}
+
+/* Sablier — 148×185px, flip animation pour indiquer le chargement */
+.loading-screen__sablier {
+  width: 148px;
+  height: 185px;
+  flex-shrink: 0;
+  animation: sablier-flip 2.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+@keyframes sablier-flip {
+  0%,
+  30% {
+    transform: rotate(0deg);
+  }
+  50%,
+  80% {
+    transform: rotate(180deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-screen__error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: sans-serif;
+  font-size: 16px;
+  color: #142533;
+  padding: 40px;
+  text-align: center;
+}
+
+@media (max-width: 820px) {
+  .loading-screen__logo-group {
+    width: clamp(160px, 50%, 280px);
+  }
+
+  .loading-screen__sablier {
+    width: 100px;
+    height: 125px;
+  }
+}

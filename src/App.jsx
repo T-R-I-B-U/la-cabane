@@ -2,10 +2,12 @@ import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
 import {
   AppLoader,
   Crosshair,
+  FinalScreen,
   GameManager,
-  IntroLoader,
+  LoadingScreen,
   NameInput,
   SavoirPanel,
+  WelcomeScreen,
   useIntroFlow,
   useSavoirAssignment,
 } from './app/index'
@@ -44,6 +46,11 @@ const PerfMonitor = lazy(() =>
 )
 export default function App() {
   const isDevBuild = import.meta.env.DEV
+  const [showWelcome, setShowWelcome] = useState(true)
+  const [showFinal, setShowFinal] = useState(false)
+  const [welcomeFading, setWelcomeFading] = useState(false)
+  const [loadingMinTimerDone, setLoadingMinTimerDone] = useState(false)
+  const [readyToShow, setReadyToShow] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
   const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
@@ -75,6 +82,8 @@ export default function App() {
   const [shouldRestorePointerLockAfterStoryUi, setShouldRestorePointerLockAfterStoryUi] =
     useState(false)
   const pointerControlsRef = useRef(null)
+  const f1CountRef = useRef(0)
+  const f1TimerRef = useRef(null)
   const isJournalInteractionActiveRef = useRef(false)
   const arbreStoryContinuityRef = useRef(false)
   const isCursorVisibleRef = useRef(false)
@@ -133,7 +142,6 @@ export default function App() {
     journalCloseToken,
     journalPuzzleEnabled,
     journalUnlocked,
-    loaderFading,
     postIntro,
     receptionChoiceVisible,
     returnHallVisible,
@@ -156,10 +164,8 @@ export default function App() {
     showNameInput,
     storyReady,
     currentStoryStepId,
-    dismissLoader,
+    exitIntro,
     handleIntroEvent,
-    handleLoaderClick,
-    handleLoaderKeyDown,
     handleJournalEnd,
     handleTreeInteract,
     handleTimeatmInteract,
@@ -194,9 +200,10 @@ export default function App() {
     handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
+    startIntro,
     skipDialogue: skipIntroDialogue,
     setPostIntro,
-  } = useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef: isModalOpenRef })
+  } = useIntroFlow({ sceneReady })
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
@@ -284,7 +291,13 @@ export default function App() {
     onLadderSpawn: spawnAtLadder,
     onPlatformSpawn: spawnAtPlatform,
     onBackAtBase: spawnAtLadderDown,
-    onOutroComplete: handleDebugGoToIntroStart,
+    onOutroComplete: useCallback(() => {
+      setShowFinal(true)
+      setIsPlayerModeActive(false)
+      setIsFlyModeActive(false)
+      exitIntro()
+      document.exitPointerLock()
+    }, [exitIntro]),
   })
 
   const openSavoirFromLeaf = useCallback(
@@ -629,7 +642,19 @@ export default function App() {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
-        setIsViewerControlsVisible((current) => !current)
+        f1CountRef.current += 1
+        clearTimeout(f1TimerRef.current)
+        if (f1CountRef.current >= 3) {
+          f1CountRef.current = 0
+          exitIntro()
+          setReadyToShow(true)
+          setIsViewerControlsVisible(true)
+        } else {
+          setIsViewerControlsVisible((current) => !current)
+          f1TimerRef.current = setTimeout(() => {
+            f1CountRef.current = 0
+          }, 600)
+        }
       } else if (event.code === 'F2') {
         event.preventDefault()
         setShowCameraEditor((current) => {
@@ -645,7 +670,7 @@ export default function App() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
+  }, [exitIntro, setReadyToShow])
 
   useEffect(() => {
     if (!dialogueActive && !arbreDialogueActive) return
@@ -658,6 +683,17 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
+
+  // Auto-launch story once loading screen min-timer and scene load are both done.
+  // startIntro() sets both introPending and introActive in one stable callback so
+  // the effect never re-runs mid-story due to a stale reference.
+  // 500ms delay before showing the scene avoids a camera teleport on first frame.
+  useEffect(() => {
+    if (showWelcome || !loadingMinTimerDone || sceneLoadStatus !== 'ok') return
+    startIntro()
+    const t = setTimeout(() => setReadyToShow(true), 500)
+    return () => clearTimeout(t)
+  }, [showWelcome, loadingMinTimerDone, sceneLoadStatus, startIntro])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
@@ -791,10 +827,6 @@ export default function App() {
         storyReady={storyReady}
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
-      />
-      <AppLoader
-        status={sceneLoadStatus}
-        error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
       />
       <Subtitles />
 
@@ -1069,20 +1101,25 @@ export default function App() {
 
       <CustomCursor visible={isCustomCursorVisible} />
 
-      {introPending && (
-        <IntroLoader
-          fading={loaderFading}
-          onClick={() => {
+      {showFinal && <FinalScreen />}
+
+      {(welcomeFading || !showWelcome) && !readyToShow && (
+        <LoadingScreen
+          status={sceneLoadStatus}
+          error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
+        />
+      )}
+
+      {showWelcome && (
+        <WelcomeScreen
+          fading={welcomeFading}
+          onStart={() => {
+            setWelcomeFading(true)
+            setTimeout(() => setLoadingMinTimerDone(true), 5000)
             const canvas = document.querySelector('canvas')
-            if (canvas) canvas.requestPointerLock()
-            handleLoaderClick()
+            if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
-          onKeyDown={(e) => {
-            const canvas = document.querySelector('canvas')
-            if (canvas) canvas.requestPointerLock()
-            handleLoaderKeyDown(e)
-          }}
-          onAnimationEnd={dismissLoader}
+          onAnimationEnd={() => setShowWelcome(false)}
         />
       )}
     </main>

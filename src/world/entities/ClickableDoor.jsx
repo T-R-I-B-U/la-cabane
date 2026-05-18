@@ -173,7 +173,20 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   }, [active, gl, doorMeshes, onDoorClickRef, setDoorHover])
 
   useFrame(() => {
-    if (!active || !doorMeshes.length || !mouseMovedRef.current) return
+    if (!active || !doorMeshes.length) return
+
+    // Without pointer lock the cursor is physical — auto-highlight the door so it
+    // is always interactive regardless of where the mouse happens to be positioned.
+    // With pointer lock the virtual cursor (cursorStore) is used, so raycasting is needed.
+    if (!document.pointerLockElement) {
+      if (!hoveredRef.current) {
+        hoveredRef.current = true
+        setDoorHover(true)
+      }
+      return
+    }
+
+    if (!mouseMovedRef.current) return
 
     raycaster.current.setFromCamera(mouseRef.current, camera)
     const hits = raycaster.current.intersectObjects(doorMeshes, true)

@@ -12,7 +12,7 @@ const INSIDE_POV = {
 const RASPBERRY_TEMP_COMPLETE_COUNT = 8
 const RASPBERRY_TEMP_AUTO_COMPLETE_DELAY = 2000
 
-export function useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef }) {
+export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
   const [introWaitingAtDoor, setIntroWaitingAtDoor] = useState(false)
@@ -138,35 +138,6 @@ export function useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef }) {
     stopDialogue()
   }, [resetFlowState, resetStory, stopDialogue])
 
-  useEffect(() => {
-    const onKeyDown = (event) => {
-      if (event.code === 'Escape' && !modalActiveRef?.current) exitIntro()
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [exitIntro, modalActiveRef])
-
-  useEffect(() => {
-    if (!postIntro) return
-
-    let wasLocked = false
-    const onPointerLockChange = () => {
-      if (document.pointerLockElement) wasLocked = true
-      else if (raspberryPhaseActiveRef.current) {
-        // minigame owns the pointer — ignore spontaneous unlocks
-      } else if (arbreActiveRef?.current) {
-        // arbre sequence owns the pointer — ignore spontaneous unlocks
-      } else if (modalActiveRef?.current) {
-        // savoir/contact panel owns the pointer — ignore spontaneous unlocks
-      } else if (wasLocked) {
-        exitIntro()
-      }
-    }
-
-    document.addEventListener('pointerlockchange', onPointerLockChange)
-    return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
-  }, [postIntro, exitIntro, arbreActiveRef, modalActiveRef])
 
   const handleIntroEvent = useCallback(
     (event, payload) => {
@@ -726,6 +697,21 @@ export function useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef }) {
     setIntroPending(true)
   }, [resetStory, sceneReady])
 
+  // Combined auto-start: prepares state AND activates the camera sequence without
+  // waiting for a user click (no loaderFading guard needed since there is no IntroLoader).
+  const startIntro = useCallback(() => {
+    if (!sceneReady) return
+
+    setPostIntro(false)
+    setShowNameInput(false)
+    resetStory()
+    setIntroPending(true)
+    setIntroDoorOpen(false)
+    setIntroWaitingAtDoor(false)
+    setIntroShouldAdvance(false)
+    setIntroActive(true)
+  }, [resetStory, sceneReady])
+
   const handleLoaderClick = useCallback(() => {
     if (!sceneReady || loaderFading) return
 
@@ -828,6 +814,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef, modalActiveRef }) {
     handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
+    startIntro,
     playDialogue,
     skipDialogue,
     setPostIntro,
