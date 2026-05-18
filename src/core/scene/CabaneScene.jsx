@@ -121,9 +121,6 @@ export function CabaneScene({
     setLeafMesh(leafInstancedMesh ?? null)
   }, [])
 
-  const areCabaneInteractionsEnabled =
-    (playerMode || postIntro) && !interactionLocked && interactionsEnabled
-
   return (
     <>
       <CabaneMap
@@ -135,7 +132,7 @@ export function CabaneScene({
 
       <TreeLeaves
         leafMesh={leafMesh}
-        active={areCabaneInteractionsEnabled}
+        active={interactionsEnabled}
         onLeafClick={onLeafClick}
         onLeafHover={onLeafHover}
         leafMaterialMode={leafMaterialMode}

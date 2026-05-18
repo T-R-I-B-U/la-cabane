@@ -1,10 +1,6 @@
 export function SavoirPanel({ savoir, onClose }) {
   return (
-    <div
-      className="savoir-overlay"
-      onPointerDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className="savoir-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
       <div
         className="savoir-card"
         onPointerDown={(e) => e.stopPropagation()}
