@@ -782,35 +782,21 @@
   width: 100%;
 }
 
-/* Conteneur feuille : même technique que step 0 */
+/* Conteneur feuille : image portrait (canvas 300×340) */
 .mv-s6-leaf-outer {
   flex: 1;
   min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 270px;
   overflow: visible;
 }
 
-.mv-s6-leaf-rotate {
-  transform: rotate(-90deg);
-  flex-shrink: 0;
-}
-
-.mv-s6-leaf-img-box {
-  width: 500px;
-  height: 268px;
-  flex-shrink: 0;
-  position: relative;
-}
-
-.mv-s6-leaf-img-box img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+.mv-s6-leaf-img {
+  display: block;
+  max-height: 100%;
+  width: auto;
+  filter: drop-shadow(0 8px 20px rgba(42, 92, 50, 0.25));
   pointer-events: none;
 }
 
