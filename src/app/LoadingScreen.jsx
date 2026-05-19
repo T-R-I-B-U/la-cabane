@@ -3,7 +3,12 @@ import './LoadingScreen.css'
 export function LoadingScreen({ status, error }) {
   return (
     <div className="loading-screen">
-      <img className="loading-screen__bg" src="/welcome/loading-bg.webp" alt="" aria-hidden="true" />
+      <img
+        className="loading-screen__bg"
+        src="/welcome/loading-bg.webp"
+        alt=""
+        aria-hidden="true"
+      />
 
       {status === 'error' ? (
         <p className="loading-screen__error" role="alert">

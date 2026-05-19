@@ -183,6 +183,7 @@ export function useArbreFlow({
   const [growingFruitPlaying, setGrowingFruitPlaying] = useState(false)
   const [growingFruitClickable, setGrowingFruitClickable] = useState(false)
   const [fruitsClickActive, setFruitsClickActive] = useState(false)
+  const [fruitExploreActive, setFruitExploreActive] = useState(false)
   const [arbreExploreSecondPhase, setArbreExploreSecondPhase] = useState(false)
   // Token to force re-trigger when zone is already 'arbre'
   const [arbreStartToken, setArbreStartToken] = useState(0)
@@ -219,6 +220,11 @@ export function useArbreFlow({
   useEffect(() => clearScheduledTimeouts, [clearScheduledTimeouts])
   useEffect(() => onRegistryChange(() => setCameraConfigVersion((version) => version + 1)), [])
 
+  const handlePlayerFruitPanelClose = useCallback(() => {
+    setFruitsClickActive(false)
+    setFruitExploreActive(true)
+  }, [])
+
   const exitArbre = useCallback(() => {
     clearScheduledTimeouts()
     setArbreActive(false)
@@ -228,6 +234,7 @@ export function useArbreFlow({
     setLadderClickActive(false)
     setStairsClickActive(false)
     setFruitsClickActive(false)
+    setFruitExploreActive(false)
     setGrowingFruitClickable(false)
     setLadderIsStoryMode(false)
     resetStory()
@@ -546,11 +553,13 @@ export function useArbreFlow({
     growingFruitClickable,
     handleGrowingFruitComplete,
     fruitsClickActive,
+    fruitExploreActive,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
     handleStairsClick,
     handleNestInteractionComplete,
     handleArbreTransitionComplete,
+    handlePlayerFruitPanelClose,
     triggerNestDialogue25,
     triggerArbreBase,
     triggerArbreTop,

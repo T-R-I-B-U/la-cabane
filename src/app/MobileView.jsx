@@ -26,7 +26,13 @@ function drawLeafImg(ctx, img) {
   ctx.translate(CW / 2, CH / 2)
   // savoir-leaf.webp is portrait (338×629) — simple contain-fit, no rotation needed
   const scale = Math.min(CW / img.width, CH / img.height)
-  ctx.drawImage(img, -(img.width * scale) / 2, -(img.height * scale) / 2, img.width * scale, img.height * scale)
+  ctx.drawImage(
+    img,
+    -(img.width * scale) / 2,
+    -(img.height * scale) / 2,
+    img.width * scale,
+    img.height * scale
+  )
   ctx.restore()
 }
 
@@ -298,7 +304,12 @@ export function MobileView() {
               {DAYS.map((day) => (
                 <div key={day} className="mv-s4-row">
                   <div className="mv-s4-day">
-                    <img className="mv-s4-chip-bg" src="/phone/chip-dark.webp" alt="" aria-hidden="true" />
+                    <img
+                      className="mv-s4-chip-bg"
+                      src="/phone/chip-dark.webp"
+                      alt=""
+                      aria-hidden="true"
+                    />
                     <span>{day}</span>
                   </div>
                   {SLOTS.map((slot) => {

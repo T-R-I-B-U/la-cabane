@@ -1,10 +1,47 @@
 [
   {
     "id": "c01",
-    "fruitId": "fruit_01",
-    "name": "Prénom Nom",
-    "role": "Rôle exemple",
-    "email": "contact@exemple.fr"
+    "fruitId": "fruit_arbre_01",
+    "name": "Roxane Martino",
+    "role": "Couturière passionnée",
+    "description": "Couturière passionnée, je partage mon savoir à la Cabane depuis 2 ans. Entre deux leçons de points de crochet ou de retouches, j'apprends la physique-chimie avec les membres du quartier. Un échange de savoirs, comme un tissu qu'on tisse ensemble.",
+    "age": "39 ans",
+    "neighborhood": "Quartier Altera Centre",
+    "memberSince": "Membre depuis 2048",
+    "fruitImage": "/player-panel/fruit.webp"
+  },
+  {
+    "id": "c02",
+    "fruitId": "fruit_arbre_02",
+    "name": "Théo Blanchard",
+    "role": "Botaniste urbain",
+    "description": "Je cultive des plantes comestibles sur les toits depuis 2046. À la Cabane, je transmets les techniques de permaculture et apprends en retour l'histoire de l'architecture vernaculaire. Le savoir pousse comme les plantes : il a besoin de soin et d'échanges.",
+    "age": "52 ans",
+    "neighborhood": "Quartier Nord-Vert",
+    "memberSince": "Membre depuis 2046",
+    "fruitImage": "/player-panel/fruit.webp"
+  },
+  {
+    "id": "c03",
+    "fruitId": "fruit_arbre_03",
+    "name": "Amara Diallo",
+    "role": "Conteuse et musicienne",
+    "description": "Venue du Mali il y a vingt ans, je transmets les contes de ma région tout en apprenant le violon classique avec les membres. La Cabane est un espace où les cultures se rencontrent et s'enrichissent mutuellement.",
+    "age": "44 ans",
+    "neighborhood": "Quartier Altera Sud",
+    "memberSince": "Membre depuis 2049",
+    "fruitImage": "/player-panel/fruit.webp"
+  },
+  {
+    "id": "c04",
+    "fruitId": "fruit_arbre_04",
+    "name": "Lucas Ferreira",
+    "role": "Ingénieur & bricoleur",
+    "description": "Ingénieur en systèmes embarqués la semaine, réparateur de vélos et d'appareils électroniques le week-end à la Cabane. J'aime rendre accessibles des compétences techniques qui semblent compliquées.",
+    "age": "31 ans",
+    "neighborhood": "Quartier Ouest",
+    "memberSince": "Membre depuis 2050",
+    "fruitImage": "/player-panel/fruit.webp"
   },
   {
     "id": "c_player",

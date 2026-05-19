@@ -2,19 +2,19 @@ import { useState } from 'react'
 import './PlayerFruitPanel.css'
 import { AddSavoirModal } from './AddSavoirModal'
 
-export function PlayerFruitPanel({ playerName }) {
+export function PlayerFruitPanel({ playerName, onClose }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   return (
     <>
-      <div
-        className="pfp-overlay"
-        onPointerDown={(e) => e.stopPropagation()}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="pfp-content">
+      <div className="pfp-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
+        <div
+          className="pfp-content"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => e.stopPropagation()}
+        >
           {/* Left card */}
           <div className="pfp-left-card">
-              <div className="pfp-left-inner">
+            <div className="pfp-left-inner">
               <div className="pfp-top-section">
                 <img
                   className="pfp-fruit-img"

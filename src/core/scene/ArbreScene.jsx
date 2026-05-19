@@ -32,6 +32,7 @@ export function ArbreScene({
   growingFruitClickable,
   onGrowingFruitComplete,
   fruitsClickActive,
+  fruitExploreActive,
   onFruitClickDuringLeaves,
   onFruitClick,
   onFruitHover,
@@ -69,7 +70,7 @@ export function ArbreScene({
           key={id}
           fruitId={id}
           position={position}
-          active={!arbreActive && interactionsEnabled}
+          active={(!arbreActive || fruitExploreActive) && interactionsEnabled}
           onFruitClick={handleFruitInteract}
           onFruitHover={onFruitHover}
         />

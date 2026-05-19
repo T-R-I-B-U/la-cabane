@@ -285,12 +285,14 @@ export default function App() {
     growingFruitClickable: arbreGrowingFruitClickable,
     handleGrowingFruitComplete,
     fruitsClickActive,
+    fruitExploreActive,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
     handleStairsClick,
     handleArbreTransitionComplete,
     handleFruitClickDuringLeaves,
     handleLeafSavoirClosed,
+    handlePlayerFruitPanelClose,
     triggerArbreBase,
     triggerArbreTop,
     triggerNestDialogue25,
@@ -581,8 +583,10 @@ export default function App() {
 
   const handleClosePlayerFruitPanel = useCallback(() => {
     setIsPlayerFruitPanelOpen(false)
-    requestPointerLockIfSceneControlAllowed()
-  }, [requestPointerLockIfSceneControlAllowed])
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handlePlayerFruitPanelClose()
+    pointerControlsRef.current?.lock()
+  }, [handlePlayerFruitPanelClose])
 
   useEffect(() => {
     if (!isPlayerFruitPanelOpen) return
@@ -837,8 +841,6 @@ export default function App() {
     setLeafArriving(false)
   }, [])
 
-
-
   const isStoryCameraControlEnabled = postIntro
 
   function toggleFreePlayerView() {
@@ -1022,6 +1024,7 @@ export default function App() {
           growingFruitClickable: arbreGrowingFruitClickable,
           onGrowingFruitComplete: handleGrowingFruitComplete,
           fruitsClickActive,
+          fruitExploreActive,
           onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
@@ -1192,7 +1195,7 @@ export default function App() {
       )}
 
       {isPlayerFruitPanelOpen && (
-        <PlayerFruitPanel playerName={playerName} />
+        <PlayerFruitPanel playerName={playerName} onClose={handleClosePlayerFruitPanel} />
       )}
 
       {incomingSavoir && (

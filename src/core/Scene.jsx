@@ -116,6 +116,7 @@ export default function Scene({
     growingFruitClickable: arbreGrowingFruitClickable,
     onGrowingFruitComplete,
     fruitsClickActive,
+    fruitExploreActive,
     onFruitClickDuringLeaves,
     leafInteractionsEnabled: arbreLeafInteractionsEnabled,
   } = arbre
@@ -236,6 +237,7 @@ export default function Scene({
             growingFruitClickable={arbreGrowingFruitClickable}
             onGrowingFruitComplete={onGrowingFruitComplete}
             fruitsClickActive={fruitsClickActive}
+            fruitExploreActive={fruitExploreActive}
             onFruitClickDuringLeaves={onFruitClickDuringLeaves}
             onFruitClick={onFruitClick}
             onFruitHover={onFruitHover}

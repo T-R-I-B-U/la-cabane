@@ -61,7 +61,7 @@ export function LeafArrival({ drawingData, targetRef, onComplete }) {
         }, 1100)
       })
     )
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   if (!style) return null
