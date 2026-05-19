@@ -14,7 +14,7 @@ const SHADOW_CAST_MIN_DIM = 2.0
 // (e.g. workbench01 is found by getObjectByName for ClickableWorkbench).
 const SKIP_GROUPING = new Set(['workbench01', 'house', 'poster'])
 
-const HOUSE_TEXTURES = ['house1', 'house2', 'house3', 'house4', 'house5', 'house6', 'house7']
+const HOUSE_TEXTURES = ['house1', 'house2', 'house3']
 const POSTER_TEXTURES = ['poster1', 'poster2', 'poster3', 'poster4', 'poster5', 'poster6']
 
 function shuffle(arr) {
