@@ -52,7 +52,6 @@ export default function App() {
   const isDevBuild = import.meta.env.DEV
   const [incomingSavoir, setIncomingSavoir] = useState(null)
   const [leafArriving, setLeafArriving] = useState(false)
-  const [leafLanded, setLeafLanded] = useState(false)
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showFinal, setShowFinal] = useState(false)
@@ -827,7 +826,6 @@ export default function App() {
       setTimeout(() => {
         document.exitPointerLock()
         setIsPlayerFruitPanelOpen(false)
-        setLeafLanded(false)
         setIncomingSavoir(savoir)
         setLeafArriving(true)
       }, 2500)
@@ -837,7 +835,6 @@ export default function App() {
 
   const handleLeafArrivalComplete = useCallback(() => {
     setLeafArriving(false)
-    setLeafLanded(true)
   }, [])
 
 
@@ -1200,9 +1197,10 @@ export default function App() {
 
       {incomingSavoir && (
         <SavoirPanel
-          savoir={leafLanded ? incomingSavoir : { ...incomingSavoir, drawingData: null }}
+          savoir={incomingSavoir}
           onClose={() => setIncomingSavoir(null)}
           leafColRef={savoirLeafColRef}
+          pendingLeaf={leafArriving}
         />
       )}
 
