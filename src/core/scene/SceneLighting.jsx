@@ -39,8 +39,8 @@ export function SceneLighting({ activeHdriId }) {
         color="#ffd7ae"
         intensity={2.2}
         position={SUN_POSITION}
-        shadow-mapSize-width={512}
-        shadow-mapSize-height={512}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-bias={-0.00018}
         shadow-normalBias={0.032}
       >
