@@ -217,16 +217,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-}
-
-.pfp-leaf-slot::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 6px;
-  background: rgba(20, 19, 19, 0.5);
-  pointer-events: none;
 }
 
 .pfp-leaf-slot--flex {
@@ -235,7 +225,8 @@
 }
 
 .pfp-leaf-img {
-  width: 100%;
+  /* 70% laisse la marge nécessaire pour rotate(-31deg) sans clipper */
+  width: 70%;
   height: auto;
   object-fit: contain;
   transform: rotate(-31deg);
