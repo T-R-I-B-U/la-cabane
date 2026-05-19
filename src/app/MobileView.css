@@ -647,7 +647,7 @@
   display: block;
   cursor: crosshair;
   touch-action: none;
-  max-height: 100%;
+  max-height: 55dvh;
   width: auto;
   filter: drop-shadow(0 8px 20px rgba(42, 92, 50, 0.25));
 }
@@ -794,7 +794,7 @@
 
 .mv-s6-leaf-img {
   display: block;
-  max-height: 100%;
+  max-height: 55dvh;
   width: auto;
   filter: drop-shadow(0 8px 20px rgba(42, 92, 50, 0.25));
   pointer-events: none;
