@@ -52,7 +52,8 @@ export default function App() {
   const isDevBuild = import.meta.env.DEV
   const [incomingSavoir, setIncomingSavoir] = useState(null)
   const [leafArriving, setLeafArriving] = useState(false)
-  const newLeafTargetRef = useRef(null)
+  const [leafLanded, setLeafLanded] = useState(false)
+  const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
@@ -357,8 +358,7 @@ export default function App() {
       isPlayerFruitPanelOpen ||
       isJournalInteractionActive ||
       raspberryPhaseActive ||
-      !!incomingSavoir ||
-      leafArriving
+      !!incomingSavoir
     ) {
       return
     }
@@ -389,7 +389,6 @@ export default function App() {
     selectedSavoirAssignment,
     showNameInput,
     incomingSavoir,
-    leafArriving,
   ])
 
   const handleNameSubmit = useCallback(
@@ -827,7 +826,8 @@ export default function App() {
       }
       setTimeout(() => {
         document.exitPointerLock()
-        setIsPlayerFruitPanelOpen(true)
+        setIsPlayerFruitPanelOpen(false)
+        setLeafLanded(false)
         setIncomingSavoir(savoir)
         setLeafArriving(true)
       }, 2500)
@@ -837,6 +837,7 @@ export default function App() {
 
   const handleLeafArrivalComplete = useCallback(() => {
     setLeafArriving(false)
+    setLeafLanded(true)
   }, [])
 
 
@@ -1194,17 +1195,21 @@ export default function App() {
       )}
 
       {isPlayerFruitPanelOpen && (
-        <PlayerFruitPanel
-          playerName={playerName}
-          newLeafTargetRef={newLeafTargetRef}
-          newLeafData={!leafArriving ? incomingSavoir?.drawingData : null}
+        <PlayerFruitPanel playerName={playerName} />
+      )}
+
+      {incomingSavoir && (
+        <SavoirPanel
+          savoir={leafLanded ? incomingSavoir : { ...incomingSavoir, drawingData: null }}
+          onClose={() => setIncomingSavoir(null)}
+          leafColRef={savoirLeafColRef}
         />
       )}
 
       {leafArriving && (
         <LeafArrival
           drawingData={incomingSavoir?.drawingData}
-          targetRef={newLeafTargetRef}
+          targetRef={savoirLeafColRef}
           onComplete={handleLeafArrivalComplete}
         />
       )}

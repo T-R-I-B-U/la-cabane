@@ -233,17 +233,6 @@
   pointer-events: none;
 }
 
-/* Slot qui reçoit la feuille du téléphone */
-.pfp-leaf-slot--received {
-  animation: pfp-slot-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  box-shadow: 0 0 0 3px #8a9042, 0 0 16px rgba(138, 144, 66, 0.5);
-}
-
-@keyframes pfp-slot-pop {
-  0%   { transform: scale(0.7); opacity: 0.4; }
-  100% { transform: scale(1);   opacity: 1; }
-}
-
 /* Ma Cabane card */
 .pfp-card--cabane {
   position: relative;

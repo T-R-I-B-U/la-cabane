@@ -1,48 +1,59 @@
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import './LeafArrival.css'
 
 export function LeafArrival({ drawingData, targetRef, onComplete }) {
-  const leafRef = useRef(null)
-  const [flyStyle, setFlyStyle] = useState(null)
+  const [style, setStyle] = useState(null)
+  const doneRef = useRef(false)
 
-  const handleEnterEnd = useCallback(() => {
-    if (flyStyle !== null) return // already in phase 2
-    const leafEl = leafRef.current
-    if (!leafEl) { onComplete?.(); return }
+  useEffect(() => {
+    const targetEl = targetRef?.current
+    const vw = window.innerWidth
+    const vh = window.innerHeight
 
-    const leafRect = leafEl.getBoundingClientRect()
-    const targetRect = targetRef?.current?.getBoundingClientRect()
-
-    const leafCx = leafRect.left + leafRect.width / 2
-    const leafCy = leafRect.top + leafRect.height / 2
-
-    let tx, ty, scale
-    if (targetRect) {
-      tx = targetRect.left + targetRect.width / 2 - leafCx
-      ty = targetRect.top + targetRect.height / 2 - leafCy
-      scale = targetRect.width / leafRect.width
-    } else {
-      // Fallback : monte hors écran
-      tx = 0; ty = -window.innerHeight; scale = 0.4
+    // Horizontal offset : center of target relative to viewport center
+    let tx = 0
+    let ty = 0
+    if (targetEl) {
+      const rect = targetEl.getBoundingClientRect()
+      tx = rect.left + rect.width / 2 - vw / 2
+      ty = rect.top + rect.height / 2 - vh / 2
     }
 
-    setFlyStyle({
-      transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
+    // Start : même X que la cible, hors écran en haut
+    const start = {
+      transform: `translate(${tx}px, ${-vh * 0.65}px) rotate(-8deg)`,
       opacity: 0,
-      transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.6, 1), opacity 0.25s 0.35s ease-in',
-    })
+      transition: 'none',
+    }
+    // End : centre de la colonne feuille, à la verticale correcte
+    const end = {
+      transform: `translate(${tx}px, ${ty}px) rotate(0deg)`,
+      opacity: 1,
+      transition: 'transform 1s cubic-bezier(0.25, 0.55, 0.45, 1), opacity 0.35s ease-in',
+    }
 
-    setTimeout(() => onComplete?.(), 680)
-  }, [flyStyle, targetRef, onComplete])
+    setStyle(start)
+
+    // Double rAF pour forcer le browser à appliquer le start avant la transition
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        setStyle(end)
+        setTimeout(() => {
+          if (!doneRef.current) {
+            doneRef.current = true
+            onComplete?.()
+          }
+        }, 1100)
+      })
+    )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  if (!style) return null
 
   return (
     <div className="la-overlay" aria-hidden="true">
-      <div
-        ref={leafRef}
-        className={`la-leaf${flyStyle === null ? ' la-leaf--entering' : ''}`}
-        style={flyStyle ?? undefined}
-        onAnimationEnd={handleEnterEnd}
-      >
+      <div className="la-leaf" style={style}>
         <img src={drawingData ?? '/savoir-leaf.webp'} alt="" className="la-img" />
       </div>
     </div>

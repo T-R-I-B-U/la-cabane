@@ -1,6 +1,6 @@
 import './SavoirPanel.css'
 
-export function SavoirPanel({ savoir, onClose }) {
+export function SavoirPanel({ savoir, onClose, leafColRef }) {
   return (
     <div className="savoir-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
       <div
@@ -13,7 +13,7 @@ export function SavoirPanel({ savoir, onClose }) {
         </button>
 
         <div className="savoir-body">
-          <div className="savoir-leaf-col">
+          <div className="savoir-leaf-col" ref={leafColRef}>
             <img
               className="savoir-leaf-img"
               src={savoir.drawingData ?? '/savoir-leaf.webp'}

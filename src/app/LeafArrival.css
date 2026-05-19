@@ -9,25 +9,13 @@
 }
 
 .la-leaf {
-  /* Phase 2 : transition inline via flyStyle */
   transform-origin: center center;
-}
-
-.la-leaf--entering {
-  animation: la-enter 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .la-img {
   display: block;
   height: 320px;
   width: auto;
-  filter: drop-shadow(0 12px 28px rgba(42, 92, 50, 0.35));
-}
-
-/* Phase 1 : entre depuis le bas, s'arrête au centre */
-@keyframes la-enter {
-  0%   { transform: translateY(110vh) rotate(22deg) scale(0.7); opacity: 0; }
-  18%  { opacity: 1; }
-  75%  { transform: translateY(8px) rotate(-4deg) scale(1.08); opacity: 1; }
-  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+  filter: drop-shadow(0 12px 32px rgba(42, 92, 50, 0.4));
 }
