@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import './AddSavoirModal.css'
 
-export function AddSavoirModal({ onClose }) {
+export function AddSavoirModal() {
   useEffect(() => {
     if (document.pointerLockElement) document.exitPointerLock()
   }, [])
@@ -14,10 +14,6 @@ export function AddSavoirModal({ onClose }) {
     >
       <div className="asm-card">
         <img className="asm-bg" src="/player-panel/add-savoir-bg.webp" alt="" aria-hidden="true" />
-
-        <button type="button" className="asm-close" onClick={onClose} aria-label="Fermer">
-          ✕
-        </button>
 
         {/* Enfant 1 – titre (Figma: flex flex-row items-end self-stretch) */}
         <div className="asm-title-wrapper">

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './PlayerFruitPanel.css'
 import { AddSavoirModal } from './AddSavoirModal'
 
-export function PlayerFruitPanel({ playerName, onClose }) {
+export function PlayerFruitPanel({ playerName }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   return (
     <>
@@ -14,10 +14,7 @@ export function PlayerFruitPanel({ playerName, onClose }) {
         <div className="pfp-content">
           {/* Left card */}
           <div className="pfp-left-card">
-            <button type="button" className="pfp-close" onClick={onClose} aria-label="Fermer">
-              ✕
-            </button>
-            <div className="pfp-left-inner">
+              <div className="pfp-left-inner">
               <div className="pfp-top-section">
                 <img
                   className="pfp-fruit-img"

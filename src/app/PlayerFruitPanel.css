@@ -30,20 +30,6 @@
   overflow: hidden;
 }
 
-.pfp-close {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  z-index: 2;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 20px;
-  color: #33330f;
-  line-height: 1;
-  padding: 4px 8px;
-}
-
 .pfp-left-inner {
   display: flex;
   flex-direction: column;
