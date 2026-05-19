@@ -431,6 +431,19 @@ export function useArbreFlow({
 
   const handleGrowingFruitComplete = useCallback(() => {}, [])
 
+  const handleSavoirReceived = useCallback(() => {
+    setFruitsClickActive(false)
+    setFruitExploreActive(true)
+  }, [])
+
+  const handleIncomingSavoirClosed = useCallback(() => {
+    if (!arbreActive) return
+    setArbreDialogueActive(true)
+    playDialogue('arbreFinal', {
+      onDone: () => setArbreDialogueActive(false),
+    })
+  }, [arbreActive, playDialogue])
+
   const arbreLeafInteractionsEnabled =
     (currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase) && !fruitsClickActive
 
@@ -552,6 +565,8 @@ export function useArbreFlow({
     growingFruitPlaying,
     growingFruitClickable,
     handleGrowingFruitComplete,
+    handleSavoirReceived,
+    handleIncomingSavoirClosed,
     fruitsClickActive,
     fruitExploreActive,
     arbreLeafInteractionsEnabled,

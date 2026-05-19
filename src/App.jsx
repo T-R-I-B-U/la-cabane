@@ -52,6 +52,7 @@ export default function App() {
   const isDevBuild = import.meta.env.DEV
   const [incomingSavoir, setIncomingSavoir] = useState(null)
   const [leafArriving, setLeafArriving] = useState(false)
+  const [hasSentSavoir, setHasSentSavoir] = useState(false)
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showFinal, setShowFinal] = useState(false)
@@ -284,13 +285,12 @@ export default function App() {
     growingFruitPlaying: arbreGrowingFruitPlaying,
     growingFruitClickable: arbreGrowingFruitClickable,
     handleGrowingFruitComplete,
-    fruitsClickActive,
-    fruitExploreActive,
+    handleSavoirReceived,
+    handleIncomingSavoirClosed,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
     handleStairsClick,
     handleArbreTransitionComplete,
-    handleFruitClickDuringLeaves,
     handleLeafSavoirClosed,
     handlePlayerFruitPanelClose,
     triggerArbreBase,
@@ -309,7 +309,6 @@ export default function App() {
       setIsPlayerModeActive(false)
       setIsFlyModeActive(false)
       exitIntro()
-      document.exitPointerLock()
     }, [exitIntro]),
   })
 
@@ -320,7 +319,6 @@ export default function App() {
       isModalOpenRef.current = true
       setIsSavoirInteractionActive(true)
       setShouldRestorePointerLockAfterStoryUi(true)
-      pointerControlsRef.current?.unlock()
     },
     [openSavoirForLeaf]
   )
@@ -330,7 +328,6 @@ export default function App() {
       if (fruitId === 'fruit_player') {
         setIsPlayerFruitPanelOpen(true)
         setShouldRestorePointerLockAfterStoryUi(true)
-        pointerControlsRef.current?.unlock()
         return
       }
       const didOpen = openContactForFruit(fruitId)
@@ -778,7 +775,8 @@ export default function App() {
     raspberryPhaseActive ||
     isSavoirInteractionActive ||
     isContactInteractionActive ||
-    isPlayerFruitPanelOpen
+    isPlayerFruitPanelOpen ||
+    !!incomingSavoir
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
@@ -804,7 +802,10 @@ export default function App() {
         receptionChoiceVisible ||
         returnHallVisible ||
         isJournalInteractionActive ||
-        isPlayerFruitPanelOpen)
+        isPlayerFruitPanelOpen ||
+        isSavoirInteractionActive ||
+        isContactInteractionActive ||
+        !!incomingSavoir)
   }, [
     postIntro,
     showNameInput,
@@ -812,6 +813,9 @@ export default function App() {
     returnHallVisible,
     isJournalInteractionActive,
     isPlayerFruitPanelOpen,
+    isSavoirInteractionActive,
+    isContactInteractionActive,
+    incomingSavoir,
   ])
 
   useEffect(() => {
@@ -828,18 +832,26 @@ export default function App() {
         drawingData: data.drawingData ?? null,
       }
       setTimeout(() => {
-        document.exitPointerLock()
         setIsPlayerFruitPanelOpen(false)
         setIncomingSavoir(savoir)
         setLeafArriving(true)
+        setHasSentSavoir(true)
+        handleSavoirReceived()
       }, 2500)
     })
     return () => socket.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleLeafArrivalComplete = useCallback(() => {
     setLeafArriving(false)
   }, [])
+
+  const handleCloseIncomingSavoir = useCallback(() => {
+    setIncomingSavoir(null)
+    handleIncomingSavoirClosed()
+    pointerControlsRef.current?.lock()
+  }, [handleIncomingSavoirClosed])
 
   const isStoryCameraControlEnabled = postIntro
 
@@ -1023,9 +1035,6 @@ export default function App() {
           growingFruitPlaying: arbreGrowingFruitPlaying,
           growingFruitClickable: arbreGrowingFruitClickable,
           onGrowingFruitComplete: handleGrowingFruitComplete,
-          fruitsClickActive,
-          fruitExploreActive,
-          onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
         leafMaterialMode={leafMaterialMode}
@@ -1195,13 +1204,17 @@ export default function App() {
       )}
 
       {isPlayerFruitPanelOpen && (
-        <PlayerFruitPanel playerName={playerName} onClose={handleClosePlayerFruitPanel} />
+        <PlayerFruitPanel
+          playerName={playerName}
+          onClose={handleClosePlayerFruitPanel}
+          hasSentSavoir={hasSentSavoir}
+        />
       )}
 
       {incomingSavoir && (
         <SavoirPanel
           savoir={incomingSavoir}
-          onClose={() => setIncomingSavoir(null)}
+          onClose={handleCloseIncomingSavoir}
           leafColRef={savoirLeafColRef}
           pendingLeaf={leafArriving}
         />

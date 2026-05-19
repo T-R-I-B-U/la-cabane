@@ -51,8 +51,14 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 24px;
+  gap: 40px;
   padding-right: 40px;
+}
+
+.cp-name-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .cp-name {
@@ -84,7 +90,7 @@
 /* ── Center fruit image ── */
 .cp-center {
   flex-shrink: 0;
-  width: 420px;
+  width: 533px;
   height: 100%;
   display: flex;
   align-items: center;
@@ -105,15 +111,26 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 0;
   padding-left: 40px;
 }
 
 .cp-info-row {
-  border-top: 1.5px solid #33330f;
+  display: flex;
+  align-items: center;
+  gap: 20px;
   padding: 20px 24px;
 }
 
+.cp-info-line {
+  flex: 1;
+  height: 1.5px;
+  background: #33330f;
+  flex-shrink: 0;
+}
+
 .cp-info-label {
+  flex: 1;
   font-family: 'citrus-gothic-rough', serif;
   font-size: 32px;
   font-weight: 400;

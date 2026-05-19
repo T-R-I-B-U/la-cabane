@@ -187,6 +187,11 @@
   line-height: 1;
 }
 
+.pfp-add-savoir--sent {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .pfp-add-label {
   font-family: 'citrus-gothic-rough', serif;
   font-size: 32px;

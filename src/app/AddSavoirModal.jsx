@@ -1,10 +1,6 @@
-import { useEffect } from 'react'
 import './AddSavoirModal.css'
 
 export function AddSavoirModal() {
-  useEffect(() => {
-    if (document.pointerLockElement) document.exitPointerLock()
-  }, [])
 
   return (
     <div

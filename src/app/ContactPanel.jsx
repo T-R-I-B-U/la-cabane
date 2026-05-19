@@ -22,8 +22,10 @@ export function ContactPanel({ contact, onClose }) {
 
         <div className="cp-body">
           <div className="cp-left">
-            <h2 className="cp-name">{contact.name}</h2>
-            <hr className="cp-sep" />
+            <div className="cp-name-section">
+              <h2 className="cp-name">{contact.name}</h2>
+              <hr className="cp-sep" />
+            </div>
             {contact.description && <p className="cp-desc">{contact.description}</p>}
           </div>
 
@@ -36,6 +38,7 @@ export function ContactPanel({ contact, onClose }) {
           <div className="cp-right">
             {infoRows.map((info, i) => (
               <div key={i} className="cp-info-row">
+                <span className="cp-info-line" />
                 <p className="cp-info-label">{info}</p>
               </div>
             ))}

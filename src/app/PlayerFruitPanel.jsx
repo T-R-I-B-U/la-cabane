@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './PlayerFruitPanel.css'
 import { AddSavoirModal } from './AddSavoirModal'
 
-export function PlayerFruitPanel({ playerName, onClose }) {
+export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   return (
     <>
@@ -57,8 +57,9 @@ export function PlayerFruitPanel({ playerName, onClose }) {
                 </div>
                 <button
                   type="button"
-                  className="pfp-add-savoir"
-                  onClick={() => setIsAddSavoirOpen(true)}
+                  className={`pfp-add-savoir${hasSentSavoir ? ' pfp-add-savoir--sent' : ''}`}
+                  onClick={() => !hasSentSavoir && setIsAddSavoirOpen(true)}
+                  disabled={hasSentSavoir}
                 >
                   <span className="pfp-add-icon">+</span>
                   <span className="pfp-add-label">Ajouter un savoir</span>
