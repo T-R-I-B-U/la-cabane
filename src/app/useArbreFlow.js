@@ -270,7 +270,13 @@ export function useArbreFlow({
       playDialogue('arbreFeuilles', {
         onDone: () => {
           setArbreDialogueActive(false)
+          setGrowingFruitClickable(true)
           completeStep('arbre.leavesDialogue')
+          // arbre.finalDialogue has no camera transition — unlock directly
+          setArbreStoryCameraTransition(null)
+          setArbreMovementLocked(false)
+          setArbreExploreSecondPhase(true)
+          setFruitsClickActive(true)
         },
       })
     } else if (currentStepId === 'arbre.backAtBase') {
@@ -375,7 +381,6 @@ export function useArbreFlow({
           setArbreDialogueActive(false)
           completeStep('arbre.platformDialogue')
           setArbreMovementLocked(false)
-          setGrowingFruitClickable(true)
         },
       })
     } else if (currentStepId === 'arbre.finalDialogue') {
