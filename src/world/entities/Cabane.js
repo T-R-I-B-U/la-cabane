@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { buildNode } from '../cabane/nodeBuilder'
 import { buildGroupInstanced } from '../cabane/groupInstancing'
-import { modelBaseName } from '../cabane/assetNaming'
+import { modelBaseName, normalizeAssetName } from '../cabane/assetNaming'
 import { findNodePosition } from '../cabane/runtime'
 export { clearTextureCache } from '../cabane/textureResolver'
 
@@ -14,10 +14,31 @@ const SHADOW_CASTER_ROOTS = new Set([
   'greenhouse',
   'nest',
   'house',
+  'platform-hut',
   'backgroundTree',
 ])
-const SHADOW_RECEIVER_ROOTS = new Set(['hut01', 'trunk', 'greenhouse', 'nest', 'house'])
+const SHADOW_RECEIVER_ROOTS = new Set([
+  'hut01',
+  'trunk',
+  'greenhouse',
+  'nest',
+  'house',
+  'platform-hut',
+])
 const SHADOW_EXCLUDED_NAMES = [/plane/i, /^background$/i, /poster/i, /^outsideplant0[23]$/i]
+const LIGHT_PASSING_SURFACE_NAMES = new Set([
+  'glass',
+  'cross-window',
+  'hut-verre',
+  'tour-fenetre',
+  'tour-fenêtre',
+  'fenetre',
+  'fenetre1',
+  'window01',
+  'window02',
+  'window03',
+])
+const LIGHT_PASSING_SURFACE_PATTERNS = [/glass/i, /window/i, /verre/i, /fenetre/i, /fenêtre/i]
 
 // Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
@@ -110,6 +131,39 @@ function createRailingSegmentCollider(start, end) {
 
   collider.rotation.y = Math.atan2(delta.x, delta.z)
   return collider
+}
+
+function forEachMaterial(material, callback) {
+  if (Array.isArray(material)) material.forEach(callback)
+  else if (material) callback(material)
+}
+
+function isLightPassingSurface(obj) {
+  let node = obj
+  while (node) {
+    const nodeName = node.name || ''
+    const normalizedName = normalizeAssetName(nodeName)
+    if (LIGHT_PASSING_SURFACE_NAMES.has(normalizedName)) return true
+    if (LIGHT_PASSING_SURFACE_PATTERNS.some((pattern) => pattern.test(nodeName))) return true
+    node = node.parent
+  }
+  return false
+}
+
+function configureLightPassingMaterial(obj) {
+  forEachMaterial(obj.material, (material) => {
+    material.transparent = true
+    material.opacity = Math.min(material.opacity ?? 1, 0.45)
+    material.depthWrite = false
+    material.side = THREE.DoubleSide
+    if ('metalness' in material) material.metalness = 0
+    if ('roughness' in material) material.roughness = 0.12
+    if ('transmission' in material) {
+      material.transmission = 0.35
+      material.thickness = 0.08
+    }
+    material.needsUpdate = true
+  })
 }
 
 function hasShadowExcludedName(obj) {
@@ -381,6 +435,12 @@ export async function buildCabane({
   // Small props (stools, glasses, signs) are excluded to reduce shadow map draw calls.
   root.traverse((obj) => {
     if (!obj.isMesh || !obj.geometry) return
+    if (isLightPassingSurface(obj)) {
+      obj.receiveShadow = false
+      obj.castShadow = false
+      configureLightPassingMaterial(obj)
+      return
+    }
     obj.receiveShadow = isShadowReceiverCandidate(obj)
     obj.castShadow = false
     if (!isShadowCasterCandidate(obj)) return
