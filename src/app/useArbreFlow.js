@@ -425,7 +425,7 @@ export function useArbreFlow({
   const handleGrowingFruitComplete = useCallback(() => {}, [])
 
   const arbreLeafInteractionsEnabled =
-    currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase
+    (currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase) && !fruitsClickActive
 
   const handleLeafSavoirClosed = useCallback(() => {
     if (currentStepId !== 'arbre.exploreLeaves') return

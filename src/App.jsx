@@ -355,7 +355,9 @@ export default function App() {
       isContactInteractionActive ||
       isPlayerFruitPanelOpen ||
       isJournalInteractionActive ||
-      raspberryPhaseActive
+      raspberryPhaseActive ||
+      !!incomingSavoir ||
+      leafArriving
     ) {
       return
     }
@@ -385,6 +387,8 @@ export default function App() {
     selectedContactAssignment,
     selectedSavoirAssignment,
     showNameInput,
+    incomingSavoir,
+    leafArriving,
   ])
 
   const handleNameSubmit = useCallback(
@@ -821,6 +825,7 @@ export default function App() {
         drawingData: data.drawingData ?? null,
       }
       setTimeout(() => {
+        document.exitPointerLock()
         setIsPlayerFruitPanelOpen(false)
         setIncomingSavoir(savoir)
         setLeafArriving(true)
