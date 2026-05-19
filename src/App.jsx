@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
+import { io } from 'socket.io-client'
 import {
   AppLoader,
   Crosshair,
   FinalScreen,
   GameManager,
+  LeafArrival,
   LoadingScreen,
   NameInput,
   SavoirPanel,
@@ -33,6 +35,7 @@ import { CustomCursor } from './app/CustomCursor'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
+const SOCKET_URL = `http://${window.location.hostname}:3001`
 const ViewerControls = lazy(() =>
   import('./app/ViewerControls').then((mod) => ({ default: mod.ViewerControls }))
 )
@@ -47,6 +50,8 @@ const PerfMonitor = lazy(() =>
 )
 export default function App() {
   const isDevBuild = import.meta.env.DEV
+  const [incomingSavoir, setIncomingSavoir] = useState(null)
+  const [leafArriving, setLeafArriving] = useState(false)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
@@ -806,6 +811,32 @@ export default function App() {
     isModalOpenRef.current = isSavoirInteractionActive || isContactInteractionActive
   }, [isSavoirInteractionActive, isContactInteractionActive])
 
+  useEffect(() => {
+    const socket = io(SOCKET_URL)
+    socket.on('savoir-received', (data) => {
+      const savoir = {
+        title: data.title ?? data.theme,
+        text: data.summary,
+        slots: data.availability ?? [],
+        drawingData: data.drawingData ?? null,
+      }
+      setTimeout(() => {
+        setIsPlayerFruitPanelOpen(false)
+        setIncomingSavoir(savoir)
+        setLeafArriving(true)
+      }, 2500)
+    })
+    return () => socket.disconnect()
+  }, [])
+
+  const handleLeafArrivalComplete = useCallback(() => {
+    setLeafArriving(false)
+  }, [])
+
+  const handleCloseReceivedSavoir = useCallback(() => {
+    setIncomingSavoir(null)
+  }, [])
+
   const isStoryCameraControlEnabled = postIntro
 
   function toggleFreePlayerView() {
@@ -1160,6 +1191,14 @@ export default function App() {
 
       {isPlayerFruitPanelOpen && (
         <PlayerFruitPanel playerName={playerName} onClose={handleClosePlayerFruitPanel} />
+      )}
+
+      {leafArriving && (
+        <LeafArrival drawingData={incomingSavoir?.drawingData} onComplete={handleLeafArrivalComplete} />
+      )}
+
+      {!leafArriving && incomingSavoir && (
+        <SavoirPanel savoir={incomingSavoir} onClose={handleCloseReceivedSavoir} />
       )}
 
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
