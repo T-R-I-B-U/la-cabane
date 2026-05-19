@@ -230,8 +230,12 @@ export function TreeLeaves({
   useEffect(() => {
     if (!leafMesh || !alphaMap || !originalProps) return
     const originalRaycast = leafMesh.raycast
+    const originalCastShadow = leafMesh.castShadow
+    const originalReceiveShadow = leafMesh.receiveShadow
 
     /* eslint-disable react-hooks/immutability */
+    leafMesh.castShadow = true
+    leafMesh.receiveShadow = true
     alphaMap.flipY = false
     alphaMap.colorSpace = THREE.LinearSRGBColorSpace
     alphaMap.needsUpdate = true
@@ -301,6 +305,8 @@ export function TreeLeaves({
 
     return () => {
       leafMesh.raycast = originalRaycast
+      leafMesh.castShadow = originalCastShadow
+      leafMesh.receiveShadow = originalReceiveShadow
       leafMesh.material = originalProps.material
       originalProps.material.side = originalProps.side
       originalProps.material.alphaMap = originalProps.alphaMap

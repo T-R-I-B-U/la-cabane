@@ -7,7 +7,17 @@ export { clearTextureCache } from '../cabane/textureResolver'
 
 // Min geometry dimension (meters) for a mesh to cast shadows.
 // Excludes small props (stools, glasses, signs) while keeping large surfaces (walls, trunk, stairs).
-const SHADOW_CAST_MIN_DIM = 2.0
+const SHADOW_CAST_MIN_DIM = 3.5
+const SHADOW_CASTER_ROOTS = new Set([
+  'hut01',
+  'trunk',
+  'greenhouse',
+  'nest',
+  'house',
+  'backgroundTree',
+])
+const SHADOW_RECEIVER_ROOTS = new Set(['hut01', 'trunk', 'greenhouse', 'nest', 'house'])
+const SHADOW_EXCLUDED_NAMES = [/plane/i, /^background$/i, /poster/i, /^outsideplant0[23]$/i]
 
 // Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
@@ -100,6 +110,40 @@ function createRailingSegmentCollider(start, end) {
 
   collider.rotation.y = Math.atan2(delta.x, delta.z)
   return collider
+}
+
+function hasShadowExcludedName(obj) {
+  let node = obj
+  while (node) {
+    if (SHADOW_EXCLUDED_NAMES.some((pattern) => pattern.test(node.name))) return true
+    node = node.parent
+  }
+  return false
+}
+
+function isShadowCasterCandidate(obj) {
+  if (hasShadowExcludedName(obj)) return false
+
+  let node = obj
+  while (node) {
+    if (SHADOW_CASTER_ROOTS.has(node.name)) return true
+    node = node.parent
+  }
+
+  return false
+}
+
+function isShadowReceiverCandidate(obj) {
+  if (obj.userData.isFloor) return true
+  if (hasShadowExcludedName(obj)) return false
+
+  let node = obj
+  while (node) {
+    if (SHADOW_RECEIVER_ROOTS.has(node.name)) return true
+    node = node.parent
+  }
+
+  return false
 }
 
 function attachRailingColliders(railingObject) {
@@ -337,12 +381,14 @@ export async function buildCabane({
   // Small props (stools, glasses, signs) are excluded to reduce shadow map draw calls.
   root.traverse((obj) => {
     if (!obj.isMesh || !obj.geometry) return
+    obj.receiveShadow = isShadowReceiverCandidate(obj)
+    obj.castShadow = false
+    if (!isShadowCasterCandidate(obj)) return
     if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox()
     const { max, min } = obj.geometry.boundingBox
     const dim = Math.max(max.x - min.x, max.y - min.y, max.z - min.z)
     if (dim >= SHADOW_CAST_MIN_DIM) {
       obj.castShadow = true
-      obj.receiveShadow = true
     }
   })
 
