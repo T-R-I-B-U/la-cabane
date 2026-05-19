@@ -52,6 +52,7 @@ export default function App() {
   const isDevBuild = import.meta.env.DEV
   const [incomingSavoir, setIncomingSavoir] = useState(null)
   const [leafArriving, setLeafArriving] = useState(false)
+  const newLeafTargetRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
@@ -826,7 +827,7 @@ export default function App() {
       }
       setTimeout(() => {
         document.exitPointerLock()
-        setIsPlayerFruitPanelOpen(false)
+        setIsPlayerFruitPanelOpen(true)
         setIncomingSavoir(savoir)
         setLeafArriving(true)
       }, 2500)
@@ -838,9 +839,7 @@ export default function App() {
     setLeafArriving(false)
   }, [])
 
-  const handleCloseReceivedSavoir = useCallback(() => {
-    setIncomingSavoir(null)
-  }, [])
+
 
   const isStoryCameraControlEnabled = postIntro
 
@@ -1195,15 +1194,19 @@ export default function App() {
       )}
 
       {isPlayerFruitPanelOpen && (
-        <PlayerFruitPanel playerName={playerName} onClose={handleClosePlayerFruitPanel} />
+        <PlayerFruitPanel
+          playerName={playerName}
+          newLeafTargetRef={newLeafTargetRef}
+          newLeafData={!leafArriving ? incomingSavoir?.drawingData : null}
+        />
       )}
 
       {leafArriving && (
-        <LeafArrival drawingData={incomingSavoir?.drawingData} onComplete={handleLeafArrivalComplete} />
-      )}
-
-      {!leafArriving && incomingSavoir && (
-        <SavoirPanel savoir={incomingSavoir} onClose={handleCloseReceivedSavoir} />
+        <LeafArrival
+          drawingData={incomingSavoir?.drawingData}
+          targetRef={newLeafTargetRef}
+          onComplete={handleLeafArrivalComplete}
+        />
       )}
 
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}

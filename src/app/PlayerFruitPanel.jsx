@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './PlayerFruitPanel.css'
 import { AddSavoirModal } from './AddSavoirModal'
 
-export function PlayerFruitPanel({ playerName }) {
+export function PlayerFruitPanel({ playerName, newLeafTargetRef, newLeafData }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   return (
     <>
@@ -80,10 +80,13 @@ export function PlayerFruitPanel({ playerName }) {
                   </div>
                 </div>
                 <div className="pfp-leaf-slots">
-                  <div className="pfp-leaf-slot">
+                  <div
+                    className={`pfp-leaf-slot${newLeafData ? ' pfp-leaf-slot--received' : ''}`}
+                    ref={newLeafTargetRef}
+                  >
                     <img
                       className="pfp-leaf-img"
-                      src="/player-panel/leaf.webp"
+                      src={newLeafData ?? '/player-panel/leaf.webp'}
                       alt=""
                       aria-hidden="true"
                     />
