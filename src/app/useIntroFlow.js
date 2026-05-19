@@ -525,12 +525,13 @@ export function useIntroFlow({ sceneReady }) {
   }, [playDialogue])
 
   const handleGreenhouseDoorClick = useCallback(() => {
+    clearScheduledTimeouts()
     setGreenhousePhaseActive(false)
     setSerreActive(true)
     fade('ambianceWorkbench', 0, 1500)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
-  }, [])
+  }, [clearScheduledTimeouts])
 
   const handleExitSerreDoorClick = useCallback(() => {
     setExitSerrePhaseActive(false)
