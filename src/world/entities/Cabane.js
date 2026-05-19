@@ -16,6 +16,57 @@ const SHADOW_CASTER_ROOTS = new Set([
   'house',
   'platform-hut',
   'backgroundTree',
+  'juicemachine',
+  'juiceglass',
+  'ladder',
+  'stairs01',
+  'stairs02',
+  'welcome01',
+  'railling',
+  'railling-hut',
+  'timeatm',
+  'hill',
+  'bulding',
+  'lampe',
+  'lampe-mushroom',
+  'cabinet',
+  'shelves',
+  'counter01',
+  'armchair',
+  'chair',
+  'chair-large',
+  'littletable',
+  'stool',
+  'workbench01',
+  'basket',
+  'drawing',
+  'hearth',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
+  'rug01',
+  'rug02',
+])
+const FORCED_SMALL_SHADOW_CASTER_ROOTS = new Set([
+  'lampe',
+  'lampe-mushroom',
+  'chair',
+  'chair-large',
+  'armchair',
+  'littletable',
+  'stool',
+  'basket',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
 ])
 const SHADOW_RECEIVER_ROOTS = new Set([
   'hut01',
@@ -24,12 +75,41 @@ const SHADOW_RECEIVER_ROOTS = new Set([
   'nest',
   'house',
   'platform-hut',
+  'lampe',
+  'lampe-mushroom',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
+  'counter01',
+  'shelves',
+  'cabinet',
+  'armchair',
+  'chair',
+  'chair-large',
+  'littletable',
+  'stool',
+  'workbench01',
+  'basket',
+  'drawing',
+  'hearth',
+  'rug01',
+  'rug02',
 ])
 const SHADOW_EXCLUDED_NAMES = [/plane/i, /^background$/i, /poster/i, /^outsideplant0[23]$/i]
 const LIGHT_PASSING_SURFACE_NAMES = new Set([
   'glass',
   'cross-window',
   'hut-verre',
+  'hut-verriere',
+  'hut-verrière',
+  'hut-verriere-haut',
+  'hut-verrière-haut',
+  'hut-verriere-top',
+  'hut-verrière-top',
   'tour-fenetre',
   'tour-fenêtre',
   'fenetre',
@@ -38,7 +118,16 @@ const LIGHT_PASSING_SURFACE_NAMES = new Set([
   'window02',
   'window03',
 ])
-const LIGHT_PASSING_SURFACE_PATTERNS = [/glass/i, /window/i, /verre/i, /fenetre/i, /fenêtre/i]
+const LIGHT_PASSING_SURFACE_PATTERNS = [
+  /glass/i,
+  /window/i,
+  /verre/i,
+  /verriere/i,
+  /verrière/i,
+  /fenetre/i,
+  /fenêtre/i,
+]
+const HUT_SKYLIGHT_PATTERNS = [/hut-verr/i, /hut-verre/i]
 
 // Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
@@ -151,15 +240,17 @@ function isLightPassingSurface(obj) {
 }
 
 function configureLightPassingMaterial(obj) {
+  const isHutSkylight = HUT_SKYLIGHT_PATTERNS.some((pattern) => pattern.test(obj.name || ''))
+
   forEachMaterial(obj.material, (material) => {
     material.transparent = true
-    material.opacity = Math.min(material.opacity ?? 1, 0.45)
-    material.depthWrite = false
-    material.side = THREE.DoubleSide
+    material.opacity = 0.9
+    material.depthWrite = isHutSkylight
+    material.side = isHutSkylight ? THREE.FrontSide : THREE.DoubleSide
     if ('metalness' in material) material.metalness = 0
-    if ('roughness' in material) material.roughness = 0.12
+    if ('roughness' in material) material.roughness = 0.18
     if ('transmission' in material) {
-      material.transmission = 0.35
+      material.transmission = isHutSkylight ? 0.08 : 0.18
       material.thickness = 0.08
     }
     material.needsUpdate = true
@@ -194,6 +285,16 @@ function isShadowReceiverCandidate(obj) {
   let node = obj
   while (node) {
     if (SHADOW_RECEIVER_ROOTS.has(node.name)) return true
+    node = node.parent
+  }
+
+  return false
+}
+
+function isForcedSmallShadowCaster(obj) {
+  let node = obj
+  while (node) {
+    if (FORCED_SMALL_SHADOW_CASTER_ROOTS.has(node.name)) return true
     node = node.parent
   }
 
@@ -444,6 +545,10 @@ export async function buildCabane({
     obj.receiveShadow = isShadowReceiverCandidate(obj)
     obj.castShadow = false
     if (!isShadowCasterCandidate(obj)) return
+    if (isForcedSmallShadowCaster(obj)) {
+      obj.castShadow = true
+      return
+    }
     if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox()
     const { max, min } = obj.geometry.boundingBox
     const dim = Math.max(max.x - min.x, max.y - min.y, max.z - min.z)
