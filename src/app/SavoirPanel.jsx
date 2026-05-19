@@ -14,7 +14,12 @@ export function SavoirPanel({ savoir, onClose }) {
 
         <div className="savoir-body">
           <div className="savoir-leaf-col">
-            <img className="savoir-leaf-img" src="/savoir-leaf.webp" alt="" aria-hidden="true" />
+            <img
+              className="savoir-leaf-img"
+              src={savoir.drawingData ?? '/savoir-leaf.webp'}
+              alt=""
+              aria-hidden="true"
+            />
           </div>
 
           <div className="savoir-content">
@@ -29,7 +34,7 @@ export function SavoirPanel({ savoir, onClose }) {
               <div className="savoir-avail-col">
                 <p className="savoir-avail-label">Disponibilité</p>
                 <div className="savoir-slots">
-                  {savoir.slots.map((slot, i) => (
+                  {savoir.slots.slice(0, 4).map((slot, i) => (
                     <div key={i} className="savoir-slot">
                       {slot}
                     </div>

@@ -136,13 +136,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  flex: 1;
 }
 
 .savoir-slot {
+  aspect-ratio: 1;
   background: #eeded0;
   border-radius: 6px;
-  padding: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
