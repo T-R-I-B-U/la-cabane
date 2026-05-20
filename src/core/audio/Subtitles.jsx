@@ -130,7 +130,7 @@ export default function Subtitles({ choices }) {
         {hasChoices && (
           <div style={CHOICES}>
             {choices.map(({ label, onClick }) => (
-              <button key={label} type="button" style={CHOICE_BTN} onClick={onClick}>
+              <button key={label} type="button" className="dialogue-choice-btn" style={CHOICE_BTN} onClick={onClick}>
                 {label}
               </button>
             ))}

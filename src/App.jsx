@@ -694,7 +694,7 @@ export default function App() {
     const blockOutsideChoice = (event) => {
       const target = event.target
       if (!(target instanceof Element)) return
-      if (target.closest('.story-choice-card button')) return
+      if (target.closest('.story-choice-card button, .dialogue-choice-btn')) return
 
       event.preventDefault()
       event.stopPropagation()
