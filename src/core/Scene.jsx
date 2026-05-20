@@ -104,7 +104,6 @@ export default function Scene({
   } = interactions
 
   const {
-    active: arbreActive,
     storyCameraTransition: arbreStoryCameraTransition,
     onTransitionComplete: onArbreTransitionComplete,
     ladderClickActive,
@@ -114,6 +113,7 @@ export default function Scene({
     onStairsHover,
     growingFruitPlaying: arbreGrowingFruitPlaying,
     growingFruitClickable: arbreGrowingFruitClickable,
+    fruitsDisabled: arbreFruitsDisabled,
     onGrowingFruitComplete,
     leafInteractionsEnabled: arbreLeafInteractionsEnabled,
   } = arbre
@@ -230,6 +230,7 @@ export default function Scene({
             platformPosition={platformPosition}
             growingFruitPlaying={arbreGrowingFruitPlaying}
             growingFruitClickable={arbreGrowingFruitClickable}
+            fruitsDisabled={arbreFruitsDisabled}
             onGrowingFruitComplete={onGrowingFruitComplete}
             onFruitClick={onFruitClick}
             onFruitHover={onFruitHover}

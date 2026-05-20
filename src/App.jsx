@@ -30,6 +30,7 @@ import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
+import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
 import { CustomCursor } from './app/CustomCursor'
 import './App.css'
@@ -554,6 +555,7 @@ export default function App() {
     closeSavoirInternal()
     setIsSavoirInteractionActive(false)
     setIsSavoirPanelOpen(false)
+    fruitHoverStore.startCooldown()
     handleLeafSavoirClosed()
     // ContactPanel/SavoirPanel stop click propagation so Drei's document.click
     // handler never fires. Call lock() directly — we're still in the user gesture.
@@ -565,6 +567,7 @@ export default function App() {
     closeContactInternal()
     setIsContactInteractionActive(false)
     setIsContactPanelOpen(false)
+    fruitHoverStore.startCooldown()
     pointerControlsRef.current?.lock()
   }, [closeContactInternal])
 
@@ -581,6 +584,7 @@ export default function App() {
   const handleClosePlayerFruitPanel = useCallback(() => {
     setIsPlayerFruitPanelOpen(false)
     setShouldRestorePointerLockAfterStoryUi(false)
+    fruitHoverStore.startCooldown()
     handlePlayerFruitPanelClose()
     pointerControlsRef.current?.lock()
   }, [handlePlayerFruitPanelClose])
@@ -849,6 +853,7 @@ export default function App() {
 
   const handleCloseIncomingSavoir = useCallback(() => {
     setIncomingSavoir(null)
+    fruitHoverStore.startCooldown()
     handleIncomingSavoirClosed()
     pointerControlsRef.current?.lock()
   }, [handleIncomingSavoirClosed])
@@ -1034,6 +1039,7 @@ export default function App() {
           onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
           growingFruitClickable: arbreGrowingFruitClickable,
+          fruitsDisabled: isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
           onGrowingFruitComplete: handleGrowingFruitComplete,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}

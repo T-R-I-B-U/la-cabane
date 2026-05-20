@@ -3,6 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { disposeObject3D } from '../../core/disposeObject3D'
+import { fruitHoverStore } from '../../utils/fruitHoverStore'
 import {
   createOutlineGeometry,
   createOutlineMaterial,
@@ -65,8 +66,11 @@ export function Fruit({
 
   useEffect(() => {
     meshRef.current = cloned.mesh
-    return () => disposeObject3D(cloned.root)
-  }, [cloned])
+    return () => {
+      disposeObject3D(cloned.root)
+      fruitHoverStore.setHovered(fruitId, false)
+    }
+  }, [cloned, fruitId])
 
   const edgesGeometry = useMemo(() => {
     if (!cloned.mesh) return null
@@ -87,7 +91,7 @@ export function Fruit({
 
   useEffect(() => {
     const onMouseDown = () => {
-      if (!hoveredRef.current || !activeRef.current) return
+      if (!hoveredRef.current || !activeRef.current || fruitHoverStore.onCooldown) return
       onFruitClickRef.current?.(fruitId)
     }
     window.addEventListener('mousedown', onMouseDown)
@@ -104,6 +108,7 @@ export function Fruit({
     if (!active || !document.pointerLockElement || !rootRef.current) {
       if (hoveredRef.current) {
         hoveredRef.current = false
+        fruitHoverStore.setHovered(fruitId, false)
         if (proxyRef.current) proxyRef.current.visible = false
         onFruitHover?.(false, fruitId)
       }
@@ -114,6 +119,7 @@ export function Fruit({
     const hit = _raycaster.intersectObject(rootRef.current, true).length > 0
     if (hit !== hoveredRef.current) {
       hoveredRef.current = hit
+      fruitHoverStore.setHovered(fruitId, hit)
       if (proxyRef.current) proxyRef.current.visible = hit
       onFruitHover?.(hit, fruitId)
     }

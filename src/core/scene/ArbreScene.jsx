@@ -29,10 +29,10 @@ export function ArbreScene({
   platformPosition,
   growingFruitPlaying,
   growingFruitClickable,
+  fruitsDisabled,
   onGrowingFruitComplete,
   onFruitClick,
   onFruitHover,
-  interactionsEnabled,
 }) {
   const { playerFruit, staticFruits } = usePlatformLayout(platformPosition)
 
@@ -65,7 +65,7 @@ export function ArbreScene({
           key={id}
           fruitId={id}
           position={position}
-          active={growingFruitClickable}
+          active={growingFruitClickable && !fruitsDisabled}
           onFruitClick={handleFruitInteract}
           onFruitHover={onFruitHover}
         />

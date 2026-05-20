@@ -188,6 +188,7 @@ export function useArbreFlow({
   // Token to force re-trigger when zone is already 'arbre'
   const [arbreStartToken, setArbreStartToken] = useState(0)
   const [ladderIsStoryMode, setLadderIsStoryMode] = useState(false)
+  const [ladderOutroMode, setLadderOutroMode] = useState(false)
   const [cameraConfigVersion, setCameraConfigVersion] = useState(0)
 
   const playedRef = useRef(false)
@@ -237,6 +238,7 @@ export function useArbreFlow({
     setFruitExploreActive(false)
     setGrowingFruitClickable(false)
     setLadderIsStoryMode(false)
+    setLadderOutroMode(false)
     resetStory()
     stopDialogue()
     setGameStep(GAME_STEPS.EXPLORATION)
@@ -264,11 +266,25 @@ export function useArbreFlow({
   }, [zone, arbreStartToken, goToStep, onLadderSpawn])
 
   const handleLadderClick = useCallback(() => {
-    setLadderClickActive(false)
-    setArbreMovementLocked(true)
-    completeStep('arbre.atLadder')
-    setArbreStoryCameraTransition({ ...povs.ladderDown })
-  }, [completeStep, povs])
+    if (ladderOutroMode) {
+      setLadderClickActive(false)
+      setLadderOutroMode(false)
+      setArbreMovementLocked(true)
+      setArbreDialogueActive(true)
+      playDialogue('arbreOutro', {
+        onDone: () => {
+          setArbreDialogueActive(false)
+          goToStep('arbre.outroPlatformTop')
+          setArbreStoryCameraTransition({ ...povs.outroPlatformTop })
+        },
+      })
+    } else {
+      setLadderClickActive(false)
+      setArbreMovementLocked(true)
+      completeStep('arbre.atLadder')
+      setArbreStoryCameraTransition({ ...povs.ladderDown })
+    }
+  }, [ladderOutroMode, completeStep, playDialogue, goToStep, povs])
 
   const handleArbreTransitionComplete = useCallback(() => {
     if (currentStepId === 'arbre.leavesDialogue') {
@@ -279,11 +295,7 @@ export function useArbreFlow({
           setArbreDialogueActive(false)
           setGrowingFruitClickable(true)
           completeStep('arbre.leavesDialogue')
-          // arbre.finalDialogue has no camera transition — unlock directly
-          setArbreStoryCameraTransition(null)
-          setArbreMovementLocked(false)
-          setArbreExploreSecondPhase(true)
-          setFruitsClickActive(true)
+          setArbreStoryCameraTransition({ ...povs.atPlatform })
         },
       })
     } else if (currentStepId === 'arbre.backAtBase') {
@@ -391,6 +403,7 @@ export function useArbreFlow({
         },
       })
     } else if (currentStepId === 'arbre.finalDialogue') {
+      setArbreStoryCameraTransition(null)
       setArbreMovementLocked(false)
       setArbreExploreSecondPhase(true)
       setFruitsClickActive(true)
@@ -440,7 +453,11 @@ export function useArbreFlow({
     if (!arbreActive) return
     setArbreDialogueActive(true)
     playDialogue('arbreFinal', {
-      onDone: () => setArbreDialogueActive(false),
+      onDone: () => {
+        setArbreDialogueActive(false)
+        setLadderClickActive(true)
+        setLadderOutroMode(true)
+      },
     })
   }, [arbreActive, playDialogue])
 

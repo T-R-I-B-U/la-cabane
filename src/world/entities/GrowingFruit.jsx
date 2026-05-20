@@ -3,6 +3,7 @@ import { useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { disposeObject3D } from '../../core/disposeObject3D'
+import { fruitHoverStore } from '../../utils/fruitHoverStore'
 import { applyAutoTextures } from '../cabane/textureResolver'
 import {
   createOutlineGeometry,
@@ -128,6 +129,7 @@ export function GrowingFruit({
     if (!active || !document.pointerLockElement || !rootRef.current) {
       if (hoveredRef.current) {
         hoveredRef.current = false
+        fruitHoverStore.setHovered('fruit_player', false)
         if (proxyRef.current) proxyRef.current.visible = false
         onFruitHover?.(false)
       }
@@ -138,6 +140,7 @@ export function GrowingFruit({
     const hit = _raycaster.intersectObject(rootRef.current, true).length > 0
     if (hit !== hoveredRef.current) {
       hoveredRef.current = hit
+      fruitHoverStore.setHovered('fruit_player', hit)
       if (proxyRef.current) proxyRef.current.visible = hit
       onFruitHover?.(hit)
     }
@@ -150,7 +153,7 @@ export function GrowingFruit({
           <primitive
             object={cloned.root}
             onPointerDown={(e) => {
-              if (!active) return
+              if (!active || fruitHoverStore.onCooldown) return
               e.stopPropagation()
               onFruitClick?.()
             }}
