@@ -214,6 +214,16 @@
   touch-action: pan-y;
 }
 
+.mv-s2-textarea--title {
+  overflow: hidden;
+}
+
+.mv-s2-textarea--summary {
+  min-height: 240px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .mv-s2-textarea:focus {
   outline: none;
 }

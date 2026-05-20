@@ -220,7 +220,7 @@ export function MobileView() {
             <p className="mv-s2-title">Titre de mon savoir</p>
             <div className="mv-s2-card-wrap">
               <textarea
-                className="mv-s2-textarea"
+                className="mv-s2-textarea mv-s2-textarea--title"
                 placeholder="Donne un titre à ton savoir…"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -245,10 +245,11 @@ export function MobileView() {
             <p className="mv-s2-title">Résumé de mon savoir</p>
             <div className="mv-s2-card-wrap">
               <textarea
-                className="mv-s2-textarea"
+                className="mv-s2-textarea mv-s2-textarea--summary"
                 placeholder="Décris ton savoir…"
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
+                rows={6}
               />
             </div>
           </div>
