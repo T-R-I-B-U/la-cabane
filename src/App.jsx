@@ -29,7 +29,7 @@ import {
 } from './core/SceneConfig'
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
-import { setSubtitleChoices, unlockAndPlay } from './utils/audioStore'
+import { setSubtitleChoices, unlockAndPlay, setGlobalVolume, getGlobalVolume } from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
 import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -72,6 +72,7 @@ export default function App() {
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
   const [shaderRadius, setShaderRadius] = useState(3)
+  const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(isDevBuild)
   const [playerSpawn, setPlayerSpawn] = useState(null)
@@ -1371,7 +1372,17 @@ export default function App() {
         />
       )}
 
-      <SettingsMenu open={showSettings} onClose={() => setShowSettings(false)} />
+      <SettingsMenu
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        volume={masterVolume}
+        onVolumeChange={(v) => {
+          setMasterVolume(v)
+          setGlobalVolume(v / 100)
+        }}
+        shadersEnabled={shaderEnabled ? 'Oui' : 'Non'}
+        onShadersChange={(v) => setShaderEnabled(v === 'Oui')}
+      />
     </main>
   )
 }

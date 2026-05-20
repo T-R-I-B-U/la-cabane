@@ -19,11 +19,9 @@ function RadioPills({ options, value, onChange }) {
   )
 }
 
-export function SettingsMenu({ open, onClose }) {
+export function SettingsMenu({ open, onClose, volume, onVolumeChange, shadersEnabled, onShadersChange }) {
   const [quality, setQuality] = useState('Normal')
-  const [volume, setVolume] = useState(0)
   const [ao, setAo] = useState('Non')
-  const [shaders, setShaders] = useState('Oui')
   const [ombres, setOmbres] = useState('Non')
 
   if (!open) return null
@@ -60,7 +58,7 @@ export function SettingsMenu({ open, onClose }) {
             min={0}
             max={100}
             value={volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
+            onChange={(e) => onVolumeChange(Number(e.target.value))}
             aria-label="Volume principal"
           />
         </div>
@@ -72,7 +70,7 @@ export function SettingsMenu({ open, onClose }) {
 
         <div className="settings-card__section">
           <p className="settings-card__label">Shaders</p>
-          <RadioPills options={['Oui', 'Non']} value={shaders} onChange={setShaders} />
+          <RadioPills options={['Oui', 'Non']} value={shadersEnabled} onChange={onShadersChange} />
         </div>
 
         <div className="settings-card__section">
