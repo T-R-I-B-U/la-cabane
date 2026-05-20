@@ -105,13 +105,9 @@ const LIGHT_PASSING_SURFACE_NAMES = new Set([
   'cross-window',
   'hut-verre',
   'hut-verriere',
-  'hut-verrière',
   'hut-verriere-haut',
-  'hut-verrière-haut',
   'hut-verriere-top',
-  'hut-verrière-top',
   'tour-fenetre',
-  'tour-fenêtre',
   'fenetre',
   'fenetre1',
   'window01',
@@ -127,7 +123,7 @@ const LIGHT_PASSING_SURFACE_PATTERNS = [
   /fenetre/i,
   /fenêtre/i,
 ]
-const HUT_SKYLIGHT_PATTERNS = [/hut-verr/i, /hut-verre/i]
+const HUT_SKYLIGHT_PATTERNS = [/hut-verr/i]
 
 // Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
