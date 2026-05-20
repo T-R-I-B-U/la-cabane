@@ -333,8 +333,11 @@ export function useIntroFlow({ sceneReady }) {
 
     completeStep('intro.goToReception')
     playDialogue('receptionDialogue', {
-      onDone: () => {
+      onLastCue: () => {
         holdSubtitle()
+        setReceptionChoiceVisible(true)
+      },
+      onDone: () => {
         setReceptionChoiceVisible(true)
       },
     })

@@ -19,6 +19,8 @@ const subtitleState = {
   startedAt: 0,
   current: { text: '', speaker: null },
   frozen: false,
+  onLastCue: null,
+  lastCueFired: false,
   listeners: new Set(),
   rafId: 0,
   hideTimeoutId: 0,
@@ -64,6 +66,8 @@ function _clearTextTimers() {
 
 function _stopCurrentDialogue() {
   subtitleState.frozen = false
+  subtitleState.onLastCue = null
+  subtitleState.lastCueFired = false
   _clearTextTimers()
   _clearDialogHideTimeout()
   if (subtitleState.activeId) {
@@ -247,12 +251,20 @@ function _tickSubtitles() {
     return
   }
   const elapsed = (performance.now() - subtitleState.startedAt) / 1000
-  const cue = (track.cfg.subtitles || []).find((s) => elapsed >= s.from && elapsed < s.to)
+  const subs = track.cfg.subtitles || []
+  const cueIdx = subs.findIndex((s) => elapsed >= s.from && elapsed < s.to)
+  const cue = cueIdx >= 0 ? subs[cueIdx] : null
+
+  if (cue && cueIdx === subs.length - 1 && !subtitleState.lastCueFired && subtitleState.onLastCue) {
+    subtitleState.lastCueFired = true
+    subtitleState.onLastCue()
+  }
+
   _emitSubtitle(cue ? cue.text : '')
   subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
 }
 
-function _startSubtitles(id) {
+function _startSubtitles(id, onLastCue) {
   const track = store.tracks[id]
   if (!track) return
   const subs = track.cfg.subtitles
@@ -260,6 +272,8 @@ function _startSubtitles(id) {
   subtitleState.activeId = id
   subtitleState.activeSpeaker = track.cfg.speaker ?? null
   subtitleState.startedAt = performance.now()
+  subtitleState.onLastCue = onLastCue ?? null
+  subtitleState.lastCueFired = false
   if (!subtitleState.rafId) {
     subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
   }
@@ -300,7 +314,7 @@ export function holdSubtitle() {
 // Joue un dialogue par son id (déclaré dans audioConfig.json).
 // Si la track a un src audio : joue l'audio + sous-titres RAF.
 // Sinon : pilote l'affichage directement via les timings SRT.
-export function playDialogue(id, { onDone } = {}) {
+export function playDialogue(id, { onDone, onLastCue } = {}) {
   _whenReady(id, () => {
     _stopCurrentDialogue()
     const track = _getTrack(id)
@@ -323,7 +337,7 @@ export function playDialogue(id, { onDone } = {}) {
       _resumeContext()
       if (track.audio.isPlaying) track.audio.stop()
       track.audio.play()
-      _startSubtitles(id)
+      _startSubtitles(id, onLastCue)
       return
     }
 
