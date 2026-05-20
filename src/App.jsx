@@ -37,6 +37,7 @@ import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
 const SOCKET_URL = `http://${window.location.hostname}:3001`
+const LOADING_EXTRA_DURATION_MS = 7000
 const ViewerControls = lazy(() =>
   import('./app/ViewerControls').then((mod) => ({ default: mod.ViewerControls }))
 )
@@ -98,6 +99,10 @@ export default function App() {
   const isCursorVisibleRef = useRef(false)
   const isCameraBlockedRef = useRef(false)
   const isModalOpenRef = useRef(false)
+  const loadingRevealTimeoutRef = useRef(null)
+  const loadingRevealScheduledRef = useRef(false)
+  const [loadingSequenceStarted, setLoadingSequenceStarted] = useState(false)
+  const [loadingExtraDurationElapsed, setLoadingExtraDurationElapsed] = useState(false)
 
   const {
     selectedSavoirAssignment,
@@ -214,6 +219,11 @@ export default function App() {
     skipDialogue: skipIntroDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+
+  const revealSceneAfterLoading = useCallback(() => {
+    startIntro()
+    setReadyToShow(true)
+  }, [startIntro])
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
@@ -702,6 +712,14 @@ export default function App() {
   }, [receptionChoiceVisible])
 
   useEffect(() => {
+    return () => {
+      if (loadingRevealTimeoutRef.current) {
+        clearTimeout(loadingRevealTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
@@ -747,16 +765,35 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
 
-  // Auto-launch story once loading screen min-timer and scene load are both done.
-  // startIntro() sets both introPending and introActive in one stable callback so
-  // the effect never re-runs mid-story due to a stale reference.
-  // 500ms delay before showing the scene avoids a camera teleport on first frame.
+  const startLoadingRevealCountdown = useCallback(() => {
+    if (loadingRevealScheduledRef.current) return
+
+    loadingRevealScheduledRef.current = true
+    if (loadingRevealTimeoutRef.current) {
+      clearTimeout(loadingRevealTimeoutRef.current)
+    }
+
+    loadingRevealTimeoutRef.current = window.setTimeout(() => {
+      setLoadingExtraDurationElapsed(true)
+      loadingRevealTimeoutRef.current = null
+    }, LOADING_EXTRA_DURATION_MS)
+  }, [])
+
   useEffect(() => {
-    if (showWelcome || sceneLoadStatus !== 'ok') return
-    startIntro()
-    const t = setTimeout(() => setReadyToShow(true), 500)
-    return () => clearTimeout(t)
-  }, [showWelcome, sceneLoadStatus, startIntro])
+    if (sceneLoadStatus !== 'ok' || !loadingSequenceStarted) return
+    startLoadingRevealCountdown()
+  }, [loadingSequenceStarted, sceneLoadStatus, startLoadingRevealCountdown])
+
+  // Auto-launch story once the loading screen has waited 7 more seconds
+  // after the scene became ready, or 7 seconds after click if it was already ready.
+  useEffect(() => {
+    if (readyToShow || showWelcome || sceneLoadStatus !== 'ok' || !loadingExtraDurationElapsed) return
+    const revealTimeoutId = window.setTimeout(() => {
+      revealSceneAfterLoading()
+    }, 0)
+
+    return () => window.clearTimeout(revealTimeoutId)
+  }, [loadingExtraDurationElapsed, readyToShow, revealSceneAfterLoading, sceneLoadStatus, showWelcome])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
@@ -1251,7 +1288,16 @@ export default function App() {
         <WelcomeScreen
           fading={welcomeFading}
           onStart={() => {
+            setLoadingSequenceStarted(true)
+            setLoadingExtraDurationElapsed(false)
+            setReadyToShow(false)
             setWelcomeFading(true)
+            loadingRevealScheduledRef.current = false
+            if (loadingRevealTimeoutRef.current) {
+              clearTimeout(loadingRevealTimeoutRef.current)
+            }
+            loadingRevealTimeoutRef.current = null
+            if (sceneLoadStatus === 'ok') startLoadingRevealCountdown()
             const canvas = document.querySelector('canvas')
             if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
