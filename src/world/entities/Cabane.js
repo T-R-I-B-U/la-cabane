@@ -528,9 +528,13 @@ export async function buildCabane({
   const mainGround = root.getObjectByName('mainGround')
   if (mainGround) mainGround.position.y += MAIN_GROUND_Y_OFFSET
 
-  // Enable castShadow only on meshes whose geometry is large enough to produce visible shadows.
-  // Small props (stools, glasses, signs) are excluded to reduce shadow map draw calls.
+  // Single pass: shadow config + walkable surface flags.
+  // Runs before attachColliders so invisible collider boxes don't inherit shadow settings.
   root.traverse((obj) => {
+    if (obj.isMesh) {
+      if (/^stairs-marche/i.test(obj.name)) obj.userData.isStair = true
+      if (obj.name === 'platform' || obj.name === 'platform-hut') obj.userData.isFloor = true
+    }
     if (!obj.isMesh || !obj.geometry) return
     if (isLightPassingSurface(obj)) {
       obj.receiveShadow = false
@@ -548,22 +552,12 @@ export async function buildCabane({
     if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox()
     const { max, min } = obj.geometry.boundingBox
     const dim = Math.max(max.x - min.x, max.y - min.y, max.z - min.z)
-    if (dim >= SHADOW_CAST_MIN_DIM) {
-      obj.castShadow = true
-    }
+    if (dim >= SHADOW_CAST_MIN_DIM) obj.castShadow = true
   })
 
   attachNestColliders(root.getObjectByName('nest'))
   attachRailingColliders(root.getObjectByName('railling'))
   attachRailingColliders(root.getObjectByName('railling-hut'))
-
-  root.traverse((obj) => {
-    if (!obj.isMesh) return
-    // Stair steps — walkable ramps instead of vertical walls.
-    if (/^stairs-marche/i.test(obj.name)) obj.userData.isStair = true
-    // Platform walkable surfaces — floor raycaster must recognise them.
-    if (obj.name === 'platform' || obj.name === 'platform-hut') obj.userData.isFloor = true
-  })
 
   return root
 }
