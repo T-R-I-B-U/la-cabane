@@ -10,7 +10,7 @@
 }
 
 .viewer-page * {
-  cursor: none;
+  cursor: none !important;
 }
 
 /* Restore cursor before the 3D experience starts */

@@ -563,13 +563,34 @@ export default function App() {
 
   // Synthetic click dispatch: forward canvas clicks to the DOM element under the virtual cursor
   useEffect(() => {
+    const setRangeFromCursor = (el) => {
+      const rect = el.getBoundingClientRect()
+      const ratio = Math.max(0, Math.min(1, (cursorStore.x - rect.left) / rect.width))
+      const min = parseFloat(el.min) || 0
+      const max = parseFloat(el.max) || 100
+      el.value = String(Math.round(min + ratio * (max - min)))
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
     const onDown = () => {
       if (!isCursorVisibleRef.current) return
       const canvas = document.querySelector('canvas')
       const el = document.elementFromPoint(cursorStore.x, cursorStore.y)
-      if (el && el !== canvas) {
-        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      if (!el || el === canvas) return
+
+      if (el instanceof HTMLInputElement && el.type === 'range') {
+        setRangeFromCursor(el)
+        const onMove = () => setRangeFromCursor(el)
+        const onUp = () => {
+          window.removeEventListener('mousemove', onMove, { capture: true })
+          window.removeEventListener('mouseup', onUp)
+        }
+        window.addEventListener('mousemove', onMove, { capture: true })
+        window.addEventListener('mouseup', onUp)
+        return
       }
+
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
@@ -708,13 +729,24 @@ export default function App() {
     return () => document.removeEventListener('click', blockPointerLock, { capture: true })
   }, [])
 
-  // Intercept Escape while pointer-locked: open settings instead of just exiting.
-  // Capture phase fires before Drei's own keydown handlers.
-  // Guards: don't intercept when another UI (journal, modal, minigame) already owns Escape.
+  // TEMP: Escape-open disabled while validating P-key open flow.
+  // useEffect(() => {
+  //   const onEscapeWhileLocked = (e) => {
+  //     if (e.key !== 'Escape') return
+  //     if (!isInGameplayRef.current) return
+  //     if (isModalOpenRef.current || isJournalInteractionActiveRef.current || isMinigameActiveRef.current) return
+  //     e.stopImmediatePropagation()
+  //     setShowSettings(true)
+  //     setShouldRestorePointerLockAfterStoryUi(true)
+  //   }
+  //   document.addEventListener('keydown', onEscapeWhileLocked, { capture: true })
+  //   return () => document.removeEventListener('keydown', onEscapeWhileLocked, { capture: true })
+  // }, [])
+
+  // Open settings via P during gameplay.
   useEffect(() => {
-    const onEscapeWhileLocked = (e) => {
-      if (e.key !== 'Escape') return
-      if (!document.pointerLockElement) return
+    const onPressP = (e) => {
+      if (e.code !== 'KeyP') return
       if (!isInGameplayRef.current) return
       if (
         isModalOpenRef.current ||
@@ -722,12 +754,12 @@ export default function App() {
         isMinigameActiveRef.current
       )
         return
-      e.stopImmediatePropagation()
+      e.preventDefault()
       setShowSettings(true)
       setShouldRestorePointerLockAfterStoryUi(true)
     }
-    document.addEventListener('keydown', onEscapeWhileLocked, { capture: true })
-    return () => document.removeEventListener('keydown', onEscapeWhileLocked, { capture: true })
+    window.addEventListener('keydown', onPressP)
+    return () => window.removeEventListener('keydown', onPressP)
   }, [])
 
   useEffect(() => {
@@ -877,7 +909,7 @@ export default function App() {
     isContactInteractionActive ||
     isPlayerFruitPanelOpen ||
     !!incomingSavoir ||
-    showSettings
+    (showSettings && (postIntro || isPlayerModeActive))
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
@@ -906,7 +938,8 @@ export default function App() {
         isPlayerFruitPanelOpen ||
         isSavoirInteractionActive ||
         isContactInteractionActive ||
-        !!incomingSavoir)
+        !!incomingSavoir ||
+        showSettings)
   }, [
     postIntro,
     showNameInput,
@@ -917,6 +950,7 @@ export default function App() {
     isSavoirInteractionActive,
     isContactInteractionActive,
     incomingSavoir,
+    showSettings,
   ])
 
   useEffect(() => {
