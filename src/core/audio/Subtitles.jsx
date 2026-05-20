@@ -31,10 +31,7 @@ const BOX = (visible) => ({
   borderRadius: 18,
   opacity: visible ? 1 : 0,
   transform: `translateY(${visible ? 0 : 6}px)`,
-  // Delay fade-out by 300ms so choices can appear without a visible text-clear flicker
-  transition: visible
-    ? 'opacity 180ms ease, transform 240ms ease'
-    : 'opacity 180ms ease 300ms, transform 240ms ease 300ms',
+  transition: 'opacity 180ms ease, transform 240ms ease',
 })
 
 const SPEAKER_SECTION = {
@@ -96,29 +93,14 @@ const CHOICE_BTN = {
 }
 
 export default function Subtitles({ choices }) {
-  const [sub, setSub] = useState({ text: '', speaker: null, lastText: '', lastSpeaker: null })
+  const [state, setState] = useState({ text: '', speaker: null })
 
-  useEffect(
-    () =>
-      subscribeSubtitles((next) => {
-        setSub((prev) => ({
-          text: next.text,
-          speaker: next.speaker,
-          // Keep last non-empty text+speaker so bar stays populated when choices show
-          lastText: next.text ? next.text : prev.lastText,
-          lastSpeaker: next.text ? next.speaker : prev.lastSpeaker,
-        }))
-      }),
-    []
-  )
+  useEffect(() => subscribeSubtitles(setState), [])
 
-  const { text, speaker, lastText, lastSpeaker } = sub
+  const { text, speaker } = state
   const hasChoices = choices && choices.length > 0
   const visible = Boolean(text) || hasChoices
-
-  const displayText = text || (hasChoices ? lastText : '')
-  const displaySpeaker = speaker || (hasChoices ? lastSpeaker : null)
-  const speakerInfo = displaySpeaker ? SPEAKERS[displaySpeaker] : null
+  const speakerInfo = speaker ? SPEAKERS[speaker] : null
 
   return (
     <div style={WRAP}>
@@ -129,11 +111,17 @@ export default function Subtitles({ choices }) {
             <p style={SPEAKER_NAME}>{speakerInfo.label}</p>
           </div>
         )}
-        <p style={SUBTITLE_TEXT}>{displayText || ' '}</p>
+        <p style={SUBTITLE_TEXT}>{text || ' '}</p>
         {hasChoices && (
           <div style={CHOICES}>
             {choices.map(({ label, onClick }) => (
-              <button key={label} type="button" className="dialogue-choice-btn" style={CHOICE_BTN} onClick={onClick}>
+              <button
+                key={label}
+                type="button"
+                className="dialogue-choice-btn"
+                style={CHOICE_BTN}
+                onClick={onClick}
+              >
                 {label}
               </button>
             ))}

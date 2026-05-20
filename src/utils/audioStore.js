@@ -18,6 +18,7 @@ const subtitleState = {
   activeSpeaker: null,
   startedAt: 0,
   current: { text: '', speaker: null },
+  frozen: false,
   listeners: new Set(),
   rafId: 0,
   hideTimeoutId: 0,
@@ -62,6 +63,7 @@ function _clearTextTimers() {
 }
 
 function _stopCurrentDialogue() {
+  subtitleState.frozen = false
   _clearTextTimers()
   _clearDialogHideTimeout()
   if (subtitleState.activeId) {
@@ -241,7 +243,7 @@ function _tickSubtitles() {
     subtitleState.activeId = null
     subtitleState.activeSpeaker = null
     subtitleState.rafId = 0
-    _emitSubtitle('', null)
+    if (!subtitleState.frozen) _emitSubtitle('', null)
     return
   }
   const elapsed = (performance.now() - subtitleState.startedAt) / 1000
@@ -287,6 +289,12 @@ export function showDialog(text, duration = 0) {
 export function hideDialog() {
   _stopCurrentDialogue()
   _emitSubtitle('')
+}
+
+// Prevent the subtitle from clearing when audio ends — useful when choices appear right after.
+// Automatically released when the next dialogue starts or hideDialog() is called.
+export function holdSubtitle() {
+  subtitleState.frozen = true
 }
 
 // Joue un dialogue par son id (déclaré dans audioConfig.json).

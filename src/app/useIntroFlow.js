@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
 import { DEFAULT_STORY_CAMERA_POVS, STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
-import { fade, stop } from '../utils/audioStore'
+import { fade, holdSubtitle, stop } from '../utils/audioStore'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -334,6 +334,7 @@ export function useIntroFlow({ sceneReady }) {
     completeStep('intro.goToReception')
     playDialogue('receptionDialogue', {
       onDone: () => {
+        holdSubtitle()
         setReceptionChoiceVisible(true)
       },
     })
