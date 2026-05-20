@@ -31,6 +31,7 @@ const PARKING_POSITIONS = [
 ]
 const DROP_THRESHOLD = 0.03
 const PIECE_LERP = 3
+const DRAG_LIFT = 0.02
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
@@ -89,6 +90,7 @@ export function JournalBook({
   // Puzzle
   const puzzlePiecesRef = useRef(null)
   const draggedPuzzlePieceRef = useRef(null)
+  const dragPlaneRef = useRef(new THREE.Plane())
   const { left, right, meshes } = useMemo(() => {
     const clone = scene.clone(true)
     const leftObject = clone.getObjectByName('book01-left')
@@ -353,8 +355,10 @@ export function JournalBook({
 
     const onPointerDown = (e) => {
       const pieces = puzzlePiecesRef.current
+      const group = groupRef.current
       if (
         !pieces ||
+        !group ||
         !pieceInteractionEnabled ||
         draggedPuzzlePieceRef.current ||
         bookStateRef.current !== 'OPEN'
@@ -371,8 +375,20 @@ export function JournalBook({
       )
       if (index === -1) return
 
-      pieces[index].state = 'dragging'
-      draggedPuzzlePieceRef.current = { index }
+      const camDir = new THREE.Vector3()
+      camera.getWorldDirection(camDir)
+      dragPlaneRef.current.setFromNormalAndCoplanarPoint(camDir.negate(), hits[0].point)
+
+      const piece = pieces[index]
+      const hitPointLocal = groupRef.current.worldToLocal(hits[0].point.clone())
+
+      piece.state = 'dragging'
+      piece.mesh.position.y = piece.targetPos.y + DRAG_LIFT
+      draggedPuzzlePieceRef.current = {
+        index,
+        offsetX: piece.mesh.position.x - hitPointLocal.x,
+        offsetZ: piece.mesh.position.z - hitPointLocal.z,
+      }
     }
 
     const onPointerMove = (e) => {
@@ -381,18 +397,17 @@ export function JournalBook({
       const group = groupRef.current
       group.updateWorldMatrix(true, false)
 
-      const piece = puzzlePiecesRef.current[draggedPuzzlePieceRef.current.index]
-      const groupWorldY = group.getWorldPosition(new THREE.Vector3()).y
-      // Plane at the piece's target height (world space), so worldToLocal gives correct local Y
-      const planeY = groupWorldY + piece.targetPos.y * MODEL_SCALE
-      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY)
+      const { index, offsetX, offsetZ } = draggedPuzzlePieceRef.current
+      const piece = puzzlePiecesRef.current[index]
 
       raycaster.setFromCamera(toNDC(e), camera)
       const hit = new THREE.Vector3()
-      if (!raycaster.ray.intersectPlane(plane, hit)) return
+      if (!raycaster.ray.intersectPlane(dragPlaneRef.current, hit)) return
 
       const localPos = group.worldToLocal(hit)
-      localPos.y = piece.targetPos.y
+      localPos.x += offsetX
+      localPos.z += offsetZ
+      localPos.y = piece.targetPos.y + DRAG_LIFT
       piece.mesh.position.copy(localPos)
     }
 
