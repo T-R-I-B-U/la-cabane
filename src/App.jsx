@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, lazy, Suspense } from 'react'
 import { io } from 'socket.io-client'
 import {
   AppLoader,
@@ -28,7 +28,7 @@ import {
 } from './core/SceneConfig'
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
-import { unlockAndPlay } from './utils/audioStore'
+import { setSubtitleChoices, unlockAndPlay } from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
 import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -416,6 +416,17 @@ export default function App() {
     [handleReceptionChoiceInternal]
   )
 
+  useLayoutEffect(() => {
+    if (receptionChoiceVisible) {
+      setSubtitleChoices([
+        { label: 'Oui', onClick: () => handleReceptionChoice('yes') },
+        { label: 'Non', onClick: () => handleReceptionChoice('no') },
+      ])
+    } else {
+      setSubtitleChoices(null)
+    }
+  }, [receptionChoiceVisible, handleReceptionChoice])
+
   const jumpToIntroStart = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToIntroStart()
@@ -694,7 +705,7 @@ export default function App() {
     const blockOutsideChoice = (event) => {
       const target = event.target
       if (!(target instanceof Element)) return
-      if (target.closest('.story-choice-card button')) return
+      if (target.closest('.story-choice-card button, .dialogue-choice-btn')) return
 
       event.preventDefault()
       event.stopPropagation()
@@ -787,13 +798,20 @@ export default function App() {
   // Auto-launch story once the loading screen has waited 7 more seconds
   // after the scene became ready, or 7 seconds after click if it was already ready.
   useEffect(() => {
-    if (readyToShow || showWelcome || sceneLoadStatus !== 'ok' || !loadingExtraDurationElapsed) return
+    if (readyToShow || showWelcome || sceneLoadStatus !== 'ok' || !loadingExtraDurationElapsed)
+      return
     const revealTimeoutId = window.setTimeout(() => {
       revealSceneAfterLoading()
     }, 0)
 
     return () => window.clearTimeout(revealTimeoutId)
-  }, [loadingExtraDurationElapsed, readyToShow, revealSceneAfterLoading, sceneLoadStatus, showWelcome])
+  }, [
+    loadingExtraDurationElapsed,
+    readyToShow,
+    revealSceneAfterLoading,
+    sceneLoadStatus,
+    showWelcome,
+  ])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
@@ -1076,7 +1094,8 @@ export default function App() {
           onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
           growingFruitClickable: arbreGrowingFruitClickable,
-          fruitsDisabled: isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
+          fruitsDisabled:
+            isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
           onGrowingFruitComplete: handleGrowingFruitComplete,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
@@ -1186,37 +1205,6 @@ export default function App() {
       )}
 
       {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
-
-      {receptionChoiceVisible && (
-        <div
-          className="story-choice"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="story-choice-title"
-        >
-          <div className="story-choice-card">
-            <p id="story-choice-title" className="story-choice-label">
-              Je te raconte l'origine du concept de Cabane si tu veux.
-            </p>
-            <div className="story-choice-actions">
-              <button
-                type="button"
-                className="camera-toggle"
-                onClick={() => handleReceptionChoice('yes')}
-              >
-                Oui
-              </button>
-              <button
-                type="button"
-                className="camera-toggle"
-                onClick={() => handleReceptionChoice('no')}
-              >
-                Non
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {returnHallVisible && (
         <div

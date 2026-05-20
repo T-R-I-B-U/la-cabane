@@ -111,6 +111,7 @@
   color: #33330f;
   line-height: 1.4;
   margin: 0;
+  max-width: 38ch;
 }
 
 .savoir-avail-col {
@@ -183,6 +184,10 @@
 
   .savoir-person {
     font-size: 28px;
+  }
+
+  .savoir-text {
+    max-width: 100%;
   }
 
   .savoir-desc-label,

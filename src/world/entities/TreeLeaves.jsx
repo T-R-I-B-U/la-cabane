@@ -346,7 +346,8 @@ export function TreeLeaves({
         }}
         onPointerDown={(e) => {
           e.stopPropagation()
-          if (!active || !onLeafClick || fruitHoverStore.anyHovered || fruitHoverStore.onCooldown) return
+          if (!active || !onLeafClick || fruitHoverStore.anyHovered || fruitHoverStore.onCooldown)
+            return
           // Under pointer lock R3F events cast from clientX/Y=0 (top-left, not center).
           // Use the id tracked by the manual center raycaster instead.
           const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId

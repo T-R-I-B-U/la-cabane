@@ -27,13 +27,14 @@ export function useNpcDialogue() {
     pending?.()
   }, [])
 
-  const playDialogue = useCallback((id, { onDone } = {}) => {
+  const playDialogue = useCallback((id, { onDone, onLastCue } = {}) => {
     const token = playbackTokenRef.current + 1
     playbackTokenRef.current = token
     setDialogueActive(true)
     pendingOnDoneRef.current = onDone ?? null
 
     playStoreDialogue(id, {
+      onLastCue,
       onDone: () => {
         if (playbackTokenRef.current !== token) return
         pendingOnDoneRef.current = null
