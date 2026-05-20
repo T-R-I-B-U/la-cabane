@@ -70,14 +70,52 @@ const SUBTITLE_TEXT = {
   minWidth: 0,
 }
 
-export default function Subtitles() {
-  const [state, setState] = useState({ text: '', speaker: null })
+const CHOICES = {
+  display: 'flex',
+  gap: 20,
+  alignItems: 'center',
+  flexShrink: 0,
+  pointerEvents: 'auto',
+}
 
-  useEffect(() => subscribeSubtitles(setState), [])
+const CHOICE_BTN = {
+  background: '#e3e7b3',
+  border: 'none',
+  borderRadius: 360,
+  padding: '8px 20px',
+  fontFamily: "'citrus-gothic-rough', serif",
+  fontSize: 32,
+  fontWeight: 400,
+  color: '#8b8e50',
+  lineHeight: 1,
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+}
 
-  const { text, speaker } = state
-  const visible = Boolean(text)
-  const speakerInfo = speaker ? SPEAKERS[speaker] : null
+export default function Subtitles({ choices }) {
+  const [sub, setSub] = useState({ text: '', speaker: null, lastText: '', lastSpeaker: null })
+
+  useEffect(
+    () =>
+      subscribeSubtitles((next) => {
+        setSub((prev) => ({
+          text: next.text,
+          speaker: next.speaker,
+          // Keep last non-empty text+speaker so bar stays populated when choices show
+          lastText: next.text ? next.text : prev.lastText,
+          lastSpeaker: next.text ? next.speaker : prev.lastSpeaker,
+        }))
+      }),
+    []
+  )
+
+  const { text, speaker, lastText, lastSpeaker } = sub
+  const hasChoices = choices && choices.length > 0
+  const visible = Boolean(text) || hasChoices
+
+  const displayText = text || (hasChoices ? lastText : '')
+  const displaySpeaker = speaker || (hasChoices ? lastSpeaker : null)
+  const speakerInfo = displaySpeaker ? SPEAKERS[displaySpeaker] : null
 
   return (
     <div style={WRAP}>
@@ -88,7 +126,16 @@ export default function Subtitles() {
             <p style={SPEAKER_NAME}>{speakerInfo.label}</p>
           </div>
         )}
-        <p style={SUBTITLE_TEXT}>{text || ' '}</p>
+        <p style={SUBTITLE_TEXT}>{displayText || ' '}</p>
+        {hasChoices && (
+          <div style={CHOICES}>
+            {choices.map(({ label, onClick }) => (
+              <button key={label} type="button" style={CHOICE_BTN} onClick={onClick}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
