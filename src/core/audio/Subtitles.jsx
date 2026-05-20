@@ -10,15 +10,19 @@ const SPEAKERS = {
 
 const WRAP = {
   position: 'fixed',
-  left: '50%',
-  bottom: 48,
-  transform: 'translateX(-50%)',
+  left: 0,
+  right: 0,
+  bottom: 0,
+  display: 'flex',
+  justifyContent: 'center',
+  padding: '60px 200px',
   zIndex: 900,
-  width: 'min(80vw, 900px)',
   pointerEvents: 'none',
 }
 
 const BOX = (visible) => ({
+  width: '100%',
+  maxWidth: 1112,
   display: 'flex',
   alignItems: 'center',
   gap: 40,
@@ -52,7 +56,7 @@ const SPEAKER_NAME = {
   color: '#33330f',
   lineHeight: 1,
   margin: 0,
-  whiteSpace: 'nowrap',
+  width: 92,
 }
 
 const SUBTITLE_TEXT = {
