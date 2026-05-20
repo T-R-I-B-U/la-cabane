@@ -17,8 +17,9 @@ const subtitleState = {
   activeId: null,
   activeSpeaker: null,
   startedAt: 0,
-  current: { text: '', speaker: null },
+  current: { text: '', speaker: null, choices: null },
   frozen: false,
+  choices: null,
   onLastCue: null,
   lastCueFired: false,
   listeners: new Set(),
@@ -66,6 +67,7 @@ function _clearTextTimers() {
 
 function _stopCurrentDialogue() {
   subtitleState.frozen = false
+  subtitleState.choices = null
   subtitleState.onLastCue = null
   subtitleState.lastCueFired = false
   _clearTextTimers()
@@ -232,8 +234,13 @@ export function unlockAndPlay() {
 
 function _emitSubtitle(text, speaker) {
   const spk = speaker !== undefined ? speaker : subtitleState.activeSpeaker
-  const next = { text, speaker: spk ?? null }
-  if (next.text === subtitleState.current.text && next.speaker === subtitleState.current.speaker)
+  const choices = subtitleState.frozen ? subtitleState.choices : null
+  const next = { text, speaker: spk ?? null, choices }
+  if (
+    next.text === subtitleState.current.text &&
+    next.speaker === subtitleState.current.speaker &&
+    next.choices === subtitleState.current.choices
+  )
     return
   subtitleState.current = next
   subtitleState.listeners.forEach((fn) => fn(next))
@@ -255,9 +262,18 @@ function _tickSubtitles() {
   const cueIdx = subs.findIndex((s) => elapsed >= s.from && elapsed < s.to)
   const cue = cueIdx >= 0 ? subs[cueIdx] : null
 
-  if (cue && cueIdx === subs.length - 1 && !subtitleState.lastCueFired && subtitleState.onLastCue) {
+  if (cue && cueIdx === subs.length - 1 && !subtitleState.lastCueFired) {
     subtitleState.lastCueFired = true
-    subtitleState.onLastCue()
+    if (subtitleState.onLastCue) {
+      subtitleState.frozen = true
+      subtitleState.onLastCue()
+    }
+  }
+
+  // When frozen and no active cue (silence after last cue), keep current text visible
+  if (!cue && subtitleState.frozen) {
+    subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
+    return
   }
 
   _emitSubtitle(cue ? cue.text : '')
@@ -283,6 +299,15 @@ export function subscribeSubtitles(fn) {
   subtitleState.listeners.add(fn)
   fn({ ...subtitleState.current })
   return () => subtitleState.listeners.delete(fn)
+}
+
+// Set choices to display in the subtitle bar (called from UI when a branching dialogue starts).
+// Choices are automatically cleared when the next dialogue starts.
+export function setSubtitleChoices(choices) {
+  subtitleState.choices = choices ?? null
+  const next = { ...subtitleState.current, choices: subtitleState.choices }
+  subtitleState.current = next
+  subtitleState.listeners.forEach((fn) => fn(next))
 }
 
 // Affiche du texte dans la zone dialogue sans audio.

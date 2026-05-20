@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, lazy, Suspense } from 'react'
 import { io } from 'socket.io-client'
 import {
   AppLoader,
@@ -28,7 +28,7 @@ import {
 } from './core/SceneConfig'
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
-import { unlockAndPlay } from './utils/audioStore'
+import { setSubtitleChoices, unlockAndPlay } from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
 import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -415,6 +415,17 @@ export default function App() {
     },
     [handleReceptionChoiceInternal]
   )
+
+  useLayoutEffect(() => {
+    if (receptionChoiceVisible) {
+      setSubtitleChoices([
+        { label: 'Oui', onClick: () => handleReceptionChoice('yes') },
+        { label: 'Non', onClick: () => handleReceptionChoice('no') },
+      ])
+    } else {
+      setSubtitleChoices(null)
+    }
+  }, [receptionChoiceVisible, handleReceptionChoice])
 
   const jumpToIntroStart = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
@@ -981,16 +992,7 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      <Subtitles
-        choices={
-          receptionChoiceVisible
-            ? [
-                { label: 'Oui', onClick: () => handleReceptionChoice('yes') },
-                { label: 'Non', onClick: () => handleReceptionChoice('no') },
-              ]
-            : null
-        }
-      />
+      <Subtitles />
 
       <Crosshair
         visible={

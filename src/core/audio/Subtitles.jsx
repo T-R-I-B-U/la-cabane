@@ -92,12 +92,12 @@ const CHOICE_BTN = {
   whiteSpace: 'nowrap',
 }
 
-export default function Subtitles({ choices }) {
-  const [state, setState] = useState({ text: '', speaker: null })
+export default function Subtitles() {
+  const [state, setState] = useState({ text: '', speaker: null, choices: null })
 
   useEffect(() => subscribeSubtitles(setState), [])
 
-  const { text, speaker } = state
+  const { text, speaker, choices } = state
   const hasChoices = choices && choices.length > 0
   const visible = Boolean(text) || hasChoices
   const speakerInfo = speaker ? SPEAKERS[speaker] : null
