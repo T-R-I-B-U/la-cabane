@@ -4,6 +4,69 @@ import { applyAutoTextures } from './textureResolver'
 import { assetModelCandidates, modelBaseName } from './assetNaming'
 import { cloneMaterialWithTextures, warnMissingAsset } from './runtime'
 
+const INSTANCED_SHADOW_EXCLUDED_GROUPS = new Set(['outsideplant02', 'outsideplant03'])
+const INSTANCED_SHADOW_CASTER_GROUPS = new Set([
+  'backgroundTree',
+  'juicemachine',
+  'juiceglass',
+  'ladder',
+  'stairs01',
+  'stairs02',
+  'welcome01',
+  'railling',
+  'railling-hut',
+  'timeatm',
+  'hill',
+  'bulding',
+  'lampe',
+  'lampe-mushroom',
+  'cabinet',
+  'shelves',
+  'counter01',
+  'armchair',
+  'chair',
+  'chair-large',
+  'littletable',
+  'stool',
+  'basket',
+  'drawing',
+  'hearth',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
+  'rug01',
+  'rug02',
+])
+const INSTANCED_SHADOW_RECEIVER_GROUPS = new Set([
+  'house',
+  'lampe',
+  'lampe-mushroom',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
+  'counter01',
+  'shelves',
+  'cabinet',
+  'armchair',
+  'chair',
+  'chair-large',
+  'littletable',
+  'stool',
+  'basket',
+  'drawing',
+  'hearth',
+  'rug01',
+  'rug02',
+])
+
 function getModelCandidates(baseName, modelBasePaths) {
   return modelBasePaths.flatMap((basePath) =>
     assetModelCandidates(baseName).flatMap((candidate) => [
@@ -77,8 +140,9 @@ export async function buildGroupInstanced(groupName, nodes, { modelBasePaths, te
 
   for (const { geometry, material } of subMeshDefs) {
     const instancedMesh = new THREE.InstancedMesh(geometry, material, count)
-    instancedMesh.castShadow = false
-    instancedMesh.receiveShadow = true
+    const isShadowExcluded = INSTANCED_SHADOW_EXCLUDED_GROUPS.has(groupName)
+    instancedMesh.castShadow = INSTANCED_SHADOW_CASTER_GROUPS.has(groupName)
+    instancedMesh.receiveShadow = !isShadowExcluded && INSTANCED_SHADOW_RECEIVER_GROUPS.has(groupName)
     for (let i = 0; i < count; i++) {
       instancedMesh.setMatrixAt(i, instanceMatrices[i])
     }

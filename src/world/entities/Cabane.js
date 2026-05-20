@@ -1,13 +1,133 @@
 import * as THREE from 'three'
 import { buildNode } from '../cabane/nodeBuilder'
 import { buildGroupInstanced } from '../cabane/groupInstancing'
-import { modelBaseName } from '../cabane/assetNaming'
+import { modelBaseName, normalizeAssetName } from '../cabane/assetNaming'
 import { findNodePosition } from '../cabane/runtime'
 export { clearTextureCache } from '../cabane/textureResolver'
 
 // Min geometry dimension (meters) for a mesh to cast shadows.
 // Excludes small props (stools, glasses, signs) while keeping large surfaces (walls, trunk, stairs).
-const SHADOW_CAST_MIN_DIM = 2.0
+const SHADOW_CAST_MIN_DIM = 3.5
+const SHADOW_CASTER_ROOTS = new Set([
+  'hut01',
+  'trunk',
+  'greenhouse',
+  'nest',
+  'house',
+  'platform-hut',
+  'backgroundTree',
+  'juicemachine',
+  'juiceglass',
+  'ladder',
+  'stairs01',
+  'stairs02',
+  'welcome01',
+  'railling',
+  'railling-hut',
+  'timeatm',
+  'hill',
+  'bulding',
+  'lampe',
+  'lampe-mushroom',
+  'cabinet',
+  'shelves',
+  'counter01',
+  'armchair',
+  'chair',
+  'chair-large',
+  'littletable',
+  'stool',
+  'workbench01',
+  'basket',
+  'drawing',
+  'hearth',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
+  'rug01',
+  'rug02',
+])
+const FORCED_SMALL_SHADOW_CASTER_ROOTS = new Set([
+  'lampe',
+  'lampe-mushroom',
+  'chair',
+  'chair-large',
+  'armchair',
+  'littletable',
+  'stool',
+  'basket',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
+])
+const SHADOW_RECEIVER_ROOTS = new Set([
+  'hut01',
+  'trunk',
+  'greenhouse',
+  'nest',
+  'house',
+  'platform-hut',
+  'lampe',
+  'lampe-mushroom',
+  'plant01',
+  'plant01-1',
+  'plant02',
+  'plant02-1',
+  'plant03',
+  'plant04',
+  'plant05',
+  'counter01',
+  'shelves',
+  'cabinet',
+  'armchair',
+  'chair',
+  'chair-large',
+  'littletable',
+  'stool',
+  'workbench01',
+  'basket',
+  'drawing',
+  'hearth',
+  'rug01',
+  'rug02',
+])
+const SHADOW_EXCLUDED_NAMES = [/plane/i, /^background$/i, /poster/i, /^outsideplant0[23]$/i]
+const LIGHT_PASSING_SURFACE_NAMES = new Set([
+  'glass',
+  'cross-window',
+  'hut-verre',
+  'hut-verriere',
+  'hut-verrière',
+  'hut-verriere-haut',
+  'hut-verrière-haut',
+  'hut-verriere-top',
+  'hut-verrière-top',
+  'tour-fenetre',
+  'tour-fenêtre',
+  'fenetre',
+  'fenetre1',
+  'window01',
+  'window02',
+  'window03',
+])
+const LIGHT_PASSING_SURFACE_PATTERNS = [
+  /glass/i,
+  /window/i,
+  /verre/i,
+  /verriere/i,
+  /verrière/i,
+  /fenetre/i,
+  /fenêtre/i,
+]
+const HUT_SKYLIGHT_PATTERNS = [/hut-verr/i, /hut-verre/i]
 
 // Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
@@ -100,6 +220,85 @@ function createRailingSegmentCollider(start, end) {
 
   collider.rotation.y = Math.atan2(delta.x, delta.z)
   return collider
+}
+
+function forEachMaterial(material, callback) {
+  if (Array.isArray(material)) material.forEach(callback)
+  else if (material) callback(material)
+}
+
+function isLightPassingSurface(obj) {
+  let node = obj
+  while (node) {
+    const nodeName = node.name || ''
+    const normalizedName = normalizeAssetName(nodeName)
+    if (LIGHT_PASSING_SURFACE_NAMES.has(normalizedName)) return true
+    if (LIGHT_PASSING_SURFACE_PATTERNS.some((pattern) => pattern.test(nodeName))) return true
+    node = node.parent
+  }
+  return false
+}
+
+function configureLightPassingMaterial(obj) {
+  const isHutSkylight = HUT_SKYLIGHT_PATTERNS.some((pattern) => pattern.test(obj.name || ''))
+
+  forEachMaterial(obj.material, (material) => {
+    material.transparent = true
+    material.opacity = 0.9
+    material.depthWrite = isHutSkylight
+    material.side = isHutSkylight ? THREE.FrontSide : THREE.DoubleSide
+    if ('metalness' in material) material.metalness = 0
+    if ('roughness' in material) material.roughness = 0.18
+    if ('transmission' in material) {
+      material.transmission = isHutSkylight ? 0.08 : 0.18
+      material.thickness = 0.08
+    }
+    material.needsUpdate = true
+  })
+}
+
+function hasShadowExcludedName(obj) {
+  let node = obj
+  while (node) {
+    if (SHADOW_EXCLUDED_NAMES.some((pattern) => pattern.test(node.name))) return true
+    node = node.parent
+  }
+  return false
+}
+
+function isShadowCasterCandidate(obj) {
+  if (hasShadowExcludedName(obj)) return false
+
+  let node = obj
+  while (node) {
+    if (SHADOW_CASTER_ROOTS.has(node.name)) return true
+    node = node.parent
+  }
+
+  return false
+}
+
+function isShadowReceiverCandidate(obj) {
+  if (obj.userData.isFloor) return true
+  if (hasShadowExcludedName(obj)) return false
+
+  let node = obj
+  while (node) {
+    if (SHADOW_RECEIVER_ROOTS.has(node.name)) return true
+    node = node.parent
+  }
+
+  return false
+}
+
+function isForcedSmallShadowCaster(obj) {
+  let node = obj
+  while (node) {
+    if (FORCED_SMALL_SHADOW_CASTER_ROOTS.has(node.name)) return true
+    node = node.parent
+  }
+
+  return false
 }
 
 function attachRailingColliders(railingObject) {
@@ -337,12 +536,24 @@ export async function buildCabane({
   // Small props (stools, glasses, signs) are excluded to reduce shadow map draw calls.
   root.traverse((obj) => {
     if (!obj.isMesh || !obj.geometry) return
+    if (isLightPassingSurface(obj)) {
+      obj.receiveShadow = false
+      obj.castShadow = false
+      configureLightPassingMaterial(obj)
+      return
+    }
+    obj.receiveShadow = isShadowReceiverCandidate(obj)
+    obj.castShadow = false
+    if (!isShadowCasterCandidate(obj)) return
+    if (isForcedSmallShadowCaster(obj)) {
+      obj.castShadow = true
+      return
+    }
     if (!obj.geometry.boundingBox) obj.geometry.computeBoundingBox()
     const { max, min } = obj.geometry.boundingBox
     const dim = Math.max(max.x - min.x, max.y - min.y, max.z - min.z)
     if (dim >= SHADOW_CAST_MIN_DIM) {
       obj.castShadow = true
-      obj.receiveShadow = true
     }
   })
 

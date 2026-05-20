@@ -109,8 +109,8 @@ export function JournalBook({
         object.visible = false
         return
       }
-      object.castShadow = true
-      object.receiveShadow = true
+      object.castShadow = false
+      object.receiveShadow = false
       meshList.push(object)
     })
 
