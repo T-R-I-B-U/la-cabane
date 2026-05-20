@@ -51,8 +51,8 @@ export function SceneLighting({ activeHdriId }) {
             SUN_SHADOW_BOUNDS,
             SUN_SHADOW_BOUNDS,
             -SUN_SHADOW_BOUNDS,
-            1,
-            260,
+            50,
+            200,
           ]}
         />
       </directionalLight>
