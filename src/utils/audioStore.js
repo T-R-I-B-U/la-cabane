@@ -15,8 +15,9 @@ const store = {
 
 const subtitleState = {
   activeId: null,
+  activeSpeaker: null,
   startedAt: 0,
-  current: '',
+  current: { text: '', speaker: null },
   listeners: new Set(),
   rafId: 0,
   hideTimeoutId: 0,
@@ -68,6 +69,7 @@ function _stopCurrentDialogue() {
     if (track?.audio?.isPlaying) track.audio.stop()
   }
   subtitleState.activeId = null
+  subtitleState.activeSpeaker = null
   if (subtitleState.rafId) {
     cancelAnimationFrame(subtitleState.rafId)
     subtitleState.rafId = 0
@@ -222,10 +224,13 @@ export function unlockAndPlay() {
   }
 }
 
-function _emitSubtitle(text) {
-  if (text === subtitleState.current) return
-  subtitleState.current = text
-  subtitleState.listeners.forEach((fn) => fn(text))
+function _emitSubtitle(text, speaker) {
+  const spk = speaker !== undefined ? speaker : subtitleState.activeSpeaker
+  const next = { text, speaker: spk ?? null }
+  if (next.text === subtitleState.current.text && next.speaker === subtitleState.current.speaker)
+    return
+  subtitleState.current = next
+  subtitleState.listeners.forEach((fn) => fn(next))
 }
 
 function _tickSubtitles() {
@@ -234,8 +239,9 @@ function _tickSubtitles() {
   const track = _getAudioTrack(id)
   if (!track || !track.audio.isPlaying) {
     subtitleState.activeId = null
+    subtitleState.activeSpeaker = null
     subtitleState.rafId = 0
-    _emitSubtitle('')
+    _emitSubtitle('', null)
     return
   }
   const elapsed = (performance.now() - subtitleState.startedAt) / 1000
@@ -250,6 +256,7 @@ function _startSubtitles(id) {
   const subs = track.cfg.subtitles
   if (!subs || subs.length === 0) return
   subtitleState.activeId = id
+  subtitleState.activeSpeaker = track.cfg.speaker ?? null
   subtitleState.startedAt = performance.now()
   if (!subtitleState.rafId) {
     subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
@@ -258,7 +265,7 @@ function _startSubtitles(id) {
 
 export function subscribeSubtitles(fn) {
   subtitleState.listeners.add(fn)
-  fn(subtitleState.current)
+  fn({ ...subtitleState.current })
   return () => subtitleState.listeners.delete(fn)
 }
 
@@ -318,9 +325,12 @@ export function playDialogue(id, { onDone } = {}) {
       return
     }
 
+    const speaker = track.cfg.speaker ?? null
     cues.forEach((cue) => {
-      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle(cue.text), cue.from * 1000))
-      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle(''), cue.to * 1000))
+      subtitleState.textTimers.push(
+        setTimeout(() => _emitSubtitle(cue.text, speaker), cue.from * 1000)
+      )
+      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle('', null), cue.to * 1000))
     })
 
     if (onDone) {

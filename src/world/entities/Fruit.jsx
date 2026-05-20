@@ -86,8 +86,12 @@ export function Fruit({
 
   const activeRef = useRef(active)
   const onFruitClickRef = useRef(onFruitClick)
-  useEffect(() => { activeRef.current = active }, [active])
-  useEffect(() => { onFruitClickRef.current = onFruitClick }, [onFruitClick])
+  useEffect(() => {
+    activeRef.current = active
+  }, [active])
+  useEffect(() => {
+    onFruitClickRef.current = onFruitClick
+  }, [onFruitClick])
 
   useEffect(() => {
     const onMouseDown = () => {

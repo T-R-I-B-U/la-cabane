@@ -787,13 +787,20 @@ export default function App() {
   // Auto-launch story once the loading screen has waited 7 more seconds
   // after the scene became ready, or 7 seconds after click if it was already ready.
   useEffect(() => {
-    if (readyToShow || showWelcome || sceneLoadStatus !== 'ok' || !loadingExtraDurationElapsed) return
+    if (readyToShow || showWelcome || sceneLoadStatus !== 'ok' || !loadingExtraDurationElapsed)
+      return
     const revealTimeoutId = window.setTimeout(() => {
       revealSceneAfterLoading()
     }, 0)
 
     return () => window.clearTimeout(revealTimeoutId)
-  }, [loadingExtraDurationElapsed, readyToShow, revealSceneAfterLoading, sceneLoadStatus, showWelcome])
+  }, [
+    loadingExtraDurationElapsed,
+    readyToShow,
+    revealSceneAfterLoading,
+    sceneLoadStatus,
+    showWelcome,
+  ])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
@@ -1076,7 +1083,8 @@ export default function App() {
           onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
           growingFruitClickable: arbreGrowingFruitClickable,
-          fruitsDisabled: isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
+          fruitsDisabled:
+            isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
           onGrowingFruitComplete: handleGrowingFruitComplete,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
