@@ -3,53 +3,21 @@ import { buildNode } from '../cabane/nodeBuilder'
 import { buildGroupInstanced } from '../cabane/groupInstancing'
 import { modelBaseName, normalizeAssetName } from '../cabane/assetNaming'
 import { findNodePosition } from '../cabane/runtime'
+import { SHARED_SHADOW_CASTER_ROOTS, SHARED_SHADOW_RECEIVER_ROOTS } from '../cabane/shadowConfig'
 export { clearTextureCache } from '../cabane/textureResolver'
 
 // Min geometry dimension (meters) for a mesh to cast shadows.
 // Excludes small props (stools, glasses, signs) while keeping large surfaces (walls, trunk, stairs).
 const SHADOW_CAST_MIN_DIM = 3.5
 const SHADOW_CASTER_ROOTS = new Set([
+  ...SHARED_SHADOW_CASTER_ROOTS,
   'hut01',
   'trunk',
   'greenhouse',
   'nest',
   'house',
   'platform-hut',
-  'backgroundTree',
-  'juicemachine',
-  'juiceglass',
-  'ladder',
-  'stairs01',
-  'stairs02',
-  'welcome01',
-  'railling',
-  'railling-hut',
-  'timeatm',
-  'hill',
-  'bulding',
-  'lampe',
-  'lampe-mushroom',
-  'cabinet',
-  'shelves',
-  'counter01',
-  'armchair',
-  'chair',
-  'chair-large',
-  'littletable',
-  'stool',
   'workbench01',
-  'basket',
-  'drawing',
-  'hearth',
-  'plant01',
-  'plant01-1',
-  'plant02',
-  'plant02-1',
-  'plant03',
-  'plant04',
-  'plant05',
-  'rug01',
-  'rug02',
 ])
 const FORCED_SMALL_SHADOW_CASTER_ROOTS = new Set([
   'lampe',
@@ -69,35 +37,14 @@ const FORCED_SMALL_SHADOW_CASTER_ROOTS = new Set([
   'plant05',
 ])
 const SHADOW_RECEIVER_ROOTS = new Set([
+  ...SHARED_SHADOW_RECEIVER_ROOTS,
   'hut01',
   'trunk',
   'greenhouse',
   'nest',
   'house',
   'platform-hut',
-  'lampe',
-  'lampe-mushroom',
-  'plant01',
-  'plant01-1',
-  'plant02',
-  'plant02-1',
-  'plant03',
-  'plant04',
-  'plant05',
-  'counter01',
-  'shelves',
-  'cabinet',
-  'armchair',
-  'chair',
-  'chair-large',
-  'littletable',
-  'stool',
   'workbench01',
-  'basket',
-  'drawing',
-  'hearth',
-  'rug01',
-  'rug02',
 ])
 const SHADOW_EXCLUDED_NAMES = [/plane/i, /^background$/i, /poster/i, /^outsideplant0[23]$/i]
 const LIGHT_PASSING_SURFACE_NAMES = new Set([

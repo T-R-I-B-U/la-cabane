@@ -3,68 +3,13 @@ import { loadModel } from '../../core/Loader'
 import { applyAutoTextures } from './textureResolver'
 import { assetModelCandidates, modelBaseName } from './assetNaming'
 import { cloneMaterialWithTextures, warnMissingAsset } from './runtime'
+import { SHARED_SHADOW_CASTER_ROOTS, SHARED_SHADOW_RECEIVER_ROOTS } from './shadowConfig'
 
 const INSTANCED_SHADOW_EXCLUDED_GROUPS = new Set(['outsideplant02', 'outsideplant03'])
-const INSTANCED_SHADOW_CASTER_GROUPS = new Set([
-  'backgroundTree',
-  'juicemachine',
-  'juiceglass',
-  'ladder',
-  'stairs01',
-  'stairs02',
-  'welcome01',
-  'railling',
-  'railling-hut',
-  'timeatm',
-  'hill',
-  'bulding',
-  'lampe',
-  'lampe-mushroom',
-  'cabinet',
-  'shelves',
-  'counter01',
-  'armchair',
-  'chair',
-  'chair-large',
-  'littletable',
-  'stool',
-  'basket',
-  'drawing',
-  'hearth',
-  'plant01',
-  'plant01-1',
-  'plant02',
-  'plant02-1',
-  'plant03',
-  'plant04',
-  'plant05',
-  'rug01',
-  'rug02',
-])
+const INSTANCED_SHADOW_CASTER_GROUPS = SHARED_SHADOW_CASTER_ROOTS
 const INSTANCED_SHADOW_RECEIVER_GROUPS = new Set([
-  'house',
-  'lampe',
-  'lampe-mushroom',
-  'plant01',
-  'plant01-1',
-  'plant02',
-  'plant02-1',
-  'plant03',
-  'plant04',
-  'plant05',
-  'counter01',
-  'shelves',
-  'cabinet',
-  'armchair',
-  'chair',
-  'chair-large',
-  'littletable',
-  'stool',
-  'basket',
-  'drawing',
-  'hearth',
-  'rug01',
-  'rug02',
+  ...SHARED_SHADOW_RECEIVER_ROOTS,
+  'house', // instanced variant — house is in SKIP_GROUPING for single instances
 ])
 
 function getModelCandidates(baseName, modelBasePaths) {
