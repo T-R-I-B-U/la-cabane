@@ -65,6 +65,13 @@
   padding-top: 200px; /* push below fruit image */
   text-align: right;
   word-break: break-word;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .pfp-bottom-section {
