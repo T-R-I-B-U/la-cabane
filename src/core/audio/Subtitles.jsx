@@ -31,7 +31,10 @@ const BOX = (visible) => ({
   borderRadius: 18,
   opacity: visible ? 1 : 0,
   transform: `translateY(${visible ? 0 : 6}px)`,
-  transition: 'opacity 180ms ease, transform 240ms ease',
+  // Delay fade-out by 300ms so choices can appear without a visible text-clear flicker
+  transition: visible
+    ? 'opacity 180ms ease, transform 240ms ease'
+    : 'opacity 180ms ease 300ms, transform 240ms ease 300ms',
 })
 
 const SPEAKER_SECTION = {
