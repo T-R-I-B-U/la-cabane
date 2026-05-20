@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
-import * as THREE from 'three'
+import { ACESFilmicToneMapping } from 'three'
 import { initKTX2Loader } from './ktx2Loader.js'
 import AudioManager from './audio/AudioManager'
 import { Floor } from './Floor'
@@ -140,14 +140,9 @@ export default function Scene({
         far: 500,
         position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
-      shadows
-      onCreated={({ gl }) => {
-        initKTX2Loader(gl)
-        gl.shadowMap.enabled = true
-        gl.shadowMap.type = THREE.PCFSoftShadowMap
-        gl.toneMapping = THREE.ACESFilmicToneMapping
-        gl.toneMappingExposure = 1.1
-      }}
+      shadows="soft"
+      gl={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
+      onCreated={({ gl }) => initKTX2Loader(gl)}
     >
       <StatsCollector onStats={onStats} />
       <AudioManager />
