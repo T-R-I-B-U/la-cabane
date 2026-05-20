@@ -104,7 +104,6 @@ export default function Scene({
   } = interactions
 
   const {
-    active: arbreActive,
     storyCameraTransition: arbreStoryCameraTransition,
     onTransitionComplete: onArbreTransitionComplete,
     ladderClickActive,
@@ -113,8 +112,9 @@ export default function Scene({
     onStairsClick,
     onStairsHover,
     growingFruitPlaying: arbreGrowingFruitPlaying,
-    fruitsClickActive,
-    onFruitClickDuringLeaves,
+    growingFruitClickable: arbreGrowingFruitClickable,
+    fruitsDisabled: arbreFruitsDisabled,
+    onGrowingFruitComplete,
     leafInteractionsEnabled: arbreLeafInteractionsEnabled,
   } = arbre
 
@@ -125,8 +125,7 @@ export default function Scene({
   const [platformPosition, setPlatformPosition] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const areSceneInteractionsEnabled =
-    (playerMode || postIntro) && !interactionLocked && interactionsEnabled
+  const areArbreFruitsInteractionsEnabled = (playerMode || postIntro) && !interactionLocked
   const collisionObjects = useMemo(
     () => [...sceneColliders, mainFloorCollider].filter(Boolean),
     [sceneColliders, mainFloorCollider]
@@ -229,13 +228,13 @@ export default function Scene({
         <Suspense fallback={null}>
           <ArbreScene
             platformPosition={platformPosition}
-            arbreActive={arbreActive}
             growingFruitPlaying={arbreGrowingFruitPlaying}
-            fruitsClickActive={fruitsClickActive}
-            onFruitClickDuringLeaves={onFruitClickDuringLeaves}
+            growingFruitClickable={arbreGrowingFruitClickable}
+            fruitsDisabled={arbreFruitsDisabled}
+            onGrowingFruitComplete={onGrowingFruitComplete}
             onFruitClick={onFruitClick}
             onFruitHover={onFruitHover}
-            interactionsEnabled={areSceneInteractionsEnabled}
+            interactionsEnabled={areArbreFruitsInteractionsEnabled}
           />
         </Suspense>
       )}

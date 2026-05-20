@@ -1,9 +1,11 @@
 import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
+import { io } from 'socket.io-client'
 import {
   AppLoader,
   Crosshair,
   FinalScreen,
   GameManager,
+  LeafArrival,
   LoadingScreen,
   NameInput,
   SavoirPanel,
@@ -12,6 +14,7 @@ import {
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
+import { PlayerFruitPanel } from './app/PlayerFruitPanel'
 import { RaspberryCounter } from './app/RaspberryCounter'
 import { useContactAssignment } from './app/useContactAssignment'
 import { useArbreFlow } from './app/useArbreFlow'
@@ -27,11 +30,14 @@ import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
 import { unlockAndPlay } from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
+import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
 import { CustomCursor } from './app/CustomCursor'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
+const SOCKET_URL = `http://${window.location.hostname}:3001`
+const LOADING_EXTRA_DURATION_MS = 7000
 const ViewerControls = lazy(() =>
   import('./app/ViewerControls').then((mod) => ({ default: mod.ViewerControls }))
 )
@@ -46,10 +52,13 @@ const PerfMonitor = lazy(() =>
 )
 export default function App() {
   const isDevBuild = import.meta.env.DEV
+  const [incomingSavoir, setIncomingSavoir] = useState(null)
+  const [leafArriving, setLeafArriving] = useState(false)
+  const [hasSentSavoir, setHasSentSavoir] = useState(false)
+  const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
-  const [loadingMinTimerDone, setLoadingMinTimerDone] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
@@ -75,6 +84,7 @@ export default function App() {
   const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
   const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
   const [isContactPanelOpen, setIsContactPanelOpen] = useState(false)
+  const [isPlayerFruitPanelOpen, setIsPlayerFruitPanelOpen] = useState(false)
   const [isLeafHovered, setIsLeafHovered] = useState(false)
   const [isFruitHovered, setIsFruitHovered] = useState(false)
   const [isStairsHovered, setIsStairsHovered] = useState(false)
@@ -89,6 +99,10 @@ export default function App() {
   const isCursorVisibleRef = useRef(false)
   const isCameraBlockedRef = useRef(false)
   const isModalOpenRef = useRef(false)
+  const loadingRevealTimeoutRef = useRef(null)
+  const loadingRevealScheduledRef = useRef(false)
+  const [loadingSequenceStarted, setLoadingSequenceStarted] = useState(false)
+  const [loadingExtraDurationElapsed, setLoadingExtraDurationElapsed] = useState(false)
 
   const {
     selectedSavoirAssignment,
@@ -161,6 +175,7 @@ export default function App() {
     arbreLadderPending,
     zoeClip,
     minigameCount,
+    playerName,
     showNameInput,
     storyReady,
     currentStoryStepId,
@@ -204,6 +219,11 @@ export default function App() {
     skipDialogue: skipIntroDialogue,
     setPostIntro,
   } = useIntroFlow({ sceneReady })
+
+  const revealSceneAfterLoading = useCallback(() => {
+    startIntro()
+    setReadyToShow(true)
+  }, [startIntro])
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
@@ -274,14 +294,18 @@ export default function App() {
     stairsClickActive,
     ladderIsStoryMode,
     growingFruitPlaying: arbreGrowingFruitPlaying,
-    fruitsClickActive,
+    growingFruitClickable: arbreGrowingFruitClickable,
+    handleGrowingFruitComplete,
+    handleSavoirReceived,
+    handleIncomingSavoirClosed,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
     handleStairsClick,
     handleArbreTransitionComplete,
-    handleFruitClickDuringLeaves,
     handleLeafSavoirClosed,
+    handlePlayerFruitPanelClose,
     triggerArbreBase,
+    triggerArbreTop,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
@@ -296,7 +320,6 @@ export default function App() {
       setIsPlayerModeActive(false)
       setIsFlyModeActive(false)
       exitIntro()
-      document.exitPointerLock()
     }, [exitIntro]),
   })
 
@@ -307,13 +330,17 @@ export default function App() {
       isModalOpenRef.current = true
       setIsSavoirInteractionActive(true)
       setShouldRestorePointerLockAfterStoryUi(true)
-      pointerControlsRef.current?.unlock()
     },
     [openSavoirForLeaf]
   )
 
   const openContactFromFruit = useCallback(
     (fruitId) => {
+      if (fruitId === 'fruit_player') {
+        setIsPlayerFruitPanelOpen(true)
+        setShouldRestorePointerLockAfterStoryUi(true)
+        return
+      }
       const didOpen = openContactForFruit(fruitId)
       if (!didOpen) return
       setIsContactInteractionActive(true)
@@ -337,8 +364,10 @@ export default function App() {
       isSavoirInteractionActive ||
       selectedContactAssignment ||
       isContactInteractionActive ||
+      isPlayerFruitPanelOpen ||
       isJournalInteractionActive ||
-      raspberryPhaseActive
+      raspberryPhaseActive ||
+      !!incomingSavoir
     ) {
       return
     }
@@ -357,6 +386,7 @@ export default function App() {
     dialogueActive,
     introMovementLocked,
     isContactInteractionActive,
+    isPlayerFruitPanelOpen,
     isJournalInteractionActive,
     isPlayerModeActive,
     isSavoirInteractionActive,
@@ -367,6 +397,7 @@ export default function App() {
     selectedContactAssignment,
     selectedSavoirAssignment,
     showNameInput,
+    incomingSavoir,
   ])
 
   const handleNameSubmit = useCallback(
@@ -452,6 +483,28 @@ export default function App() {
     triggerArbreBase()
   }, [setPostIntro, triggerArbreBase])
 
+  const handleGoToArbreTop = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    // Spawn libre : mouvement non verrouillé, pointer lock demandé normalement
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+    triggerArbreTop()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
   const handleGoToNestDialogue25 = useCallback(() => {
     arbreStoryContinuityRef.current = true
     setShouldRestorePointerLockAfterStoryUi(false)
@@ -512,6 +565,7 @@ export default function App() {
     closeSavoirInternal()
     setIsSavoirInteractionActive(false)
     setIsSavoirPanelOpen(false)
+    fruitHoverStore.startCooldown()
     handleLeafSavoirClosed()
     // ContactPanel/SavoirPanel stop click propagation so Drei's document.click
     // handler never fires. Call lock() directly — we're still in the user gesture.
@@ -523,6 +577,7 @@ export default function App() {
     closeContactInternal()
     setIsContactInteractionActive(false)
     setIsContactPanelOpen(false)
+    fruitHoverStore.startCooldown()
     pointerControlsRef.current?.lock()
   }, [closeContactInternal])
 
@@ -535,6 +590,24 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [isContactInteractionActive, handleCloseContact])
+
+  const handleClosePlayerFruitPanel = useCallback(() => {
+    setIsPlayerFruitPanelOpen(false)
+    setShouldRestorePointerLockAfterStoryUi(false)
+    fruitHoverStore.startCooldown()
+    handlePlayerFruitPanelClose()
+    pointerControlsRef.current?.lock()
+  }, [handlePlayerFruitPanelClose])
+
+  useEffect(() => {
+    if (!isPlayerFruitPanelOpen) return
+    const onKeyDown = (e) => {
+      if (e.code !== 'Escape') return
+      handleClosePlayerFruitPanel()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isPlayerFruitPanelOpen, handleClosePlayerFruitPanel])
 
   const isStoryBlockingPlayer =
     dialogueActive ||
@@ -639,6 +712,14 @@ export default function App() {
   }, [receptionChoiceVisible])
 
   useEffect(() => {
+    return () => {
+      if (loadingRevealTimeoutRef.current) {
+        clearTimeout(loadingRevealTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
@@ -684,16 +765,35 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
 
-  // Auto-launch story once loading screen min-timer and scene load are both done.
-  // startIntro() sets both introPending and introActive in one stable callback so
-  // the effect never re-runs mid-story due to a stale reference.
-  // 500ms delay before showing the scene avoids a camera teleport on first frame.
+  const startLoadingRevealCountdown = useCallback(() => {
+    if (loadingRevealScheduledRef.current) return
+
+    loadingRevealScheduledRef.current = true
+    if (loadingRevealTimeoutRef.current) {
+      clearTimeout(loadingRevealTimeoutRef.current)
+    }
+
+    loadingRevealTimeoutRef.current = window.setTimeout(() => {
+      setLoadingExtraDurationElapsed(true)
+      loadingRevealTimeoutRef.current = null
+    }, LOADING_EXTRA_DURATION_MS)
+  }, [])
+
   useEffect(() => {
-    if (showWelcome || !loadingMinTimerDone || sceneLoadStatus !== 'ok') return
-    startIntro()
-    const t = setTimeout(() => setReadyToShow(true), 500)
-    return () => clearTimeout(t)
-  }, [showWelcome, loadingMinTimerDone, sceneLoadStatus, startIntro])
+    if (sceneLoadStatus !== 'ok' || !loadingSequenceStarted) return
+    startLoadingRevealCountdown()
+  }, [loadingSequenceStarted, sceneLoadStatus, startLoadingRevealCountdown])
+
+  // Auto-launch story once the loading screen has waited 7 more seconds
+  // after the scene became ready, or 7 seconds after click if it was already ready.
+  useEffect(() => {
+    if (readyToShow || showWelcome || sceneLoadStatus !== 'ok' || !loadingExtraDurationElapsed) return
+    const revealTimeoutId = window.setTimeout(() => {
+      revealSceneAfterLoading()
+    }, 0)
+
+    return () => window.clearTimeout(revealTimeoutId)
+  }, [loadingExtraDurationElapsed, readyToShow, revealSceneAfterLoading, sceneLoadStatus, showWelcome])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
@@ -715,7 +815,9 @@ export default function App() {
     isJournalInteractionActive ||
     raspberryPhaseActive ||
     isSavoirInteractionActive ||
-    isContactInteractionActive
+    isContactInteractionActive ||
+    isPlayerFruitPanelOpen ||
+    !!incomingSavoir
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
@@ -737,18 +839,61 @@ export default function App() {
   useEffect(() => {
     isCameraBlockedRef.current =
       postIntro &&
-      (showNameInput || receptionChoiceVisible || returnHallVisible || isJournalInteractionActive)
+      (showNameInput ||
+        receptionChoiceVisible ||
+        returnHallVisible ||
+        isJournalInteractionActive ||
+        isPlayerFruitPanelOpen ||
+        isSavoirInteractionActive ||
+        isContactInteractionActive ||
+        !!incomingSavoir)
   }, [
     postIntro,
     showNameInput,
     receptionChoiceVisible,
     returnHallVisible,
     isJournalInteractionActive,
+    isPlayerFruitPanelOpen,
+    isSavoirInteractionActive,
+    isContactInteractionActive,
+    incomingSavoir,
   ])
 
   useEffect(() => {
     isModalOpenRef.current = isSavoirInteractionActive || isContactInteractionActive
   }, [isSavoirInteractionActive, isContactInteractionActive])
+
+  useEffect(() => {
+    const socket = io(SOCKET_URL)
+    socket.on('savoir-received', (data) => {
+      const savoir = {
+        title: data.title ?? data.theme,
+        text: data.summary,
+        slots: data.availability ?? [],
+        drawingData: data.drawingData ?? null,
+      }
+      setTimeout(() => {
+        setIsPlayerFruitPanelOpen(false)
+        setIncomingSavoir(savoir)
+        setLeafArriving(true)
+        setHasSentSavoir(true)
+        handleSavoirReceived()
+      }, 2500)
+    })
+    return () => socket.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleLeafArrivalComplete = useCallback(() => {
+    setLeafArriving(false)
+  }, [])
+
+  const handleCloseIncomingSavoir = useCallback(() => {
+    setIncomingSavoir(null)
+    fruitHoverStore.startCooldown()
+    handleIncomingSavoirClosed()
+    pointerControlsRef.current?.lock()
+  }, [handleIncomingSavoirClosed])
 
   const isStoryCameraControlEnabled = postIntro
 
@@ -772,6 +917,7 @@ export default function App() {
 
   const explorationReady = false
   const showDevOverlays =
+    !showWelcome &&
     !introPending &&
     !introActive &&
     !postIntro &&
@@ -841,9 +987,10 @@ export default function App() {
           !selectedContactAssignment &&
           !isContactInteractionActive &&
           !isJournalInteractionActive &&
-          !raspberryPhaseActive
+          !raspberryPhaseActive &&
+          !isPlayerFruitPanelOpen
         }
-        active={(interactionsEnabled && (isLeafHovered || isFruitHovered)) || isStairsHovered}
+        active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
       />
 
       <Scene
@@ -928,8 +1075,9 @@ export default function App() {
           onStairsClick: handleStairsClick,
           onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
-          fruitsClickActive,
-          onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
+          growingFruitClickable: arbreGrowingFruitClickable,
+          fruitsDisabled: isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
+          onGrowingFruitComplete: handleGrowingFruitComplete,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
         leafMaterialMode={leafMaterialMode}
@@ -994,6 +1142,7 @@ export default function App() {
             onGoToJuiceMachine={jumpToJuiceMachine}
             onGoToSortieSerre={jumpToSortieSerre}
             onGoToArbreBase={handleGoToArbreBase}
+            onGoToArbreTop={handleGoToArbreTop}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>
@@ -1097,6 +1246,31 @@ export default function App() {
         <ContactPanel contact={selectedContactAssignment.contact} onClose={handleCloseContact} />
       )}
 
+      {isPlayerFruitPanelOpen && (
+        <PlayerFruitPanel
+          playerName={playerName}
+          onClose={handleClosePlayerFruitPanel}
+          hasSentSavoir={hasSentSavoir}
+        />
+      )}
+
+      {incomingSavoir && (
+        <SavoirPanel
+          savoir={incomingSavoir}
+          onClose={handleCloseIncomingSavoir}
+          leafColRef={savoirLeafColRef}
+          pendingLeaf={leafArriving}
+        />
+      )}
+
+      {leafArriving && (
+        <LeafArrival
+          drawingData={incomingSavoir?.drawingData}
+          targetRef={savoirLeafColRef}
+          onComplete={handleLeafArrivalComplete}
+        />
+      )}
+
       {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
       <CustomCursor visible={isCustomCursorVisible} />
@@ -1114,8 +1288,16 @@ export default function App() {
         <WelcomeScreen
           fading={welcomeFading}
           onStart={() => {
+            setLoadingSequenceStarted(true)
+            setLoadingExtraDurationElapsed(false)
+            setReadyToShow(false)
             setWelcomeFading(true)
-            setTimeout(() => setLoadingMinTimerDone(true), 5000)
+            loadingRevealScheduledRef.current = false
+            if (loadingRevealTimeoutRef.current) {
+              clearTimeout(loadingRevealTimeoutRef.current)
+            }
+            loadingRevealTimeoutRef.current = null
+            if (sceneLoadStatus === 'ok') startLoadingRevealCountdown()
             const canvas = document.querySelector('canvas')
             if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}

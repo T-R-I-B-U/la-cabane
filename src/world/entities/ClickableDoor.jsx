@@ -6,8 +6,6 @@ import { cursorStore } from '../../utils/cursorStore'
 
 const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
-const OUTLINE_COLOR = 0xffffff
-const OUTLINE_OPACITY = 0.9
 const INTRO_DOOR_PARENT = 'door01'
 
 function findIntroDoorMeshes(cabane) {
@@ -35,22 +33,6 @@ function cloneMaterial(material) {
   return Array.isArray(material) ? material.map((entry) => entry.clone()) : material.clone()
 }
 
-function createDoorOutline(mesh) {
-  const geometry = new THREE.EdgesGeometry(mesh.geometry, 20)
-  const material = new THREE.LineBasicMaterial({
-    color: OUTLINE_COLOR,
-    transparent: true,
-    opacity: OUTLINE_OPACITY,
-    depthTest: false,
-  })
-  const outline = new THREE.LineSegments(geometry, material)
-  outline.name = `${mesh.name}-hover-outline`
-  outline.visible = false
-  outline.renderOrder = 10
-  outline.raycast = () => {}
-  return outline
-}
-
 export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
   const hoveredRef = useRef(false)
@@ -58,7 +40,6 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const mouseMovedRef = useRef(false)
   const prevActiveRef = useRef(false)
   const onDoorClickRef = useStableInteractionCallback(onDoorClick)
-  const outlinesRef = useRef([])
   const materialStatesRef = useRef(new Map())
   const clonedMaterialsRef = useRef(new Map())
   const raycaster = useRef(new THREE.Raycaster())
@@ -75,13 +56,6 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
       clonedMaterialsRef.current.set(mesh, { originalMaterial, clonedMaterial })
     })
 
-    const outlines = doorMeshes.map((mesh) => {
-      const outline = createDoorOutline(mesh)
-      mesh.add(outline)
-      return outline
-    })
-
-    outlinesRef.current = outlines
     materialStatesRef.current = new Map()
 
     doorMeshes.forEach((mesh) => {
@@ -95,27 +69,17 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
     })
 
     return () => {
-      outlines.forEach((outline) => {
-        outline.removeFromParent()
-        outline.geometry.dispose()
-        outline.material.dispose()
-      })
       clonedMaterialsRef.current.forEach(({ originalMaterial, clonedMaterial }, mesh) => {
         mesh.material = originalMaterial
         forEachMaterial(clonedMaterial, (material) => material.dispose())
       })
       clonedMaterialsRef.current = new Map()
       materialStatesRef.current = new Map()
-      outlinesRef.current = []
     }
   }, [doorMeshes])
 
   const setDoorHover = useCallback(
     (isHovered) => {
-      outlinesRef.current.forEach((outline) => {
-        outline.visible = isHovered
-      })
-
       doorMeshes.forEach((mesh) => {
         forEachMaterial(mesh.material, (material) => {
           const original = materialStatesRef.current.get(material)

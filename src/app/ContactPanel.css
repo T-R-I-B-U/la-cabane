@@ -1,0 +1,141 @@
+.cp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.cp-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  padding: 40px;
+  width: calc(100vw - 120px);
+  max-width: 1392px;
+  height: calc(100vh - 120px);
+  max-height: 801px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cp-back {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-bottom: -8px;
+}
+
+.cp-back img {
+  display: block;
+  height: 50px;
+  width: auto;
+}
+
+.cp-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Left column ── */
+.cp-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 40px;
+  padding-right: 40px;
+}
+
+.cp-name-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cp-name {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 70px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+  text-transform: uppercase;
+  word-break: break-word;
+}
+
+.cp-sep {
+  border: none;
+  border-top: 1.5px solid #33330f;
+  margin: 0;
+}
+
+.cp-desc {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #33330f;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Center fruit image ── */
+.cp-center {
+  flex-shrink: 0;
+  width: 533px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cp-fruit-img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* ── Right column ── */
+.cp-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0;
+  padding-left: 40px;
+}
+
+.cp-info-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+}
+
+.cp-info-line {
+  flex: 1;
+  height: 1.5px;
+  background: #33330f;
+  flex-shrink: 0;
+}
+
+.cp-info-label {
+  flex: 1;
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: #33330f;
+  margin: 0;
+  text-transform: uppercase;
+}

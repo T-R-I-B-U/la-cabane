@@ -14,7 +14,7 @@ function usePlatformLayout(platformPosition) {
     const eyeY = py + PLAYER_HEIGHT + 3
 
     return {
-      playerFruit: [px, eyeY, pz - 1],
+      playerFruit: [px - 2.5, eyeY + 2, pz - 2],
       staticFruits: [
         { id: 'fruit_arbre_01', position: [px + 1.5, eyeY + 3, pz - 2] },
         { id: 'fruit_arbre_02', position: [px - 1.5, eyeY + 3.5, pz - 1.5] },
@@ -27,22 +27,20 @@ function usePlatformLayout(platformPosition) {
 
 export function ArbreScene({
   platformPosition,
-  arbreActive,
   growingFruitPlaying,
-  fruitsClickActive,
-  onFruitClickDuringLeaves,
+  growingFruitClickable,
+  fruitsDisabled,
+  onGrowingFruitComplete,
   onFruitClick,
   onFruitHover,
-  interactionsEnabled,
 }) {
   const { playerFruit, staticFruits } = usePlatformLayout(platformPosition)
 
   const handleFruitInteract = useCallback(
     (fruitId) => {
-      if (fruitsClickActive) onFruitClickDuringLeaves?.()
-      else onFruitClick?.(fruitId)
+      onFruitClick?.(fruitId)
     },
-    [fruitsClickActive, onFruitClickDuringLeaves, onFruitClick]
+    [onFruitClick]
   )
 
   return (
@@ -53,14 +51,21 @@ export function ArbreScene({
         onLeave={() => setZone('cabane')}
       />
 
-      <GrowingFruit position={playerFruit} playing={growingFruitPlaying} />
+      <GrowingFruit
+        position={playerFruit}
+        playing={growingFruitPlaying}
+        active={growingFruitClickable}
+        onComplete={onGrowingFruitComplete}
+        onFruitClick={() => onFruitClick?.('fruit_player')}
+        onFruitHover={onFruitHover}
+      />
 
       {staticFruits.map(({ id, position }) => (
         <Fruit
           key={id}
           fruitId={id}
           position={position}
-          active={fruitsClickActive || (!arbreActive && interactionsEnabled)}
+          active={growingFruitClickable && !fruitsDisabled}
           onFruitClick={handleFruitInteract}
           onFruitHover={onFruitHover}
         />

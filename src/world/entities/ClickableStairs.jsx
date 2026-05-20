@@ -6,8 +6,6 @@ import { useStableInteractionCallback } from '../interactions/useStableInteracti
 const CENTER_NDC = new THREE.Vector2(0, 0)
 const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
-const OUTLINE_COLOR = 0xffffff
-const OUTLINE_OPACITY = 0.9
 const noop = () => {}
 
 function forEachMaterial(material, callback) {
@@ -44,7 +42,6 @@ export function ClickableStairs({ cabane, isInteractable, onInteract, onHover })
   const raycasterRef = useRef(new THREE.Raycaster())
   const onInteractRef = useStableInteractionCallback(onInteract)
   const onHoverRef = useStableInteractionCallback(onHover)
-  const outlinesRef = useRef([])
   const materialStatesRef = useRef(new Map())
   const clonedMaterialsRef = useRef(new Map())
 
@@ -62,25 +59,6 @@ export function ClickableStairs({ cabane, isInteractable, onInteract, onHover })
       clonedMaterialsRef.current.set(mesh, { originalMaterial, cloned })
     })
 
-    const outlines = data.meshes.map((mesh) => {
-      const geo = new THREE.EdgesGeometry(mesh.geometry, 20)
-      const mat = new THREE.LineBasicMaterial({
-        color: OUTLINE_COLOR,
-        transparent: true,
-        opacity: OUTLINE_OPACITY,
-        depthTest: false,
-      })
-      const line = new THREE.LineSegments(geo, mat)
-      line.name = `${mesh.name}-hover-outline`
-      line.visible = false
-      line.renderOrder = 10
-      line.raycast = () => {}
-      mesh.add(line)
-      return line
-    })
-
-    outlinesRef.current = outlines
-
     data.meshes.forEach((mesh) => {
       forEachMaterial(mesh.material, (mat) => {
         if (!mat.emissive) return
@@ -92,26 +70,17 @@ export function ClickableStairs({ cabane, isInteractable, onInteract, onHover })
     })
 
     return () => {
-      outlines.forEach((line) => {
-        line.removeFromParent()
-        line.geometry.dispose()
-        line.material.dispose()
-      })
       clonedMaterialsRef.current.forEach(({ originalMaterial, cloned }, mesh) => {
         mesh.material = originalMaterial
         forEachMaterial(cloned, (m) => m.dispose())
       })
       clonedMaterialsRef.current = new Map()
       materialStatesRef.current = new Map()
-      outlinesRef.current = []
     }
   }, [data])
 
   const setStairsHover = useCallback(
     (isHovered) => {
-      outlinesRef.current.forEach((line) => {
-        line.visible = isHovered
-      })
       if (data?.meshes) {
         data.meshes.forEach((mesh) => {
           forEachMaterial(mesh.material, (mat) => {

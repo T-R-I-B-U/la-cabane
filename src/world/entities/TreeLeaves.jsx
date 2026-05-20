@@ -8,6 +8,7 @@ import {
   useOutlineResolution,
 } from '../materials/outlineEffect'
 import { useHoverEffect } from '../interactions/useHoverEffect'
+import { fruitHoverStore } from '../../utils/fruitHoverStore'
 
 const _instanceMatrix = new THREE.Matrix4()
 const _worldMatrix = new THREE.Matrix4()
@@ -135,7 +136,7 @@ export function TreeLeaves({
   const _leafHoveredRef = useRef(false)
   const _lastHoveredIdRef = useRef(-1)
   useFrame(({ camera }) => {
-    if (!leafMesh || !active || !document.pointerLockElement) {
+    if (!leafMesh || !active || !document.pointerLockElement || fruitHoverStore.anyHovered) {
       if (_leafHoveredRef.current) {
         _leafHoveredRef.current = false
         _lastHoveredIdRef.current = -1
@@ -345,7 +346,7 @@ export function TreeLeaves({
         }}
         onPointerDown={(e) => {
           e.stopPropagation()
-          if (!active || !onLeafClick) return
+          if (!active || !onLeafClick || fruitHoverStore.anyHovered || fruitHoverStore.onCooldown) return
           // Under pointer lock R3F events cast from clientX/Y=0 (top-left, not center).
           // Use the id tracked by the manual center raycaster instead.
           const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId
