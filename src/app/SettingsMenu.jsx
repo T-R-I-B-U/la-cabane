@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './SettingsMenu.css'
 import { GearIcon } from './GearIcon'
 
@@ -26,12 +26,32 @@ export function SettingsMenu({
   onVolumeChange,
   shadersEnabled,
   onShadersChange,
+  shadowsEnabled,
+  onShadowsChange,
+  sensitivity,
+  onSensitivityChange,
 }) {
   const [quality, setQuality] = useState('Normal')
   const [ao, setAo] = useState('Non')
-  const [ombres, setOmbres] = useState('Non')
+  const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement)
+
+  useEffect(() => {
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', onFsChange)
+    return () => document.removeEventListener('fullscreenchange', onFsChange)
+  }, [])
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen()
+    } else {
+      document.exitFullscreen()
+    }
+  }
 
   if (!open) return null
+
+  const sensitivityPercent = Math.round((sensitivity - 0.5) * 100)
 
   return (
     <div className="settings-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
@@ -71,6 +91,23 @@ export function SettingsMenu({
         </div>
 
         <div className="settings-card__section">
+          <div className="settings-card__label-row">
+            <p className="settings-card__label">Sensibilité</p>
+            <p className="settings-card__value">{sensitivityPercent}%</p>
+          </div>
+          <input
+            type="range"
+            className="settings-range"
+            min={50}
+            max={150}
+            step={5}
+            value={Math.round(sensitivity * 100)}
+            onChange={(e) => onSensitivityChange(Number(e.target.value) / 100)}
+            aria-label="Sensibilité souris"
+          />
+        </div>
+
+        <div className="settings-card__section">
           <p className="settings-card__label">Occlusion ambiante</p>
           <RadioPills options={['Oui', 'Non']} value={ao} onChange={setAo} />
         </div>
@@ -82,8 +119,12 @@ export function SettingsMenu({
 
         <div className="settings-card__section">
           <p className="settings-card__label">Ombres</p>
-          <RadioPills options={['Oui', 'Non']} value={ombres} onChange={setOmbres} />
+          <RadioPills options={['Oui', 'Non']} value={shadowsEnabled} onChange={onShadowsChange} />
         </div>
+
+        <button type="button" className="settings-fullscreen-btn" onClick={toggleFullscreen}>
+          {isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
+        </button>
       </div>
     </div>
   )

@@ -139,3 +139,22 @@
   background: transparent;
   height: 0;
 }
+
+.settings-fullscreen-btn {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #33330f;
+  background: #e3e7b3;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  transition: opacity 0.15s ease;
+}
+
+.settings-fullscreen-btn:hover {
+  opacity: 0.75;
+}

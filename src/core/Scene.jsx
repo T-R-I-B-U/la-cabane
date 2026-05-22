@@ -33,6 +33,7 @@ export default function Scene({
   interactions,
   shaderEnabled,
   shaderRadius,
+  shadowsEnabled = true,
   journalAutoOpenToken,
   journalCloseToken,
   journalPuzzleEnabled,
@@ -46,6 +47,7 @@ export default function Scene({
     eyeHeight: playerEyeHeight,
     spawnKey: playerSpawnKey,
     movementLocked,
+    sensitivity: playerSensitivity = 1,
   } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
   const {
@@ -140,7 +142,7 @@ export default function Scene({
         far: 500,
         position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
-      shadows="soft"
+      shadows={shadowsEnabled ? 'soft' : false}
       gl={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >
@@ -264,6 +266,7 @@ export default function Scene({
         controlsRef={controlsRef}
         hutPosition={hutPosition}
         cameraFixed={cameraFixed}
+        sensitivity={playerSensitivity}
       />
 
       {shaderEnabled && (

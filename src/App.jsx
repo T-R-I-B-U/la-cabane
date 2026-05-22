@@ -78,6 +78,8 @@ export default function App() {
   const [shaderEnabled, setShaderEnabled] = useState(false)
   const [shaderRadius, setShaderRadius] = useState(3)
   const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
+  const [shadowsEnabled, setShadowsEnabled] = useState(true)
+  const [mouseSensitivity, setMouseSensitivity] = useState(1)
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(isDevBuild)
   const [playerSpawn, setPlayerSpawn] = useState(null)
@@ -1110,6 +1112,7 @@ export default function App() {
           eyeHeight: playerEyeHeight,
           spawnKey: playerSpawnKey,
           movementLocked: isPlayerInteractionLocked || userMovementLocked,
+          sensitivity: mouseSensitivity,
         }}
         debug={{
           doors: debugDoors,
@@ -1211,6 +1214,7 @@ export default function App() {
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
+        shadowsEnabled={shadowsEnabled}
         journalAutoOpenToken={journalAutoOpenToken}
         journalCloseToken={journalCloseToken}
         journalPuzzleEnabled={journalPuzzleEnabled}
@@ -1388,6 +1392,10 @@ export default function App() {
         }}
         shadersEnabled={shaderEnabled ? 'Oui' : 'Non'}
         onShadersChange={(v) => setShaderEnabled(v === 'Oui')}
+        shadowsEnabled={shadowsEnabled ? 'Oui' : 'Non'}
+        onShadowsChange={(v) => setShadowsEnabled(v === 'Oui')}
+        sensitivity={mouseSensitivity}
+        onSensitivityChange={setMouseSensitivity}
       />
     </main>
   )
