@@ -1,4 +1,4 @@
-const TOTAL = 8
+const TOTAL = 5
 
 export function RaspberryCounter({ count }) {
   const pct = Math.min(count / TOTAL, 1) * 100
