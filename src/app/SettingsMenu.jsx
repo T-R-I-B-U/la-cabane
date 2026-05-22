@@ -8,6 +8,12 @@ const DPR_OPTIONS = [
   { label: 'Élevée', value: Math.min(window.devicePixelRatio, 2) },
 ]
 
+const QUALITY_OPTIONS = [
+  { label: 'Faible', value: 'compressed2' },
+  { label: 'Normal', value: 'compressed' },
+  { label: 'Élevée', value: 'raw' },
+]
+
 function RadioPills({ options, value, onChange }) {
   return (
     <div className="settings-card__pills">
@@ -38,6 +44,9 @@ export function SettingsMenu({
   onSensitivityChange,
   dpr,
   onDprChange,
+  modelQuality,
+  onModelQualityChange,
+  sceneLoaded,
 }) {
   const ao = 'Non'
   const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement)
@@ -60,6 +69,8 @@ export function SettingsMenu({
 
   const sensitivityPercent = Math.round((sensitivity - 0.5) * 100)
   const activeDprLabel = DPR_OPTIONS.find((o) => o.value === dpr)?.label ?? 'Normal'
+  const activeQualityLabel =
+    QUALITY_OPTIONS.find((o) => o.value === modelQuality)?.label ?? 'Faible'
 
   return (
     <div className="settings-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
@@ -71,6 +82,20 @@ export function SettingsMenu({
         <div className="settings-card__header">
           <h2 className="settings-card__title">Réglages</h2>
           <GearIcon variant="textured" onClick={onClose} ariaLabel="Fermer les réglages" />
+        </div>
+
+        <div
+          className={`settings-card__section${sceneLoaded ? ' settings-card__section--disabled' : ''}`}
+        >
+          <p className="settings-card__label">Qualité des modèles</p>
+          <RadioPills
+            options={QUALITY_OPTIONS.map((o) => o.label)}
+            value={activeQualityLabel}
+            onChange={(label) => {
+              const opt = QUALITY_OPTIONS.find((o) => o.label === label)
+              if (opt) onModelQualityChange(opt.value)
+            }}
+          />
         </div>
 
         <div className="settings-card__section">

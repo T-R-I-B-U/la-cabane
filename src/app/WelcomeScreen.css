@@ -28,39 +28,6 @@
   z-index: 1;
 }
 
-.welcome-screen__quality {
-  position: absolute;
-  top: 60px;
-  left: 60px;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.welcome-screen__quality-pill {
-  font-family: 'Albert Sans', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #33330f;
-  background: rgba(227, 231, 179, 0.75);
-  border: none;
-  border-radius: 360px;
-  padding: 4px 12px;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-  backdrop-filter: blur(4px);
-}
-
-.welcome-screen__quality-pill:hover:not(.welcome-screen__quality-pill--active) {
-  opacity: 0.75;
-}
-
-.welcome-screen__quality-pill--active {
-  background: #33330f;
-  color: #e3e7b3;
-}
-
 .welcome-screen__bg {
   position: absolute;
   inset: 0;

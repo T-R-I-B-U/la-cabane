@@ -1360,8 +1360,6 @@ export default function App() {
           onAnimationEnd={() => setShowWelcome(false)}
           onOpenSettings={() => setShowSettings(true)}
           settingsOpen={showSettings}
-          modelQuality={modelQuality}
-          onModelQualityChange={setModelQuality}
         />
       )}
 
@@ -1381,6 +1379,9 @@ export default function App() {
         onSensitivityChange={setMouseSensitivity}
         dpr={dpr}
         onDprChange={setDpr}
+        modelQuality={modelQuality}
+        onModelQualityChange={setModelQuality}
+        sceneLoaded={sceneLoadStatus === 'ok'}
       />
     </main>
   )
