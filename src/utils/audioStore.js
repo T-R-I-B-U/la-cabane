@@ -15,8 +15,13 @@ const store = {
 
 const subtitleState = {
   activeId: null,
+  activeSpeaker: null,
   startedAt: 0,
-  current: '',
+  current: { text: '', speaker: null, choices: null },
+  frozen: false,
+  choices: null,
+  onLastCue: null,
+  lastCueFired: false,
   listeners: new Set(),
   rafId: 0,
   hideTimeoutId: 0,
@@ -61,6 +66,10 @@ function _clearTextTimers() {
 }
 
 function _stopCurrentDialogue() {
+  subtitleState.frozen = false
+  subtitleState.choices = null
+  subtitleState.onLastCue = null
+  subtitleState.lastCueFired = false
   _clearTextTimers()
   _clearDialogHideTimeout()
   if (subtitleState.activeId) {
@@ -68,6 +77,7 @@ function _stopCurrentDialogue() {
     if (track?.audio?.isPlaying) track.audio.stop()
   }
   subtitleState.activeId = null
+  subtitleState.activeSpeaker = null
   if (subtitleState.rafId) {
     cancelAnimationFrame(subtitleState.rafId)
     subtitleState.rafId = 0
@@ -222,10 +232,18 @@ export function unlockAndPlay() {
   }
 }
 
-function _emitSubtitle(text) {
-  if (text === subtitleState.current) return
-  subtitleState.current = text
-  subtitleState.listeners.forEach((fn) => fn(text))
+function _emitSubtitle(text, speaker) {
+  const spk = speaker !== undefined ? speaker : subtitleState.activeSpeaker
+  const choices = subtitleState.frozen ? subtitleState.choices : null
+  const next = { text, speaker: spk ?? null, choices }
+  if (
+    next.text === subtitleState.current.text &&
+    next.speaker === subtitleState.current.speaker &&
+    next.choices === subtitleState.current.choices
+  )
+    return
+  subtitleState.current = next
+  subtitleState.listeners.forEach((fn) => fn(next))
 }
 
 function _tickSubtitles() {
@@ -234,23 +252,44 @@ function _tickSubtitles() {
   const track = _getAudioTrack(id)
   if (!track || !track.audio.isPlaying) {
     subtitleState.activeId = null
+    subtitleState.activeSpeaker = null
     subtitleState.rafId = 0
-    _emitSubtitle('')
+    if (!subtitleState.frozen) _emitSubtitle('', null)
     return
   }
   const elapsed = (performance.now() - subtitleState.startedAt) / 1000
-  const cue = (track.cfg.subtitles || []).find((s) => elapsed >= s.from && elapsed < s.to)
+  const subs = track.cfg.subtitles || []
+  const cueIdx = subs.findIndex((s) => elapsed >= s.from && elapsed < s.to)
+  const cue = cueIdx >= 0 ? subs[cueIdx] : null
+
+  if (cue && cueIdx === subs.length - 1 && !subtitleState.lastCueFired) {
+    subtitleState.lastCueFired = true
+    if (subtitleState.onLastCue) {
+      subtitleState.frozen = true
+      subtitleState.onLastCue()
+    }
+  }
+
+  // When frozen and no active cue (silence after last cue), keep current text visible
+  if (!cue && subtitleState.frozen) {
+    subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
+    return
+  }
+
   _emitSubtitle(cue ? cue.text : '')
   subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
 }
 
-function _startSubtitles(id) {
+function _startSubtitles(id, onLastCue) {
   const track = store.tracks[id]
   if (!track) return
   const subs = track.cfg.subtitles
   if (!subs || subs.length === 0) return
   subtitleState.activeId = id
+  subtitleState.activeSpeaker = track.cfg.speaker ?? null
   subtitleState.startedAt = performance.now()
+  subtitleState.onLastCue = onLastCue ?? null
+  subtitleState.lastCueFired = false
   if (!subtitleState.rafId) {
     subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
   }
@@ -258,8 +297,17 @@ function _startSubtitles(id) {
 
 export function subscribeSubtitles(fn) {
   subtitleState.listeners.add(fn)
-  fn(subtitleState.current)
+  fn({ ...subtitleState.current })
   return () => subtitleState.listeners.delete(fn)
+}
+
+// Set choices to display in the subtitle bar (called from UI when a branching dialogue starts).
+// Choices are automatically cleared when the next dialogue starts.
+export function setSubtitleChoices(choices) {
+  subtitleState.choices = choices ?? null
+  const next = { ...subtitleState.current, choices: subtitleState.choices }
+  subtitleState.current = next
+  subtitleState.listeners.forEach((fn) => fn(next))
 }
 
 // Affiche du texte dans la zone dialogue sans audio.
@@ -282,10 +330,16 @@ export function hideDialog() {
   _emitSubtitle('')
 }
 
+// Prevent the subtitle from clearing when audio ends — useful when choices appear right after.
+// Automatically released when the next dialogue starts or hideDialog() is called.
+export function holdSubtitle() {
+  subtitleState.frozen = true
+}
+
 // Joue un dialogue par son id (déclaré dans audioConfig.json).
 // Si la track a un src audio : joue l'audio + sous-titres RAF.
 // Sinon : pilote l'affichage directement via les timings SRT.
-export function playDialogue(id, { onDone } = {}) {
+export function playDialogue(id, { onDone, onLastCue } = {}) {
   _whenReady(id, () => {
     _stopCurrentDialogue()
     const track = _getTrack(id)
@@ -308,7 +362,7 @@ export function playDialogue(id, { onDone } = {}) {
       _resumeContext()
       if (track.audio.isPlaying) track.audio.stop()
       track.audio.play()
-      _startSubtitles(id)
+      _startSubtitles(id, onLastCue)
       return
     }
 
@@ -318,9 +372,12 @@ export function playDialogue(id, { onDone } = {}) {
       return
     }
 
+    const speaker = track.cfg.speaker ?? null
     cues.forEach((cue) => {
-      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle(cue.text), cue.from * 1000))
-      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle(''), cue.to * 1000))
+      subtitleState.textTimers.push(
+        setTimeout(() => _emitSubtitle(cue.text, speaker), cue.from * 1000)
+      )
+      subtitleState.textTimers.push(setTimeout(() => _emitSubtitle('', null), cue.to * 1000))
     })
 
     if (onDone) {

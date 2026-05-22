@@ -36,6 +36,7 @@
     {
       "id": "01-voice-tree",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/01-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -45,6 +46,7 @@
     {
       "id": "02-voice-tree",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/02-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -54,6 +56,7 @@
     {
       "id": "receptionDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/03-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -63,6 +66,7 @@
     {
       "id": "receptionYesDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/04-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -72,6 +76,7 @@
     {
       "id": "receptionNoDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/05-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -81,6 +86,7 @@
     {
       "id": "bookIntroDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/06-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -90,6 +96,7 @@
     {
       "id": "bookImg1Dialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/07-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -99,6 +106,7 @@
     {
       "id": "bookImg2Dialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/08-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -108,6 +116,7 @@
     {
       "id": "bookImg3Dialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/09-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -117,6 +126,7 @@
     {
       "id": "bookImg4Dialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/10-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -126,6 +136,7 @@
     {
       "id": "marieDialogue",
       "type": "dialogue",
+      "speaker": "marie",
       "loop": false,
       "volume": 1,
       "autoplay": false,
@@ -134,6 +145,7 @@
     {
       "id": "thomasDialogue",
       "type": "dialogue",
+      "speaker": "thomas",
       "loop": false,
       "volume": 1,
       "autoplay": false,
@@ -142,6 +154,7 @@
     {
       "id": "treePiedDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/11-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -151,6 +164,7 @@
     {
       "id": "treeRacinesDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/12-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -160,6 +174,7 @@
     {
       "id": "treeBorneDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/13-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -169,6 +184,7 @@
     {
       "id": "treeArbreDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/14-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -178,6 +194,7 @@
     {
       "id": "treeOutroDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/15-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -187,6 +204,7 @@
     {
       "id": "etabliDialogue",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/16-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -196,6 +214,7 @@
     {
       "id": "thomasEtabliDialogue",
       "type": "dialogue",
+      "speaker": "thomas",
       "src": "thomas/THOMAS.mp3",
       "loop": false,
       "volume": 1,
@@ -205,6 +224,7 @@
     {
       "id": "18-voice-tree",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/18-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -214,6 +234,7 @@
     {
       "id": "19-voice-tree",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/19-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -223,6 +244,7 @@
     {
       "id": "arbrePlateforme",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/20-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -232,6 +254,7 @@
     {
       "id": "arbreFeuilles",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/21-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -241,6 +264,7 @@
     {
       "id": "arbreFinal",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/22-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -250,6 +274,7 @@
     {
       "id": "arbreOutro",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/23-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -259,6 +284,7 @@
     {
       "id": "nidArrivee",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/24-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -268,6 +294,7 @@
     {
       "id": "marieNid1",
       "type": "dialogue",
+      "speaker": "marie",
       "src": "marie/01-MARIE.mp3",
       "loop": false,
       "volume": 1,
@@ -277,6 +304,7 @@
     {
       "id": "marieNid2",
       "type": "dialogue",
+      "speaker": "marie",
       "src": "marie/02-MARIE.mp3",
       "loop": false,
       "volume": 1,
@@ -286,6 +314,7 @@
     {
       "id": "treeDialogue25",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/25-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -295,6 +324,7 @@
     {
       "id": "serreNarration",
       "type": "dialogue",
+      "speaker": "tree",
       "src": "tree/17-voice-tree.mp3",
       "loop": false,
       "volume": 1,
@@ -304,6 +334,7 @@
     {
       "id": "zoeIntro",
       "type": "dialogue",
+      "speaker": "zoe",
       "loop": false,
       "volume": 1,
       "autoplay": false,
@@ -312,6 +343,7 @@
     {
       "id": "zoeJuice",
       "type": "dialogue",
+      "speaker": "zoe",
       "loop": false,
       "volume": 1,
       "autoplay": false,
@@ -320,6 +352,7 @@
     {
       "id": "zoeFarewell",
       "type": "dialogue",
+      "speaker": "zoe",
       "loop": false,
       "volume": 1,
       "autoplay": false,
@@ -328,6 +361,7 @@
     {
       "id": "zoeUnripe",
       "type": "dialogue",
+      "speaker": "zoe",
       "loop": false,
       "volume": 1,
       "autoplay": false,

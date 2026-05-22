@@ -1,0 +1,924 @@
+/* ── Écran 0 : Landing ── */
+.mv-s0-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.mv-s0-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Layout flex : s'adapte à la vraie hauteur viewport */
+.mv-s0-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Zone feuille : prend l'espace restant, clip si trop petite */
+.mv-s0-leaf-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 218.736px;
+  overflow: hidden;
+}
+
+/* -rotate-90 sur l'image landscape → apparaît portrait */
+.mv-s0-leaf-rotate {
+  transform: rotate(-90deg);
+  flex-shrink: 0;
+}
+
+/* Image landscape 408×218, tourne pour donner la feuille portrait */
+.mv-s0-leaf-img-box {
+  width: 408px;
+  height: 218.736px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.mv-s0-leaf-img-box img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Bas : titre + bouton */
+.mv-s0-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* citrus-gothic-rough 32px #33330f, w-230 centré */
+.mv-s0-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  width: 230px;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* Bouton pill avec image Figma en fond */
+.mv-s0-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.mv-s0-btn-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 360px;
+  pointer-events: none;
+}
+
+/* Albert Sans 24px #eeded0 */
+.mv-s0-btn span {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #eeded0;
+  position: relative;
+  white-space: nowrap;
+}
+
+/* ── Écran 2 : Résumé ── */
+.mv-s2-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.mv-s2-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Figma : flex-col gap-40, justify-between, px-20 py-40 */
+.mv-s2-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Figma : flex-[1_0_0] flex-col gap-40 items-center min-h-0 w-full */
+.mv-s2-top {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Figma : citrus-gothic-rough 32px #33330f text-center w-full */
+.mv-s2-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Figma : flex-[1_0_0] flex-col items-start min-h-0 w-full */
+.mv-s2-card-wrap {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Figma : bg-white/95 rounded-18 px-40 py-20 flex-[1_0_0] — textarea en remplacement */
+.mv-s2-textarea {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 18px;
+  padding: 20px 40px;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #3b5866;
+  line-height: 1.5;
+  resize: none;
+  box-sizing: border-box;
+  touch-action: pan-y;
+}
+
+.mv-s2-textarea--title {
+  overflow: hidden;
+}
+
+.mv-s2-textarea--summary {
+  min-height: 240px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mv-s2-textarea:focus {
+  outline: none;
+}
+
+.mv-s2-textarea::placeholder {
+  color: rgba(59, 88, 102, 0.4);
+}
+
+/* Figma : pill dark bg, Albert Sans 24px #eeded0 */
+.mv-s2-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.mv-s2-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mv-s2-btn-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 360px;
+  pointer-events: none;
+}
+
+.mv-s2-btn span {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #eeded0;
+  position: relative;
+  white-space: nowrap;
+}
+
+/* ── Écran 1 : Thème ── */
+.mv-s1-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.mv-s1-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Figma : flex-col, justify-between, px-20 py-40 */
+.mv-s1-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Figma : flex-col gap-40 items-center shrink-0 w-full */
+.mv-s1-top {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Figma : citrus-gothic-rough 32px #eeded0 text-center w-full */
+.mv-s1-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #eeded0;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Figma : flex-col gap-20 h-470 → flex:1 adaptable */
+.mv-s1-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Figma : flex-[1_0_0] bg-white/95 rounded-18 flex items-center justify-center px-40 py-20 */
+.mv-s1-card {
+  flex: 1;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  box-sizing: border-box;
+  transition:
+    background 0.12s,
+    color 0.12s;
+}
+
+.mv-s1-card--selected {
+  background: #3b5866;
+}
+
+.mv-s1-card span {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #3b5866;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.12s;
+}
+
+.mv-s1-card--selected span {
+  color: #eeded0;
+}
+
+/* Figma : pill cream bg, Albert Sans 24px #3b5866 */
+.mv-s1-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin-top: 40px;
+  transition: opacity 0.15s;
+}
+
+.mv-s1-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.mv-s1-btn-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 360px;
+  pointer-events: none;
+}
+
+.mv-s1-btn span {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #3b5866;
+  position: relative;
+  white-space: nowrap;
+}
+
+/* ── Écran 4 : Disponibilités ── */
+.mv-s4-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.mv-s4-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.mv-s4-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.mv-s4-top {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.mv-s4-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.mv-s4-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.mv-s4-row {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.mv-s4-chip-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.mv-s4-day {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.mv-s4-day span {
+  position: relative;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #eeded0;
+  white-space: nowrap;
+}
+
+.mv-s4-slot {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: none;
+  overflow: hidden;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.mv-s4-slot span {
+  position: relative;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #3b5866;
+  white-space: nowrap;
+}
+
+.mv-s4-slot--selected span {
+  color: #33330f;
+}
+
+.mv-s4-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin-top: 20px;
+}
+
+.mv-s4-btn-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 360px;
+  pointer-events: none;
+}
+
+.mv-s4-btn span {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #eeded0;
+  position: relative;
+  white-space: nowrap;
+}
+
+/* ── Écran 5 : Dessin ── */
+.mv-s5-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.mv-s5-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.mv-s5-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.mv-s5-top {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.mv-s5-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+/* Zone centrale : canvas centré, palette à droite */
+.mv-s5-draw-area {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.mv-s5-canvas {
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+  max-height: 55dvh;
+  width: auto;
+  filter: drop-shadow(0 8px 20px rgba(42, 92, 50, 0.25));
+}
+
+/* Animation envoi */
+.mv-canvas--flying {
+  animation: mv-fly-up 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes mv-fly-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(-50px) scale(1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-110vh) scale(0.45);
+  }
+}
+
+/* Palette : colonne de 4 ronds, positionnée à droite du canvas */
+.mv-s5-palette {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mv-s5-color-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.12s;
+}
+
+.mv-s5-color-btn--active {
+  transform: scale(1.2);
+  box-shadow:
+    0 0 0 3px white,
+    0 0 0 5px currentColor;
+  outline: 3px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.mv-s5-subtitle {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.mv-s5-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 40px;
+  border-radius: 360px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  margin-top: 20px;
+}
+
+.mv-s5-btn-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 360px;
+  pointer-events: none;
+}
+
+.mv-s5-btn span {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: #eeded0;
+  position: relative;
+  white-space: nowrap;
+}
+
+/* ── Écran 6 : Envoi (swipe up) ── */
+.mv-s6-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.mv-s6-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.mv-s6-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Conteneur feuille : image portrait (canvas 300×340) */
+.mv-s6-leaf-outer {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.mv-s6-leaf-img {
+  display: block;
+  max-height: 55dvh;
+  width: auto;
+  filter: drop-shadow(0 8px 20px rgba(42, 92, 50, 0.25));
+  pointer-events: none;
+}
+
+/* Animation swipe up */
+.mv-s6-leaf--flying {
+  animation: mv-s6-fly 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes mv-s6-fly {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-60px) scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-90vh) scale(0.5) rotate(20deg);
+  }
+}
+
+/* Bas : titre + flèche */
+.mv-s6-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+  width: 100%;
+}
+
+.mv-s6-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.mv-s6-arrow-wrap {
+  width: 120px;
+  height: 120px;
+  opacity: 0.4;
+  animation: mv-s6-bounce 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.mv-s6-arrow {
+  width: 100%;
+  height: 100%;
+  /* SVG pointe à gauche → rotate 90° pour pointer vers le haut */
+  transform: rotate(90deg);
+  display: block;
+}
+
+@keyframes mv-s6-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+/* ── Écran 7 : Bravo ── */
+.mv-s7-root {
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.mv-s7-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  pointer-events: none;
+}
+
+/* Texte aligné en bas, centré, w-260 comme Figma */
+.mv-s7-content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 40px 20px;
+  padding-bottom: max(40px, env(safe-area-inset-bottom));
+  box-sizing: border-box;
+}
+
+.mv-s7-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: normal;
+  color: #33330f;
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0;
+  width: 260px;
+}

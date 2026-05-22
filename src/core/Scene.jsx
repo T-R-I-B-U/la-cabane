@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { ACESFilmicToneMapping } from 'three'
 import { initKTX2Loader } from './ktx2Loader.js'
 import AudioManager from './audio/AudioManager'
 import { Floor } from './Floor'
@@ -104,7 +105,6 @@ export default function Scene({
   } = interactions
 
   const {
-    active: arbreActive,
     storyCameraTransition: arbreStoryCameraTransition,
     onTransitionComplete: onArbreTransitionComplete,
     ladderClickActive,
@@ -113,8 +113,9 @@ export default function Scene({
     onStairsClick,
     onStairsHover,
     growingFruitPlaying: arbreGrowingFruitPlaying,
-    fruitsClickActive,
-    onFruitClickDuringLeaves,
+    growingFruitClickable: arbreGrowingFruitClickable,
+    fruitsDisabled: arbreFruitsDisabled,
+    onGrowingFruitComplete,
     leafInteractionsEnabled: arbreLeafInteractionsEnabled,
   } = arbre
 
@@ -125,8 +126,7 @@ export default function Scene({
   const [platformPosition, setPlatformPosition] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const areSceneInteractionsEnabled =
-    (playerMode || postIntro) && !interactionLocked && interactionsEnabled
+  const areArbreFruitsInteractionsEnabled = (playerMode || postIntro) && !interactionLocked
   const collisionObjects = useMemo(
     () => [...sceneColliders, mainFloorCollider].filter(Boolean),
     [sceneColliders, mainFloorCollider]
@@ -140,7 +140,8 @@ export default function Scene({
         far: 500,
         position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
-      shadows
+      shadows="soft"
+      gl={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >
       <StatsCollector onStats={onStats} />
@@ -229,13 +230,13 @@ export default function Scene({
         <Suspense fallback={null}>
           <ArbreScene
             platformPosition={platformPosition}
-            arbreActive={arbreActive}
             growingFruitPlaying={arbreGrowingFruitPlaying}
-            fruitsClickActive={fruitsClickActive}
-            onFruitClickDuringLeaves={onFruitClickDuringLeaves}
+            growingFruitClickable={arbreGrowingFruitClickable}
+            fruitsDisabled={arbreFruitsDisabled}
+            onGrowingFruitComplete={onGrowingFruitComplete}
             onFruitClick={onFruitClick}
             onFruitHover={onFruitHover}
-            interactionsEnabled={areSceneInteractionsEnabled}
+            interactionsEnabled={areArbreFruitsInteractionsEnabled}
           />
         </Suspense>
       )}
