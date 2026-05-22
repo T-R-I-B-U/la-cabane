@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react'
 import './SettingsMenu.css'
 import { GearIcon } from './GearIcon'
 
+const DPR_OPTIONS = [
+  { label: 'Faible', value: 0.75 },
+  { label: 'Normal', value: 1 },
+  { label: 'Élevée', value: Math.min(window.devicePixelRatio, 2) },
+]
+
 function RadioPills({ options, value, onChange }) {
   return (
     <div className="settings-card__pills">
@@ -30,9 +36,10 @@ export function SettingsMenu({
   onShadowsChange,
   sensitivity,
   onSensitivityChange,
+  dpr,
+  onDprChange,
 }) {
-  const [quality, setQuality] = useState('Normal')
-  const [ao, setAo] = useState('Non')
+  const ao = 'Non'
   const [isFullscreen, setIsFullscreen] = useState(!!document.fullscreenElement)
 
   useEffect(() => {
@@ -52,6 +59,7 @@ export function SettingsMenu({
   if (!open) return null
 
   const sensitivityPercent = Math.round((sensitivity - 0.5) * 100)
+  const activeDprLabel = DPR_OPTIONS.find((o) => o.value === dpr)?.label ?? 'Normal'
 
   return (
     <div className="settings-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
@@ -66,11 +74,14 @@ export function SettingsMenu({
         </div>
 
         <div className="settings-card__section">
-          <p className="settings-card__label">Qualité graphique</p>
+          <p className="settings-card__label">Résolution</p>
           <RadioPills
-            options={['Faible', 'Normal', 'Élevée']}
-            value={quality}
-            onChange={setQuality}
+            options={DPR_OPTIONS.map((o) => o.label)}
+            value={activeDprLabel}
+            onChange={(label) => {
+              const opt = DPR_OPTIONS.find((o) => o.label === label)
+              if (opt) onDprChange(opt.value)
+            }}
           />
         </div>
 

@@ -80,6 +80,7 @@ export default function App() {
   const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
   const [shadowsEnabled, setShadowsEnabled] = useState(true)
   const [mouseSensitivity, setMouseSensitivity] = useState(1)
+  const [dpr, setDpr] = useState(1)
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(isDevBuild)
   const [playerSpawn, setPlayerSpawn] = useState(null)
@@ -1215,6 +1216,7 @@ export default function App() {
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
         shadowsEnabled={shadowsEnabled}
+        dpr={dpr}
         journalAutoOpenToken={journalAutoOpenToken}
         journalCloseToken={journalCloseToken}
         journalPuzzleEnabled={journalPuzzleEnabled}
@@ -1379,6 +1381,8 @@ export default function App() {
           onAnimationEnd={() => setShowWelcome(false)}
           onOpenSettings={() => setShowSettings(true)}
           settingsOpen={showSettings}
+          modelQuality={modelQuality}
+          onModelQualityChange={setModelQuality}
         />
       )}
 
@@ -1396,6 +1400,8 @@ export default function App() {
         onShadowsChange={(v) => setShadowsEnabled(v === 'Oui')}
         sensitivity={mouseSensitivity}
         onSensitivityChange={setMouseSensitivity}
+        dpr={dpr}
+        onDprChange={setDpr}
       />
     </main>
   )
