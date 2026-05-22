@@ -107,9 +107,9 @@ export function SettingsMenu({
           />
         </div>
 
-        <div className="settings-card__section">
+        <div className="settings-card__section settings-card__section--disabled">
           <p className="settings-card__label">Occlusion ambiante</p>
-          <RadioPills options={['Oui', 'Non']} value={ao} onChange={setAo} />
+          <RadioPills options={['Oui', 'Non']} value={ao} onChange={() => {}} />
         </div>
 
         <div className="settings-card__section">

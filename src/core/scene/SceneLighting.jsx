@@ -12,7 +12,7 @@ export function SceneLighting({ activeHdriId }) {
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
   )
   const activeHdri = getHdriOption(activeHdriId)
-  const environmentIntensity = activeHdri?.file ? activeHdri.intensity ?? 0.32 : 0.28
+  const environmentIntensity = activeHdri?.file ? (activeHdri.intensity ?? 0.32) : 0.28
   const backgroundTexture = useMemo(() => {
     if (!skyTexture) return null
     const texture = skyTexture.clone()

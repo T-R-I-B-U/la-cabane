@@ -140,6 +140,11 @@
   height: 0;
 }
 
+.settings-card__section--disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
 .settings-fullscreen-btn {
   font-family: 'Albert Sans', sans-serif;
   font-size: 18px;
