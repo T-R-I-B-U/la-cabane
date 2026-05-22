@@ -34,15 +34,15 @@ const GROUP_WORLD_POS = [-38.5, 0.44, -42.4]
 // World y ≈ 0.95–1.18 = visual top of the raspberry plants.
 const RASPBERRY_DEFS = [
   // Plant 1 (world x≈-38.53) rot=(-1.537,-1.262,-1.807)
-  { position: [0.605, 0.520, 0.93], rotation: [0.2, 0.8, 0.3], isRipe: true },
+  { position: [0.605, 0.52, 0.93], rotation: [0.2, 0.8, 0.3], isRipe: true },
   { position: [0.627, 0.312, 0.78], rotation: [-0.3, 2.1, 0.1], isRipe: false },
   // Plant 2 (world x≈-39.26) rot=(-1.604, 1.262, 1.335)
-  { position: [0.507, 0.540, 0.41], rotation: [0.1, 3.8, -0.2], isRipe: true },
-  { position: [0.420, 0.426, 0.37], rotation: [-0.2, 1.5, 0.4], isRipe: true },
+  { position: [0.507, 0.54, 0.41], rotation: [0.1, 3.8, -0.2], isRipe: true },
+  { position: [0.42, 0.426, 0.37], rotation: [-0.2, 1.5, 0.4], isRipe: true },
   { position: [0.395, 0.308, 0.42], rotation: [0.4, 4.2, -0.1], isRipe: false },
   // Plant 3 (world x≈-40.13) rot=(-1.537,-1.262,-1.807)
-  { position: [-0.996, 0.520, 0.93], rotation: [-0.1, 0.4, 0.5], isRipe: true },
-  { position: [-0.960, 0.382, 0.88], rotation: [0.3, 2.7, -0.3], isRipe: true },
+  { position: [-0.996, 0.52, 0.93], rotation: [-0.1, 0.4, 0.5], isRipe: true },
+  { position: [-0.96, 0.382, 0.88], rotation: [0.3, 2.7, -0.3], isRipe: true },
   { position: [-0.974, 0.312, 0.78], rotation: [-0.4, 5.1, 0.2], isRipe: false },
 ]
 
@@ -112,7 +112,6 @@ function RaspberryInstance({ definition, onMeshRef }) {
     })
     return c
   }, [scene, material])
-
 
   const callbackRef = useCallback(
     (node) => {
@@ -219,7 +218,9 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       for (let i = 0; i < meshRegistryRef.current.length; i++) {
         const root = meshRegistryRef.current[i]
         if (!root) continue
-        root.traverse((child) => { if (child === hitObject) idx = i })
+        root.traverse((child) => {
+          if (child === hitObject) idx = i
+        })
         if (idx !== -1) break
       }
       if (idx === -1 || collectedSlots.current[idx] !== null) return
@@ -355,11 +356,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
         <meshBasicMaterial color="cyan" depthTest={false} />
       </mesh>
       {RASPBERRY_DEFS.map((def, i) => (
-        <RaspberryInstance
-          key={i}
-          definition={def}
-          onMeshRef={handleMeshRef(i)}
-        />
+        <RaspberryInstance key={i} definition={def} onMeshRef={handleMeshRef(i)} />
       ))}
     </group>
   )
