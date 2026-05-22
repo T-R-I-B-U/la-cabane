@@ -29,7 +29,12 @@ import {
 } from './core/SceneConfig'
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
-import { setSubtitleChoices, unlockAndPlay, setGlobalVolume, getGlobalVolume } from './utils/audioStore'
+import {
+  setSubtitleChoices,
+  unlockAndPlay,
+  setGlobalVolume,
+  getGlobalVolume,
+} from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
 import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -102,6 +107,7 @@ export default function App() {
   const isCursorVisibleRef = useRef(false)
   const isCameraBlockedRef = useRef(false)
   const isModalOpenRef = useRef(false)
+  const isInGameplayRef = useRef(false)
   const loadingRevealTimeoutRef = useRef(null)
   const loadingRevealScheduledRef = useRef(false)
   const [loadingSequenceStarted, setLoadingSequenceStarted] = useState(false)

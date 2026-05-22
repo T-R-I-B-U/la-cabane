@@ -19,7 +19,14 @@ function RadioPills({ options, value, onChange }) {
   )
 }
 
-export function SettingsMenu({ open, onClose, volume, onVolumeChange, shadersEnabled, onShadersChange }) {
+export function SettingsMenu({
+  open,
+  onClose,
+  volume,
+  onVolumeChange,
+  shadersEnabled,
+  onShadersChange,
+}) {
   const [quality, setQuality] = useState('Normal')
   const [ao, setAo] = useState('Non')
   const [ombres, setOmbres] = useState('Non')
