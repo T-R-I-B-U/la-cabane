@@ -739,24 +739,9 @@ export default function App() {
     return () => document.removeEventListener('click', blockPointerLock, { capture: true })
   }, [])
 
-  // TEMP: Escape-open disabled while validating P-key open flow.
-  // useEffect(() => {
-  //   const onEscapeWhileLocked = (e) => {
-  //     if (e.key !== 'Escape') return
-  //     if (!isInGameplayRef.current) return
-  //     if (isModalOpenRef.current || isJournalInteractionActiveRef.current || isMinigameActiveRef.current) return
-  //     e.stopImmediatePropagation()
-  //     setShowSettings(true)
-  //     setShouldRestorePointerLockAfterStoryUi(true)
-  //   }
-  //   document.addEventListener('keydown', onEscapeWhileLocked, { capture: true })
-  //   return () => document.removeEventListener('keydown', onEscapeWhileLocked, { capture: true })
-  // }, [])
-
-  // Open settings via P during gameplay.
   useEffect(() => {
-    const onPressP = (e) => {
-      if (e.code !== 'KeyP') return
+    const onEscape = (e) => {
+      if (e.key !== 'Escape') return
       if (!isInGameplayRef.current) return
       if (
         isModalOpenRef.current ||
@@ -764,22 +749,16 @@ export default function App() {
         isMinigameActiveRef.current
       )
         return
-      e.preventDefault()
-      setShowSettings(true)
-      setShouldRestorePointerLockAfterStoryUi(true)
+      e.stopImmediatePropagation()
+      if (showSettings) {
+        setShowSettings(false)
+      } else {
+        setShowSettings(true)
+        setShouldRestorePointerLockAfterStoryUi(true)
+      }
     }
-    window.addEventListener('keydown', onPressP)
-    return () => window.removeEventListener('keydown', onPressP)
-  }, [])
-
-  useEffect(() => {
-    if (!showSettings) return
-    const onEscapeClose = (e) => {
-      if (e.key !== 'Escape') return
-      setShowSettings(false)
-    }
-    window.addEventListener('keydown', onEscapeClose)
-    return () => window.removeEventListener('keydown', onEscapeClose)
+    document.addEventListener('keydown', onEscape, { capture: true })
+    return () => document.removeEventListener('keydown', onEscape, { capture: true })
   }, [showSettings])
 
   useEffect(() => {
