@@ -34,7 +34,6 @@ export default function Scene({
   shaderEnabled,
   shaderRadius,
   shadowsEnabled = true,
-  dpr = 1,
   journalAutoOpenToken,
   journalCloseToken,
   journalPuzzleEnabled,
@@ -144,7 +143,6 @@ export default function Scene({
         position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
       shadows={shadowsEnabled ? 'soft' : false}
-      dpr={dpr}
       gl={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >

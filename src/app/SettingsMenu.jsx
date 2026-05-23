@@ -2,12 +2,6 @@ import { useState, useEffect } from 'react'
 import './SettingsMenu.css'
 import { GearIcon } from './GearIcon'
 
-const DPR_OPTIONS = [
-  { label: 'Faible', value: 0.75 },
-  { label: 'Normal', value: 1 },
-  { label: 'Élevée', value: Math.min(window.devicePixelRatio, 2) },
-]
-
 const QUALITY_OPTIONS = [
   { label: 'Faible', value: 'compressed2' },
   { label: 'Normal', value: 'compressed' },
@@ -42,8 +36,6 @@ export function SettingsMenu({
   onShadowsChange,
   sensitivity,
   onSensitivityChange,
-  dpr,
-  onDprChange,
   modelQuality,
   onModelQualityChange,
   sceneLoaded,
@@ -68,7 +60,6 @@ export function SettingsMenu({
   if (!open) return null
 
   const sensitivityPercent = Math.round((sensitivity - 0.5) * 100)
-  const activeDprLabel = DPR_OPTIONS.find((o) => o.value === dpr)?.label ?? 'Normal'
   const activeQualityLabel =
     QUALITY_OPTIONS.find((o) => o.value === modelQuality)?.label ?? 'Faible'
 
@@ -94,18 +85,6 @@ export function SettingsMenu({
             onChange={(label) => {
               const opt = QUALITY_OPTIONS.find((o) => o.label === label)
               if (opt) onModelQualityChange(opt.value)
-            }}
-          />
-        </div>
-
-        <div className="settings-card__section">
-          <p className="settings-card__label">Résolution</p>
-          <RadioPills
-            options={DPR_OPTIONS.map((o) => o.label)}
-            value={activeDprLabel}
-            onChange={(label) => {
-              const opt = DPR_OPTIONS.find((o) => o.label === label)
-              if (opt) onDprChange(opt.value)
             }}
           />
         </div>
