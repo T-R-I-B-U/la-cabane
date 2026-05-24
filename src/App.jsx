@@ -1377,7 +1377,7 @@ export default function App() {
         onSensitivityChange={setMouseSensitivity}
         modelQuality={modelQuality}
         onModelQualityChange={setModelQuality}
-        sceneLoaded={sceneLoadStatus === 'ok'}
+        sceneLoaded={!showWelcome}
       />
     </main>
   )
