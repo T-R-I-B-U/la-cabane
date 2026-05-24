@@ -21,6 +21,13 @@
   }
 }
 
+.welcome-screen__top-right {
+  position: absolute;
+  top: 60px;
+  right: 60px;
+  z-index: 1;
+}
+
 .welcome-screen__bg {
   position: absolute;
   inset: 0;

@@ -9,6 +9,7 @@ import {
   LoadingScreen,
   NameInput,
   SavoirPanel,
+  SettingsMenu,
   WelcomeScreen,
   useIntroFlow,
   useSavoirAssignment,
@@ -28,7 +29,12 @@ import {
 } from './core/SceneConfig'
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
-import { setSubtitleChoices, unlockAndPlay } from './utils/audioStore'
+import {
+  setSubtitleChoices,
+  unlockAndPlay,
+  setGlobalVolume,
+  getGlobalVolume,
+} from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
 import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
@@ -57,6 +63,7 @@ export default function App() {
   const [hasSentSavoir, setHasSentSavoir] = useState(false)
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
@@ -70,6 +77,9 @@ export default function App() {
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
   const [shaderRadius, setShaderRadius] = useState(3)
+  const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
+  const [shadowsEnabled, setShadowsEnabled] = useState(true)
+  const [mouseSensitivity, setMouseSensitivity] = useState(1)
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(isDevBuild)
   const [playerSpawn, setPlayerSpawn] = useState(null)
@@ -99,6 +109,7 @@ export default function App() {
   const isCursorVisibleRef = useRef(false)
   const isCameraBlockedRef = useRef(false)
   const isModalOpenRef = useRef(false)
+  const isInGameplayRef = useRef(false)
   const loadingRevealTimeoutRef = useRef(null)
   const loadingRevealScheduledRef = useRef(false)
   const [loadingSequenceStarted, setLoadingSequenceStarted] = useState(false)
@@ -355,6 +366,7 @@ export default function App() {
 
   const requestPointerLockIfSceneControlAllowed = useCallback(() => {
     if (
+      showSettings ||
       dialogueActive ||
       introMovementLocked ||
       showNameInput ||
@@ -382,6 +394,7 @@ export default function App() {
     }
     pointerControlsRef.current?.lock()
   }, [
+    showSettings,
     currentStoryStepId,
     dialogueActive,
     introMovementLocked,
@@ -559,13 +572,34 @@ export default function App() {
 
   // Synthetic click dispatch: forward canvas clicks to the DOM element under the virtual cursor
   useEffect(() => {
+    const setRangeFromCursor = (el) => {
+      const rect = el.getBoundingClientRect()
+      const ratio = Math.max(0, Math.min(1, (cursorStore.x - rect.left) / rect.width))
+      const min = parseFloat(el.min) || 0
+      const max = parseFloat(el.max) || 100
+      el.value = String(Math.round(min + ratio * (max - min)))
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
     const onDown = () => {
       if (!isCursorVisibleRef.current) return
       const canvas = document.querySelector('canvas')
       const el = document.elementFromPoint(cursorStore.x, cursorStore.y)
-      if (el && el !== canvas) {
-        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      if (!el || el === canvas) return
+
+      if (el instanceof HTMLInputElement && el.type === 'range') {
+        setRangeFromCursor(el)
+        const onMove = () => setRangeFromCursor(el)
+        const onUp = () => {
+          window.removeEventListener('mousemove', onMove, { capture: true })
+          window.removeEventListener('mouseup', onUp)
+        }
+        window.addEventListener('mousemove', onMove, { capture: true })
+        window.addEventListener('mouseup', onUp)
+        return
       }
+
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
@@ -638,7 +672,7 @@ export default function App() {
     isStoryBlockingPlayer || isModalBlockingPlayer || isJournalBlockingPlayer
 
   useEffect(() => {
-    if (!shouldRestorePointerLockAfterStoryUi || showNameInput || !postIntro) return
+    if (!shouldRestorePointerLockAfterStoryUi || showNameInput || !postIntro || showSettings) return
 
     let cancelled = false
     let frameId = 0
@@ -680,6 +714,7 @@ export default function App() {
     postIntro,
     requestPointerLockIfSceneControlAllowed,
     showNameInput,
+    showSettings,
   ])
 
   useEffect(() => {
@@ -691,6 +726,10 @@ export default function App() {
   }, [arbreActive])
 
   useEffect(() => {
+    isInGameplayRef.current = isPlayerModeActive || postIntro
+  }, [isPlayerModeActive, postIntro])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -698,6 +737,28 @@ export default function App() {
     document.addEventListener('click', blockPointerLock, { capture: true })
     return () => document.removeEventListener('click', blockPointerLock, { capture: true })
   }, [])
+
+  useEffect(() => {
+    const onEscape = (e) => {
+      if (e.key !== 'Escape') return
+      if (!isInGameplayRef.current) return
+      if (
+        isModalOpenRef.current ||
+        isJournalInteractionActiveRef.current ||
+        isMinigameActiveRef.current
+      )
+        return
+      e.stopImmediatePropagation()
+      if (showSettings) {
+        setShowSettings(false)
+      } else {
+        setShowSettings(true)
+        setShouldRestorePointerLockAfterStoryUi(true)
+      }
+    }
+    document.addEventListener('keydown', onEscape, { capture: true })
+    return () => document.removeEventListener('keydown', onEscape, { capture: true })
+  }, [showSettings])
 
   useEffect(() => {
     if (!receptionChoiceVisible) return
@@ -835,7 +896,8 @@ export default function App() {
     isSavoirInteractionActive ||
     isContactInteractionActive ||
     isPlayerFruitPanelOpen ||
-    !!incomingSavoir
+    !!incomingSavoir ||
+    (showSettings && (postIntro || isPlayerModeActive))
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
@@ -864,7 +926,8 @@ export default function App() {
         isPlayerFruitPanelOpen ||
         isSavoirInteractionActive ||
         isContactInteractionActive ||
-        !!incomingSavoir)
+        !!incomingSavoir ||
+        showSettings)
   }, [
     postIntro,
     showNameInput,
@@ -875,6 +938,7 @@ export default function App() {
     isSavoirInteractionActive,
     isContactInteractionActive,
     incomingSavoir,
+    showSettings,
   ])
 
   useEffect(() => {
@@ -1027,6 +1091,7 @@ export default function App() {
           eyeHeight: playerEyeHeight,
           spawnKey: playerSpawnKey,
           movementLocked: isPlayerInteractionLocked || userMovementLocked,
+          sensitivity: mouseSensitivity,
         }}
         debug={{
           doors: debugDoors,
@@ -1128,6 +1193,7 @@ export default function App() {
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
+        shadowsEnabled={shadowsEnabled}
         journalAutoOpenToken={journalAutoOpenToken}
         journalCloseToken={journalCloseToken}
         journalPuzzleEnabled={journalPuzzleEnabled}
@@ -1290,8 +1356,29 @@ export default function App() {
             if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
           onAnimationEnd={() => setShowWelcome(false)}
+          onOpenSettings={() => setShowSettings(true)}
+          settingsOpen={showSettings}
         />
       )}
+
+      <SettingsMenu
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        volume={masterVolume}
+        onVolumeChange={(v) => {
+          setMasterVolume(v)
+          setGlobalVolume(v / 100)
+        }}
+        shadersEnabled={shaderEnabled ? 'Oui' : 'Non'}
+        onShadersChange={(v) => setShaderEnabled(v === 'Oui')}
+        shadowsEnabled={shadowsEnabled ? 'Oui' : 'Non'}
+        onShadowsChange={(v) => setShadowsEnabled(v === 'Oui')}
+        sensitivity={mouseSensitivity}
+        onSensitivityChange={setMouseSensitivity}
+        modelQuality={modelQuality}
+        onModelQualityChange={setModelQuality}
+        sceneLoaded={!showWelcome}
+      />
     </main>
   )
 }

@@ -7,12 +7,12 @@ import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureRes
 const SUN_POSITION = [-84, 72, -34]
 const SUN_SHADOW_BOUNDS = 65
 
-export function SceneLighting({ activeHdriId }) {
+export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
   const skyTexture = use(
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
   )
   const activeHdri = getHdriOption(activeHdriId)
-  const environmentIntensity = activeHdri?.file ? activeHdri.intensity ?? 0.32 : 0.28
+  const environmentIntensity = activeHdri?.file ? (activeHdri.intensity ?? 0.32) : 0.28
   const backgroundTexture = useMemo(() => {
     if (!skyTexture) return null
     const texture = skyTexture.clone()
@@ -35,7 +35,7 @@ export function SceneLighting({ activeHdriId }) {
       <ambientLight intensity={0.1} color="#f1dcc8" />
       <hemisphereLight intensity={0.42} color="#ffd8bf" groundColor="#705f4f" />
       <directionalLight
-        castShadow
+        castShadow={shadowsEnabled}
         color="#ffd7ae"
         intensity={2.2}
         position={SUN_POSITION}

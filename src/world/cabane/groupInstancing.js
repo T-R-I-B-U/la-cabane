@@ -87,7 +87,8 @@ export async function buildGroupInstanced(groupName, nodes, { modelBasePaths, te
     const instancedMesh = new THREE.InstancedMesh(geometry, material, count)
     const isShadowExcluded = INSTANCED_SHADOW_EXCLUDED_GROUPS.has(groupName)
     instancedMesh.castShadow = INSTANCED_SHADOW_CASTER_GROUPS.has(groupName)
-    instancedMesh.receiveShadow = !isShadowExcluded && INSTANCED_SHADOW_RECEIVER_GROUPS.has(groupName)
+    instancedMesh.receiveShadow =
+      !isShadowExcluded && INSTANCED_SHADOW_RECEIVER_GROUPS.has(groupName)
     for (let i = 0; i < count; i++) {
       instancedMesh.setMatrixAt(i, instanceMatrices[i])
     }

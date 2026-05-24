@@ -33,6 +33,7 @@ export default function Scene({
   interactions,
   shaderEnabled,
   shaderRadius,
+  shadowsEnabled = true,
   journalAutoOpenToken,
   journalCloseToken,
   journalPuzzleEnabled,
@@ -46,6 +47,7 @@ export default function Scene({
     eyeHeight: playerEyeHeight,
     spawnKey: playerSpawnKey,
     movementLocked,
+    sensitivity: playerSensitivity = 1,
   } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
   const {
@@ -147,7 +149,7 @@ export default function Scene({
       <StatsCollector onStats={onStats} />
       <AudioManager />
 
-      <SceneLighting activeHdriId={activeHdriId} />
+      <SceneLighting activeHdriId={activeHdriId} shadowsEnabled={shadowsEnabled} />
 
       <Floor mainFloorRef={setMainFloorCollider} />
       {/* <BackgroundPlanes hutPosition={hutPosition} /> */}
@@ -264,6 +266,7 @@ export default function Scene({
         controlsRef={controlsRef}
         hutPosition={hutPosition}
         cameraFixed={cameraFixed}
+        sensitivity={playerSensitivity}
       />
 
       {shaderEnabled && (
