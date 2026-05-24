@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { subscribeSubtitles } from '../../utils/audioStore'
 
 const SPEAKERS = {
-  marie: { label: 'MARIE', avatar: '/avatars/marie.svg' },
-  thomas: { label: 'THOMAS', avatar: '/avatars/thomas.svg' },
-  zoe: { label: 'ZOÉ', avatar: '/avatars/zoe.svg' },
-  tree: { label: 'VOTRE GUIDE', avatar: '/avatars/tree.svg' },
+  marie: { label: 'MARIE', avatar: '/avatars/marie.png' },
+  thomas: { label: 'THOMAS', avatar: '/avatars/thomas.png' },
+  zoe: { label: 'ZOÉ', avatar: '/avatars/zoe.png' },
+  tree: { label: 'VOTRE GUIDE', avatar: '/avatars/guide.png' },
 }
 
 const WRAP = {
