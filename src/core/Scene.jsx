@@ -1,5 +1,6 @@
-import { useState, useRef, useMemo, Suspense, lazy } from 'react'
+import { useState, useRef, useMemo, Suspense, lazy, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { useThree } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
 import { initKTX2Loader } from './ktx2Loader.js'
 import AudioManager from './audio/AudioManager'
@@ -18,6 +19,17 @@ const ArbreScene = lazy(() =>
 const WatercolorPass = lazy(() =>
   import('../world/materials/WatercolorPass').then((mod) => ({ default: mod.WatercolorPass }))
 )
+
+function ShadowMapController({ enabled }) {
+  const { gl } = useThree()
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/immutability
+    gl.shadowMap.enabled = enabled
+    // eslint-disable-next-line react-hooks/immutability
+    gl.shadowMap.needsUpdate = true
+  }, [gl, enabled])
+  return null
+}
 
 export default function Scene({
   modelQuality,
@@ -142,10 +154,11 @@ export default function Scene({
         far: 500,
         position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
-      shadows={shadowsEnabled ? 'soft' : false}
+      shadows="soft"
       gl={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >
+      <ShadowMapController enabled={shadowsEnabled} />
       <StatsCollector onStats={onStats} />
       <AudioManager />
 
