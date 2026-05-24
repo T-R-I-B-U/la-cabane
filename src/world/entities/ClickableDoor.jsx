@@ -8,25 +8,24 @@ const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
 const OUTLINE_COLOR = 0xffffff
 const OUTLINE_OPACITY = 0.9
+const INTRO_HUT = 'hut01'
 const INTRO_DOOR_PARENT = 'door01'
-const INTRO_DOOR_EXCLUDE = 'door02'
 
 function findIntroDoorMeshes(cabane) {
   if (!cabane) return []
 
-  const parent = cabane.getObjectByName(INTRO_DOOR_PARENT)
+  // Scope search to hut01 first — greenhouse.gltf also has a node named door01
+  // and its order in the scene can vary depending on cabane.json entry order.
+  const hut = cabane.getObjectByName(INTRO_HUT)
+  if (!hut) return []
+
+  const parent = hut.getObjectByName(INTRO_DOOR_PARENT)
   if (!parent) return []
 
   const meshes = []
   parent.traverse((obj) => {
     if (!obj.isMesh) return
     if (!obj.name.startsWith('door_right') && !obj.name.startsWith('door_left')) return
-    // Exclude meshes that belong to door02 (back door shares the same child names)
-    let ancestor = obj.parent
-    while (ancestor && ancestor !== parent) {
-      if (ancestor.name === INTRO_DOOR_EXCLUDE) return
-      ancestor = ancestor.parent
-    }
     meshes.push(obj)
   })
 
