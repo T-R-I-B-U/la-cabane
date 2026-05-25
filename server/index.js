@@ -43,6 +43,8 @@ const httpServer = createServer((req, res) => {
     '.glb': 'model/gltf-binary',
     '.gltf': 'model/gltf+json',
     '.hdr': 'application/octet-stream',
+    '.wasm': 'application/wasm',
+    '.ktx2': 'image/ktx2',
   }
 
   fs.readFile(filePath, (error, content) => {
