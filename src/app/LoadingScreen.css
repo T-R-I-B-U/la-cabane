@@ -58,6 +58,16 @@
   image-rendering: auto;
 }
 
+.loading-screen--fading {
+  animation: loading-fade-out 0.8s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes loading-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 .loading-screen__error {
   position: absolute;
   inset: 0;
