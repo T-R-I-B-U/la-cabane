@@ -3,6 +3,7 @@ import { useNpcDialogue } from './useNpcDialogue'
 import { useStoryFlow } from './useStoryFlow'
 import { useActiveZone } from '../utils/gameManagerStore'
 import { setZone } from '../utils/gameManagerStore'
+import { setAmbiance } from '../utils/audioStore'
 import { setGameStep, GAME_STEPS } from '../utils/gameStateStore'
 import { PLATFORM_POS, PLAYER_HEIGHT } from '../core/SceneConfig'
 import { getCameraPose, onRegistryChange } from '../core/cameraRegistry'
@@ -342,6 +343,7 @@ export function useArbreFlow({
                 onDone: () => {
                   setArbreDialogueActive(false)
                   completeStep('arbre.treeDialogue25')
+                  setAmbiance('musicEnd')
                   setArbreStoryCameraTransition({ ...povs.outroStairs02Top })
                 },
               })
@@ -357,6 +359,7 @@ export function useArbreFlow({
         onDone: () => {
           setArbreDialogueActive(false)
           completeStep('arbre.treeDialogue25')
+          setAmbiance('musicEnd')
           setArbreStoryCameraTransition({ ...povs.outroStairs02Top })
         },
       })

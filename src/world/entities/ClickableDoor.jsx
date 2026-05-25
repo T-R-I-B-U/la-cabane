@@ -6,12 +6,20 @@ import { cursorStore } from '../../utils/cursorStore'
 
 const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
+const OUTLINE_COLOR = 0xffffff
+const OUTLINE_OPACITY = 0.9
+const INTRO_HUT = 'hut01'
 const INTRO_DOOR_PARENT = 'door01'
 
 function findIntroDoorMeshes(cabane) {
   if (!cabane) return []
 
-  const parent = cabane.getObjectByName(INTRO_DOOR_PARENT)
+  // Scope search to hut01 first — greenhouse.gltf also has a node named door01
+  // and its order in the scene can vary depending on cabane.json entry order.
+  const hut = cabane.getObjectByName(INTRO_HUT)
+  if (!hut) return []
+
+  const parent = hut.getObjectByName(INTRO_DOOR_PARENT)
   if (!parent) return []
 
   const meshes = []
@@ -33,6 +41,22 @@ function cloneMaterial(material) {
   return Array.isArray(material) ? material.map((entry) => entry.clone()) : material.clone()
 }
 
+function createDoorOutline(mesh) {
+  const geometry = new THREE.EdgesGeometry(mesh.geometry, 20)
+  const material = new THREE.LineBasicMaterial({
+    color: OUTLINE_COLOR,
+    transparent: true,
+    opacity: OUTLINE_OPACITY,
+    depthTest: false,
+  })
+  const outline = new THREE.LineSegments(geometry, material)
+  outline.name = `${mesh.name}-hover-outline`
+  outline.visible = false
+  outline.renderOrder = 10
+  outline.raycast = () => {}
+  return outline
+}
+
 export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
   const hoveredRef = useRef(false)
@@ -42,6 +66,7 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const onDoorClickRef = useStableInteractionCallback(onDoorClick)
   const materialStatesRef = useRef(new Map())
   const clonedMaterialsRef = useRef(new Map())
+  const outlinesRef = useRef([])
   const raycaster = useRef(new THREE.Raycaster())
 
   const doorMeshes = useMemo(() => findIntroDoorMeshes(cabane), [cabane])
@@ -68,7 +93,21 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
       })
     })
 
+    const outlines = doorMeshes.map((mesh) => {
+      const outline = createDoorOutline(mesh)
+      mesh.add(outline)
+      return outline
+    })
+
+    outlinesRef.current = outlines
+
     return () => {
+      outlines.forEach((outline) => {
+        outline.removeFromParent()
+        outline.geometry.dispose()
+        outline.material.dispose()
+      })
+      outlinesRef.current = []
       clonedMaterialsRef.current.forEach(({ originalMaterial, clonedMaterial }, mesh) => {
         mesh.material = originalMaterial
         forEachMaterial(clonedMaterial, (material) => material.dispose())
@@ -80,6 +119,12 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
 
   const setDoorHover = useCallback(
     (isHovered) => {
+      cursorStore.setType(isHovered ? 'pointer' : 'default')
+
+      outlinesRef.current.forEach((outline) => {
+        outline.visible = isHovered
+      })
+
       doorMeshes.forEach((mesh) => {
         forEachMaterial(mesh.material, (material) => {
           const original = materialStatesRef.current.get(material)

@@ -1,14 +1,15 @@
 import './SavoirPanel.css'
+import { playOnce } from '../utils/audioStore'
 
 export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf }) {
   return (
-    <div className="savoir-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
+    <div className="savoir-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={() => { playOnce('closeUi'); onClose() }}>
       <div
         className="savoir-card"
         onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className="savoir-back" onClick={onClose} aria-label="Fermer">
+        <button type="button" className="savoir-back" onClick={() => { playOnce('closeUi'); onClose() }} aria-label="Fermer">
           <img src="/arrow.svg" alt="" aria-hidden="true" />
         </button>
 

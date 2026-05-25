@@ -1,4 +1,5 @@
 import { use, useEffect, useRef, useMemo } from 'react'
+import { playOnce } from '../../utils/audioStore'
 import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { preferKtx2, loadStandaloneTexture } from '../cabane/textureResolver.js'
@@ -358,6 +359,7 @@ export function TreeLeaves({
           // Use the id tracked by the manual center raycaster instead.
           const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId
           if (id === undefined || id < 0 || !inRangeRef.current?.[id]) return
+          playOnce('clickMagic')
           onLeafClick(id)
         }}
       />

@@ -10,6 +10,7 @@ import { StatsCollector } from './StatsCollector'
 import { SceneControls } from './scene/SceneControls'
 import { SceneLighting } from './scene/SceneLighting'
 import { CabaneScene } from './scene/CabaneScene'
+import { CinematicPlayer } from './CinematicPlayer'
 import { useActiveZone } from '../utils/gameManagerStore'
 
 const ArbreScene = lazy(() =>
@@ -37,6 +38,8 @@ export default function Scene({
   journalAutoOpenToken,
   journalCloseToken,
   journalPuzzleEnabled,
+  cinematicActive = false,
+  cinematicKeypoints = [],
 }) {
   const { onStats, onReady, onError } = sceneState
   const {
@@ -268,6 +271,8 @@ export default function Scene({
         cameraFixed={cameraFixed}
         sensitivity={playerSensitivity}
       />
+
+      <CinematicPlayer active={cinematicActive} keypoints={cinematicKeypoints} />
 
       {shaderEnabled && (
         <Suspense fallback={null}>
