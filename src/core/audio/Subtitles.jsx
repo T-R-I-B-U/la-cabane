@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { subscribeSubtitles } from '../../utils/audioStore'
+import { cursorStore } from '../../utils/cursorStore'
 
 const SPEAKERS = {
   marie: { label: 'MARIE', avatar: '/avatars/marie.png' },
@@ -78,6 +79,34 @@ const CHOICES = {
   pointerEvents: 'auto',
 }
 
+function ChoiceButton({ label, onClick }) {
+  const ref = useRef(null)
+  const [hovered, setHovered] = useState(false)
+
+  useEffect(() => {
+    return cursorStore.subscribePos((x, y) => {
+      if (!ref.current) return
+      const rect = ref.current.getBoundingClientRect()
+      const isOver = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+      setHovered((prev) => {
+        if (prev !== isOver) cursorStore.setType(isOver ? 'pointer' : 'default')
+        return isOver
+      })
+    })
+  }, [])
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={`dialogue-choice-btn${hovered ? ' dialogue-choice-btn--hovered' : ''}`}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  )
+}
+
 export default function Subtitles() {
   const [state, setState] = useState({ text: '', speaker: null, choices: null })
 
@@ -101,9 +130,7 @@ export default function Subtitles() {
         {hasChoices && (
           <div style={CHOICES}>
             {choices.map(({ label, onClick }) => (
-              <button key={label} type="button" className="dialogue-choice-btn" onClick={onClick}>
-                {label}
-              </button>
+              <ChoiceButton key={label} label={label} onClick={onClick} />
             ))}
           </div>
         )}

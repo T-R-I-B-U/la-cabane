@@ -219,7 +219,8 @@
     color 0.1s ease;
 }
 
-.dialogue-choice-btn:hover {
+.dialogue-choice-btn:hover,
+.dialogue-choice-btn--hovered {
   background: #8b8e50;
   color: #33330f;
 }
