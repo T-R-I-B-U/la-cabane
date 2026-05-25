@@ -89,6 +89,12 @@
   transition: opacity 0.15s ease;
 }
 
+/* Override the global cursor: auto !important from .viewer-page--cursor-visible * */
+.viewer-page--cursor-visible .welcome-screen__btn,
+.viewer-page--cursor-visible .welcome-screen__btn * {
+  cursor: pointer !important;
+}
+
 .welcome-screen__btn-bg {
   position: absolute;
   inset: 0;
@@ -98,12 +104,30 @@
   pointer-events: none;
 }
 
-.welcome-screen__btn span {
-  position: relative;
+.welcome-screen__btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 19, 19, 0.5);
+  border-radius: 360px;
+  opacity: 0;
+  transition: opacity 0.1s ease;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.welcome-screen__btn:hover {
-  opacity: 0.85;
+.welcome-screen__btn:hover::after {
+  opacity: 1;
+}
+
+.welcome-screen__btn span {
+  position: relative;
+  z-index: 2;
+  transition: color 0.1s ease;
+}
+
+.welcome-screen__btn:hover span {
+  color: white;
 }
 
 @media (max-width: 820px) {
