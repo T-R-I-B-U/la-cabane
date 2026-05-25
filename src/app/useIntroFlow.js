@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
-import { STORY_CAMERA_POVS } from './storyCameraPovs'
+import { DEFAULT_STORY_CAMERA_POVS, STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
-import { fade, stop } from '../utils/audioStore'
+import { setAmbiance, stopAmbiance } from '../utils/audioStore'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -12,7 +12,7 @@ const INSIDE_POV = {
 const RASPBERRY_TEMP_COMPLETE_COUNT = 8
 const RASPBERRY_TEMP_AUTO_COMPLETE_DELAY = 2000
 
-export function useIntroFlow({ sceneReady, arbreActiveRef }) {
+export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
   const [introWaitingAtDoor, setIntroWaitingAtDoor] = useState(false)
@@ -120,8 +120,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setZoeClip(null)
     setMinigameCount(0)
     setPlayerName('')
-    stop('ambianceWorkbench')
-    stop('ambianceGreenhouse')
+    stopAmbiance()
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
@@ -138,38 +137,11 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     stopDialogue()
   }, [resetFlowState, resetStory, stopDialogue])
 
-  useEffect(() => {
-    const onKeyDown = (event) => {
-      if (event.code === 'Escape') exitIntro()
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [exitIntro])
-
-  useEffect(() => {
-    if (!postIntro) return
-
-    let wasLocked = false
-    const onPointerLockChange = () => {
-      if (document.pointerLockElement) wasLocked = true
-      else if (raspberryPhaseActiveRef.current) {
-        // minigame owns the pointer — ignore spontaneous unlocks
-      } else if (arbreActiveRef?.current) {
-        // arbre sequence owns the pointer — ignore spontaneous unlocks
-      } else if (wasLocked) {
-        exitIntro()
-      }
-    }
-
-    document.addEventListener('pointerlockchange', onPointerLockChange)
-    return () => document.removeEventListener('pointerlockchange', onPointerLockChange)
-  }, [postIntro, exitIntro, arbreActiveRef])
-
   const handleIntroEvent = useCallback(
     (event, payload) => {
       if (event === 'camera:ready') {
         setLoaderFading(true)
+        setAmbiance('musicBeginning')
       }
 
       if (event === 'wait:door') setIntroWaitingAtDoor(true)
@@ -182,6 +154,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
       if (event === 'door:open') setIntroDoorOpen(true)
 
       if (event === 'inside') {
+        setAmbiance('musicIndoor')
         if (payload) setIntroSpawn(payload)
         setIntroDoorOpen(false)
         setIntroShouldAdvance(false)
@@ -254,7 +227,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
       playDialogue('thomasEtabliDialogue', {
         onDone: () => {
           setThomasAnimationPhase('returning')
-          scheduleFlowTimeout(() => fade('ambianceWorkbench', 0.7, 2000), 2000)
+          scheduleFlowTimeout(() => setAmbiance('ambianceWorkbench'), 2000)
           setGreenhousePhaseActive(true)
         },
       })
@@ -306,6 +279,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     if (greenhouseTransitionStageRef.current === 'exitFront') {
       greenhouseTransitionStageRef.current = null
+      setAmbiance('ambianceOutside')
       scheduleFlowTimeout(() => {
         playDialogue('18-voice-tree', {
           onDone: () =>
@@ -342,7 +316,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     if (greenhouseTransitionStageRef.current === 'corridor') {
       greenhouseTransitionStageRef.current = 'inside'
-      fade('ambianceGreenhouse', 0.7, 2000)
+      setAmbiance('ambianceGreenhouse')
       scheduleFlowTimeout(() => {
         setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInside, duration: 2.5 })
       }, 1000)
@@ -361,7 +335,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
     completeStep('intro.goToReception')
     playDialogue('receptionDialogue', {
-      onDone: () => {
+      onLastCue: () => {
         setReceptionChoiceVisible(true)
       },
     })
@@ -480,7 +454,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
-    fade('ambianceWorkbench', 0.7, 800)
+    setAmbiance('ambianceWorkbench')
     isEtabliTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelier, duration: 1.5 })
   }, [])
@@ -553,16 +527,17 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   }, [playDialogue])
 
   const handleGreenhouseDoorClick = useCallback(() => {
+    clearScheduledTimeouts()
     setGreenhousePhaseActive(false)
     setSerreActive(true)
-    fade('ambianceWorkbench', 0, 1500)
+    setAmbiance(null)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
-  }, [])
+  }, [clearScheduledTimeouts])
 
   const handleExitSerreDoorClick = useCallback(() => {
     setExitSerrePhaseActive(false)
-    fade('ambianceGreenhouse', 0, 1500)
+    setAmbiance(null)
     greenhouseTransitionStageRef.current = 'exitIndoor'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInsideExit, duration: 2.0 })
   }, [])
@@ -570,7 +545,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
   const handleThomasEtabliInteract = useCallback(() => {
     setThomasEtabliPhaseActive(false)
     setThomasAnimationPhase('talking')
-    fade('ambianceWorkbench', 0, 1500)
+    setAmbiance(null)
     isAtelierBetweenTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelierBetween, duration: 1.0 })
   }, [])
@@ -587,15 +562,18 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setLoaderFading(true)
   }, [resetFlowState, stopDialogue])
 
-  const prepareDebugPostIntroState = useCallback(() => {
-    stopDialogue()
-    resetFlowState()
-    setLoaderFading(false)
-    setPostIntro(true)
-    setIntroSpawn(INSIDE_POV)
-    setIntroMovementLocked(true)
-    setPlayerName('Debug')
-  }, [resetFlowState, stopDialogue])
+  const prepareDebugPostIntroState = useCallback(
+    (lockMovement = true) => {
+      stopDialogue()
+      resetFlowState()
+      setLoaderFading(false)
+      setPostIntro(true)
+      setIntroSpawn(INSIDE_POV)
+      setIntroMovementLocked(lockMovement)
+      setPlayerName('Debug')
+    },
+    [resetFlowState, stopDialogue]
+  )
 
   const debugGoToIntroStart = useCallback(() => {
     prepareDebugStoryState()
@@ -603,7 +581,8 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setIntroActive(true)
   }, [prepareDebugStoryState, resetStory])
 
-  const debugGoToDoorPassage = useCallback(() => {
+  // 2. Player just entered the cabin — tree welcome dialogue, movement locked
+  const debugGoToBienvenue = useCallback(() => {
     prepareDebugPostIntroState()
     setPlayerName('')
     startStory('intro.treeWelcome')
@@ -615,47 +594,98 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     })
   }, [completeStep, playDialogue, prepareDebugPostIntroState, startStory])
 
-  const debugGoToReception = useCallback(() => {
+  // 3. At the reception desk
+  const debugGoToAccueil = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.accueil
+    if (pov?.position) setIntroSpawn(pov)
     goToStep('intro.goToReception')
   }, [goToStep, prepareDebugPostIntroState])
 
-  const debugGoToTree = useCallback(() => {
+  // 4. Journal unlocked, auto-opens so the puzzle is immediately available
+  const debugGoToJournal = useCallback(() => {
+    prepareDebugPostIntroState(false)
+    const pov = DEFAULT_STORY_CAMERA_POVS.accueil
+    if (pov?.position) setIntroSpawn(pov)
+    setJournalUnlocked(true)
+    setJournalPuzzleEnabled(true)
+    setJournalAutoOpenToken((t) => t + 1)
+  }, [prepareDebugPostIntroState])
+
+  // 5. Tree dialogues phase 1, after the journal
+  const debugGoToArbreApresJournal = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.apresAccueil
+    if (pov?.position) setIntroSpawn(pov)
     treeClickPhaseRef.current = 1
     setTreePhaseActive(true)
   }, [prepareDebugPostIntroState])
 
+  // 6. Workbench interactable
   const debugGoToEtabli = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.atelier
+    if (pov?.position) setIntroSpawn(pov)
     unlockWorkbenchPhase()
   }, [prepareDebugPostIntroState, unlockWorkbenchPhase])
 
+  // 7. Thomas at the workbench, ready to be talked to
+  const debugGoToThomasEtabli = useCallback(() => {
+    prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.atelier
+    if (pov?.position) setIntroSpawn(pov)
+    setThomasEtabliPhaseActive(true)
+  }, [prepareDebugPostIntroState])
+
+  // 8. Greenhouse front door, ready to enter
   const debugGoToSerre = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.greenhouseFrontDoor
+    if (pov?.position) setIntroSpawn(pov)
+    setSerreActive(true)
     setGreenhousePhaseActive(true)
   }, [prepareDebugPostIntroState])
 
-  const debugGoToMinijeu = useCallback(() => {
+  // 9. Inside greenhouse, Zoé ready to talk
+  const debugGoToZoeSerre = useCallback(() => {
     prepareDebugPostIntroState()
-    // Mark transition so handleStoryCameraTransitionComplete knows to just clear and return
-    isSerreRaspberryTransitionRef.current = true
+    const pov = DEFAULT_STORY_CAMERA_POVS.serreZoe
+    if (pov?.position) setIntroSpawn(pov)
     setSerreActive(true)
-    setRaspberryPhaseActive(true)
-    setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreRaspberry, duration: 0.01 })
+    setZoePhaseActive(true)
   }, [prepareDebugPostIntroState])
 
-  const debugGoToPostMinigame = useCallback(() => {
+  // 10. Raspberry minigame
+  const debugGoToMinijeu = useCallback(() => {
     prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.serreRaspberry
+    if (pov?.position) setIntroSpawn(pov)
     setSerreActive(true)
-    setIntroSpawn({ ...STORY_CAMERA_POVS.greenhouseFrontDoorExit })
+    setRaspberryPhaseActive(true)
+  }, [prepareDebugPostIntroState])
+
+  // 11. Juice machine interaction
+  const debugGoToJuiceMachine = useCallback(() => {
+    prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.serreJuice
+    if (pov?.position) setIntroSpawn(pov)
+    setSerreActive(true)
+    setJuiceMachinePhaseActive(true)
+  }, [prepareDebugPostIntroState])
+
+  // 12. Exiting greenhouse, heading to the tree
+  const debugGoToSortieSerre = useCallback(() => {
+    prepareDebugPostIntroState()
+    const pov = DEFAULT_STORY_CAMERA_POVS.greenhouseFrontDoorExit
+    if (pov?.position) setIntroSpawn(pov)
+    setSerreActive(true)
     scheduleFlowTimeout(() => {
       playDialogue('18-voice-tree', {
         onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
       })
       scheduleFlowTimeout(() => {
         greenhouseTransitionStageRef.current = 'arbreStairs1'
-        setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
+        setStoryCameraTransition({ ...DEFAULT_STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
       }, 2000)
     }, 500)
   }, [prepareDebugPostIntroState, playDialogue, scheduleFlowTimeout])
@@ -667,6 +697,21 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     setShowNameInput(false)
     resetStory()
     setIntroPending(true)
+  }, [resetStory, sceneReady])
+
+  // Combined auto-start: prepares state AND activates the camera sequence without
+  // waiting for a user click (no loaderFading guard needed since there is no IntroLoader).
+  const startIntro = useCallback(() => {
+    if (!sceneReady) return
+
+    setPostIntro(false)
+    setShowNameInput(false)
+    resetStory()
+    setIntroPending(true)
+    setIntroDoorOpen(false)
+    setIntroWaitingAtDoor(false)
+    setIntroShouldAdvance(false)
+    setIntroActive(true)
   }, [resetStory, sceneReady])
 
   const handleLoaderClick = useCallback(() => {
@@ -737,14 +782,18 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     handleLoaderClick,
     handleLoaderKeyDown,
     handleNameSubmit,
-    handleDebugGoToDoorPassage: debugGoToDoorPassage,
     handleDebugGoToIntroStart: debugGoToIntroStart,
-    handleDebugGoToReception: debugGoToReception,
-    handleDebugGoToTree: debugGoToTree,
+    handleDebugGoToBienvenue: debugGoToBienvenue,
+    handleDebugGoToAccueil: debugGoToAccueil,
+    handleDebugGoToJournal: debugGoToJournal,
+    handleDebugGoToArbreApresJournal: debugGoToArbreApresJournal,
     handleDebugGoToEtabli: debugGoToEtabli,
+    handleDebugGoToThomasEtabli: debugGoToThomasEtabli,
     handleDebugGoToSerre: debugGoToSerre,
+    handleDebugGoToZoeSerre: debugGoToZoeSerre,
     handleDebugGoToMinijeu: debugGoToMinijeu,
-    handleDebugGoToPostMinigame: debugGoToPostMinigame,
+    handleDebugGoToJuiceMachine: debugGoToJuiceMachine,
+    handleDebugGoToSortieSerre: debugGoToSortieSerre,
     handleWorkbenchInteract,
     handleThomasEtabliInteract,
     handleGreenhouseDoorClick,
@@ -767,6 +816,7 @@ export function useIntroFlow({ sceneReady, arbreActiveRef }) {
     handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
+    startIntro,
     playDialogue,
     skipDialogue,
     setPostIntro,

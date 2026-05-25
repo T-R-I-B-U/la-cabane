@@ -10,7 +10,7 @@
 }
 
 .viewer-page * {
-  cursor: none;
+  cursor: none !important;
 }
 
 /* Restore cursor before the 3D experience starts */
@@ -18,6 +18,7 @@
 .viewer-page--cursor-visible * {
   cursor: auto !important;
 }
+
 
 /* ── Custom cursor ───────────────────────────────────────────────── */
 
@@ -731,85 +732,6 @@
   user-select: none;
 }
 
-/* ── Savoir panel ────────────────────────────────────────────────── */
-
-.savoir-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(10, 20, 28, 0.45);
-  backdrop-filter: blur(2px);
-}
-
-.savoir-card {
-  position: relative;
-  width: min(420px, calc(100vw - 32px));
-  padding: 28px 32px 24px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 12px 48px rgba(10, 20, 28, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.savoir-close {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: #6a8899;
-  padding: 4px 6px;
-  line-height: 1;
-}
-
-.savoir-close:hover {
-  color: #0f1f2b;
-}
-
-.savoir-category {
-  margin: 0;
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #4a7088;
-}
-
-.savoir-title {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #0f1f2b;
-  line-height: 1.3;
-}
-
-.savoir-text {
-  margin: 0;
-  font-size: 0.82rem;
-  color: #2a4455;
-  line-height: 1.6;
-}
-
-.savoir-contact {
-  margin: 8px 0 0;
-  font-size: 0.75rem;
-  color: #6a8899;
-}
-
-.savoir-contact-label {
-  font-weight: 600;
-  color: #4a7088;
-}
-
 /* ── Contact panel ───────────────────────────────────────────────── */
 
 .contact-overlay {
@@ -892,7 +814,7 @@
 .name-input-overlay {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 200;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -900,46 +822,69 @@
 }
 
 .name-input-card {
+  position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(20, 37, 49, 0.12);
+  gap: 12px;
+  padding: 30px;
+  border-radius: 18px;
+  background-image: url('/name-input-bg.png');
+  background-size: cover;
+  background-position: center;
+  width: min(460px, calc(100vw - 40px));
   pointer-events: all;
 }
 
-.name-input-label {
+.name-input-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.name-input-title {
   margin: 0;
-  font-size: 0.78rem;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-weight: 500;
-  color: #4a7088;
-  white-space: nowrap;
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #33330f;
+  text-align: center;
+  line-height: 1.1;
+  text-transform: uppercase;
 }
 
 .name-input-field {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(15, 31, 43, 0.15);
-  background: rgba(255, 255, 255, 0.9);
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.78rem;
-  color: #0f1f2b;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255, 255, 255, 0.95);
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #3b5866;
   outline: none;
-  width: 160px;
 }
 
-.name-input-field:focus {
-  border-color: rgba(15, 31, 43, 0.35);
+.name-input-field::placeholder {
+  opacity: 0.4;
 }
 
 .name-input-submit {
-  width: auto;
-  padding: 6px 14px;
+  padding: 10px 28px;
+  border-radius: 360px;
+  border: none;
+  background-image: url('/name-input-btn.png');
+  background-size: cover;
+  background-position: center;
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  color: #eeded0;
+  cursor: pointer;
+  line-height: 1;
 }
 
 /* ── Crosshair (mode joueur / pointer-lock) ──────────────────────── */

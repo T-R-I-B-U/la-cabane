@@ -1,142 +1,182 @@
 [
   {
     "id": "s01",
-    "title": "Savoir 1",
-    "text": "Description du savoir 1.",
-    "category": "Catégorie A",
-    "contact": "contact1@exemple.fr"
+    "title": "Initiation à la couture",
+    "person": "Sophie Mercier",
+    "text": "Un moment doux et inspirant pour apprendre à dompter une machine à coudre, choisir ses tissus et réaliser ses premiers points. Ensemble, on crée un petit projet simple pour repartir fièrement avec une pièce 100 % faite main.",
+    "category": "Textile",
+    "contact": "sophie.mercier@lacabane.fr",
+    "slots": ["12.04.50 - 10h", "19.04.50 - 10h", "26.04.50 - 14h", "03.05.50 - 10h"]
   },
   {
     "id": "s02",
-    "title": "Savoir 2",
-    "text": "Description du savoir 2.",
-    "category": "Catégorie A",
-    "contact": "contact2@exemple.fr"
+    "title": "Jardinage en permaculture",
+    "person": "Thomas Dubois",
+    "text": "Apprends à lire ton sol, associer tes plantes et créer un jardin qui se nourrit lui-même. Pas de chimie, pas de gaspillage — juste l'intelligence du vivant appliquée à ton coin de terre.",
+    "category": "Nature",
+    "contact": "thomas.dubois@lacabane.fr",
+    "slots": ["10.04.50 - 9h", "17.04.50 - 9h", "24.04.50 - 9h", "01.05.50 - 9h"]
   },
   {
     "id": "s03",
-    "title": "Savoir 3",
-    "text": "Description du savoir 3.",
-    "category": "Catégorie B",
-    "contact": "contact3@exemple.fr"
+    "title": "Réparation électronique",
+    "person": "Camille Leroux",
+    "text": "Ton appareil est en panne ? Avant de le jeter, ouvre-le. On apprend à diagnostiquer les pannes courantes, souder, remplacer des composants et redonner vie à ce qu'on croyait perdu.",
+    "category": "Technologie",
+    "contact": "camille.leroux@lacabane.fr",
+    "slots": ["08.04.50 - 18h", "15.04.50 - 18h", "22.04.50 - 18h", "29.04.50 - 18h"]
   },
   {
     "id": "s04",
-    "title": "Savoir 4",
-    "text": "Description du savoir 4.",
-    "category": "Catégorie B",
-    "contact": "contact4@exemple.fr"
+    "title": "Cuisine fermentée",
+    "person": "Antoine Bernard",
+    "text": "Kombucha, kéfir, kimchi, miso — la fermentation est l'art de transformer le simple en extraordinaire. On explore ensemble les bases de la lacto-fermentation et on repart avec ses premières cultures.",
+    "category": "Alimentation",
+    "contact": "antoine.bernard@lacabane.fr",
+    "slots": ["11.04.50 - 15h", "18.04.50 - 15h", "25.04.50 - 15h", "02.05.50 - 15h"]
   },
   {
     "id": "s05",
-    "title": "Savoir 5",
-    "text": "Description du savoir 5.",
-    "category": "Catégorie C",
-    "contact": "contact5@exemple.fr"
+    "title": "Construction en terre crue",
+    "person": "Léa Fontaine",
+    "text": "La terre est le matériau de construction le plus ancien du monde — et l'un des plus performants. Venez toucher, malaxer, construire un panneau en pisé ou en bauge, et comprendre pourquoi ce matériau revient en force.",
+    "category": "Construction",
+    "contact": "lea.fontaine@lacabane.fr",
+    "slots": ["13.04.50 - 10h", "20.04.50 - 10h", "27.04.50 - 10h", "04.05.50 - 10h"]
   },
   {
     "id": "s06",
-    "title": "Savoir 6",
-    "text": "Description du savoir 6.",
-    "category": "Catégorie C",
-    "contact": "contact6@exemple.fr"
+    "title": "Apiculture urbaine",
+    "person": "Julien Morel",
+    "text": "Les abeilles vivent au cœur de la cabane depuis trois ans. Je vous emmène découvrir la ruche, comprendre la vie d'une colonie et démystifier ces insectes essentiels. Combinaison fournie, peur non incluse.",
+    "category": "Nature",
+    "contact": "julien.morel@lacabane.fr",
+    "slots": ["09.04.50 - 11h", "16.04.50 - 11h", "23.04.50 - 11h", "30.04.50 - 11h"]
   },
   {
     "id": "s07",
-    "title": "Savoir 7",
-    "text": "Description du savoir 7.",
-    "category": "Catégorie A",
-    "contact": "contact7@exemple.fr"
+    "title": "Teinture naturelle",
+    "person": "Marie Garnier",
+    "text": "Gaude, indigo, noix de galle, pelures d'oignons — la nature regorge de couleurs. On apprend à préparer un bain de teinture, mordancer des fibres et obtenir des teintes durables sans produits synthétiques.",
+    "category": "Textile",
+    "contact": "marie.garnier@lacabane.fr",
+    "slots": ["14.04.50 - 14h", "21.04.50 - 14h", "28.04.50 - 14h", "05.05.50 - 14h"]
   },
   {
     "id": "s08",
-    "title": "Savoir 8",
-    "text": "Description du savoir 8.",
-    "category": "Catégorie B",
-    "contact": "contact8@exemple.fr"
+    "title": "Sérigraphie manuelle",
+    "person": "Paul Lefebvre",
+    "text": "Avec un cadre, de l'émulsion et de l'encre, on peut imprimer sur presque tout. Ce atelier initie aux bases de la sérigraphie : préparation du cadre, exposition, impression et entretien du matériel.",
+    "category": "Art",
+    "contact": "paul.lefebvre@lacabane.fr",
+    "slots": ["07.04.50 - 17h", "14.04.50 - 17h", "21.04.50 - 17h", "28.04.50 - 17h"]
   },
   {
     "id": "s09",
-    "title": "Savoir 9",
-    "text": "Description du savoir 9.",
-    "category": "Catégorie C",
-    "contact": "contact9@exemple.fr"
+    "title": "Mycologie pratique",
+    "person": "Clara Rousseau",
+    "text": "Identifier les champignons comestibles, comprendre le réseau mycélien et apprendre à cultiver des pleurotes chez soi. Une plongée fascinante dans le règne fongique, l'un des plus méconnus du vivant.",
+    "category": "Nature",
+    "contact": "clara.rousseau@lacabane.fr",
+    "slots": ["10.04.50 - 14h", "17.04.50 - 14h", "24.04.50 - 14h", "01.05.50 - 14h"]
   },
   {
     "id": "s10",
-    "title": "Savoir 10",
-    "text": "Description du savoir 10.",
-    "category": "Catégorie A",
-    "contact": "contact10@exemple.fr"
+    "title": "Fabrication de savon",
+    "person": "Hugo Martin",
+    "text": "Huile d'olive, soude, plantes aromatiques — on fabrique ensemble un savon surgras de A à Z. On aborde la saponification, le choix des huiles et les ajouts naturels pour des savons adaptés à chaque peau.",
+    "category": "Bien-être",
+    "contact": "hugo.martin@lacabane.fr",
+    "slots": ["12.04.50 - 15h", "19.04.50 - 15h", "26.04.50 - 15h", "03.05.50 - 15h"]
   },
   {
     "id": "s11",
-    "title": "Savoir 11",
-    "text": "Description du savoir 11.",
-    "category": "Catégorie B",
-    "contact": "contact11@exemple.fr"
+    "title": "Installation solaire autonome",
+    "person": "Emma Blanc",
+    "text": "Panneau, batterie, régulateur, onduleur — on démystifie l'électricité solaire basse tension. Idéal pour alimenter un abri, un van ou réduire sa dépendance au réseau. Calculs de dimensionnement inclus.",
+    "category": "Technologie",
+    "contact": "emma.blanc@lacabane.fr",
+    "slots": ["08.04.50 - 10h", "15.04.50 - 10h", "22.04.50 - 10h", "29.04.50 - 10h"]
   },
   {
     "id": "s12",
-    "title": "Savoir 12",
-    "text": "Description du savoir 12.",
-    "category": "Catégorie C",
-    "contact": "contact12@exemple.fr"
+    "title": "Compostage et lombricompost",
+    "person": "Mathieu Girard",
+    "text": "Que faire de ses épluchures quand on n'a pas de jardin ? Le lombricompost, c'est compact, sans odeur et ultra-efficace. On monte ensemble un bac, on choisit ses vers et on apprend à nourrir son petit écosystème domestique.",
+    "category": "Nature",
+    "contact": "mathieu.girard@lacabane.fr",
+    "slots": ["11.04.50 - 17h", "18.04.50 - 17h", "25.04.50 - 17h", "02.05.50 - 17h"]
   },
   {
     "id": "s13",
-    "title": "Savoir 13",
-    "text": "Description du savoir 13.",
-    "category": "Catégorie A",
-    "contact": "contact13@exemple.fr"
+    "title": "Vannerie et tressage",
+    "person": "Noémie Bonnet",
+    "text": "Osier, rotin, raphia ou châtaignier — le tressage est une méditation en action. On apprend les points de base et on repart avec un objet réalisé de ses mains : panier, dessous-de-plat ou vide-poche.",
+    "category": "Art",
+    "contact": "noemie.bonnet@lacabane.fr",
+    "slots": ["13.04.50 - 14h", "20.04.50 - 14h", "27.04.50 - 14h", "04.05.50 - 14h"]
   },
   {
     "id": "s14",
-    "title": "Savoir 14",
-    "text": "Description du savoir 14.",
-    "category": "Catégorie B",
-    "contact": "contact14@exemple.fr"
+    "title": "Plantes médicinales locales",
+    "person": "Alexandre Petit",
+    "text": "La pharmacie est dans le pré. On part en balade identifier plantain, millepertuis, ortie et achillée, puis on rentre préparer des tisanes, des huiles infusées et des teintures-mères simples.",
+    "category": "Bien-être",
+    "contact": "alexandre.petit@lacabane.fr",
+    "slots": ["09.04.50 - 9h", "16.04.50 - 9h", "23.04.50 - 9h", "30.04.50 - 9h"]
   },
   {
     "id": "s15",
-    "title": "Savoir 15",
-    "text": "Description du savoir 15.",
-    "category": "Catégorie C",
-    "contact": "contact15@exemple.fr"
+    "title": "Cosmétiques naturels maison",
+    "person": "Chloé Lambert",
+    "text": "Baume à lèvres, crème hydratante, déodorant solide — on formule ensemble des soins simples avec des ingrédients qu'on connaît. Beurres végétaux, cires, huiles essentielles : la cosmétique transparente.",
+    "category": "Bien-être",
+    "contact": "chloe.lambert@lacabane.fr",
+    "slots": ["14.04.50 - 10h", "21.04.50 - 10h", "28.04.50 - 10h", "05.05.50 - 10h"]
   },
   {
     "id": "s16",
-    "title": "Savoir 16",
-    "text": "Description du savoir 16.",
-    "category": "Catégorie A",
-    "contact": "contact16@exemple.fr"
+    "title": "Cartographie participative",
+    "person": "Raphaël Simon",
+    "text": "Comment représenter ensemble un territoire, ses ressources et ses usages ? On explore les outils de cartographie collaborative — numériques et papier — pour documenter et partager les connaissances du lieu.",
+    "category": "Technologie",
+    "contact": "raphael.simon@lacabane.fr",
+    "slots": ["07.04.50 - 14h", "14.04.50 - 14h", "21.04.50 - 14h", "28.04.50 - 14h"]
   },
   {
     "id": "s17",
-    "title": "Savoir 17",
-    "text": "Description du savoir 17.",
-    "category": "Catégorie B",
-    "contact": "contact17@exemple.fr"
+    "title": "Musique improvisée collective",
+    "person": "Inès Dupont",
+    "text": "Pas besoin de savoir jouer pour participer. Voix, percussions corporelles, instruments de récup — on explore l'écoute, l'espace sonore et le plaisir de créer de la musique ensemble, sans partition ni jugement.",
+    "category": "Art",
+    "contact": "ines.dupont@lacabane.fr",
+    "slots": ["12.04.50 - 18h", "19.04.50 - 18h", "26.04.50 - 18h", "03.05.50 - 18h"]
   },
   {
     "id": "s18",
-    "title": "Savoir 18",
-    "text": "Description du savoir 18.",
-    "category": "Catégorie C",
-    "contact": "contact18@exemple.fr"
+    "title": "Réparation vélo",
+    "person": "Théo Moreau",
+    "text": "Crevaison, dérailleur capricieux, frein qui grince — on apprend à diagnostiquer et réparer les pannes les plus courantes. Amène ton vélo, on l'ausculte ensemble et tu repars avec les mains dans le cambouis et le sourire.",
+    "category": "Technologie",
+    "contact": "theo.moreau@lacabane.fr",
+    "slots": ["10.04.50 - 10h", "17.04.50 - 10h", "24.04.50 - 10h", "01.05.50 - 10h"]
   },
   {
     "id": "s19",
-    "title": "Savoir 19",
-    "text": "Description du savoir 19.",
-    "category": "Catégorie A",
-    "contact": "contact19@exemple.fr"
+    "title": "Écriture créative",
+    "person": "Juliette André",
+    "text": "Écrire pour dire ce qu'on ne sait pas dire autrement. Cet atelier propose des exercices d'écriture courte : contraintes, images, fragments. On écrit, on partage si on veut, on repart avec quelques pages qui nous appartiennent.",
+    "category": "Art",
+    "contact": "juliette.andre@lacabane.fr",
+    "slots": ["08.04.50 - 17h", "15.04.50 - 17h", "22.04.50 - 17h", "29.04.50 - 17h"]
   },
   {
     "id": "s20",
-    "title": "Savoir 20",
-    "text": "Description du savoir 20.",
-    "category": "Catégorie B",
-    "contact": "contact20@exemple.fr"
+    "title": "Récupération et upcycling",
+    "person": "Baptiste Roux",
+    "text": "Une palette devient un meuble, un jean usé devient un sac, des bouteilles deviennent des luminaires. On explore ensemble les gestes et l'état d'esprit du réemploi créatif, avec les matériaux du moment.",
+    "category": "Art",
+    "contact": "baptiste.roux@lacabane.fr",
+    "slots": ["13.04.50 - 11h", "20.04.50 - 11h", "27.04.50 - 11h", "04.05.50 - 11h"]
   }
 ]

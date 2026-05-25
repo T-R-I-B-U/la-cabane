@@ -13,24 +13,25 @@ const DUR_OPEN = 0.9
 const DUR_CLOSE = 0.7
 const OPEN_ROTATION_Z = Math.PI
 const MODEL_SCALE = 1.8
-const TOP_CAMERA_DISTANCE = 1.1
 const LEFT_HINGE_X = -0.0688
 const LEFT_HINGE_Y = 0.013614202849566936
 const LEFT_CLOSED_X = -0.06768058240413666
-const CAMERA_TOP_DIRECTION = new THREE.Vector3(0, 0.98, 0.2).normalize()
+const BOOK_CAM_POSITION = new THREE.Vector3(-80.1664, 1.3962, -48.9429)
+const BOOK_CAM_TARGET = new THREE.Vector3(-80.5838, -3.4207, -50.2167)
 const HOVER_EMISSIVE = new THREE.Color(0xffefbf)
 const HOVER_EMISSIVE_INTENSITY = 0.18
 
 // Puzzle
 const PIECE_NAMES = ['img01', 'img02', 'img03', 'img04']
 const PARKING_POSITIONS = [
-  new THREE.Vector3(-0.09, 0.015, 0.16),
-  new THREE.Vector3(-0.03, 0.015, 0.16),
-  new THREE.Vector3(0.03, 0.015, 0.16),
-  new THREE.Vector3(0.09, 0.015, 0.16),
+  new THREE.Vector3(-0.3233, -0.0501, -0.0132),
+  new THREE.Vector3(0.1839, -0.0501, 0.0216),
+  new THREE.Vector3(-0.3044, -0.0499, 0.0813),
+  new THREE.Vector3(0.2051, -0.0499, -0.093),
 ]
 const DROP_THRESHOLD = 0.03
 const PIECE_LERP = 3
+const DRAG_LIFT = 0.02
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2)
 
@@ -89,6 +90,7 @@ export function JournalBook({
   // Puzzle
   const puzzlePiecesRef = useRef(null)
   const draggedPuzzlePieceRef = useRef(null)
+  const dragPlaneRef = useRef(new THREE.Plane())
   const { left, right, meshes } = useMemo(() => {
     const clone = scene.clone(true)
     const leftObject = clone.getObjectByName('book01-left')
@@ -107,8 +109,8 @@ export function JournalBook({
         object.visible = false
         return
       }
-      object.castShadow = true
-      object.receiveShadow = true
+      object.castShadow = false
+      object.receiveShadow = false
       meshList.push(object)
     })
 
@@ -211,6 +213,8 @@ export function JournalBook({
 
     if (state === 'OPEN' || state === 'CLOSING') {
       restoreCameraAfterCloseRef.current = true
+      cameraReturnStartPosRef.current.copy(camera.position)
+      cameraReturnStartQuatRef.current.copy(camera.quaternion)
       bookStateRef.current = 'CLOSING'
       transitionElapsedRef.current = 0
       playOnce('book')
@@ -220,15 +224,8 @@ export function JournalBook({
   const openBook = useCallback(() => {
     if (!active || bookStateRef.current !== 'CLOSED') return
 
-    const bookPosition = groupRef.current.getWorldPosition(new THREE.Vector3())
-    cameraTargetPosRef.current
-      .copy(bookPosition)
-      .addScaledVector(CAMERA_TOP_DIRECTION, TOP_CAMERA_DISTANCE)
-    const lookAtMatrix = new THREE.Matrix4().lookAt(
-      cameraTargetPosRef.current,
-      bookPosition,
-      camera.up
-    )
+    cameraTargetPosRef.current.copy(BOOK_CAM_POSITION)
+    const lookAtMatrix = new THREE.Matrix4().lookAt(BOOK_CAM_POSITION, BOOK_CAM_TARGET, camera.up)
 
     cameraInitPosRef.current.copy(camera.position)
     cameraInitQuatRef.current.copy(camera.quaternion)
@@ -358,14 +355,15 @@ export function JournalBook({
 
     const onPointerDown = (e) => {
       const pieces = puzzlePiecesRef.current
+      const group = groupRef.current
       if (
         !pieces ||
+        !group ||
         !pieceInteractionEnabled ||
         draggedPuzzlePieceRef.current ||
         bookStateRef.current !== 'OPEN'
       )
         return
-
       raycaster.setFromCamera(toNDC(e), camera)
       const pickable = pieces.filter((p) => p.state !== 'placed').map((p) => p.mesh)
       const hits = raycaster.intersectObjects(pickable, true)
@@ -377,8 +375,20 @@ export function JournalBook({
       )
       if (index === -1) return
 
-      pieces[index].state = 'dragging'
-      draggedPuzzlePieceRef.current = { index }
+      const camDir = new THREE.Vector3()
+      camera.getWorldDirection(camDir)
+      dragPlaneRef.current.setFromNormalAndCoplanarPoint(camDir.negate(), hits[0].point)
+
+      const piece = pieces[index]
+      const hitPointLocal = groupRef.current.worldToLocal(hits[0].point.clone())
+
+      piece.state = 'dragging'
+      piece.mesh.position.y = piece.targetPos.y + DRAG_LIFT
+      draggedPuzzlePieceRef.current = {
+        index,
+        offsetX: piece.mesh.position.x - hitPointLocal.x,
+        offsetZ: piece.mesh.position.z - hitPointLocal.z,
+      }
     }
 
     const onPointerMove = (e) => {
@@ -387,18 +397,17 @@ export function JournalBook({
       const group = groupRef.current
       group.updateWorldMatrix(true, false)
 
-      const piece = puzzlePiecesRef.current[draggedPuzzlePieceRef.current.index]
-      const groupWorldY = group.getWorldPosition(new THREE.Vector3()).y
-      // Plane at the piece's target height (world space), so worldToLocal gives correct local Y
-      const planeY = groupWorldY + piece.targetPos.y * MODEL_SCALE
-      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY)
+      const { index, offsetX, offsetZ } = draggedPuzzlePieceRef.current
+      const piece = puzzlePiecesRef.current[index]
 
       raycaster.setFromCamera(toNDC(e), camera)
       const hit = new THREE.Vector3()
-      if (!raycaster.ray.intersectPlane(plane, hit)) return
+      if (!raycaster.ray.intersectPlane(dragPlaneRef.current, hit)) return
 
       const localPos = group.worldToLocal(hit)
-      localPos.y = piece.targetPos.y
+      localPos.x += offsetX
+      localPos.z += offsetZ
+      localPos.y = piece.targetPos.y + DRAG_LIFT
       piece.mesh.position.copy(localPos)
     }
 
@@ -566,19 +575,31 @@ export function JournalBook({
     }
 
     if (state === 'CLOSING') {
-      const t = ease(Math.min(elapsed / DUR_CLOSE, 1))
-      leftPivot.rotation.z = OPEN_ROTATION_Z * (1 - t)
+      const tClose = ease(Math.min(elapsed / DUR_CLOSE, 1))
+      leftPivot.rotation.z = OPEN_ROTATION_Z * (1 - tClose)
 
-      if (elapsed >= DUR_CLOSE) {
+      if (restoreCameraAfterCloseRef.current) {
+        const tCam = ease(Math.min(elapsed / DUR_CAMERA, 1))
+        camera.position.lerpVectors(cameraReturnStartPosRef.current, cameraInitPosRef.current, tCam)
+        camera.quaternion.slerpQuaternions(
+          cameraReturnStartQuatRef.current,
+          cameraInitQuatRef.current,
+          tCam
+        )
+      }
+
+      const totalDur = restoreCameraAfterCloseRef.current
+        ? Math.max(DUR_CLOSE, DUR_CAMERA)
+        : DUR_CLOSE
+
+      if (elapsed >= totalDur) {
         leftPivot.rotation.z = 0
         transitionElapsedRef.current = 0
-
         if (restoreCameraAfterCloseRef.current) {
           restoreCameraAfterCloseRef.current = false
-          startCameraReturn()
-          return
+          camera.position.copy(cameraInitPosRef.current)
+          camera.quaternion.copy(cameraInitQuatRef.current)
         }
-
         bookStateRef.current = 'CLOSED'
         onInteractionEnd?.()
       }

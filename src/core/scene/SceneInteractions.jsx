@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
@@ -84,6 +84,7 @@ export function SceneInteractions({
   modelQuality,
 }) {
   const [characters, setCharacters] = useState(() => getRegistry().characters ?? [])
+  const zoeHoveredRef = useRef(false)
   const isJournalInteractable = (playerMode || postIntro) && journalUnlocked
   // Keep Zoe's visible mesh on the source GLB and reuse the compressed GLB for animation clips,
   // matching the historical fix that restored her motion after model export changes.
@@ -182,7 +183,14 @@ export function SceneInteractions({
         />
       )}
 
-      <ClickableZoe isInteractable={zoePhaseActive} position={zoePosition} onZoeTalk={onZoeTalk} />
+      <ClickableZoe
+        isInteractable={zoePhaseActive}
+        position={zoePosition}
+        onZoeTalk={onZoeTalk}
+        onHoverChange={(h) => {
+          zoeHoveredRef.current = h
+        }}
+      />
 
       <ClickableJuiceMachine
         cabane={cabane}
@@ -227,6 +235,7 @@ export function SceneInteractions({
             position={zoePosition}
             rotation={[0, zoe?.rotationY ?? -Math.PI / 2, 0]}
             scale={zoe?.scale ?? 11}
+            hoveredRef={zoePhaseActive ? zoeHoveredRef : undefined}
           />
         </Suspense>
       )}

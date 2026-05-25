@@ -93,6 +93,10 @@ export function getCameraPose(id) {
   return _state.cameras.find((camera) => camera.id === id) ?? null
 }
 
+export function getDefaultCameraPose(id) {
+  return DEFAULT_CONFIG.cameras.find((camera) => camera.id === id) ?? null
+}
+
 export function getCameraSequence(id) {
   return _state.sequences?.[id] ?? []
 }

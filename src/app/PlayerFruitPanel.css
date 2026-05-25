@@ -1,0 +1,336 @@
+.pfp-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.pfp-content {
+  display: flex;
+  gap: 40px;
+  width: calc(100vw - 120px);
+  max-width: 1392px;
+  height: calc(100vh - 120px);
+  max-height: 801px;
+}
+
+/* ── Left card ── */
+.pfp-left-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 497px; /* 417px inner + 2×40px padding */
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pfp-left-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.pfp-top-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.pfp-fruit-img {
+  position: absolute;
+  left: -83px;
+  top: -70px;
+  width: 322px;
+  height: 435px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.pfp-player-name {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 70px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+  padding-top: 200px; /* push below fruit image */
+  text-align: right;
+  word-break: break-word;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.pfp-bottom-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pfp-role {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+}
+
+.pfp-desc-label {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+}
+
+.pfp-desc-text {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  font-style: italic;
+  color: #33330f;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* ── Right section ── */
+.pfp-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.pfp-row {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 40px;
+}
+
+/* ── Cards ── */
+.pfp-card {
+  flex: 1;
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  overflow: hidden;
+}
+
+.pfp-card-header {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.pfp-card-icon {
+  width: 48px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.pfp-card-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.pfp-card-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1;
+  color: #33330f;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.pfp-card-subtitle {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: #33330f;
+  margin: 0;
+}
+
+/* Passeur "add" button */
+.pfp-add-savoir {
+  background: #b0cfd1;
+  border-radius: 18px;
+  padding: 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.pfp-add-icon {
+  font-size: 32px;
+  color: #33330f;
+  line-height: 1;
+}
+
+.pfp-add-savoir--sent {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pfp-add-label {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #33330f;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Leaf slots row */
+.pfp-leaf-slots {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.pfp-leaf-slot {
+  position: relative;
+  background: #e3e7b3;
+  border-radius: 6px;
+  padding: 10px;
+  width: 102px;
+  height: 102px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pfp-leaf-slot--flex {
+  flex: 1;
+  width: auto;
+}
+
+.pfp-leaf-img {
+  /* 70% laisse la marge nécessaire pour rotate(-31deg) sans clipper */
+  width: 70%;
+  height: auto;
+  object-fit: contain;
+  transform: rotate(-31deg);
+  pointer-events: none;
+}
+
+/* Ma Cabane card */
+.pfp-card--cabane {
+  position: relative;
+  background: transparent;
+  border: 6px solid rgba(255, 255, 255, 0.9);
+  padding: 40px;
+  justify-content: flex-end;
+  gap: 0;
+}
+
+.pfp-cabane-bg {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  pointer-events: none;
+}
+
+.pfp-cabane-text {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pfp-cabane-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  color: #8b8e50;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.pfp-cabane-subtitle {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+  color: #8b8e50;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .pfp-content {
+    flex-direction: column;
+    width: calc(100vw - 40px);
+    height: calc(100vh - 40px);
+    max-height: none;
+    overflow-y: auto;
+  }
+
+  .pfp-left-card {
+    width: auto;
+    min-height: 300px;
+  }
+
+  .pfp-fruit-img {
+    width: 180px;
+    height: 250px;
+    left: -20px;
+    top: -20px;
+  }
+
+  .pfp-player-name {
+    font-size: 44px;
+    padding-top: 120px;
+  }
+
+  .pfp-role {
+    font-size: 28px;
+  }
+
+  .pfp-right {
+    flex: none;
+  }
+
+  .pfp-row {
+    flex-direction: column;
+  }
+
+  .pfp-card-title {
+    font-size: 28px;
+  }
+}

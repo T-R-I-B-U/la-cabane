@@ -52,6 +52,7 @@ export function SceneControls({
   controlsRef,
   hutPosition,
   cameraFixed,
+  sensitivity = 1,
 }) {
   const [editorFlyMode, setEditorFlyMode] = useState(getEditorFlyMode)
 
@@ -89,6 +90,7 @@ export function SceneControls({
           eyeHeight={playerEyeHeight}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
+          pointerSpeed={sensitivity}
         />
         {arbreStoryCameraTransition && (
           <StoryCameraTransition
@@ -113,6 +115,7 @@ export function SceneControls({
             lookAtTarget={introSpawn?.target}
             collisionObjects={collisionObjects}
             controlsRef={pointerControlsRef}
+            pointerSpeed={sensitivity}
           />
         )}
         <StoryCameraTransition
@@ -135,6 +138,7 @@ export function SceneControls({
               ref={controlsRef}
               enablePan
               enableDamping
+              enableZoom={false}
               minDistance={0.5}
               maxDistance={500}
             />
@@ -154,6 +158,7 @@ export function SceneControls({
             ref={controlsRef}
             enablePan
             enableDamping
+            enableZoom={false}
             minDistance={0.5}
             maxDistance={500}
           />

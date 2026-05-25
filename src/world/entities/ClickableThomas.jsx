@@ -6,9 +6,15 @@ import { useStableInteractionCallback } from '../interactions/useStableInteracti
 const CENTER_NDC = new THREE.Vector2(0, 0)
 const DEFAULT_THOMAS_POSITION = [-3.0, 0.04, -13.259]
 
-export function ClickableThomas({ active, position = DEFAULT_THOMAS_POSITION, onInteract }) {
+export function ClickableThomas({
+  active,
+  position = DEFAULT_THOMAS_POSITION,
+  onInteract,
+  onHoverChange,
+}) {
   const { camera } = useThree()
   const hoveredRef = useRef(false)
+  const prevHoveredRef = useRef(false)
   const meshRef = useRef()
   const raycaster = useRef(new THREE.Raycaster())
   const onInteractRef = useStableInteractionCallback(onInteract)
@@ -25,11 +31,19 @@ export function ClickableThomas({ active, position = DEFAULT_THOMAS_POSITION, on
   useFrame(() => {
     if (!active || !meshRef.current) {
       hoveredRef.current = false
+      if (prevHoveredRef.current) {
+        prevHoveredRef.current = false
+        onHoverChange?.(false)
+      }
       return
     }
     raycaster.current.setFromCamera(CENTER_NDC, camera)
     const hits = raycaster.current.intersectObject(meshRef.current)
     hoveredRef.current = hits.length > 0
+    if (hoveredRef.current !== prevHoveredRef.current) {
+      prevHoveredRef.current = hoveredRef.current
+      onHoverChange?.(hoveredRef.current)
+    }
   })
 
   return (

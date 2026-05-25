@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { AnimatedCharacter } from '../../world/entities/AnimatedCharacter'
 import { ClickableThomas } from '../../world/entities/ClickableThomas'
 import { FLOOR_Y } from '../SceneConfig'
@@ -44,6 +44,7 @@ export function SceneCharacters({
   showCabaneInterior = true,
 }) {
   const [characters, setCharacters] = useState(() => getRegistry().characters ?? [])
+  const thomasHoveredRef = useRef(false)
   const thomasUrl = resolveCharacterUrl('thomas-animated.glb', modelQuality)
   const marieUrl = resolveCharacterUrl('marie-animated.glb', modelQuality)
   const textureBasePaths = ['/textures/ktx2/', '/textures/compressed/', '/textures/']
@@ -65,6 +66,9 @@ export function SceneCharacters({
             active={thomasEtabliPhaseActive}
             position={thomasPosition}
             onInteract={onThomasEtabliInteract}
+            onHoverChange={(h) => {
+              thomasHoveredRef.current = h
+            }}
           />
           <Suspense fallback={null}>
             <AnimatedCharacter
@@ -76,6 +80,7 @@ export function SceneCharacters({
               position={thomasPosition}
               rotation={[0, thomas?.rotationY ?? (150 * Math.PI) / 180, 0]}
               scale={thomas?.scale ?? 9}
+              hoveredRef={thomasEtabliPhaseActive ? thomasHoveredRef : undefined}
             />
           </Suspense>
         </>

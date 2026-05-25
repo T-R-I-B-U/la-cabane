@@ -3,6 +3,14 @@ import { loadModel } from '../../core/Loader'
 import { applyAutoTextures } from './textureResolver'
 import { assetModelCandidates, modelBaseName } from './assetNaming'
 import { cloneMaterialWithTextures, warnMissingAsset } from './runtime'
+import { SHARED_SHADOW_CASTER_ROOTS, SHARED_SHADOW_RECEIVER_ROOTS } from './shadowConfig'
+
+const INSTANCED_SHADOW_EXCLUDED_GROUPS = new Set(['outsideplant02', 'outsideplant03'])
+const INSTANCED_SHADOW_CASTER_GROUPS = SHARED_SHADOW_CASTER_ROOTS
+const INSTANCED_SHADOW_RECEIVER_GROUPS = new Set([
+  ...SHARED_SHADOW_RECEIVER_ROOTS,
+  'house', // instanced variant — house is in SKIP_GROUPING for single instances
+])
 
 function getModelCandidates(baseName, modelBasePaths) {
   return modelBasePaths.flatMap((basePath) =>
@@ -77,8 +85,10 @@ export async function buildGroupInstanced(groupName, nodes, { modelBasePaths, te
 
   for (const { geometry, material } of subMeshDefs) {
     const instancedMesh = new THREE.InstancedMesh(geometry, material, count)
-    instancedMesh.castShadow = false
-    instancedMesh.receiveShadow = true
+    const isShadowExcluded = INSTANCED_SHADOW_EXCLUDED_GROUPS.has(groupName)
+    instancedMesh.castShadow = INSTANCED_SHADOW_CASTER_GROUPS.has(groupName)
+    instancedMesh.receiveShadow =
+      !isShadowExcluded && INSTANCED_SHADOW_RECEIVER_GROUPS.has(groupName)
     for (let i = 0; i < count; i++) {
       instancedMesh.setMatrixAt(i, instanceMatrices[i])
     }

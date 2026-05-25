@@ -1,4 +1,5 @@
 import { use, useEffect, useRef, useMemo } from 'react'
+import { playOnce } from '../../utils/audioStore'
 import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { preferKtx2, loadStandaloneTexture } from '../cabane/textureResolver.js'
@@ -8,6 +9,7 @@ import {
   useOutlineResolution,
 } from '../materials/outlineEffect'
 import { useHoverEffect } from '../interactions/useHoverEffect'
+import { fruitHoverStore } from '../../utils/fruitHoverStore'
 
 const _instanceMatrix = new THREE.Matrix4()
 const _worldMatrix = new THREE.Matrix4()
@@ -133,16 +135,31 @@ export function TreeLeaves({
   const _centerNdc = useMemo(() => new THREE.Vector2(0, 0), [])
   const _leafRaycaster = useMemo(() => new THREE.Raycaster(), [])
   const _leafHoveredRef = useRef(false)
+  const _lastHoveredIdRef = useRef(-1)
   useFrame(({ camera }) => {
-    if (!leafMesh || !active || !document.pointerLockElement) {
+    if (!leafMesh || !active || !document.pointerLockElement || fruitHoverStore.anyHovered) {
       if (_leafHoveredRef.current) {
         _leafHoveredRef.current = false
+        _lastHoveredIdRef.current = -1
+        if (proxyRef.current) proxyRef.current.visible = false
         onLeafHover?.(false)
       }
       return
     }
     _leafRaycaster.setFromCamera(_centerNdc, camera)
-    const hit = _leafRaycaster.intersectObject(leafMesh, false).length > 0
+    const hits = _leafRaycaster.intersectObject(leafMesh, false)
+    const hit = hits.length > 0 && !!inRangeRef.current?.[hits[0].instanceId]
+    if (hit) {
+      const hoveredId = hits[0].instanceId
+      if (_lastHoveredIdRef.current !== hoveredId) {
+        _lastHoveredIdRef.current = hoveredId
+        syncProxy(hoveredId)
+        if (proxyRef.current) proxyRef.current.visible = true
+      }
+    } else if (_lastHoveredIdRef.current !== -1) {
+      _lastHoveredIdRef.current = -1
+      if (proxyRef.current) proxyRef.current.visible = false
+    }
     if (hit !== _leafHoveredRef.current) {
       _leafHoveredRef.current = hit
       onLeafHover?.(hit)
@@ -215,8 +232,12 @@ export function TreeLeaves({
   useEffect(() => {
     if (!leafMesh || !alphaMap || !originalProps) return
     const originalRaycast = leafMesh.raycast
+    const originalCastShadow = leafMesh.castShadow
+    const originalReceiveShadow = leafMesh.receiveShadow
 
     /* eslint-disable react-hooks/immutability */
+    leafMesh.castShadow = true
+    leafMesh.receiveShadow = true
     alphaMap.flipY = false
     alphaMap.colorSpace = THREE.LinearSRGBColorSpace
     alphaMap.needsUpdate = true
@@ -286,6 +307,8 @@ export function TreeLeaves({
 
     return () => {
       leafMesh.raycast = originalRaycast
+      leafMesh.castShadow = originalCastShadow
+      leafMesh.receiveShadow = originalReceiveShadow
       leafMesh.material = originalProps.material
       originalProps.material.side = originalProps.side
       originalProps.material.alphaMap = originalProps.alphaMap
@@ -330,15 +353,14 @@ export function TreeLeaves({
         }}
         onPointerDown={(e) => {
           e.stopPropagation()
-          if (
-            !active ||
-            e.instanceId === undefined ||
-            !inRangeRef.current?.[e.instanceId] ||
-            !onLeafClick
-          )
+          if (!active || !onLeafClick || fruitHoverStore.anyHovered || fruitHoverStore.onCooldown)
             return
-
-          onLeafClick(e.instanceId)
+          // Under pointer lock R3F events cast from clientX/Y=0 (top-left, not center).
+          // Use the id tracked by the manual center raycaster instead.
+          const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId
+          if (id === undefined || id < 0 || !inRangeRef.current?.[id]) return
+          playOnce('clickMagic')
+          onLeafClick(id)
         }}
       />
 

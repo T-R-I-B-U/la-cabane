@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
+import { ACESFilmicToneMapping } from 'three'
 import { initKTX2Loader } from './ktx2Loader.js'
 import AudioManager from './audio/AudioManager'
 import { Floor } from './Floor'
@@ -9,6 +10,7 @@ import { StatsCollector } from './StatsCollector'
 import { SceneControls } from './scene/SceneControls'
 import { SceneLighting } from './scene/SceneLighting'
 import { CabaneScene } from './scene/CabaneScene'
+import { CinematicPlayer } from './CinematicPlayer'
 import { useActiveZone } from '../utils/gameManagerStore'
 
 const ArbreScene = lazy(() =>
@@ -32,9 +34,12 @@ export default function Scene({
   interactions,
   shaderEnabled,
   shaderRadius,
+  shadowsEnabled = true,
   journalAutoOpenToken,
   journalCloseToken,
   journalPuzzleEnabled,
+  cinematicActive = false,
+  cinematicKeypoints = [],
 }) {
   const { onStats, onReady, onError } = sceneState
   const {
@@ -45,6 +50,7 @@ export default function Scene({
     eyeHeight: playerEyeHeight,
     spawnKey: playerSpawnKey,
     movementLocked,
+    sensitivity: playerSensitivity = 1,
   } = player
   const { doors: debugDoors, collisions: debugCollisions } = debug
   const {
@@ -104,7 +110,6 @@ export default function Scene({
   } = interactions
 
   const {
-    active: arbreActive,
     storyCameraTransition: arbreStoryCameraTransition,
     onTransitionComplete: onArbreTransitionComplete,
     ladderClickActive,
@@ -113,8 +118,9 @@ export default function Scene({
     onStairsClick,
     onStairsHover,
     growingFruitPlaying: arbreGrowingFruitPlaying,
-    fruitsClickActive,
-    onFruitClickDuringLeaves,
+    growingFruitClickable: arbreGrowingFruitClickable,
+    fruitsDisabled: arbreFruitsDisabled,
+    onGrowingFruitComplete,
     leafInteractionsEnabled: arbreLeafInteractionsEnabled,
   } = arbre
 
@@ -125,8 +131,7 @@ export default function Scene({
   const [platformPosition, setPlatformPosition] = useState(null)
   const controlsRef = useRef()
   const firstPersonMode = playerMode || (postIntro && postIntroLocked)
-  const areSceneInteractionsEnabled =
-    (playerMode || postIntro) && !interactionLocked && interactionsEnabled
+  const areArbreFruitsInteractionsEnabled = (playerMode || postIntro) && !interactionLocked
   const collisionObjects = useMemo(
     () => [...sceneColliders, mainFloorCollider].filter(Boolean),
     [sceneColliders, mainFloorCollider]
@@ -140,13 +145,14 @@ export default function Scene({
         far: 500,
         position: [DEFAULT_HUT_POS[0] + 22, DEFAULT_HUT_POS[1] + 14, DEFAULT_HUT_POS[2] + 28],
       }}
-      shadows
+      shadows="soft"
+      gl={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.1 }}
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >
       <StatsCollector onStats={onStats} />
       <AudioManager />
 
-      <SceneLighting activeHdriId={activeHdriId} />
+      <SceneLighting activeHdriId={activeHdriId} shadowsEnabled={shadowsEnabled} />
 
       <Floor mainFloorRef={setMainFloorCollider} />
       {/* <BackgroundPlanes hutPosition={hutPosition} /> */}
@@ -229,13 +235,13 @@ export default function Scene({
         <Suspense fallback={null}>
           <ArbreScene
             platformPosition={platformPosition}
-            arbreActive={arbreActive}
             growingFruitPlaying={arbreGrowingFruitPlaying}
-            fruitsClickActive={fruitsClickActive}
-            onFruitClickDuringLeaves={onFruitClickDuringLeaves}
+            growingFruitClickable={arbreGrowingFruitClickable}
+            fruitsDisabled={arbreFruitsDisabled}
+            onGrowingFruitComplete={onGrowingFruitComplete}
             onFruitClick={onFruitClick}
             onFruitHover={onFruitHover}
-            interactionsEnabled={areSceneInteractionsEnabled}
+            interactionsEnabled={areArbreFruitsInteractionsEnabled}
           />
         </Suspense>
       )}
@@ -263,7 +269,10 @@ export default function Scene({
         controlsRef={controlsRef}
         hutPosition={hutPosition}
         cameraFixed={cameraFixed}
+        sensitivity={playerSensitivity}
       />
+
+      <CinematicPlayer active={cinematicActive} keypoints={cinematicKeypoints} />
 
       {shaderEnabled && (
         <Suspense fallback={null}>

@@ -7,9 +7,15 @@ const CENTER_NDC = new THREE.Vector2(0, 0)
 
 const DEFAULT_ZOE_POSITION = [26.0, 0.04, -5.4]
 
-export function ClickableZoe({ isInteractable, position = DEFAULT_ZOE_POSITION, onZoeTalk }) {
+export function ClickableZoe({
+  isInteractable,
+  position = DEFAULT_ZOE_POSITION,
+  onZoeTalk,
+  onHoverChange,
+}) {
   const { camera } = useThree()
   const hoveredRef = useRef(false)
+  const prevHoveredRef = useRef(false)
   const meshRef = useRef()
   const raycaster = useRef(new THREE.Raycaster())
   const onZoeTalkRef = useStableInteractionCallback(onZoeTalk)
@@ -26,11 +32,19 @@ export function ClickableZoe({ isInteractable, position = DEFAULT_ZOE_POSITION, 
   useFrame(() => {
     if (!isInteractable || !meshRef.current) {
       hoveredRef.current = false
+      if (prevHoveredRef.current) {
+        prevHoveredRef.current = false
+        onHoverChange?.(false)
+      }
       return
     }
     raycaster.current.setFromCamera(CENTER_NDC, camera)
     const hits = raycaster.current.intersectObject(meshRef.current)
     hoveredRef.current = hits.length > 0
+    if (hoveredRef.current !== prevHoveredRef.current) {
+      prevHoveredRef.current = hoveredRef.current
+      onHoverChange?.(hoveredRef.current)
+    }
   })
 
   return (

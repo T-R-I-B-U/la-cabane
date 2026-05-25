@@ -1,15 +1,21 @@
-import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react'
+import { useState, useCallback, useEffect, useLayoutEffect, useRef, lazy, Suspense } from 'react'
+import { io } from 'socket.io-client'
 import {
   AppLoader,
   Crosshair,
+  FinalScreen,
   GameManager,
-  IntroLoader,
+  LeafArrival,
+  LoadingScreen,
   NameInput,
   SavoirPanel,
+  SettingsMenu,
+  WelcomeScreen,
   useIntroFlow,
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
+import { PlayerFruitPanel } from './app/PlayerFruitPanel'
 import { RaspberryCounter } from './app/RaspberryCounter'
 import { useContactAssignment } from './app/useContactAssignment'
 import { useArbreFlow } from './app/useArbreFlow'
@@ -23,13 +29,21 @@ import {
 } from './core/SceneConfig'
 import { getCameraPose, setEditorFlyMode } from './core/cameraRegistry'
 import Subtitles from './core/audio/Subtitles'
-import { unlockAndPlay } from './utils/audioStore'
+import {
+  setSubtitleChoices,
+  unlockAndPlay,
+  setGlobalVolume,
+  getGlobalVolume,
+} from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
+import { fruitHoverStore } from './utils/fruitHoverStore'
 import { GAME_STEPS } from './utils/gameStateStore'
 import { CustomCursor } from './app/CustomCursor'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
+const SOCKET_URL = `http://${window.location.hostname}:3001`
+const LOADING_EXTRA_DURATION_MS = 7000
 const ViewerControls = lazy(() =>
   import('./app/ViewerControls').then((mod) => ({ default: mod.ViewerControls }))
 )
@@ -42,8 +56,20 @@ const CameraEditorPanel = lazy(() =>
 const PerfMonitor = lazy(() =>
   import('./core/PerfMonitor').then((mod) => ({ default: mod.PerfMonitor }))
 )
+const CinematicPanel = lazy(() =>
+  import('./app/CinematicPanel').then((mod) => ({ default: mod.CinematicPanel }))
+)
 export default function App() {
   const isDevBuild = import.meta.env.DEV
+  const [incomingSavoir, setIncomingSavoir] = useState(null)
+  const [leafArriving, setLeafArriving] = useState(false)
+  const [hasSentSavoir, setHasSentSavoir] = useState(false)
+  const savoirLeafColRef = useRef(null)
+  const [showWelcome, setShowWelcome] = useState(true)
+  const [showSettings, setShowSettings] = useState(false)
+  const [showFinal, setShowFinal] = useState(false)
+  const [welcomeFading, setWelcomeFading] = useState(false)
+  const [readyToShow, setReadyToShow] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
   const [sceneLoadInfo, setSceneLoadInfo] = useState(null)
@@ -54,6 +80,9 @@ export default function App() {
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
   const [shaderRadius, setShaderRadius] = useState(3)
+  const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
+  const [shadowsEnabled, setShadowsEnabled] = useState(true)
+  const [mouseSensitivity, setMouseSensitivity] = useState(1)
   const [activeHdriId, setActiveHdriId] = useState(DEFAULT_HDRI_ID)
   const [isViewerControlsVisible, setIsViewerControlsVisible] = useState(isDevBuild)
   const [playerSpawn, setPlayerSpawn] = useState(null)
@@ -68,6 +97,7 @@ export default function App() {
   const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
   const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
   const [isContactPanelOpen, setIsContactPanelOpen] = useState(false)
+  const [isPlayerFruitPanelOpen, setIsPlayerFruitPanelOpen] = useState(false)
   const [isLeafHovered, setIsLeafHovered] = useState(false)
   const [isFruitHovered, setIsFruitHovered] = useState(false)
   const [isStairsHovered, setIsStairsHovered] = useState(false)
@@ -75,10 +105,18 @@ export default function App() {
   const [shouldRestorePointerLockAfterStoryUi, setShouldRestorePointerLockAfterStoryUi] =
     useState(false)
   const pointerControlsRef = useRef(null)
+  const f1CountRef = useRef(0)
+  const f1TimerRef = useRef(null)
   const isJournalInteractionActiveRef = useRef(false)
   const arbreStoryContinuityRef = useRef(false)
   const isCursorVisibleRef = useRef(false)
   const isCameraBlockedRef = useRef(false)
+  const isModalOpenRef = useRef(false)
+  const isInGameplayRef = useRef(false)
+  const loadingRevealTimeoutRef = useRef(null)
+  const loadingRevealScheduledRef = useRef(false)
+  const [loadingSequenceStarted, setLoadingSequenceStarted] = useState(false)
+  const [loadingExtraDurationElapsed, setLoadingExtraDurationElapsed] = useState(false)
 
   const {
     selectedSavoirAssignment,
@@ -132,7 +170,6 @@ export default function App() {
     journalCloseToken,
     journalPuzzleEnabled,
     journalUnlocked,
-    loaderFading,
     postIntro,
     receptionChoiceVisible,
     returnHallVisible,
@@ -152,13 +189,12 @@ export default function App() {
     arbreLadderPending,
     zoeClip,
     minigameCount,
+    playerName,
     showNameInput,
     storyReady,
     currentStoryStepId,
-    dismissLoader,
+    exitIntro,
     handleIntroEvent,
-    handleLoaderClick,
-    handleLoaderKeyDown,
     handleJournalEnd,
     handleTreeInteract,
     handleTimeatmInteract,
@@ -166,14 +202,18 @@ export default function App() {
     handleJournalOpen,
     handleJournalPiecePlaced,
     handleNameSubmit: handleNameSubmitInternal,
-    handleDebugGoToDoorPassage,
     handleDebugGoToIntroStart,
-    handleDebugGoToReception,
-    handleDebugGoToTree,
+    handleDebugGoToBienvenue,
+    handleDebugGoToAccueil,
+    handleDebugGoToJournal,
+    handleDebugGoToArbreApresJournal,
     handleDebugGoToEtabli,
+    handleDebugGoToThomasEtabli,
     handleDebugGoToSerre,
+    handleDebugGoToZoeSerre,
     handleDebugGoToMinijeu,
-    handleDebugGoToPostMinigame,
+    handleDebugGoToJuiceMachine,
+    handleDebugGoToSortieSerre,
     handleWorkbenchInteract,
     handleGreenhouseDoorClick,
     handleExitSerreDoorClick,
@@ -189,9 +229,15 @@ export default function App() {
     handleReturnToHall,
     handleStoryCameraTransitionComplete,
     launchIntro,
+    startIntro,
     skipDialogue: skipIntroDialogue,
     setPostIntro,
-  } = useIntroFlow({ sceneReady, arbreActiveRef })
+  } = useIntroFlow({ sceneReady })
+
+  const revealSceneAfterLoading = useCallback(() => {
+    startIntro()
+    setReadyToShow(true)
+  }, [startIntro])
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
@@ -262,13 +308,18 @@ export default function App() {
     stairsClickActive,
     ladderIsStoryMode,
     growingFruitPlaying: arbreGrowingFruitPlaying,
-    fruitsClickActive,
+    growingFruitClickable: arbreGrowingFruitClickable,
+    handleGrowingFruitComplete,
+    handleSavoirReceived,
+    handleIncomingSavoirClosed,
     arbreLeafInteractionsEnabled,
     handleLadderClick,
     handleStairsClick,
     handleArbreTransitionComplete,
-    handleFruitClickDuringLeaves,
+    handleLeafSavoirClosed,
+    handlePlayerFruitPanelClose,
     triggerArbreBase,
+    triggerArbreTop,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
@@ -278,13 +329,19 @@ export default function App() {
     onLadderSpawn: spawnAtLadder,
     onPlatformSpawn: spawnAtPlatform,
     onBackAtBase: spawnAtLadderDown,
-    onOutroComplete: handleDebugGoToIntroStart,
+    onOutroComplete: useCallback(() => {
+      setShowFinal(true)
+      setIsPlayerModeActive(false)
+      setIsFlyModeActive(false)
+      exitIntro()
+    }, [exitIntro]),
   })
 
   const openSavoirFromLeaf = useCallback(
     (id) => {
       const didOpen = openSavoirForLeaf(id)
       if (!didOpen) return
+      isModalOpenRef.current = true
       setIsSavoirInteractionActive(true)
       setShouldRestorePointerLockAfterStoryUi(true)
     },
@@ -293,6 +350,11 @@ export default function App() {
 
   const openContactFromFruit = useCallback(
     (fruitId) => {
+      if (fruitId === 'fruit_player') {
+        setIsPlayerFruitPanelOpen(true)
+        setShouldRestorePointerLockAfterStoryUi(true)
+        return
+      }
       const didOpen = openContactForFruit(fruitId)
       if (!didOpen) return
       setIsContactInteractionActive(true)
@@ -303,10 +365,14 @@ export default function App() {
 
   const [showCameraEditor, setShowCameraEditor] = useState(false)
   const [showStoryDebug, setShowStoryDebug] = useState(false)
+  const [showCinematicPanel, setShowCinematicPanel] = useState(false)
+  const [cinematicActive, setCinematicActive] = useState(false)
+  const [cinematicKeypoints, setCinematicKeypoints] = useState([])
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestPointerLockIfSceneControlAllowed = useCallback(() => {
     if (
+      showSettings ||
       dialogueActive ||
       introMovementLocked ||
       showNameInput ||
@@ -316,8 +382,10 @@ export default function App() {
       isSavoirInteractionActive ||
       selectedContactAssignment ||
       isContactInteractionActive ||
+      isPlayerFruitPanelOpen ||
       isJournalInteractionActive ||
-      raspberryPhaseActive
+      raspberryPhaseActive ||
+      !!incomingSavoir
     ) {
       return
     }
@@ -332,10 +400,12 @@ export default function App() {
     }
     pointerControlsRef.current?.lock()
   }, [
+    showSettings,
     currentStoryStepId,
     dialogueActive,
     introMovementLocked,
     isContactInteractionActive,
+    isPlayerFruitPanelOpen,
     isJournalInteractionActive,
     isPlayerModeActive,
     isSavoirInteractionActive,
@@ -346,6 +416,7 @@ export default function App() {
     selectedContactAssignment,
     selectedSavoirAssignment,
     showNameInput,
+    incomingSavoir,
   ])
 
   const handleNameSubmit = useCallback(
@@ -364,45 +435,76 @@ export default function App() {
     [handleReceptionChoiceInternal]
   )
 
+  useLayoutEffect(() => {
+    if (receptionChoiceVisible) {
+      setSubtitleChoices([
+        { label: 'Oui', onClick: () => handleReceptionChoice('yes') },
+        { label: 'Non', onClick: () => handleReceptionChoice('no') },
+      ])
+    } else {
+      setSubtitleChoices(null)
+    }
+  }, [receptionChoiceVisible, handleReceptionChoice])
+
   const jumpToIntroStart = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToIntroStart()
   }, [handleDebugGoToIntroStart])
 
-  const jumpToDoorPassage = useCallback(() => {
+  const jumpToBienvenue = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
-    handleDebugGoToDoorPassage()
-  }, [handleDebugGoToDoorPassage])
+    handleDebugGoToBienvenue()
+  }, [handleDebugGoToBienvenue])
 
-  const jumpToReception = useCallback(() => {
+  const jumpToAccueil = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(true)
-    handleDebugGoToReception()
-  }, [handleDebugGoToReception])
+    handleDebugGoToAccueil()
+  }, [handleDebugGoToAccueil])
 
-  const jumpToTree = useCallback(() => {
+  const jumpToJournal = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(true)
-    handleDebugGoToTree()
-  }, [handleDebugGoToTree])
+    handleDebugGoToJournal()
+  }, [handleDebugGoToJournal])
+
+  const jumpToArbreApresJournal = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(true)
+    handleDebugGoToArbreApresJournal()
+  }, [handleDebugGoToArbreApresJournal])
 
   const jumpToEtabli = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(true)
     handleDebugGoToEtabli()
   }, [handleDebugGoToEtabli])
 
+  const jumpToThomasEtabli = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(true)
+    handleDebugGoToThomasEtabli()
+  }, [handleDebugGoToThomasEtabli])
+
   const jumpToSerre = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToSerre()
   }, [handleDebugGoToSerre])
+
+  const jumpToZoeSerre = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handleDebugGoToZoeSerre()
+  }, [handleDebugGoToZoeSerre])
 
   const jumpToMinijeu = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
     handleDebugGoToMinijeu()
   }, [handleDebugGoToMinijeu])
 
-  const jumpToPostMinigame = useCallback(() => {
+  const jumpToJuiceMachine = useCallback(() => {
     setShouldRestorePointerLockAfterStoryUi(false)
-    handleDebugGoToPostMinigame()
-  }, [handleDebugGoToPostMinigame])
+    handleDebugGoToJuiceMachine()
+  }, [handleDebugGoToJuiceMachine])
+
+  const jumpToSortieSerre = useCallback(() => {
+    setShouldRestorePointerLockAfterStoryUi(false)
+    handleDebugGoToSortieSerre()
+  }, [handleDebugGoToSortieSerre])
 
   const handleGoToArbreBase = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -410,6 +512,28 @@ export default function App() {
     setPostIntro(true)
     triggerArbreBase()
   }, [setPostIntro, triggerArbreBase])
+
+  const handleGoToArbreTop = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    // Spawn libre : mouvement non verrouillé, pointer lock demandé normalement
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+    triggerArbreTop()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
 
   const handleGoToNestDialogue25 = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -454,33 +578,87 @@ export default function App() {
 
   // Synthetic click dispatch: forward canvas clicks to the DOM element under the virtual cursor
   useEffect(() => {
+    const setRangeFromCursor = (el) => {
+      const rect = el.getBoundingClientRect()
+      const ratio = Math.max(0, Math.min(1, (cursorStore.x - rect.left) / rect.width))
+      const min = parseFloat(el.min) || 0
+      const max = parseFloat(el.max) || 100
+      el.value = String(Math.round(min + ratio * (max - min)))
+      el.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+
     const onDown = () => {
       if (!isCursorVisibleRef.current) return
       const canvas = document.querySelector('canvas')
       const el = document.elementFromPoint(cursorStore.x, cursorStore.y)
-      if (el && el !== canvas) {
-        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+      if (!el || el === canvas) return
+
+      if (el instanceof HTMLInputElement && el.type === 'range') {
+        setRangeFromCursor(el)
+        const onMove = () => setRangeFromCursor(el)
+        const onUp = () => {
+          window.removeEventListener('mousemove', onMove, { capture: true })
+          window.removeEventListener('mouseup', onUp)
+        }
+        window.addEventListener('mousemove', onMove, { capture: true })
+        window.addEventListener('mouseup', onUp)
+        return
       }
+
+      el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
     }
     document.addEventListener('mousedown', onDown)
     return () => document.removeEventListener('mousedown', onDown)
   }, [])
 
   const handleCloseSavoir = useCallback(() => {
+    isModalOpenRef.current = false
     closeSavoirInternal()
     setIsSavoirInteractionActive(false)
     setIsSavoirPanelOpen(false)
+    fruitHoverStore.startCooldown()
+    handleLeafSavoirClosed()
     // ContactPanel/SavoirPanel stop click propagation so Drei's document.click
     // handler never fires. Call lock() directly — we're still in the user gesture.
     pointerControlsRef.current?.lock()
-  }, [closeSavoirInternal])
+  }, [closeSavoirInternal, handleLeafSavoirClosed])
 
   const handleCloseContact = useCallback(() => {
+    isModalOpenRef.current = false
     closeContactInternal()
     setIsContactInteractionActive(false)
     setIsContactPanelOpen(false)
+    fruitHoverStore.startCooldown()
     pointerControlsRef.current?.lock()
   }, [closeContactInternal])
+
+  useEffect(() => {
+    if (!isContactInteractionActive) return
+    const onKeyDown = (e) => {
+      if (e.code !== 'Escape') return
+      handleCloseContact()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isContactInteractionActive, handleCloseContact])
+
+  const handleClosePlayerFruitPanel = useCallback(() => {
+    setIsPlayerFruitPanelOpen(false)
+    setShouldRestorePointerLockAfterStoryUi(false)
+    fruitHoverStore.startCooldown()
+    handlePlayerFruitPanelClose()
+    pointerControlsRef.current?.lock()
+  }, [handlePlayerFruitPanelClose])
+
+  useEffect(() => {
+    if (!isPlayerFruitPanelOpen) return
+    const onKeyDown = (e) => {
+      if (e.code !== 'Escape') return
+      handleClosePlayerFruitPanel()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isPlayerFruitPanelOpen, handleClosePlayerFruitPanel])
 
   const isStoryBlockingPlayer =
     dialogueActive ||
@@ -500,7 +678,7 @@ export default function App() {
     isStoryBlockingPlayer || isModalBlockingPlayer || isJournalBlockingPlayer
 
   useEffect(() => {
-    if (!shouldRestorePointerLockAfterStoryUi || showNameInput || !postIntro) return
+    if (!shouldRestorePointerLockAfterStoryUi || showNameInput || !postIntro || showSettings) return
 
     let cancelled = false
     let frameId = 0
@@ -542,6 +720,7 @@ export default function App() {
     postIntro,
     requestPointerLockIfSceneControlAllowed,
     showNameInput,
+    showSettings,
   ])
 
   useEffect(() => {
@@ -553,6 +732,10 @@ export default function App() {
   }, [arbreActive])
 
   useEffect(() => {
+    isInGameplayRef.current = isPlayerModeActive || postIntro
+  }, [isPlayerModeActive, postIntro])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -562,12 +745,34 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    const onEscape = (e) => {
+      if (e.key !== 'Escape') return
+      if (!isInGameplayRef.current) return
+      if (
+        isModalOpenRef.current ||
+        isJournalInteractionActiveRef.current ||
+        isMinigameActiveRef.current
+      )
+        return
+      e.stopImmediatePropagation()
+      if (showSettings) {
+        setShowSettings(false)
+      } else {
+        setShowSettings(true)
+        setShouldRestorePointerLockAfterStoryUi(true)
+      }
+    }
+    document.addEventListener('keydown', onEscape, { capture: true })
+    return () => document.removeEventListener('keydown', onEscape, { capture: true })
+  }, [showSettings])
+
+  useEffect(() => {
     if (!receptionChoiceVisible) return
 
     const blockOutsideChoice = (event) => {
       const target = event.target
       if (!(target instanceof Element)) return
-      if (target.closest('.story-choice-card button')) return
+      if (target.closest('.story-choice-card button, .dialogue-choice-btn')) return
 
       event.preventDefault()
       event.stopPropagation()
@@ -585,10 +790,30 @@ export default function App() {
   }, [receptionChoiceVisible])
 
   useEffect(() => {
+    return () => {
+      if (loadingRevealTimeoutRef.current) {
+        clearTimeout(loadingRevealTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
-        setIsViewerControlsVisible((current) => !current)
+        f1CountRef.current += 1
+        clearTimeout(f1TimerRef.current)
+        if (f1CountRef.current >= 3) {
+          f1CountRef.current = 0
+          exitIntro()
+          setReadyToShow(true)
+          setIsViewerControlsVisible(true)
+        } else {
+          setIsViewerControlsVisible((current) => !current)
+          f1TimerRef.current = setTimeout(() => {
+            f1CountRef.current = 0
+          }, 600)
+        }
       } else if (event.code === 'F2') {
         event.preventDefault()
         setShowCameraEditor((current) => {
@@ -599,12 +824,20 @@ export default function App() {
       } else if (event.code === 'F3') {
         event.preventDefault()
         setShowStoryDebug((current) => !current)
+      } else if (event.code === 'F4') {
+        event.preventDefault()
+        if (cinematicActive) {
+          setCinematicActive(false)
+          document.exitFullscreen?.()
+        } else {
+          setShowCinematicPanel((current) => !current)
+        }
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [])
+  }, [exitIntro, setReadyToShow, cinematicActive])
 
   useEffect(() => {
     if (!dialogueActive && !arbreDialogueActive) return
@@ -617,6 +850,43 @@ export default function App() {
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
+
+  const startLoadingRevealCountdown = useCallback(() => {
+    if (loadingRevealScheduledRef.current) return
+
+    loadingRevealScheduledRef.current = true
+    if (loadingRevealTimeoutRef.current) {
+      clearTimeout(loadingRevealTimeoutRef.current)
+    }
+
+    loadingRevealTimeoutRef.current = window.setTimeout(() => {
+      setLoadingExtraDurationElapsed(true)
+      loadingRevealTimeoutRef.current = null
+    }, LOADING_EXTRA_DURATION_MS)
+  }, [])
+
+  useEffect(() => {
+    if (sceneLoadStatus !== 'ok' || !loadingSequenceStarted) return
+    startLoadingRevealCountdown()
+  }, [loadingSequenceStarted, sceneLoadStatus, startLoadingRevealCountdown])
+
+  // Auto-launch story once the loading screen has waited 7 more seconds
+  // after the scene became ready, or 7 seconds after click if it was already ready.
+  useEffect(() => {
+    if (readyToShow || showWelcome || sceneLoadStatus !== 'ok' || !loadingExtraDurationElapsed)
+      return
+    const revealTimeoutId = window.setTimeout(() => {
+      revealSceneAfterLoading()
+    }, 0)
+
+    return () => window.clearTimeout(revealTimeoutId)
+  }, [
+    loadingExtraDurationElapsed,
+    readyToShow,
+    revealSceneAfterLoading,
+    sceneLoadStatus,
+    showWelcome,
+  ])
 
   const handleSceneReady = useCallback((data) => {
     setSceneLoadInfo(data)
@@ -636,14 +906,21 @@ export default function App() {
     receptionChoiceVisible ||
     returnHallVisible ||
     isJournalInteractionActive ||
-    raspberryPhaseActive
+    raspberryPhaseActive ||
+    isSavoirInteractionActive ||
+    isContactInteractionActive ||
+    isPlayerFruitPanelOpen ||
+    !!incomingSavoir ||
+    (showSettings && (postIntro || isPlayerModeActive))
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
-    showCameraEditor ||
-    (!introActive &&
-      !postIntro &&
-      (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked))
+    !cinematicActive &&
+    (showCameraEditor ||
+      showCinematicPanel ||
+      (!introActive &&
+        !postIntro &&
+        (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked)))
 
   // Keep refs in sync for stable event handlers.
   // isCursorVisibleRef: used by mousedown dispatch.
@@ -658,14 +935,63 @@ export default function App() {
   useEffect(() => {
     isCameraBlockedRef.current =
       postIntro &&
-      (showNameInput || receptionChoiceVisible || returnHallVisible || isJournalInteractionActive)
+      (showNameInput ||
+        receptionChoiceVisible ||
+        returnHallVisible ||
+        isJournalInteractionActive ||
+        isPlayerFruitPanelOpen ||
+        isSavoirInteractionActive ||
+        isContactInteractionActive ||
+        !!incomingSavoir ||
+        showSettings)
   }, [
     postIntro,
     showNameInput,
     receptionChoiceVisible,
     returnHallVisible,
     isJournalInteractionActive,
+    isPlayerFruitPanelOpen,
+    isSavoirInteractionActive,
+    isContactInteractionActive,
+    incomingSavoir,
+    showSettings,
   ])
+
+  useEffect(() => {
+    isModalOpenRef.current = isSavoirInteractionActive || isContactInteractionActive
+  }, [isSavoirInteractionActive, isContactInteractionActive])
+
+  useEffect(() => {
+    const socket = io(SOCKET_URL)
+    socket.on('savoir-received', (data) => {
+      const savoir = {
+        title: data.title ?? data.theme,
+        text: data.summary,
+        slots: data.availability ?? [],
+        drawingData: data.drawingData ?? null,
+      }
+      setTimeout(() => {
+        setIsPlayerFruitPanelOpen(false)
+        setIncomingSavoir(savoir)
+        setLeafArriving(true)
+        setHasSentSavoir(true)
+        handleSavoirReceived()
+      }, 2500)
+    })
+    return () => socket.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleLeafArrivalComplete = useCallback(() => {
+    setLeafArriving(false)
+  }, [])
+
+  const handleCloseIncomingSavoir = useCallback(() => {
+    setIncomingSavoir(null)
+    fruitHoverStore.startCooldown()
+    handleIncomingSavoirClosed()
+    pointerControlsRef.current?.lock()
+  }, [handleIncomingSavoirClosed])
 
   const isStoryCameraControlEnabled = postIntro
 
@@ -689,6 +1015,8 @@ export default function App() {
 
   const explorationReady = false
   const showDevOverlays =
+    !cinematicActive &&
+    !showWelcome &&
     !introPending &&
     !introActive &&
     !postIntro &&
@@ -735,7 +1063,9 @@ export default function App() {
   }, [])
 
   return (
-    <main className={`viewer-page${isNativeCursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
+    <main
+      className={`viewer-page${isNativeCursorVisible ? ' viewer-page--cursor-visible' : ''}${cinematicActive ? ' viewer-page--cinematic' : ''}`}
+    >
       <GameManager
         sceneReady={sceneReady}
         introPending={introPending}
@@ -745,27 +1075,26 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      <AppLoader
-        status={sceneLoadStatus}
-        error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
-      />
-      <Subtitles />
+      {!cinematicActive && <Subtitles />}
 
-      <Crosshair
-        visible={
-          (isPlayerModeActive || isStoryCameraControlEnabled) &&
-          !showNameInput &&
-          !receptionChoiceVisible &&
-          !returnHallVisible &&
-          !selectedSavoirAssignment &&
-          !isSavoirInteractionActive &&
-          !selectedContactAssignment &&
-          !isContactInteractionActive &&
-          !isJournalInteractionActive &&
-          !raspberryPhaseActive
-        }
-        active={(interactionsEnabled && (isLeafHovered || isFruitHovered)) || isStairsHovered}
-      />
+      {!cinematicActive && (
+        <Crosshair
+          visible={
+            (isPlayerModeActive || isStoryCameraControlEnabled) &&
+            !showNameInput &&
+            !receptionChoiceVisible &&
+            !returnHallVisible &&
+            !selectedSavoirAssignment &&
+            !isSavoirInteractionActive &&
+            !selectedContactAssignment &&
+            !isContactInteractionActive &&
+            !isJournalInteractionActive &&
+            !raspberryPhaseActive &&
+            !isPlayerFruitPanelOpen
+          }
+          active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
+        />
+      )}
 
       <Scene
         modelQuality={modelQuality}
@@ -783,6 +1112,7 @@ export default function App() {
           eyeHeight: playerEyeHeight,
           spawnKey: playerSpawnKey,
           movementLocked: isPlayerInteractionLocked || userMovementLocked,
+          sensitivity: mouseSensitivity,
         }}
         debug={{
           doors: debugDoors,
@@ -849,8 +1179,10 @@ export default function App() {
           onStairsClick: handleStairsClick,
           onStairsHover: setIsStairsHovered,
           growingFruitPlaying: arbreGrowingFruitPlaying,
-          fruitsClickActive,
-          onFruitClickDuringLeaves: handleFruitClickDuringLeaves,
+          growingFruitClickable: arbreGrowingFruitClickable,
+          fruitsDisabled:
+            isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
+          onGrowingFruitComplete: handleGrowingFruitComplete,
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
         leafMaterialMode={leafMaterialMode}
@@ -882,9 +1214,12 @@ export default function App() {
         }}
         shaderEnabled={shaderEnabled}
         shaderRadius={shaderRadius}
+        shadowsEnabled={shadowsEnabled}
         journalAutoOpenToken={journalAutoOpenToken}
         journalCloseToken={journalCloseToken}
         journalPuzzleEnabled={journalPuzzleEnabled}
+        cinematicActive={cinematicActive}
+        cinematicKeypoints={cinematicKeypoints}
       />
 
       {showDevOverlays && isViewerControlsVisible && (
@@ -899,18 +1234,37 @@ export default function App() {
         </Suspense>
       )}
 
+      {showCinematicPanel && (
+        <Suspense fallback={null}>
+          <CinematicPanel
+            onLaunch={(keypoints) => {
+              setCinematicKeypoints(keypoints)
+              setCinematicActive(true)
+              setShowCinematicPanel(false)
+              document.documentElement.requestFullscreen?.()
+            }}
+            onClose={() => setShowCinematicPanel(false)}
+          />
+        </Suspense>
+      )}
+
       {showDevOverlays && showStoryDebug && (
         <Suspense fallback={null}>
           <StoryDebugPanel
             onGoToIntroStart={jumpToIntroStart}
-            onGoToDoorPassage={jumpToDoorPassage}
-            onGoToReception={jumpToReception}
-            onGoToTree={jumpToTree}
+            onGoToBienvenue={jumpToBienvenue}
+            onGoToAccueil={jumpToAccueil}
+            onGoToJournal={jumpToJournal}
+            onGoToArbreApresJournal={jumpToArbreApresJournal}
             onGoToEtabli={jumpToEtabli}
+            onGoToThomasEtabli={jumpToThomasEtabli}
             onGoToSerre={jumpToSerre}
+            onGoToZoeSerre={jumpToZoeSerre}
             onGoToMinijeu={jumpToMinijeu}
-            onGoToPostMinigame={jumpToPostMinigame}
+            onGoToJuiceMachine={jumpToJuiceMachine}
+            onGoToSortieSerre={jumpToSortieSerre}
             onGoToArbreBase={handleGoToArbreBase}
+            onGoToArbreTop={handleGoToArbreTop}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>
@@ -953,40 +1307,9 @@ export default function App() {
         </Suspense>
       )}
 
-      {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
+      {!cinematicActive && showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
-      {receptionChoiceVisible && (
-        <div
-          className="story-choice"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="story-choice-title"
-        >
-          <div className="story-choice-card">
-            <p id="story-choice-title" className="story-choice-label">
-              Je te raconte l'origine du concept de Cabane si tu veux.
-            </p>
-            <div className="story-choice-actions">
-              <button
-                type="button"
-                className="camera-toggle"
-                onClick={() => handleReceptionChoice('yes')}
-              >
-                Oui
-              </button>
-              <button
-                type="button"
-                className="camera-toggle"
-                onClick={() => handleReceptionChoice('no')}
-              >
-                Non
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {returnHallVisible && (
+      {!cinematicActive && returnHallVisible && (
         <div
           className="story-choice"
           role="dialog"
@@ -1006,32 +1329,93 @@ export default function App() {
         </div>
       )}
 
-      {isSavoirPanelOpen && selectedSavoirAssignment && (
+      {!cinematicActive && isSavoirPanelOpen && selectedSavoirAssignment && (
         <SavoirPanel savoir={selectedSavoirAssignment.savoir} onClose={handleCloseSavoir} />
       )}
 
-      {isContactPanelOpen && selectedContactAssignment && (
+      {!cinematicActive && isContactPanelOpen && selectedContactAssignment && (
         <ContactPanel contact={selectedContactAssignment.contact} onClose={handleCloseContact} />
       )}
 
-      {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
+      {!cinematicActive && isPlayerFruitPanelOpen && (
+        <PlayerFruitPanel
+          playerName={playerName}
+          onClose={handleClosePlayerFruitPanel}
+          hasSentSavoir={hasSentSavoir}
+        />
+      )}
 
-      <CustomCursor visible={isCustomCursorVisible} />
+      {!cinematicActive && incomingSavoir && (
+        <SavoirPanel
+          savoir={incomingSavoir}
+          onClose={handleCloseIncomingSavoir}
+          leafColRef={savoirLeafColRef}
+          pendingLeaf={leafArriving}
+        />
+      )}
 
-      {introPending && (
-        <IntroLoader
-          fading={loaderFading}
-          onClick={() => {
+      {!cinematicActive && leafArriving && (
+        <LeafArrival
+          drawingData={incomingSavoir?.drawingData}
+          targetRef={savoirLeafColRef}
+          onComplete={handleLeafArrivalComplete}
+        />
+      )}
+
+      {!cinematicActive && raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
+
+      {!cinematicActive && <CustomCursor visible={isCustomCursorVisible} />}
+
+      {!cinematicActive && showFinal && <FinalScreen />}
+
+      {!cinematicActive && (welcomeFading || !showWelcome) && !readyToShow && (
+        <LoadingScreen
+          status={sceneLoadStatus}
+          error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
+        />
+      )}
+
+      {!cinematicActive && showWelcome && (
+        <WelcomeScreen
+          fading={welcomeFading}
+          onStart={() => {
+            setLoadingSequenceStarted(true)
+            setLoadingExtraDurationElapsed(false)
+            setReadyToShow(false)
+            setWelcomeFading(true)
+            loadingRevealScheduledRef.current = false
+            if (loadingRevealTimeoutRef.current) {
+              clearTimeout(loadingRevealTimeoutRef.current)
+            }
+            loadingRevealTimeoutRef.current = null
+            if (sceneLoadStatus === 'ok') startLoadingRevealCountdown()
             const canvas = document.querySelector('canvas')
-            if (canvas) canvas.requestPointerLock()
-            handleLoaderClick()
+            if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
-          onKeyDown={(e) => {
-            const canvas = document.querySelector('canvas')
-            if (canvas) canvas.requestPointerLock()
-            handleLoaderKeyDown(e)
+          onAnimationEnd={() => setShowWelcome(false)}
+          onOpenSettings={() => setShowSettings(true)}
+          settingsOpen={showSettings}
+        />
+      )}
+
+      {!cinematicActive && (
+        <SettingsMenu
+          open={showSettings}
+          onClose={() => setShowSettings(false)}
+          volume={masterVolume}
+          onVolumeChange={(v) => {
+            setMasterVolume(v)
+            setGlobalVolume(v / 100)
           }}
-          onAnimationEnd={dismissLoader}
+          shadersEnabled={shaderEnabled ? 'Oui' : 'Non'}
+          onShadersChange={(v) => setShaderEnabled(v === 'Oui')}
+          shadowsEnabled={shadowsEnabled ? 'Oui' : 'Non'}
+          onShadowsChange={(v) => setShadowsEnabled(v === 'Oui')}
+          sensitivity={mouseSensitivity}
+          onSensitivityChange={setMouseSensitivity}
+          modelQuality={modelQuality}
+          onModelQualityChange={setModelQuality}
+          sceneLoaded={!showWelcome}
         />
       )}
     </main>

@@ -8,12 +8,18 @@ const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
 const OUTLINE_COLOR = 0xffffff
 const OUTLINE_OPACITY = 0.9
+const INTRO_HUT = 'hut01'
 const INTRO_DOOR_PARENT = 'door01'
 
 function findIntroDoorMeshes(cabane) {
   if (!cabane) return []
 
-  const parent = cabane.getObjectByName(INTRO_DOOR_PARENT)
+  // Scope search to hut01 first — greenhouse.gltf also has a node named door01
+  // and its order in the scene can vary depending on cabane.json entry order.
+  const hut = cabane.getObjectByName(INTRO_HUT)
+  if (!hut) return []
+
+  const parent = hut.getObjectByName(INTRO_DOOR_PARENT)
   if (!parent) return []
 
   const meshes = []
@@ -58,9 +64,9 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   const mouseMovedRef = useRef(false)
   const prevActiveRef = useRef(false)
   const onDoorClickRef = useStableInteractionCallback(onDoorClick)
-  const outlinesRef = useRef([])
   const materialStatesRef = useRef(new Map())
   const clonedMaterialsRef = useRef(new Map())
+  const outlinesRef = useRef([])
   const raycaster = useRef(new THREE.Raycaster())
 
   const doorMeshes = useMemo(() => findIntroDoorMeshes(cabane), [cabane])
@@ -75,13 +81,6 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
       clonedMaterialsRef.current.set(mesh, { originalMaterial, clonedMaterial })
     })
 
-    const outlines = doorMeshes.map((mesh) => {
-      const outline = createDoorOutline(mesh)
-      mesh.add(outline)
-      return outline
-    })
-
-    outlinesRef.current = outlines
     materialStatesRef.current = new Map()
 
     doorMeshes.forEach((mesh) => {
@@ -94,24 +93,34 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
       })
     })
 
+    const outlines = doorMeshes.map((mesh) => {
+      const outline = createDoorOutline(mesh)
+      mesh.add(outline)
+      return outline
+    })
+
+    outlinesRef.current = outlines
+
     return () => {
       outlines.forEach((outline) => {
         outline.removeFromParent()
         outline.geometry.dispose()
         outline.material.dispose()
       })
+      outlinesRef.current = []
       clonedMaterialsRef.current.forEach(({ originalMaterial, clonedMaterial }, mesh) => {
         mesh.material = originalMaterial
         forEachMaterial(clonedMaterial, (material) => material.dispose())
       })
       clonedMaterialsRef.current = new Map()
       materialStatesRef.current = new Map()
-      outlinesRef.current = []
     }
   }, [doorMeshes])
 
   const setDoorHover = useCallback(
     (isHovered) => {
+      cursorStore.setType(isHovered ? 'pointer' : 'default')
+
       outlinesRef.current.forEach((outline) => {
         outline.visible = isHovered
       })
@@ -173,7 +182,20 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
   }, [active, gl, doorMeshes, onDoorClickRef, setDoorHover])
 
   useFrame(() => {
-    if (!active || !doorMeshes.length || !mouseMovedRef.current) return
+    if (!active || !doorMeshes.length) return
+
+    // Without pointer lock the cursor is physical — auto-highlight the door so it
+    // is always interactive regardless of where the mouse happens to be positioned.
+    // With pointer lock the virtual cursor (cursorStore) is used, so raycasting is needed.
+    if (!document.pointerLockElement) {
+      if (!hoveredRef.current) {
+        hoveredRef.current = true
+        setDoorHover(true)
+      }
+      return
+    }
+
+    if (!mouseMovedRef.current) return
 
     raycaster.current.setFromCamera(mouseRef.current, camera)
     const hits = raycaster.current.intersectObjects(doorMeshes, true)
