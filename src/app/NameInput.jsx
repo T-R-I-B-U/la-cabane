@@ -12,19 +12,23 @@ export function NameInput({ onSubmit }) {
   return (
     <div className="name-input-overlay">
       <div className="name-input-card">
-        <p className="name-input-label">Comment t'appelles-tu ?</p>
-        <input
-          className="name-input-field"
-          type="text"
-          aria-label="Ton prénom"
-          placeholder="Ton prénom…"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          onKeyDown={(event) => event.key === 'Enter' && submitName()}
-          autoFocus
-        />
-        <button type="button" className="name-input-submit camera-toggle" onClick={submitName}>
-          Continuer
+        <div className="name-input-content">
+          <p className="name-input-title">
+            Bienvenue à toi Nouveau membre : comment tu t&apos;appelles ?
+          </p>
+          <input
+            className="name-input-field"
+            type="text"
+            aria-label="Ton prénom"
+            placeholder="Mon prénom"
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            onKeyDown={(event) => event.key === 'Enter' && submitName()}
+            autoFocus
+          />
+        </div>
+        <button type="button" className="name-input-submit" onClick={submitName}>
+          Je valide !
         </button>
       </div>
     </div>
