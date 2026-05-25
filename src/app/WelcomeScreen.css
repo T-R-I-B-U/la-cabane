@@ -90,7 +90,8 @@
 }
 
 /* Override the global cursor: auto !important from .viewer-page--cursor-visible * */
-.viewer-page--cursor-visible .welcome-screen__btn {
+.viewer-page--cursor-visible .welcome-screen__btn,
+.viewer-page--cursor-visible .welcome-screen__btn * {
   cursor: pointer !important;
 }
 
