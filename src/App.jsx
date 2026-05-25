@@ -56,6 +56,9 @@ const CameraEditorPanel = lazy(() =>
 const PerfMonitor = lazy(() =>
   import('./core/PerfMonitor').then((mod) => ({ default: mod.PerfMonitor }))
 )
+const CinematicPanel = lazy(() =>
+  import('./app/CinematicPanel').then((mod) => ({ default: mod.CinematicPanel }))
+)
 export default function App() {
   const isDevBuild = import.meta.env.DEV
   const [incomingSavoir, setIncomingSavoir] = useState(null)
@@ -362,6 +365,9 @@ export default function App() {
 
   const [showCameraEditor, setShowCameraEditor] = useState(false)
   const [showStoryDebug, setShowStoryDebug] = useState(false)
+  const [showCinematicPanel, setShowCinematicPanel] = useState(false)
+  const [cinematicActive, setCinematicActive] = useState(false)
+  const [cinematicKeypoints, setCinematicKeypoints] = useState([])
   const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
 
   const requestPointerLockIfSceneControlAllowed = useCallback(() => {
@@ -818,12 +824,20 @@ export default function App() {
       } else if (event.code === 'F3') {
         event.preventDefault()
         setShowStoryDebug((current) => !current)
+      } else if (event.code === 'F4') {
+        event.preventDefault()
+        if (cinematicActive) {
+          setCinematicActive(false)
+          document.exitFullscreen?.()
+        } else {
+          setShowCinematicPanel((current) => !current)
+        }
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [exitIntro, setReadyToShow])
+  }, [exitIntro, setReadyToShow, cinematicActive])
 
   useEffect(() => {
     if (!dialogueActive && !arbreDialogueActive) return
@@ -1046,7 +1060,9 @@ export default function App() {
   }, [])
 
   return (
-    <main className={`viewer-page${isNativeCursorVisible ? ' viewer-page--cursor-visible' : ''}`}>
+    <main
+      className={`viewer-page${isNativeCursorVisible ? ' viewer-page--cursor-visible' : ''}${cinematicActive ? ' viewer-page--cinematic' : ''}`}
+    >
       <GameManager
         sceneReady={sceneReady}
         introPending={introPending}
@@ -1056,24 +1072,26 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      <Subtitles />
+      {!cinematicActive && <Subtitles />}
 
-      <Crosshair
-        visible={
-          (isPlayerModeActive || isStoryCameraControlEnabled) &&
-          !showNameInput &&
-          !receptionChoiceVisible &&
-          !returnHallVisible &&
-          !selectedSavoirAssignment &&
-          !isSavoirInteractionActive &&
-          !selectedContactAssignment &&
-          !isContactInteractionActive &&
-          !isJournalInteractionActive &&
-          !raspberryPhaseActive &&
-          !isPlayerFruitPanelOpen
-        }
-        active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
-      />
+      {!cinematicActive && (
+        <Crosshair
+          visible={
+            (isPlayerModeActive || isStoryCameraControlEnabled) &&
+            !showNameInput &&
+            !receptionChoiceVisible &&
+            !returnHallVisible &&
+            !selectedSavoirAssignment &&
+            !isSavoirInteractionActive &&
+            !selectedContactAssignment &&
+            !isContactInteractionActive &&
+            !isJournalInteractionActive &&
+            !raspberryPhaseActive &&
+            !isPlayerFruitPanelOpen
+          }
+          active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
+        />
+      )}
 
       <Scene
         modelQuality={modelQuality}
@@ -1197,7 +1215,20 @@ export default function App() {
         journalAutoOpenToken={journalAutoOpenToken}
         journalCloseToken={journalCloseToken}
         journalPuzzleEnabled={journalPuzzleEnabled}
+        cinematicActive={cinematicActive}
+        cinematicKeypoints={cinematicKeypoints}
       />
+
+      <button
+        type="button"
+        className="cinematic-stop-btn"
+        onClick={() => {
+          setCinematicActive(false)
+          document.exitFullscreen?.()
+        }}
+      >
+        ■ Arrêter (F4)
+      </button>
 
       {showDevOverlays && isViewerControlsVisible && (
         <Suspense fallback={null}>
@@ -1208,6 +1239,20 @@ export default function App() {
       {showCameraEditorOverlay && (
         <Suspense fallback={null}>
           <CameraEditorPanel onClose={closeCameraEditor} />
+        </Suspense>
+      )}
+
+      {showCinematicPanel && (
+        <Suspense fallback={null}>
+          <CinematicPanel
+            onLaunch={(keypoints) => {
+              setCinematicKeypoints(keypoints)
+              setCinematicActive(true)
+              setShowCinematicPanel(false)
+              document.documentElement.requestFullscreen?.()
+            }}
+            onClose={() => setShowCinematicPanel(false)}
+          />
         </Suspense>
       )}
 
@@ -1270,9 +1315,9 @@ export default function App() {
         </Suspense>
       )}
 
-      {showNameInput && <NameInput onSubmit={handleNameSubmit} />}
+      {!cinematicActive && showNameInput && <NameInput onSubmit={handleNameSubmit} />}
 
-      {returnHallVisible && (
+      {!cinematicActive && returnHallVisible && (
         <div
           className="story-choice"
           role="dialog"
@@ -1292,15 +1337,15 @@ export default function App() {
         </div>
       )}
 
-      {isSavoirPanelOpen && selectedSavoirAssignment && (
+      {!cinematicActive && isSavoirPanelOpen && selectedSavoirAssignment && (
         <SavoirPanel savoir={selectedSavoirAssignment.savoir} onClose={handleCloseSavoir} />
       )}
 
-      {isContactPanelOpen && selectedContactAssignment && (
+      {!cinematicActive && isContactPanelOpen && selectedContactAssignment && (
         <ContactPanel contact={selectedContactAssignment.contact} onClose={handleCloseContact} />
       )}
 
-      {isPlayerFruitPanelOpen && (
+      {!cinematicActive && isPlayerFruitPanelOpen && (
         <PlayerFruitPanel
           playerName={playerName}
           onClose={handleClosePlayerFruitPanel}
@@ -1308,7 +1353,7 @@ export default function App() {
         />
       )}
 
-      {incomingSavoir && (
+      {!cinematicActive && incomingSavoir && (
         <SavoirPanel
           savoir={incomingSavoir}
           onClose={handleCloseIncomingSavoir}
@@ -1317,7 +1362,7 @@ export default function App() {
         />
       )}
 
-      {leafArriving && (
+      {!cinematicActive && leafArriving && (
         <LeafArrival
           drawingData={incomingSavoir?.drawingData}
           targetRef={savoirLeafColRef}
@@ -1325,20 +1370,20 @@ export default function App() {
         />
       )}
 
-      {raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
+      {!cinematicActive && raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
-      <CustomCursor visible={isCustomCursorVisible} />
+      {!cinematicActive && <CustomCursor visible={isCustomCursorVisible} />}
 
-      {showFinal && <FinalScreen />}
+      {!cinematicActive && showFinal && <FinalScreen />}
 
-      {(welcomeFading || !showWelcome) && !readyToShow && (
+      {!cinematicActive && (welcomeFading || !showWelcome) && !readyToShow && (
         <LoadingScreen
           status={sceneLoadStatus}
           error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
         />
       )}
 
-      {showWelcome && (
+      {!cinematicActive && showWelcome && (
         <WelcomeScreen
           fading={welcomeFading}
           onStart={() => {
@@ -1361,24 +1406,26 @@ export default function App() {
         />
       )}
 
-      <SettingsMenu
-        open={showSettings}
-        onClose={() => setShowSettings(false)}
-        volume={masterVolume}
-        onVolumeChange={(v) => {
-          setMasterVolume(v)
-          setGlobalVolume(v / 100)
-        }}
-        shadersEnabled={shaderEnabled ? 'Oui' : 'Non'}
-        onShadersChange={(v) => setShaderEnabled(v === 'Oui')}
-        shadowsEnabled={shadowsEnabled ? 'Oui' : 'Non'}
-        onShadowsChange={(v) => setShadowsEnabled(v === 'Oui')}
-        sensitivity={mouseSensitivity}
-        onSensitivityChange={setMouseSensitivity}
-        modelQuality={modelQuality}
-        onModelQualityChange={setModelQuality}
-        sceneLoaded={!showWelcome}
-      />
+      {!cinematicActive && (
+        <SettingsMenu
+          open={showSettings}
+          onClose={() => setShowSettings(false)}
+          volume={masterVolume}
+          onVolumeChange={(v) => {
+            setMasterVolume(v)
+            setGlobalVolume(v / 100)
+          }}
+          shadersEnabled={shaderEnabled ? 'Oui' : 'Non'}
+          onShadersChange={(v) => setShaderEnabled(v === 'Oui')}
+          shadowsEnabled={shadowsEnabled ? 'Oui' : 'Non'}
+          onShadowsChange={(v) => setShadowsEnabled(v === 'Oui')}
+          sensitivity={mouseSensitivity}
+          onSensitivityChange={setMouseSensitivity}
+          modelQuality={modelQuality}
+          onModelQualityChange={setModelQuality}
+          sceneLoaded={!showWelcome}
+        />
+      )}
     </main>
   )
 }
