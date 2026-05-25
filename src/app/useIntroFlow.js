@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
 import { DEFAULT_STORY_CAMERA_POVS, STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
-import { fade, stop } from '../utils/audioStore'
+import { setAmbiance, stopAmbiance } from '../utils/audioStore'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -120,8 +120,7 @@ export function useIntroFlow({ sceneReady }) {
     setZoeClip(null)
     setMinigameCount(0)
     setPlayerName('')
-    stop('ambianceWorkbench')
-    stop('ambianceGreenhouse')
+    stopAmbiance()
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
@@ -142,6 +141,7 @@ export function useIntroFlow({ sceneReady }) {
     (event, payload) => {
       if (event === 'camera:ready') {
         setLoaderFading(true)
+        setAmbiance('musicBeginning')
       }
 
       if (event === 'wait:door') setIntroWaitingAtDoor(true)
@@ -154,6 +154,7 @@ export function useIntroFlow({ sceneReady }) {
       if (event === 'door:open') setIntroDoorOpen(true)
 
       if (event === 'inside') {
+        setAmbiance('musicIndoor')
         if (payload) setIntroSpawn(payload)
         setIntroDoorOpen(false)
         setIntroShouldAdvance(false)
@@ -226,7 +227,7 @@ export function useIntroFlow({ sceneReady }) {
       playDialogue('thomasEtabliDialogue', {
         onDone: () => {
           setThomasAnimationPhase('returning')
-          scheduleFlowTimeout(() => fade('ambianceWorkbench', 0.7, 2000), 2000)
+          scheduleFlowTimeout(() => setAmbiance('ambianceWorkbench'), 2000)
           setGreenhousePhaseActive(true)
         },
       })
@@ -278,6 +279,7 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'exitFront') {
       greenhouseTransitionStageRef.current = null
+      setAmbiance('ambianceOutside')
       scheduleFlowTimeout(() => {
         playDialogue('18-voice-tree', {
           onDone: () =>
@@ -314,7 +316,7 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'corridor') {
       greenhouseTransitionStageRef.current = 'inside'
-      fade('ambianceGreenhouse', 0.7, 2000)
+      setAmbiance('ambianceGreenhouse')
       scheduleFlowTimeout(() => {
         setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInside, duration: 2.5 })
       }, 1000)
@@ -452,7 +454,7 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
-    fade('ambianceWorkbench', 0.7, 800)
+    setAmbiance('ambianceWorkbench')
     isEtabliTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelier, duration: 1.5 })
   }, [])
@@ -528,14 +530,14 @@ export function useIntroFlow({ sceneReady }) {
     clearScheduledTimeouts()
     setGreenhousePhaseActive(false)
     setSerreActive(true)
-    fade('ambianceWorkbench', 0, 1500)
+    setAmbiance(null)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
   }, [clearScheduledTimeouts])
 
   const handleExitSerreDoorClick = useCallback(() => {
     setExitSerrePhaseActive(false)
-    fade('ambianceGreenhouse', 0, 1500)
+    setAmbiance(null)
     greenhouseTransitionStageRef.current = 'exitIndoor'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInsideExit, duration: 2.0 })
   }, [])
@@ -543,7 +545,7 @@ export function useIntroFlow({ sceneReady }) {
   const handleThomasEtabliInteract = useCallback(() => {
     setThomasEtabliPhaseActive(false)
     setThomasAnimationPhase('talking')
-    fade('ambianceWorkbench', 0, 1500)
+    setAmbiance(null)
     isAtelierBetweenTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelierBetween, duration: 1.0 })
   }, [])
