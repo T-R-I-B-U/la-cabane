@@ -89,6 +89,11 @@
   transition: opacity 0.15s ease;
 }
 
+/* Override the global cursor: auto !important from .viewer-page--cursor-visible * */
+.viewer-page--cursor-visible .welcome-screen__btn {
+  cursor: pointer !important;
+}
+
 .welcome-screen__btn-bg {
   position: absolute;
   inset: 0;
