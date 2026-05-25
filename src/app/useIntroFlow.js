@@ -384,7 +384,7 @@ export function useIntroFlow({ sceneReady }) {
         onDone: () => {
           if (isLast) {
             journalCompletedRef.current = true
-            scheduleFlowTimeout(() => setJournalCloseToken((t) => t + 1), 5000)
+            scheduleFlowTimeout(() => setJournalCloseToken((t) => t + 1), 3000)
             return
           }
 
