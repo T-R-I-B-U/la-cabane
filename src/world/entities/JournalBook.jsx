@@ -9,6 +9,7 @@ import { disposeObject3D } from '../../core/disposeObject3D'
 
 const MODEL_URL = '/models/book01.gltf'
 const DUR_CAMERA = 0.8
+const DUR_CAMERA_RETURN = 2.0
 const DUR_OPEN = 0.9
 const DUR_CLOSE = 0.7
 const OPEN_ROTATION_Z = Math.PI
@@ -522,7 +523,7 @@ export function JournalBook({
     }
 
     if (state === 'CAMERA_RETURNING') {
-      const t = ease(Math.min(elapsed / DUR_CAMERA, 1))
+      const t = ease(Math.min(elapsed / DUR_CAMERA_RETURN, 1))
       camera.position.lerpVectors(cameraReturnStartPosRef.current, cameraInitPosRef.current, t)
       camera.quaternion.slerpQuaternions(
         cameraReturnStartQuatRef.current,
@@ -530,7 +531,7 @@ export function JournalBook({
         t
       )
 
-      if (elapsed >= DUR_CAMERA) {
+      if (elapsed >= DUR_CAMERA_RETURN) {
         camera.position.copy(cameraInitPosRef.current)
         camera.quaternion.copy(cameraInitQuatRef.current)
         bookStateRef.current = 'CLOSED'
@@ -579,7 +580,7 @@ export function JournalBook({
       leftPivot.rotation.z = OPEN_ROTATION_Z * (1 - tClose)
 
       if (restoreCameraAfterCloseRef.current) {
-        const tCam = ease(Math.min(elapsed / DUR_CAMERA, 1))
+        const tCam = ease(Math.min(elapsed / DUR_CAMERA_RETURN, 1))
         camera.position.lerpVectors(cameraReturnStartPosRef.current, cameraInitPosRef.current, tCam)
         camera.quaternion.slerpQuaternions(
           cameraReturnStartQuatRef.current,
@@ -589,7 +590,7 @@ export function JournalBook({
       }
 
       const totalDur = restoreCameraAfterCloseRef.current
-        ? Math.max(DUR_CLOSE, DUR_CAMERA)
+        ? Math.max(DUR_CLOSE, DUR_CAMERA_RETURN)
         : DUR_CLOSE
 
       if (elapsed >= totalDur) {

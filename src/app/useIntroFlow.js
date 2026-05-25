@@ -384,7 +384,7 @@ export function useIntroFlow({ sceneReady }) {
         onDone: () => {
           if (isLast) {
             journalCompletedRef.current = true
-            setJournalCloseToken((t) => t + 1)
+            scheduleFlowTimeout(() => setJournalCloseToken((t) => t + 1), 3000)
             return
           }
 
@@ -392,7 +392,7 @@ export function useIntroFlow({ sceneReady }) {
         },
       })
     },
-    [playDialogue]
+    [playDialogue, scheduleFlowTimeout]
   )
 
   const handleJournalInteractionStart = useCallback(() => {}, [])
