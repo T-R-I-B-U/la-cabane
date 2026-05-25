@@ -14,7 +14,7 @@ function buildFrameUrls() {
 
 const FRAME_URLS = buildFrameUrls()
 
-export function LoadingScreen({ status, error }) {
+export function LoadingScreen({ status, error, fading, onAnimationEnd }) {
   const [frameIndex, setFrameIndex] = useState(0)
   const [framesReady, setFramesReady] = useState(false)
 
@@ -63,7 +63,10 @@ export function LoadingScreen({ status, error }) {
   }, [framesReady])
 
   return (
-    <div className="loading-screen">
+    <div
+      className={`loading-screen${fading ? ' loading-screen--fading' : ''}`}
+      onAnimationEnd={fading ? onAnimationEnd : undefined}
+    >
       <img
         className="loading-screen__bg"
         src="/welcome/loading-bg.webp"
