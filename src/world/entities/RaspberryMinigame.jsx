@@ -9,8 +9,8 @@ import { cursorStore } from '../../utils/cursorStore'
 // Static basket from cabane.json at world [-32.9799, 0.3203, -42.6757] scale [1,1,1].
 // basket.gltf bbox y_max = 0.239 → top opening at world y = 0.3203 + 0.239 = 0.5593.
 // BASKET_SNAP expressed in GROUP_WORLD_POS-local space.
-// local = world_basket - GROUP_WORLD_POS = [-32.98-(-39.3), 0.56-0.44, -42.68-(-42.7)]
-const BASKET_SNAP = [6.32, 0.05, 0.02]
+// local = world_basket_top - GROUP_WORLD_POS = [-32.98-(-38.5), 0.56-0.44, -42.68-(-42.4)]
+const BASKET_SNAP = [5.52, 0.12, -0.28]
 const BASKET_NDC_RADIUS = 0.15
 
 // Berry slots: offsets inside the basket relative to BASKET_SNAP.
@@ -27,7 +27,7 @@ const RIPE_COUNT = 5
 
 // World anchor on the outsideplant03 row nearest the basket (cabane.json).
 // Row at z≈-42.7: plants at x=-38.53, -39.26, -40.13 / y≈0.44.
-const GROUP_WORLD_POS = [-38.5, 0.44, -42.4]
+const GROUP_WORLD_POS = [-35.5, 1.0, -41.0]
 
 // Berry positions derived from outsideplant03.gltf vertex clusters, rotation-corrected.
 // Each plant's euler rotation (from cabane.json) was applied to model-local cluster centers.
@@ -41,9 +41,9 @@ const RASPBERRY_DEFS = [
   { position: [0.42, 0.426, 0.37], rotation: [-0.2, 1.5, 0.4], isRipe: true },
   { position: [0.395, 0.308, 0.42], rotation: [0.4, 4.2, -0.1], isRipe: false },
   // Plant 3 (world x≈-40.13) rot=(-1.537,-1.262,-1.807)
-  { position: [-0.996, 0.52, 0.93], rotation: [-0.1, 0.4, 0.5], isRipe: true },
-  { position: [-0.96, 0.382, 0.88], rotation: [0.3, 2.7, -0.3], isRipe: true },
-  { position: [-0.974, 0.312, 0.78], rotation: [-0.4, 5.1, 0.2], isRipe: false },
+  { position: [0.996, 0.52, 0.42], rotation: [-0.1, 0.4, 0.5], isRipe: true },
+  { position: [0.96, 0.382, 0.38], rotation: [0.3, 2.7, -0.3], isRipe: true },
+  { position: [0.974, 0.312, 0.35], rotation: [-0.4, 5.1, 0.2], isRipe: false },
 ]
 
 // ── Hide static raspberry meshes in the cabane model during minigame ──────────
@@ -77,7 +77,7 @@ function RaspberryInstance({ definition, onMeshRef }) {
   const roughnessMap = useTexture('/textures/raspberry-roughness.png')
   const metalnessMap = useTexture('/textures/raspberry-metallic.png')
 
-  const baseScale = 2.0
+  const baseScale = 1.0
 
   const material = useMemo(() => {
     if (definition.isRipe) {
@@ -133,7 +133,7 @@ function RaspberryInstance({ definition, onMeshRef }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) {
-  const { camera, gl } = useThree()
+  const { camera, gl, scene } = useThree()
   const groupRef = useRef()
 
   // Hide the static raspberry meshes in the cabane model while minigame is active
@@ -171,15 +171,11 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
   const pointerNdcRef = useRef(new THREE.Vector2())
   const raycaster = useMemo(() => new THREE.Raycaster(), [])
   const _hit = useMemo(() => new THREE.Vector3(), [])
-  const _basketWorldPos = useMemo(
-    () =>
-      new THREE.Vector3(
-        GROUP_WORLD_POS[0] + BASKET_SNAP[0],
-        GROUP_WORLD_POS[1] + BASKET_SNAP[1],
-        GROUP_WORLD_POS[2] + BASKET_SNAP[2]
-      ),
-    []
-  )
+
+  // Basket position — resolved once from the scene's basket mesh (cabane model)
+  const basketMeshRef = useRef(null)
+  const _basketWorldPos = useRef(new THREE.Vector3())
+  const _basketLocalPos = useRef(new THREE.Vector3(...BASKET_SNAP))
 
   useEffect(() => {
     if (!isActive) return
@@ -249,19 +245,19 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       meshRegistryRef.current[idx]?.position.set(nx, ny, nz)
     }
 
-    const onPointerUp = (e) => {
+    const onPointerUp = () => {
       const idx = draggedIndexRef.current
       if (idx === null) return
       draggedIndexRef.current = null
       cursorStore.setType('default')
-      toNDC(e)
 
-      const basketNdc = _basketWorldPos.clone().project(camera)
-      const dx = pointerNdcRef.current.x - basketNdc.x
-      const dy = pointerNdcRef.current.y - basketNdc.y
+      const berryWorldPos = groupRef.current
+        ? groupRef.current.localToWorld(new THREE.Vector3(...posRefs.current[idx]))
+        : new THREE.Vector3(...posRefs.current[idx])
+      const dist = berryWorldPos.distanceTo(_basketWorldPos.current)
       const def = RASPBERRY_DEFS[idx]
 
-      if (Math.sqrt(dx * dx + dy * dy) < BASKET_NDC_RADIUS) {
+      if (dist < 1.2) {
         if (!def.isRipe) {
           onUnripeAttempt?.()
           posRefs.current[idx] = [...def.position]
@@ -288,20 +284,41 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       document.removeEventListener('pointerup', onPointerUp)
       cursorStore.setType('default')
     }
-  }, [
-    isActive,
-    camera,
-    gl,
-    toNDC,
-    raycaster,
-    onStateChange,
-    onUnripeAttempt,
-    _basketWorldPos,
-    _hit,
-  ])
+  }, [isActive, camera, gl, toNDC, raycaster, onStateChange, onUnripeAttempt])
 
-  // Hover cursor + basket-snap / scale animation
   useFrame(() => {
+    // basket is auto-instanced — position baked into instance matrices, not Group transform
+    if (!basketMeshRef.current) {
+      let found = null
+      scene.traverse((obj) => {
+        if (obj.name === 'basket') found = obj
+      })
+      if (found) {
+        const instancedMesh = found.children.find((c) => c.isInstancedMesh)
+        if (instancedMesh) {
+          const mat = new THREE.Matrix4()
+          const pos = new THREE.Vector3()
+          const _q = new THREE.Quaternion()
+          const _s = new THREE.Vector3()
+          let bestY = Infinity
+          for (let i = 0; i < instancedMesh.count; i++) {
+            instancedMesh.getMatrixAt(i, mat)
+            mat.decompose(pos, _q, _s)
+            if (pos.y < bestY) {
+              bestY = pos.y
+              _basketWorldPos.current.copy(pos)
+            }
+          }
+          basketMeshRef.current = found
+        }
+      }
+    }
+    if (basketMeshRef.current && groupRef.current) {
+      const local = _basketWorldPos.current.clone()
+      groupRef.current.worldToLocal(local)
+      _basketLocalPos.current.copy(local)
+    }
+
     const idx = draggedIndexRef.current
 
     if (idx === null && isActive && collectedCountRef.current < RIPE_COUNT) {
@@ -320,9 +337,9 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       if (!mesh) continue
 
       const s = BASKET_SLOTS[slot]
-      const tx = BASKET_SNAP[0] + s[0]
-      const ty = BASKET_SNAP[1] + s[1]
-      const tz = BASKET_SNAP[2] + s[2]
+      const tx = _basketLocalPos.current.x + s[0]
+      const ty = _basketLocalPos.current.y + s[1]
+      const tz = _basketLocalPos.current.z + s[2]
       const [cx, cy, cz] = posRefs.current[i]
       const dx = tx - cx,
         dy = ty - cy,
@@ -344,21 +361,13 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
   })
 
   return (
-    <group ref={groupRef} position={GROUP_WORLD_POS}>
-      {/* DEBUG anchor — sphère jaune à l'origine du groupe */}
-      <mesh renderOrder={20}>
-        <sphereGeometry args={[0.06, 8, 8]} />
-        <meshBasicMaterial color="yellow" depthTest={false} />
-      </mesh>
-      {/* DEBUG basket snap zone — sphère cyan au centre du hitbox panier */}
-      <mesh position={BASKET_SNAP} renderOrder={20}>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshBasicMaterial color="cyan" depthTest={false} />
-      </mesh>
-      {RASPBERRY_DEFS.map((def, i) => (
-        <RaspberryInstance key={i} definition={def} onMeshRef={handleMeshRef(i)} />
-      ))}
-    </group>
+    <>
+      <group ref={groupRef} position={GROUP_WORLD_POS}>
+        {RASPBERRY_DEFS.map((def, i) => (
+          <RaspberryInstance key={i} definition={def} onMeshRef={handleMeshRef(i)} />
+        ))}
+      </group>
+    </>
   )
 }
 
