@@ -39,7 +39,6 @@ function cloneMaterial(material) {
   return Array.isArray(material) ? material.map((entry) => entry.clone()) : material.clone()
 }
 
-
 export function ClickableDoor({ cabane, active, onDoorClick }) {
   const { camera, gl } = useThree()
   const hoveredRef = useRef(false)
