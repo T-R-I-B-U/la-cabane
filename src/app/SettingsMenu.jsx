@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './SettingsMenu.css'
 import { GearIcon } from './GearIcon'
+import { playOnce } from '../utils/audioStore'
 
 const QUALITY_OPTIONS = [
   { label: 'Faible', value: 'compressed2' },
@@ -16,7 +17,7 @@ function RadioPills({ options, value, onChange }) {
           key={opt}
           type="button"
           className={`settings-pill${value === opt ? ' settings-pill--active' : ''}`}
-          onClick={() => onChange(opt)}
+          onClick={() => { playOnce('clickUi'); onChange(opt) }}
         >
           {opt}
         </button>
@@ -72,7 +73,7 @@ export function SettingsMenu({
       >
         <div className="settings-card__header">
           <h2 className="settings-card__title">Réglages</h2>
-          <GearIcon variant="textured" onClick={onClose} ariaLabel="Fermer les réglages" />
+          <GearIcon variant="textured" onClick={() => { playOnce('closeUi'); onClose() }} ariaLabel="Fermer les réglages" />
         </div>
 
         <div
@@ -137,7 +138,7 @@ export function SettingsMenu({
           <RadioPills options={['Oui', 'Non']} value={shadowsEnabled} onChange={onShadowsChange} />
         </div>
 
-        <button type="button" className="settings-fullscreen-btn" onClick={toggleFullscreen}>
+        <button type="button" className="settings-fullscreen-btn" onClick={() => { playOnce('clickUi'); toggleFullscreen() }}>
           {isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
         </button>
       </div>

@@ -1,5 +1,6 @@
 import './WelcomeScreen.css'
 import { GearIcon } from './GearIcon'
+import { playOnce } from '../utils/audioStore'
 
 export function WelcomeScreen({ fading, onStart, onAnimationEnd, onOpenSettings, settingsOpen }) {
   return (
@@ -9,7 +10,7 @@ export function WelcomeScreen({ fading, onStart, onAnimationEnd, onOpenSettings,
     >
       {!settingsOpen && (
         <div className="welcome-screen__top-right">
-          <GearIcon variant="solid" onClick={onOpenSettings} ariaLabel="Ouvrir les réglages" />
+          <GearIcon variant="solid" onClick={() => { playOnce('clickUi'); onOpenSettings() }} ariaLabel="Ouvrir les réglages" />
         </div>
       )}
       <img className="welcome-screen__bg" src="/welcome/bg.webp" alt="" aria-hidden="true" />
@@ -27,7 +28,7 @@ export function WelcomeScreen({ fading, onStart, onAnimationEnd, onOpenSettings,
         <button
           className="welcome-screen__btn"
           type="button"
-          onClick={!fading ? onStart : undefined}
+          onClick={!fading ? () => { playOnce('clickUi'); onStart() } : undefined}
         >
           <img
             className="welcome-screen__btn-bg"
