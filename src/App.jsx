@@ -916,6 +916,7 @@ export default function App() {
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
     showCameraEditor ||
+    showCinematicPanel ||
     (!introActive &&
       !postIntro &&
       (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked))
@@ -1013,6 +1014,7 @@ export default function App() {
 
   const explorationReady = false
   const showDevOverlays =
+    !cinematicActive &&
     !showWelcome &&
     !introPending &&
     !introActive &&
@@ -1218,17 +1220,6 @@ export default function App() {
         cinematicActive={cinematicActive}
         cinematicKeypoints={cinematicKeypoints}
       />
-
-      <button
-        type="button"
-        className="cinematic-stop-btn"
-        onClick={() => {
-          setCinematicActive(false)
-          document.exitFullscreen?.()
-        }}
-      >
-        ■ Arrêter (F4)
-      </button>
 
       {showDevOverlays && isViewerControlsVisible && (
         <Suspense fallback={null}>

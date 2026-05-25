@@ -1,84 +1,55 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-function easeInOut(t) {
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
-}
+// Exponential decay — camera drifts lazily toward each keypoint.
+// LERP_SPEED=1.0 → 63% of the way there after 1s, 95% after 3s.
+// Lower = dreamier. Advance when ~85% there so the camera never fully stops.
+const LERP_SPEED = 1.0
+const ADVANCE_THRESHOLD = 0.15 // advance when progress > 1 - 0.15 = 85%
+
+const _targetPos = new THREE.Vector3()
+const _lookAt = new THREE.Matrix4()
+const _targetQuat = new THREE.Quaternion()
 
 export function CinematicPlayer({ active, keypoints }) {
   const { camera } = useThree()
-
-  const startPositionRef = useRef(new THREE.Vector3())
-  const startQuaternionRef = useRef(new THREE.Quaternion())
-  const targetPositionRef = useRef(new THREE.Vector3())
-  const targetQuaternionRef = useRef(new THREE.Quaternion())
-  const startFovRef = useRef(60)
-  const targetFovRef = useRef(60)
-  const elapsedRef = useRef(0)
-  const phaseRef = useRef('transition') // 'transition' | 'dwell'
   const indexRef = useRef(0)
-
-  const lookAtMatrix = useMemo(() => new THREE.Matrix4(), [])
-
-  function initTarget(kp) {
-    startPositionRef.current.copy(camera.position)
-    startQuaternionRef.current.copy(camera.quaternion)
-    startFovRef.current = camera.fov
-    targetFovRef.current = kp.fov ?? camera.fov
-    targetPositionRef.current.set(kp.position.x, kp.position.y, kp.position.z)
-    const targetVec = new THREE.Vector3(kp.target.x, kp.target.y, kp.target.z)
-    lookAtMatrix.lookAt(targetPositionRef.current, targetVec, camera.up)
-    targetQuaternionRef.current.setFromRotationMatrix(lookAtMatrix)
-    elapsedRef.current = 0
-  }
+  const progressRef = useRef(0)
 
   useEffect(() => {
-    if (!active || !keypoints || keypoints.length === 0) return
+    if (!active || !keypoints?.length) return
     indexRef.current = 0
-    phaseRef.current = 'transition'
-    initTarget(keypoints[0])
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    progressRef.current = 0
   }, [active, keypoints])
 
   useFrame((state, delta) => {
-    if (!active || !keypoints || keypoints.length === 0) return
+    if (!active || !keypoints?.length) return
 
     const frameCamera = state.camera
     const kp = keypoints[indexRef.current]
-    const dt = Math.min(delta, 0.1)
 
-    if (phaseRef.current === 'transition') {
-      const duration = kp.transition ?? 2
-      elapsedRef.current += dt
-      const t = easeInOut(Math.min(elapsedRef.current / duration, 1))
+    _targetPos.set(kp.position.x, kp.position.y, kp.position.z)
+    const targetVec = new THREE.Vector3(kp.target.x, kp.target.y, kp.target.z)
+    _lookAt.lookAt(_targetPos, targetVec, camera.up)
+    _targetQuat.setFromRotationMatrix(_lookAt)
 
-      frameCamera.position.lerpVectors(startPositionRef.current, targetPositionRef.current, t)
-      frameCamera.quaternion.slerpQuaternions(
-        startQuaternionRef.current,
-        targetQuaternionRef.current,
-        t
-      )
-      if (frameCamera.fov !== targetFovRef.current) {
-        frameCamera.fov = THREE.MathUtils.lerp(startFovRef.current, targetFovRef.current, t)
-        frameCamera.updateProjectionMatrix()
-      }
+    // Exponential lerp — frame-rate independent, always smooth
+    const alpha = 1 - Math.exp(-LERP_SPEED * delta)
 
-      if (t >= 1) {
-        frameCamera.position.copy(targetPositionRef.current)
-        frameCamera.quaternion.copy(targetQuaternionRef.current)
-        frameCamera.fov = targetFovRef.current
-        frameCamera.updateProjectionMatrix()
-        elapsedRef.current = 0
-        phaseRef.current = 'dwell'
-      }
-    } else {
-      elapsedRef.current += dt
-      if (elapsedRef.current >= (kp.dwell ?? 3)) {
-        indexRef.current = (indexRef.current + 1) % keypoints.length
-        phaseRef.current = 'transition'
-        initTarget(keypoints[indexRef.current])
-      }
+    frameCamera.position.lerp(_targetPos, alpha)
+    frameCamera.quaternion.slerp(_targetQuat, alpha)
+
+    if (kp.fov != null && frameCamera.fov !== kp.fov) {
+      frameCamera.fov = THREE.MathUtils.lerp(frameCamera.fov, kp.fov, alpha)
+      frameCamera.updateProjectionMatrix()
+    }
+
+    // Advance to next keypoint once close enough (based on position distance)
+    progressRef.current += alpha * (1 - progressRef.current)
+    if (progressRef.current > 1 - ADVANCE_THRESHOLD) {
+      indexRef.current = (indexRef.current + 1) % keypoints.length
+      progressRef.current = 0
     }
   })
 
