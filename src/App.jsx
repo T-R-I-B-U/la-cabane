@@ -915,11 +915,12 @@ export default function App() {
 
   // Native OS cursor — shown before/outside the experience (dev tools, pre-launch state)
   const isNativeCursorVisible =
-    showCameraEditor ||
-    showCinematicPanel ||
-    (!introActive &&
-      !postIntro &&
-      (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked))
+    !cinematicActive &&
+    (showCameraEditor ||
+      showCinematicPanel ||
+      (!introActive &&
+        !postIntro &&
+        (!isPlayerModeActive || isPlayerInteractionLocked || userMovementLocked)))
 
   // Keep refs in sync for stable event handlers.
   // isCursorVisibleRef: used by mousedown dispatch.

@@ -2,54 +2,66 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-// Exponential decay — camera drifts lazily toward each keypoint.
-// LERP_SPEED=1.0 → 63% of the way there after 1s, 95% after 3s.
-// Lower = dreamier. Advance when ~85% there so the camera never fully stops.
-const LERP_SPEED = 0.2
-const ADVANCE_THRESHOLD = 0.15 // advance when progress > 1 - 0.15 = 85%
+// Seconds to travel from one keypoint to the next (target moves at this pace).
+const SEGMENT_DURATION = 8
+// How tightly the camera follows the moving target — lower = lazier/dreamier.
+const LERP_SPEED = 0.5
 
 const _targetPos = new THREE.Vector3()
+const _interpPos = new THREE.Vector3()
+const _interpTarget = new THREE.Vector3()
 const _lookAt = new THREE.Matrix4()
 const _targetQuat = new THREE.Quaternion()
 
 export function CinematicPlayer({ active, keypoints }) {
   const { camera } = useThree()
-  const indexRef = useRef(0)
-  const progressRef = useRef(0)
+  const tRef = useRef(0) // continuous parameter: integer part = current segment
 
   useEffect(() => {
     if (!active || !keypoints?.length) return
-    indexRef.current = 0
-    progressRef.current = 0
+    tRef.current = 0
   }, [active, keypoints])
 
   useFrame((state, delta) => {
-    if (!active || !keypoints?.length) return
+    if (!active || !keypoints?.length || keypoints.length < 2) return
 
     const frameCamera = state.camera
-    const kp = keypoints[indexRef.current]
+    const n = keypoints.length
 
-    _targetPos.set(kp.position.x, kp.position.y, kp.position.z)
-    const targetVec = new THREE.Vector3(kp.target.x, kp.target.y, kp.target.z)
-    _lookAt.lookAt(_targetPos, targetVec, camera.up)
+    // Advance t at steady pace, wrap around
+    tRef.current = (tRef.current + delta / SEGMENT_DURATION) % n
+
+    // Interpolate target position between adjacent keypoints
+    const seg = Math.floor(tRef.current)
+    const frac = tRef.current - seg
+    const kpA = keypoints[seg]
+    const kpB = keypoints[(seg + 1) % n]
+
+    _interpPos.set(
+      kpA.position.x + (kpB.position.x - kpA.position.x) * frac,
+      kpA.position.y + (kpB.position.y - kpA.position.y) * frac,
+      kpA.position.z + (kpB.position.z - kpA.position.z) * frac
+    )
+    _interpTarget.set(
+      kpA.target.x + (kpB.target.x - kpA.target.x) * frac,
+      kpA.target.y + (kpB.target.y - kpA.target.y) * frac,
+      kpA.target.z + (kpB.target.z - kpA.target.z) * frac
+    )
+    const interpFov = kpA.fov + ((kpB.fov ?? kpA.fov) - kpA.fov) * frac
+
+    // Build target quaternion from interpolated look direction
+    _targetPos.copy(_interpPos)
+    _lookAt.lookAt(_targetPos, _interpTarget, frameCamera.up)
     _targetQuat.setFromRotationMatrix(_lookAt)
 
-    // Exponential lerp — frame-rate independent, always smooth
+    // Camera lazily follows the moving target
     const alpha = 1 - Math.exp(-LERP_SPEED * delta)
-
-    frameCamera.position.lerp(_targetPos, alpha)
+    frameCamera.position.lerp(_interpPos, alpha)
     frameCamera.quaternion.slerp(_targetQuat, alpha)
 
-    if (kp.fov != null && frameCamera.fov !== kp.fov) {
-      frameCamera.fov = THREE.MathUtils.lerp(frameCamera.fov, kp.fov, alpha)
+    if (frameCamera.fov !== interpFov) {
+      frameCamera.fov = THREE.MathUtils.lerp(frameCamera.fov, interpFov, alpha)
       frameCamera.updateProjectionMatrix()
-    }
-
-    // Advance to next keypoint once close enough (based on position distance)
-    progressRef.current += alpha * (1 - progressRef.current)
-    if (progressRef.current > 1 - ADVANCE_THRESHOLD) {
-      indexRef.current = (indexRef.current + 1) % keypoints.length
-      progressRef.current = 0
     }
   })
 
