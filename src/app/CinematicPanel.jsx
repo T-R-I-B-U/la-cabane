@@ -89,18 +89,6 @@ const S = {
     border: '1px solid rgba(255,255,255,0.07)',
   },
   posLabel: { flex: 1, fontSize: 10, color: 'rgba(255,255,255,0.5)', fontFamily: 'monospace' },
-  fieldGroup: { display: 'flex', alignItems: 'center', gap: 3 },
-  fieldLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)' },
-  numberInput: {
-    width: 44,
-    padding: '2px 4px',
-    borderRadius: 4,
-    border: '1px solid rgba(255,255,255,0.15)',
-    background: 'rgba(0,0,0,0.4)',
-    color: '#f4f7fb',
-    fontSize: 11,
-    textAlign: 'right',
-  },
   deleteBtn: {
     background: 'none',
     border: 'none',
@@ -201,21 +189,9 @@ export function CinematicPanel({ onLaunch, onClose }) {
   function captureKeypoint() {
     const cam = getLiveCamera()
     if (!cam) return
-    const kp = { position: cam.position, target: cam.target, fov: cam.fov, transition: 2, dwell: 3 }
+    const kp = { position: cam.position, target: cam.target, fov: cam.fov }
     setPresets((prev) =>
       prev.map((p, i) => (i === activeIdx ? { ...p, keypoints: [...p.keypoints, kp] } : p))
-    )
-  }
-
-  function updateKeypoint(kpIdx, field, value) {
-    setPresets((prev) =>
-      prev.map((p, i) => {
-        if (i !== activeIdx) return p
-        const kps = p.keypoints.map((kp, j) =>
-          j === kpIdx ? { ...kp, [field]: parseFloat(value) || 0 } : kp
-        )
-        return { ...p, keypoints: kps }
-      })
     )
   }
 
@@ -273,30 +249,6 @@ export function CinematicPanel({ onLaunch, onClose }) {
               {i + 1}. ({kp.position.x.toFixed(1)}, {kp.position.y.toFixed(1)},{' '}
               {kp.position.z.toFixed(1)})
             </span>
-            <div style={S.fieldGroup}>
-              <span style={S.fieldLabel}>trans</span>
-              <input
-                style={S.numberInput}
-                type="number"
-                min="0.1"
-                step="0.5"
-                value={kp.transition}
-                onChange={(e) => updateKeypoint(i, 'transition', e.target.value)}
-              />
-              <span style={S.fieldLabel}>s</span>
-            </div>
-            <div style={S.fieldGroup}>
-              <span style={S.fieldLabel}>dwell</span>
-              <input
-                style={S.numberInput}
-                type="number"
-                min="0"
-                step="0.5"
-                value={kp.dwell}
-                onChange={(e) => updateKeypoint(i, 'dwell', e.target.value)}
-              />
-              <span style={S.fieldLabel}>s</span>
-            </div>
             <button style={S.deleteBtn} onClick={() => deleteKeypoint(i)}>
               ×
             </button>

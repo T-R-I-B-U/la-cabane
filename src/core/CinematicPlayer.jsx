@@ -5,7 +5,7 @@ import * as THREE from 'three'
 // Exponential decay — camera drifts lazily toward each keypoint.
 // LERP_SPEED=1.0 → 63% of the way there after 1s, 95% after 3s.
 // Lower = dreamier. Advance when ~85% there so the camera never fully stops.
-const LERP_SPEED = 1.0
+const LERP_SPEED = 0.2
 const ADVANCE_THRESHOLD = 0.15 // advance when progress > 1 - 0.15 = 85%
 
 const _targetPos = new THREE.Vector3()
