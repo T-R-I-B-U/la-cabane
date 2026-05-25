@@ -17,7 +17,15 @@ export function ContactPanel({ contact, onClose }) {
         onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className="cp-back" onClick={() => { playOnce('closeUi'); onClose() }} aria-label="Fermer">
+        <button
+          type="button"
+          className="cp-back"
+          onClick={() => {
+            playOnce('closeUi')
+            onClose()
+          }}
+          aria-label="Fermer"
+        >
           <img src="/arrow.svg" alt="" aria-hidden="true" />
         </button>
 
