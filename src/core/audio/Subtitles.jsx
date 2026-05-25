@@ -78,20 +78,6 @@ const CHOICES = {
   pointerEvents: 'auto',
 }
 
-const CHOICE_BTN = {
-  background: '#e3e7b3',
-  border: 'none',
-  borderRadius: 360,
-  padding: '8px 20px',
-  fontFamily: "'citrus-gothic-rough', serif",
-  fontSize: 32,
-  fontWeight: 400,
-  color: '#8b8e50',
-  lineHeight: 1,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
-}
-
 export default function Subtitles() {
   const [state, setState] = useState({ text: '', speaker: null, choices: null })
 
@@ -115,13 +101,7 @@ export default function Subtitles() {
         {hasChoices && (
           <div style={CHOICES}>
             {choices.map(({ label, onClick }) => (
-              <button
-                key={label}
-                type="button"
-                className="dialogue-choice-btn"
-                style={CHOICE_BTN}
-                onClick={onClick}
-              >
+              <button key={label} type="button" className="dialogue-choice-btn" onClick={onClick}>
                 {label}
               </button>
             ))}

@@ -19,7 +19,6 @@
   cursor: auto !important;
 }
 
-
 /* ── Custom cursor ───────────────────────────────────────────────── */
 
 .custom-cursor {
@@ -201,6 +200,33 @@
   display: flex;
   justify-content: center;
   gap: 12px;
+}
+
+.dialogue-choice-btn {
+  background: #e3e7b3;
+  border: none;
+  border-radius: 360px;
+  padding: 8px 20px;
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 32px;
+  font-weight: 400;
+  color: #8b8e50;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.1s ease,
+    color 0.1s ease;
+}
+
+.dialogue-choice-btn:hover {
+  background: #8b8e50;
+  color: #33330f;
+}
+
+.viewer-page--cursor-visible .dialogue-choice-btn,
+.viewer-page--cursor-visible .dialogue-choice-btn * {
+  cursor: pointer !important;
 }
 
 .story-debug-panel {
