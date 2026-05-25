@@ -77,6 +77,14 @@ export function LoadingScreen({ status, error }) {
         </p>
       ) : (
         <div className="loading-screen__center">
+          <img
+            className="loading-screen__sequence"
+            src={FRAME_URLS[framesReady ? frameIndex : 0]}
+            width={160}
+            height={160}
+            alt=""
+            aria-hidden="true"
+          />
           <div className="loading-screen__logo-group">
             <img
               className="loading-screen__logo-main"
@@ -91,14 +99,6 @@ export function LoadingScreen({ status, error }) {
               alt="Altera 2050"
             />
           </div>
-          <img
-            className="loading-screen__sequence"
-            src={FRAME_URLS[framesReady ? frameIndex : 0]}
-            width={160}
-            height={160}
-            alt=""
-            aria-hidden="true"
-          />
         </div>
       )}
     </div>
