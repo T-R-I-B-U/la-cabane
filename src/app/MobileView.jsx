@@ -2,7 +2,10 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { io } from 'socket.io-client'
 import './MobileView.css'
 
-const SOCKET_URL = `http://${window.location.hostname}:3001`
+const SOCKET_URL =
+  import.meta.env.MODE === 'production'
+    ? window.location.origin
+    : `http://${window.location.hostname}:3001`
 
 const DAYS = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']
 const SLOTS = ['Matin', 'Aprem', 'Soir']
