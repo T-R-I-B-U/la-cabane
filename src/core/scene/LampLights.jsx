@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 
-const LAMP_GROUP_NAMES = new Set(['lampe', 'lampe-mushroom'])
+const LAMP_GROUP_NAMES = new Set(['lampe'])
 
 const tempMatrix = new THREE.Matrix4()
 const tempPos = new THREE.Vector3()
