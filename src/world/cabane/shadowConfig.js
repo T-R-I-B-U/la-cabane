@@ -41,6 +41,20 @@ export const SHARED_SHADOW_CASTER_ROOTS = new Set([
   'plant08-1',
   'rug01',
   'rug02',
+  'large-table',
+  'computer',
+  'cushiow',
+  'little-table-2',
+  'vase',
+  'wateringcan',
+  'wheelbarrow',
+  'bike',
+  'bikewheel',
+  'balloon',
+  'pepper',
+  'raspberry',
+  'tool01',
+  'tool02',
 ])
 
 export const SHARED_SHADOW_RECEIVER_ROOTS = new Set([
@@ -69,4 +83,8 @@ export const SHARED_SHADOW_RECEIVER_ROOTS = new Set([
   'hearth',
   'rug01',
   'rug02',
+  'large-table',
+  'computer',
+  'cushiow',
+  'little-table-2',
 ])

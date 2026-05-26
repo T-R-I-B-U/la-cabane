@@ -38,6 +38,20 @@ const FORCED_SMALL_SHADOW_CASTER_ROOTS = new Set([
   'plant06',
   'plant08',
   'plant08-1',
+  'large-table',
+  'computer',
+  'cushiow',
+  'little-table-2',
+  'vase',
+  'wateringcan',
+  'wheelbarrow',
+  'bike',
+  'bikewheel',
+  'balloon',
+  'pepper',
+  'raspberry',
+  'tool01',
+  'tool02',
 ])
 const SHADOW_RECEIVER_ROOTS = new Set([
   ...SHARED_SHADOW_RECEIVER_ROOTS,
@@ -48,6 +62,8 @@ const SHADOW_RECEIVER_ROOTS = new Set([
   'house',
   'platform-hut',
   'workbench01',
+  'greenhouse_ground',
+  'ground-hut',
 ])
 const SHADOW_EXCLUDED_NAMES = [/plane/i, /^background$/i, /poster/i, /^outsideplant0[23]$/i]
 const LIGHT_PASSING_SURFACE_NAMES = new Set([
