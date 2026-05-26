@@ -1,14 +1,19 @@
 import { Environment } from '@react-three/drei'
-import { use, useEffect, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { use, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { getHdriOption } from './hdriOptions'
 import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureResolver.js'
 
-const SUN_POSITION = [-84, 72, -34]
-const SUN_SHADOW_BOUNDS = 65
-
+// Sun direction offset from its target (world-space, constant).
+// Original: light at (-84,72,-34), target at (0,0,0) → offset = (-84,72,-34).
+const SUN_OFFSET = new THREE.Vector3(-84, 72, -34)
+// Coverage radius around the player — smaller = better shadow resolution.
+const SUN_SHADOW_BOUNDS = 50
 
 export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
+  const lightRef = useRef()
+
   const skyTexture = use(
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
   )
@@ -25,6 +30,17 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
     return () => backgroundTexture?.dispose()
   }, [backgroundTexture])
 
+  // Keep shadow camera centered on player so only nearby visible objects cast shadows.
+  useFrame(({ camera }) => {
+    const light = lightRef.current
+    if (!light) return
+    const cx = camera.position.x
+    const cz = camera.position.z
+    light.position.set(cx + SUN_OFFSET.x, SUN_OFFSET.y, cz + SUN_OFFSET.z)
+    light.target.position.set(cx, 0, cz)
+    light.target.updateMatrixWorld()
+  })
+
   return (
     <>
       {backgroundTexture && <primitive attach="background" object={backgroundTexture} />}
@@ -36,10 +52,10 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
       <ambientLight intensity={0.1} color="#f1dcc8" />
       <hemisphereLight intensity={0.42} color="#ffd8bf" groundColor="#705f4f" />
       <directionalLight
+        ref={lightRef}
         castShadow={shadowsEnabled}
         color="#ffd7ae"
         intensity={2.2}
-        position={SUN_POSITION}
         shadow-mapSize-width={512}
         shadow-mapSize-height={512}
         shadow-bias={-0.00018}

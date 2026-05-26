@@ -1,3 +1,4 @@
+/* global process */
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import { networkInterfaces } from 'os'
