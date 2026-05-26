@@ -51,7 +51,7 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
             SUN_SHADOW_BOUNDS,
             SUN_SHADOW_BOUNDS,
             -SUN_SHADOW_BOUNDS,
-            50,
+            5,
             200,
           ]}
         />
