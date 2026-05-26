@@ -35,6 +35,9 @@ const FORCED_SMALL_SHADOW_CASTER_ROOTS = new Set([
   'plant03',
   'plant04',
   'plant05',
+  'plant06',
+  'plant08',
+  'plant08-1',
 ])
 const SHADOW_RECEIVER_ROOTS = new Set([
   ...SHARED_SHADOW_RECEIVER_ROOTS,
