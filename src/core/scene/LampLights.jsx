@@ -40,10 +40,7 @@ export function LampLights({ cabane }) {
       intensity={3}
       distance={10}
       decay={2}
-      castShadow
-      shadow-mapSize-width={256}
-      shadow-mapSize-height={256}
-      shadow-bias={-0.005}
+
     />
   ))
 }
