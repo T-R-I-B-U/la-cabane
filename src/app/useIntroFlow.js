@@ -420,37 +420,31 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleTreeInteract = useCallback(() => {
     setTreePhaseActive(false)
-
-    if (treeClickPhaseRef.current === 1) {
-      playDialogue('treePiedDialogue', {
-        onDone: () => {
-          playDialogue('treeRacinesDialogue', {
-            onDone: () => {
-              setTimeatmPhaseActive(true)
-            },
-          })
-        },
-      })
-    } else {
-      playDialogue('treeArbreDialogue', {
-        onDone: () => {
-          playDialogue('treeOutroDialogue', {
-            onDone: unlockWorkbenchPhase,
-          })
-        },
-      })
-    }
-  }, [playDialogue, unlockWorkbenchPhase])
+    playDialogue('treePiedDialogue', {
+      onDone: () => {
+        playDialogue('treeRacinesDialogue', {
+          onDone: () => {
+            playDialogue('treeArbreDialogue', {
+              onDone: () => {
+                setTimeatmPhaseActive(true)
+              },
+            })
+          },
+        })
+      },
+    })
+  }, [playDialogue])
 
   const handleTimeatmInteract = useCallback(() => {
     setTimeatmPhaseActive(false)
     playDialogue('treeBorneDialogue', {
       onDone: () => {
-        treeClickPhaseRef.current = 2
-        setTreePhaseActive(true)
+        playDialogue('treeOutroDialogue', {
+          onDone: unlockWorkbenchPhase,
+        })
       },
     })
-  }, [playDialogue])
+  }, [playDialogue, unlockWorkbenchPhase])
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
