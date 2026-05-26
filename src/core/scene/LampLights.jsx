@@ -31,13 +31,16 @@ function ZoneSpotLight({ position, targetOffset }) {
       color="#ffdd99"
       intensity={8}
       distance={18}
-      angle={Math.PI / 3}
-      penumbra={0.4}
+      angle={Math.PI / 4}
+      penumbra={0.5}
       decay={2}
       castShadow
-      shadow-mapSize-width={512}
-      shadow-mapSize-height={512}
-      shadow-bias={-0.001}
+      shadow-mapSize-width={1024}
+      shadow-mapSize-height={1024}
+      shadow-camera-near={0.5}
+      shadow-camera-far={20}
+      shadow-bias={-0.002}
+      shadow-normalBias={0.05}
     />
   )
 }
