@@ -8,17 +8,21 @@ import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureRes
 // Sun direction offset from its target (world-space, constant).
 // Original: light at (-84,72,-34), target at (0,0,0) → offset = (-84,72,-34).
 const SUN_OFFSET = new THREE.Vector3(-84, 72, -34)
-// Coverage radius around the player — smaller = better shadow resolution.
-const SUN_SHADOW_BOUNDS = 50
-// Snap shadow camera to texel grid to prevent shadow swimming when the camera moves.
-const SHADOW_TEXEL_SIZE = (2 * SUN_SHADOW_BOUNDS) / 512
-// Only re-render the shadow map when the player moves more than this distance (metres).
-const SHADOW_UPDATE_THRESHOLD_SQ = 8 * 8
 
-export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
+// Exterior mode: large static frustum centred on origin, computed once.
+const EXTERIOR_BOUNDS = 150
+
+// Player mode: small frustum following the player, snapped to texel grid.
+const PLAYER_BOUNDS = 50
+const PLAYER_TEXEL = (2 * PLAYER_BOUNDS) / 512
+// Re-render only when the player moves more than this distance (metres).
+const PLAYER_THRESHOLD_SQ = 8 * 8
+
+export function SceneLighting({ activeHdriId, shadowsEnabled = true, firstPersonMode = false }) {
   const lightRef = useRef()
   const lastShadowPos = useRef(new THREE.Vector2(Infinity, Infinity))
   const shadowInitialized = useRef(false)
+  const lastMode = useRef(null)
 
   const skyTexture = use(
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
@@ -36,25 +40,49 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
     return () => backgroundTexture?.dispose()
   }, [backgroundTexture])
 
-  // Re-render shadow map only when the player moves past the update threshold.
-  // gl is taken from useFrame state (not useThree) to satisfy react-hooks/immutability.
   useFrame(({ camera, gl }) => {
     if (!shadowInitialized.current) {
       gl.shadowMap.autoUpdate = false
-      gl.shadowMap.needsUpdate = true
       shadowInitialized.current = true
     }
+
     const light = lightRef.current
     if (!light) return
-    const dx = camera.position.x - lastShadowPos.current.x
-    const dz = camera.position.z - lastShadowPos.current.y
-    if (dx * dx + dz * dz < SHADOW_UPDATE_THRESHOLD_SQ) return
-    const cx = Math.round(camera.position.x / SHADOW_TEXEL_SIZE) * SHADOW_TEXEL_SIZE
-    const cz = Math.round(camera.position.z / SHADOW_TEXEL_SIZE) * SHADOW_TEXEL_SIZE
-    light.position.set(cx + SUN_OFFSET.x, SUN_OFFSET.y, cz + SUN_OFFSET.z)
-    light.target.position.set(cx, 0, cz)
+
+    const modeChanged = firstPersonMode !== lastMode.current
+
+    if (!firstPersonMode) {
+      // Exterior view: fixed frustum covering the whole scene, rendered once.
+      if (!modeChanged) return
+      light.shadow.camera.left = -EXTERIOR_BOUNDS
+      light.shadow.camera.right = EXTERIOR_BOUNDS
+      light.shadow.camera.top = EXTERIOR_BOUNDS
+      light.shadow.camera.bottom = -EXTERIOR_BOUNDS
+      light.shadow.camera.updateProjectionMatrix()
+      light.position.set(SUN_OFFSET.x, SUN_OFFSET.y, SUN_OFFSET.z)
+      light.target.position.set(0, 0, 0)
+    } else {
+      // Player view: small frustum following player, updated every 8m.
+      if (modeChanged) {
+        light.shadow.camera.left = -PLAYER_BOUNDS
+        light.shadow.camera.right = PLAYER_BOUNDS
+        light.shadow.camera.top = PLAYER_BOUNDS
+        light.shadow.camera.bottom = -PLAYER_BOUNDS
+        light.shadow.camera.updateProjectionMatrix()
+        lastShadowPos.current.set(Infinity, Infinity)
+      }
+      const dx = camera.position.x - lastShadowPos.current.x
+      const dz = camera.position.z - lastShadowPos.current.y
+      if (!modeChanged && dx * dx + dz * dz < PLAYER_THRESHOLD_SQ) return
+      const cx = Math.round(camera.position.x / PLAYER_TEXEL) * PLAYER_TEXEL
+      const cz = Math.round(camera.position.z / PLAYER_TEXEL) * PLAYER_TEXEL
+      light.position.set(cx + SUN_OFFSET.x, SUN_OFFSET.y, cz + SUN_OFFSET.z)
+      light.target.position.set(cx, 0, cz)
+      lastShadowPos.current.set(camera.position.x, camera.position.z)
+    }
+
     light.target.updateMatrixWorld()
-    lastShadowPos.current.set(camera.position.x, camera.position.z)
+    lastMode.current = firstPersonMode
     gl.shadowMap.needsUpdate = true
   })
 
@@ -80,14 +108,7 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
       >
         <orthographicCamera
           attach="shadow-camera"
-          args={[
-            -SUN_SHADOW_BOUNDS,
-            SUN_SHADOW_BOUNDS,
-            SUN_SHADOW_BOUNDS,
-            -SUN_SHADOW_BOUNDS,
-            5,
-            200,
-          ]}
+          args={[-EXTERIOR_BOUNDS, EXTERIOR_BOUNDS, EXTERIOR_BOUNDS, -EXTERIOR_BOUNDS, 5, 200]}
         />
       </directionalLight>
     </>

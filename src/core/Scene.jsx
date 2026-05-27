@@ -152,7 +152,11 @@ export default function Scene({
       <StatsCollector onStats={onStats} />
       <AudioManager />
 
-      <SceneLighting activeHdriId={activeHdriId} shadowsEnabled={shadowsEnabled} />
+      <SceneLighting
+        activeHdriId={activeHdriId}
+        shadowsEnabled={shadowsEnabled}
+        firstPersonMode={firstPersonMode}
+      />
 
       <Floor mainFloorRef={setMainFloorCollider} />
       <BackgroundPlanes hutPosition={hutPosition} />
