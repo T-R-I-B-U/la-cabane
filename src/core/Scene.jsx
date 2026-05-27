@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
 import { initKTX2Loader } from './ktx2Loader.js'
+import { Stats } from '@react-three/drei'
 import AudioManager from './audio/AudioManager'
 import { Floor } from './Floor'
 import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
@@ -150,6 +151,7 @@ export default function Scene({
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >
       <StatsCollector onStats={onStats} />
+      <Stats />
       <AudioManager />
 
       <SceneLighting activeHdriId={activeHdriId} shadowsEnabled={shadowsEnabled} />
