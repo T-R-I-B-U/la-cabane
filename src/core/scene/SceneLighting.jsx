@@ -5,7 +5,7 @@ import { getHdriOption } from './hdriOptions'
 import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureResolver.js'
 
 const SUN_POSITION = [-84, 72, -34]
-const SUN_SHADOW_BOUNDS = 65
+const SUN_SHADOW_BOUNDS = 40
 
 
 export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
@@ -40,8 +40,8 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
         color="#ffd7ae"
         intensity={2.2}
         position={SUN_POSITION}
-        shadow-mapSize-width={512}
-        shadow-mapSize-height={512}
+        shadow-mapSize-width={256}
+        shadow-mapSize-height={256}
         shadow-bias={-0.00018}
         shadow-normalBias={0.032}
       >
