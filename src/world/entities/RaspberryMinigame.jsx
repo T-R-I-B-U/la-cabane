@@ -10,17 +10,18 @@ import { cursorStore } from '../../utils/cursorStore'
 // basket.gltf bbox y_max = 0.239 → top opening at world y = 0.3203 + 0.239 = 0.5593.
 // BASKET_SNAP expressed in GROUP_WORLD_POS-local space.
 // local = world_basket_top - GROUP_WORLD_POS = [-32.98-(-38.5), 0.56-0.44, -42.68-(-42.4)]
+const BASKET_ORIGIN = [-32.9799, 0.3203, -42.6757]
 const BASKET_SNAP = [5.52, 0.12, -0.28]
 const BASKET_NDC_RADIUS = 0.15
 
 // Berry slots: offsets inside the basket relative to BASKET_SNAP.
 // Basket interior ≈ ±0.2m in x/z at scale 1; berries sit slightly below the opening.
 const BASKET_SLOTS = [
-  [0.0, -0.08, 0.0],
-  [0.16, -0.05, 0.14],
-  [-0.16, -0.05, 0.14],
-  [0.16, -0.05, -0.14],
-  [-0.16, -0.05, -0.14],
+  [0.0, -0.12, 0.0],
+  [0.1, -0.09, 0.09],
+  [-0.1, -0.09, 0.09],
+  [0.1, -0.09, -0.09],
+  [-0.1, -0.09, -0.09],
 ]
 const BASKET_SCALE_IN = 0.9
 const RIPE_COUNT = 5
@@ -284,7 +285,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       document.removeEventListener('pointerup', onPointerUp)
       cursorStore.setType('default')
     }
-  }, [isActive, camera, gl, toNDC, raycaster, onStateChange, onUnripeAttempt])
+  }, [isActive, camera, gl, toNDC, raycaster, onStateChange, onUnripeAttempt, _hit])
 
   useFrame(() => {
     // basket is auto-instanced — position baked into instance matrices, not Group transform
