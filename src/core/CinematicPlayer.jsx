@@ -14,7 +14,7 @@ const _lookAt = new THREE.Matrix4()
 const _targetQuat = new THREE.Quaternion()
 
 export function CinematicPlayer({ active, keypoints }) {
-  const { camera } = useThree()
+  const { camera: _camera } = useThree()
   const tRef = useRef(0) // continuous parameter: integer part = current segment
 
   useEffect(() => {

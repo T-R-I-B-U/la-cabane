@@ -500,10 +500,16 @@ export function fade(id, to, duration = 500) {
     const now = ctx.currentTime
     const end = now + duration / 1000
 
-    if (!audio.isPlaying && to > 0) audio.play()
-
     gain.cancelScheduledValues(now)
-    gain.setValueAtTime(gain.value, now)
+
+    if (!audio.isPlaying && to > 0) {
+      // Start from silence so the fade-in is audible
+      gain.setValueAtTime(0, now)
+      audio.play()
+    } else {
+      gain.setValueAtTime(gain.value, now)
+    }
+
     gain.linearRampToValueAtTime(target, end)
 
     cfg.volume = to

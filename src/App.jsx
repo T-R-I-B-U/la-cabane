@@ -42,7 +42,10 @@ import { CustomCursor } from './app/CustomCursor'
 import './App.css'
 
 const STATS_INIT = { fps: 0, frameMs: 0, calls: 0, triangles: 0, geometries: 0, textures: 0 }
-const SOCKET_URL = `http://${window.location.hostname}:3001`
+const SOCKET_URL =
+  import.meta.env.MODE === 'production'
+    ? window.location.origin
+    : `http://${window.location.hostname}:3001`
 const LOADING_EXTRA_DURATION_MS = 7000
 const ViewerControls = lazy(() =>
   import('./app/ViewerControls').then((mod) => ({ default: mod.ViewerControls }))
@@ -69,6 +72,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
+  const [loadingFading, setLoadingFading] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
   const [stats, setStats] = useState(STATS_INIT)
   const [sceneLoadStatus, setSceneLoadStatus] = useState('loading')
@@ -236,8 +240,13 @@ export default function App() {
 
   const revealSceneAfterLoading = useCallback(() => {
     startIntro()
-    setReadyToShow(true)
+    setLoadingFading(true)
   }, [startIntro])
+
+  const handleLoadingFadeEnd = useCallback(() => {
+    setReadyToShow(true)
+    setLoadingFading(false)
+  }, [])
 
   const spawnAtLadder = useCallback(() => {
     const spawn = getLadderBaseSpawn(sceneLoadInfo?.platformPosition, sceneLoadInfo?.hutPosition)
@@ -1372,6 +1381,8 @@ export default function App() {
         <LoadingScreen
           status={sceneLoadStatus}
           error={sceneLoadStatus === 'error' ? sceneLoadInfo : null}
+          fading={loadingFading}
+          onAnimationEnd={handleLoadingFadeEnd}
         />
       )}
 
