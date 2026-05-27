@@ -12,9 +12,13 @@ const SUN_OFFSET = new THREE.Vector3(-84, 72, -34)
 const SUN_SHADOW_BOUNDS = 50
 // Snap shadow camera to texel grid to prevent shadow swimming when the camera moves.
 const SHADOW_TEXEL_SIZE = (2 * SUN_SHADOW_BOUNDS) / 512
+// Only re-render the shadow map when the player moves more than this distance (metres).
+const SHADOW_UPDATE_THRESHOLD_SQ = 8 * 8
 
 export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
   const lightRef = useRef()
+  const lastShadowPos = useRef(new THREE.Vector2(Infinity, Infinity))
+  const shadowInitialized = useRef(false)
 
   const skyTexture = use(
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
@@ -32,15 +36,26 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
     return () => backgroundTexture?.dispose()
   }, [backgroundTexture])
 
-  // Keep shadow camera centered on player so only nearby visible objects cast shadows.
-  useFrame(({ camera }) => {
+  // Re-render shadow map only when the player moves past the update threshold.
+  // gl is taken from useFrame state (not useThree) to satisfy react-hooks/immutability.
+  useFrame(({ camera, gl }) => {
+    if (!shadowInitialized.current) {
+      gl.shadowMap.autoUpdate = false
+      gl.shadowMap.needsUpdate = true
+      shadowInitialized.current = true
+    }
     const light = lightRef.current
     if (!light) return
+    const dx = camera.position.x - lastShadowPos.current.x
+    const dz = camera.position.z - lastShadowPos.current.y
+    if (dx * dx + dz * dz < SHADOW_UPDATE_THRESHOLD_SQ) return
     const cx = Math.round(camera.position.x / SHADOW_TEXEL_SIZE) * SHADOW_TEXEL_SIZE
     const cz = Math.round(camera.position.z / SHADOW_TEXEL_SIZE) * SHADOW_TEXEL_SIZE
     light.position.set(cx + SUN_OFFSET.x, SUN_OFFSET.y, cz + SUN_OFFSET.z)
     light.target.position.set(cx, 0, cz)
     light.target.updateMatrixWorld()
+    lastShadowPos.current.set(camera.position.x, camera.position.z)
+    gl.shadowMap.needsUpdate = true
   })
 
   return (
