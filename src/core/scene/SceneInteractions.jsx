@@ -22,6 +22,7 @@ import { getRegistry, onRegistryChange } from '../cameraRegistry'
 const JOURNAL_OFFSET = { x: 0.68, y: 0, z: 1.77 }
 // outsideplant03 world pos [32.8189,1.5645,-5.6124] + BASKET_ORIGIN [-0.1,-0.4,0.2]
 const BASKET_PREVIEW_POS = [32.7189, 1.1645, -5.4124]
+const ZOE_POINT_SEQUENCE = [{ clip: 'zoe-pointing' }, { clip: 'zoe-idle', duration: 999999 }]
 const JOURNAL_ROTATION_Y = 0.41
 
 function getCharacterConfig(id) {
@@ -70,6 +71,7 @@ export function SceneInteractions({
   serreActive,
   zoePhaseActive,
   raspberryPhaseActive,
+  raspberryGameCompleted,
   juiceMachinePhaseActive,
   juicePipePlaying,
   juicePhaseActive,
@@ -206,9 +208,9 @@ export function SceneInteractions({
         onInteract={onJuiceInteract}
       />
 
-      {raspberryPhaseActive && (
+      {(raspberryPhaseActive || raspberryGameCompleted) && (
         <RaspberryMinigame
-          isActive
+          isActive={raspberryPhaseActive}
           onStateChange={onMinigameStateChange}
           onUnripeAttempt={onUnripeAttempt}
         />
@@ -230,6 +232,7 @@ export function SceneInteractions({
                 : '/models/compressed/zoe-animated.glb'
             }
             clip={zoeClip}
+            animationSequence={zoeClip === 'zoe-pointing' ? ZOE_POINT_SEQUENCE : undefined}
             textureName="zoe-animated"
             textureBasePaths={textureBasePaths}
             position={zoePosition}

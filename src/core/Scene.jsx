@@ -78,6 +78,7 @@ export default function Scene({
     serreActive,
     zoePhaseActive,
     raspberryPhaseActive,
+    raspberryGameCompleted,
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,
@@ -193,6 +194,7 @@ export default function Scene({
             serreActive={serreActive}
             zoePhaseActive={zoePhaseActive}
             raspberryPhaseActive={raspberryPhaseActive}
+            raspberryGameCompleted={raspberryGameCompleted}
             juiceMachinePhaseActive={juiceMachinePhaseActive}
             juicePipePlaying={juicePipePlaying}
             juicePhaseActive={juicePhaseActive}

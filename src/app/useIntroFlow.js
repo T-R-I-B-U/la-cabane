@@ -37,6 +37,7 @@ export function useIntroFlow({ sceneReady }) {
   const [serreActive, setSerreActive] = useState(false)
   const [zoePhaseActive, setZoePhaseActive] = useState(false)
   const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
+  const [raspberryGameCompleted, setRaspberryGameCompleted] = useState(false)
   const [juiceMachinePhaseActive, setJuiceMachinePhaseActive] = useState(false)
   const [juicePipePlaying, setJuicePipePlaying] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
@@ -110,6 +111,7 @@ export function useIntroFlow({ sceneReady }) {
     setSerreActive(false)
     setZoePhaseActive(false)
     setRaspberryPhaseActive(false)
+    setRaspberryGameCompleted(false)
     setJuiceMachinePhaseActive(false)
     setJuicePhaseActive(false)
     setExitSerrePhaseActive(false)
@@ -465,6 +467,7 @@ export function useIntroFlow({ sceneReady }) {
       setMinigameCount(state.count)
       if (!state.complete) return
       setRaspberryPhaseActive(false)
+      setRaspberryGameCompleted(true)
       setZoeClip('zoe-pointing')
       scheduleFlowTimeout(() => {
         playDialogue('zoeJuice', {
@@ -742,6 +745,7 @@ export function useIntroFlow({ sceneReady }) {
     serreActive,
     zoePhaseActive,
     raspberryPhaseActive,
+    raspberryGameCompleted,
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,
