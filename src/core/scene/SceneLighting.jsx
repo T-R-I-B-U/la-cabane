@@ -1,5 +1,6 @@
 import { Environment } from '@react-three/drei'
-import { use, useEffect, useMemo } from 'react'
+import { useFrame } from '@react-three/fiber'
+import { use, useEffect, useMemo, useRef } from 'react'
 import * as THREE from 'three'
 import { getHdriOption } from './hdriOptions'
 import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureResolver.js'
@@ -7,7 +8,12 @@ import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureRes
 const SUN_POSITION = [-84, 72, -34]
 const SUN_SHADOW_BOUNDS = 65
 
+// Render shadow map every frame for the first N frames so async-loaded objects
+// are captured, then freeze — light is fixed so result never changes after that.
+const SHADOW_WARMUP_FRAMES = 180
+
 export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
+  const warmup = useRef(SHADOW_WARMUP_FRAMES)
   const skyTexture = use(
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
   )
@@ -23,6 +29,15 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
   useEffect(() => {
     return () => backgroundTexture?.dispose()
   }, [backgroundTexture])
+
+  useFrame(({ gl }) => {
+    if (warmup.current > 0) {
+      warmup.current -= 1
+      return
+    }
+    // Scene fully loaded — freeze shadow map, never recalculate.
+    if (gl.shadowMap.autoUpdate) gl.shadowMap.autoUpdate = false
+  })
 
   return (
     <>
