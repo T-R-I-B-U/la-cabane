@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { CabaneMap } from './CabaneMap'
-import { LampLights } from './LampLights'
 import { TreeLeaves } from '../../world/entities/TreeLeaves'
 import { SceneCharacters } from './SceneCharacters'
 import { SceneInteractions } from './SceneInteractions'
@@ -130,8 +129,6 @@ export function CabaneScene({
         onError={onError}
         onCabaneLoaded={handleCabaneGroupLoaded}
       />
-
-      <LampLights cabane={cabaneGroup} />
 
       <TreeLeaves
         leafMesh={leafMesh}
