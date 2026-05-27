@@ -10,6 +10,8 @@ import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureRes
 const SUN_OFFSET = new THREE.Vector3(-84, 72, -34)
 // Coverage radius around the player — smaller = better shadow resolution.
 const SUN_SHADOW_BOUNDS = 50
+// Snap shadow camera to texel grid to prevent shadow swimming when the camera moves.
+const SHADOW_TEXEL_SIZE = (2 * SUN_SHADOW_BOUNDS) / 512
 
 export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
   const lightRef = useRef()
@@ -34,8 +36,8 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
   useFrame(({ camera }) => {
     const light = lightRef.current
     if (!light) return
-    const cx = camera.position.x
-    const cz = camera.position.z
+    const cx = Math.round(camera.position.x / SHADOW_TEXEL_SIZE) * SHADOW_TEXEL_SIZE
+    const cz = Math.round(camera.position.z / SHADOW_TEXEL_SIZE) * SHADOW_TEXEL_SIZE
     light.position.set(cx + SUN_OFFSET.x, SUN_OFFSET.y, cz + SUN_OFFSET.z)
     light.target.position.set(cx, 0, cz)
     light.target.updateMatrixWorld()
