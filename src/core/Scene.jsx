@@ -1,8 +1,9 @@
-import { useState, useRef, useMemo, Suspense, lazy } from 'react'
+import { useState, useRef, useMemo, useCallback, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
 import { initKTX2Loader } from './ktx2Loader.js'
 import AudioManager from './audio/AudioManager'
+import { Stats } from '@react-three/drei'
 import { Floor } from './Floor'
 import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -41,7 +42,15 @@ export default function Scene({
   cinematicActive = false,
   cinematicKeypoints = [],
 }) {
-  const { onStats, onReady, onError } = sceneState
+  const { onStats, onReady: onReadyOrig, onError } = sceneState
+  const [shadowRefreshToken, setShadowRefreshToken] = useState(0)
+  const onReady = useCallback(
+    (info) => {
+      onReadyOrig(info)
+      setShadowRefreshToken((t) => t + 1)
+    },
+    [onReadyOrig]
+  )
   const {
     mode: playerMode,
     flyMode,
@@ -150,12 +159,14 @@ export default function Scene({
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >
       <StatsCollector onStats={onStats} />
+      <Stats />
       <AudioManager />
 
       <SceneLighting
         activeHdriId={activeHdriId}
         shadowsEnabled={shadowsEnabled}
         firstPersonMode={firstPersonMode}
+        shadowRefreshToken={shadowRefreshToken}
       />
 
       <Floor mainFloorRef={setMainFloorCollider} />

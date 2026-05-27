@@ -18,11 +18,21 @@ const PLAYER_TEXEL = (2 * PLAYER_BOUNDS) / 512
 // Re-render only when the player moves more than this distance (metres).
 const PLAYER_THRESHOLD_SQ = 8 * 8
 
-export function SceneLighting({ activeHdriId, shadowsEnabled = true, firstPersonMode = false }) {
+export function SceneLighting({
+  activeHdriId,
+  shadowsEnabled = true,
+  firstPersonMode = false,
+  shadowRefreshToken = 0,
+}) {
   const lightRef = useRef()
   const lastShadowPos = useRef(new THREE.Vector2(Infinity, Infinity))
   const shadowInitialized = useRef(false)
   const lastMode = useRef(null)
+  const pendingRefresh = useRef(false)
+
+  useEffect(() => {
+    pendingRefresh.current = true
+  }, [shadowRefreshToken])
 
   const skyTexture = use(
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
@@ -53,7 +63,9 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true, firstPerson
 
     if (!firstPersonMode) {
       // Exterior view: fixed frustum covering the whole scene, rendered once.
-      if (!modeChanged) return
+      const needsRefresh = pendingRefresh.current
+      if (needsRefresh) pendingRefresh.current = false
+      if (!modeChanged && !needsRefresh) return
       light.shadow.camera.left = -EXTERIOR_BOUNDS
       light.shadow.camera.right = EXTERIOR_BOUNDS
       light.shadow.camera.top = EXTERIOR_BOUNDS
