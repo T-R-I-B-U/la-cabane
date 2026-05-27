@@ -30,8 +30,6 @@ const INTERIOR_ONLY_ROOTS = new Set([
   'littletable',
 ])
 
-// Hidden in first-person (only visible from outside).
-const EXTERIOR_ONLY_ROOTS = new Set(['backgroundTree', 'outsideplant02', 'outsideplant03'])
 
 export function CabaneScene({
   modelQuality,
@@ -113,7 +111,6 @@ export function CabaneScene({
     cabaneGroup.traverse((obj) => {
       const base = obj.name.replace(/-\d+$/, '')
       if (INTERIOR_ONLY_ROOTS.has(base)) obj.visible = firstPersonMode
-      else if (EXTERIOR_ONLY_ROOTS.has(base)) obj.visible = !firstPersonMode
     })
   }, [cabaneGroup, firstPersonMode])
 
