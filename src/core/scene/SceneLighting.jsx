@@ -9,7 +9,7 @@ import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureRes
 // Original: light at (-84,72,-34), target at (0,0,0) → offset = (-84,72,-34).
 const SUN_OFFSET = new THREE.Vector3(-84, 72, -34)
 
-// Exterior mode: large static frustum centred on origin, computed once.
+// Exterior mode: large static frustum centred on origin.
 const EXTERIOR_BOUNDS = 150
 
 // Player mode: small frustum following the player, snapped to texel grid.
@@ -18,21 +18,10 @@ const PLAYER_TEXEL = (2 * PLAYER_BOUNDS) / 512
 // Re-render only when the player moves more than this distance (metres).
 const PLAYER_THRESHOLD_SQ = 8 * 8
 
-export function SceneLighting({
-  activeHdriId,
-  shadowsEnabled = true,
-  firstPersonMode = false,
-  shadowRefreshToken = 0,
-}) {
+export function SceneLighting({ activeHdriId, shadowsEnabled = true, firstPersonMode = false }) {
   const lightRef = useRef()
   const lastShadowPos = useRef(new THREE.Vector2(Infinity, Infinity))
-  const shadowInitialized = useRef(false)
   const lastMode = useRef(null)
-  const pendingRefresh = useRef(false)
-
-  useEffect(() => {
-    pendingRefresh.current = true
-  }, [shadowRefreshToken])
 
   const skyTexture = use(
     loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
@@ -50,22 +39,15 @@ export function SceneLighting({
     return () => backgroundTexture?.dispose()
   }, [backgroundTexture])
 
-  useFrame(({ camera, gl }) => {
-    if (!shadowInitialized.current) {
-      gl.shadowMap.autoUpdate = false
-      shadowInitialized.current = true
-    }
-
+  useFrame(({ camera }) => {
     const light = lightRef.current
     if (!light) return
 
     const modeChanged = firstPersonMode !== lastMode.current
 
     if (!firstPersonMode) {
-      // Exterior view: fixed frustum covering the whole scene, rendered once.
-      const needsRefresh = pendingRefresh.current
-      if (needsRefresh) pendingRefresh.current = false
-      if (!modeChanged && !needsRefresh) return
+      // Exterior: fixed frustum over the whole scene, only reposition on mode change.
+      if (!modeChanged) return
       light.shadow.camera.left = -EXTERIOR_BOUNDS
       light.shadow.camera.right = EXTERIOR_BOUNDS
       light.shadow.camera.top = EXTERIOR_BOUNDS
@@ -74,7 +56,7 @@ export function SceneLighting({
       light.position.set(SUN_OFFSET.x, SUN_OFFSET.y, SUN_OFFSET.z)
       light.target.position.set(0, 0, 0)
     } else {
-      // Player view: small frustum following player, updated every 8m.
+      // Player mode: small frustum following camera, updated every 8 m.
       if (modeChanged) {
         light.shadow.camera.left = -PLAYER_BOUNDS
         light.shadow.camera.right = PLAYER_BOUNDS
@@ -95,7 +77,6 @@ export function SceneLighting({
 
     light.target.updateMatrixWorld()
     lastMode.current = firstPersonMode
-    gl.shadowMap.needsUpdate = true
   })
 
   return (
