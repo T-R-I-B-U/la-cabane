@@ -12,7 +12,7 @@ import { PLATFORM_POS } from '../SceneConfig'
 
 const ARBRE_TRIGGER_RADIUS = 10
 
-// Objects only visible from inside — hidden in exterior view to cut triangle count.
+// Hidden in exterior view (only visible from inside).
 const INTERIOR_ONLY_ROOTS = new Set([
   'raspberry',
   'chair',
@@ -29,6 +29,9 @@ const INTERIOR_ONLY_ROOTS = new Set([
   'large-table',
   'littletable',
 ])
+
+// Hidden in first-person (only visible from outside).
+const EXTERIOR_ONLY_ROOTS = new Set(['backgroundTree', 'outsideplant02', 'outsideplant03'])
 
 export function CabaneScene({
   modelQuality,
@@ -110,6 +113,7 @@ export function CabaneScene({
     cabaneGroup.traverse((obj) => {
       const base = obj.name.replace(/-\d+$/, '')
       if (INTERIOR_ONLY_ROOTS.has(base)) obj.visible = firstPersonMode
+      else if (EXTERIOR_ONLY_ROOTS.has(base)) obj.visible = !firstPersonMode
     })
   }, [cabaneGroup, firstPersonMode])
 

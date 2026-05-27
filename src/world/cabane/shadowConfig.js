@@ -4,7 +4,6 @@
 // Instanced-only specifics (house receiver, excluded groups) stay in groupInstancing.js.
 
 export const SHARED_SHADOW_CASTER_ROOTS = new Set([
-  'backgroundTree',
   'juicemachine',
   'juiceglass',
   'ladder',
