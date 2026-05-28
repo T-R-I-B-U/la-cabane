@@ -100,9 +100,12 @@ export function AnimatedCharacter({
         })
         hoverMaterialsRef.current = null
       }
-      disposeObject3D(clonedScene)
     }
   }, [clonedScene, hoveredRef])
+
+  useEffect(() => {
+    return () => disposeObject3D(clonedScene)
+  }, [clonedScene])
 
   useFrame(() => {
     if (!hoveredRef || !hoverMaterialsRef.current) return
