@@ -2,9 +2,11 @@ import { useState } from 'react'
 import './PlayerFruitPanel.css'
 import { playOnce } from '../utils/audioStore'
 import { AddSavoirModal } from './AddSavoirModal'
+import { useFavorites } from '../utils/favoritesStore'
 
 export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
+  const favorites = useFavorites()
   return (
     <>
       <div className="pfp-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
@@ -137,30 +139,21 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false })
                   </div>
                 </div>
                 <div className="pfp-leaf-slots">
-                  <div className="pfp-leaf-slot pfp-leaf-slot--flex">
-                    <img
-                      className="pfp-leaf-img"
-                      src="/player-panel/leaf.webp"
-                      alt=""
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="pfp-leaf-slot pfp-leaf-slot--flex">
-                    <img
-                      className="pfp-leaf-img"
-                      src="/player-panel/leaf.webp"
-                      alt=""
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <div className="pfp-leaf-slot pfp-leaf-slot--flex">
-                    <img
-                      className="pfp-leaf-img"
-                      src="/player-panel/leaf.webp"
-                      alt=""
-                      aria-hidden="true"
-                    />
-                  </div>
+                  {Array.from({ length: 3 }).map((_, i) => {
+                    const fav = favorites[i]
+                    return (
+                      <div key={i} className={`pfp-leaf-slot pfp-leaf-slot--flex${!fav ? ' pfp-leaf-slot--empty' : ''}`}>
+                        {fav && (
+                          <img
+                            className="pfp-leaf-img"
+                            src={fav.drawingData ?? '/player-panel/leaf.webp'}
+                            alt={fav.title}
+                            title={fav.title}
+                          />
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
 

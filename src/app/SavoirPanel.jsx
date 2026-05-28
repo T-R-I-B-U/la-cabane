@@ -1,7 +1,18 @@
+import { useState, useEffect } from 'react'
 import './SavoirPanel.css'
 import { playOnce } from '../utils/audioStore'
+import { favoritesStore } from '../utils/favoritesStore'
 
 export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf }) {
+  const [isFav, setIsFav] = useState(() => favoritesStore.isFavorite(savoir.id))
+  const [isFull, setIsFull] = useState(() => favoritesStore.isFull())
+
+  useEffect(() => {
+    return favoritesStore.subscribe(() => {
+      setIsFav(favoritesStore.isFavorite(savoir.id))
+      setIsFull(favoritesStore.isFull())
+    })
+  }, [savoir.id])
   return (
     <div
       className="savoir-overlay"
@@ -79,11 +90,20 @@ export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf }) {
                     ))}
                   </div>
                 </div>
-                <button type="button" className="savoir-fav-btn">
-                  Ajouter au favoris
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <button
+                  type="button"
+                  className={`savoir-fav-btn${isFav ? ' savoir-fav-btn--active' : ''}${!isFav && isFull ? ' savoir-fav-btn--disabled' : ''}`}
+                  onClick={() => {
+                    if (!isFav && isFull) return
+                    favoritesStore.toggle(savoir)
+                  }}
+                  disabled={!isFav && isFull}
+                >
+                  {isFav ? 'Retirer des favoris' : 'Ajouter au favoris'}
+                  <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
                     <path
                       d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"
+                      fill={isFav ? '#3b5866' : 'none'}
                       stroke="#3b5866"
                       strokeWidth="1.5"
                       strokeLinecap="round"

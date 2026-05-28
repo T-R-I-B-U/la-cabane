@@ -235,6 +235,10 @@
   width: auto;
 }
 
+.pfp-leaf-slot--empty {
+  opacity: 0.35;
+}
+
 .pfp-leaf-img {
   /* 70% laisse la marge nécessaire pour rotate(-31deg) sans clipper */
   width: 70%;

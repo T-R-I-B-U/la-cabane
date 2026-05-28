@@ -165,6 +165,16 @@
   padding: 20px;
 }
 
+.savoir-fav-btn--active {
+  background: #3b5866;
+  color: #eeded0;
+}
+
+.savoir-fav-btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .savoir-fav-btn {
   display: flex;
   align-items: center;
