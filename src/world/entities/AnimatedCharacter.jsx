@@ -125,7 +125,22 @@ export function AnimatedCharacter({
 
   useEffect(() => {
     if (!textureName) return
-    applyAutoTextures(clonedScene, textureName, textureBasePaths)
+    let cancelled = false
+    applyAutoTextures(clonedScene, textureName, textureBasePaths).then(() => {
+      if (cancelled) return
+      // Re-apply after texture load: applyAutoTextures re-sets roughnessMap/metalnessMap
+      // which overrides the fix applied in useMemo.
+      clonedScene.traverse((obj) => {
+        if (!obj.isMesh) return
+        forEachMeshMaterial(obj.material, (mat) => {
+          if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
+          if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+          if ('envMapIntensity' in mat) mat.envMapIntensity = 0
+          mat.needsUpdate = true
+        })
+      })
+    })
+    return () => { cancelled = true }
   }, [clonedScene, textureName, textureBasePaths])
 
   // Simple looping clip — used by characters without a sequence (e.g. Zoé idle)
