@@ -66,7 +66,7 @@ export function AnimatedCharacter({
       if (!obj.isMesh) return
       obj.raycast = NO_RAYCAST
       obj.castShadow = false
-      obj.receiveShadow = false
+      obj.receiveShadow = true
       // Skinned meshes need frustum culling disabled — rest-pose bbox desync causes invisible characters
       obj.frustumCulled = false
       obj.userData.isCharacter = true
