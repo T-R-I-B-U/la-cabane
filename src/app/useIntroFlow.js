@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNpcDialogue } from './useNpcDialogue'
 import { DEFAULT_STORY_CAMERA_POVS, STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
-import { setAmbiance, stopAmbiance } from '../utils/audioStore'
+import { setAmbiance, stopAmbiance, fade, play, stop } from '../utils/audioStore'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -226,7 +226,10 @@ export function useIntroFlow({ sceneReady }) {
       playDialogue('thomasEtabliDialogue', {
         onDone: () => {
           setThomasAnimationPhase('returning')
-          scheduleFlowTimeout(() => setAmbiance('ambianceWorkbench'), 2000)
+          scheduleFlowTimeout(() => {
+            fade('musicIndoor', 0.15, 1500)
+            play('ambianceWorkbench')
+          }, 2000)
           setGreenhousePhaseActive(true)
         },
       })
@@ -447,7 +450,8 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
-    setAmbiance('ambianceWorkbench')
+    fade('musicIndoor', 0.15, 1500)
+    play('ambianceWorkbench')
     isEtabliTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelier, duration: 1.5 })
   }, [])
@@ -505,6 +509,7 @@ export function useIntroFlow({ sceneReady }) {
     clearScheduledTimeouts()
     setGreenhousePhaseActive(false)
     setSerreActive(true)
+    stop('ambianceWorkbench')
     setAmbiance(null)
     greenhouseTransitionStageRef.current = 'front'
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoor, duration: 3.0 })
@@ -520,7 +525,7 @@ export function useIntroFlow({ sceneReady }) {
   const handleThomasEtabliInteract = useCallback(() => {
     setThomasEtabliPhaseActive(false)
     setThomasAnimationPhase('talking')
-    setAmbiance(null)
+    stop('ambianceWorkbench')
     isAtelierBetweenTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelierBetween, duration: 1.0 })
   }, [])

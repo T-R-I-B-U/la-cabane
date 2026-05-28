@@ -49,8 +49,14 @@ export function AnimatedCharacter({
       if (!obj.isMesh) return
       obj.material = cloneMeshMaterialShallow(obj.material)
       forEachMeshMaterial(obj.material, (mat) => {
-        if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
-        if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+        if ('roughness' in mat) {
+          mat.roughness = 1
+          mat.roughnessMap = null
+        }
+        if ('metalness' in mat) {
+          mat.metalness = 0
+          mat.metalnessMap = null
+        }
         if ('envMapIntensity' in mat) mat.envMapIntensity = 0
         mat.needsUpdate = true
       })
@@ -136,14 +142,22 @@ export function AnimatedCharacter({
       clonedScene.traverse((obj) => {
         if (!obj.isMesh) return
         forEachMeshMaterial(obj.material, (mat) => {
-          if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
-          if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+          if ('roughness' in mat) {
+            mat.roughness = 1
+            mat.roughnessMap = null
+          }
+          if ('metalness' in mat) {
+            mat.metalness = 0
+            mat.metalnessMap = null
+          }
           if ('envMapIntensity' in mat) mat.envMapIntensity = 0
           mat.needsUpdate = true
         })
       })
     })
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+    }
   }, [clonedScene, textureName, textureBasePaths])
 
   // Simple looping clip — used by characters without a sequence (e.g. Zoé idle)

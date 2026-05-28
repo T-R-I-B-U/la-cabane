@@ -30,7 +30,6 @@ const INTERIOR_ONLY_ROOTS = new Set([
   'littletable',
 ])
 
-
 export function CabaneScene({
   modelQuality,
   onError,
