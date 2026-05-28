@@ -55,6 +55,12 @@ export function AnimatedCharacter({
       // Skinned meshes need frustum culling disabled — rest-pose bbox desync causes invisible characters
       obj.frustumCulled = false
       obj.userData.isCharacter = true
+      forEachMeshMaterial(obj.material, (mat) => {
+        if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
+        if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+        if ('envMapIntensity' in mat) mat.envMapIntensity = 0
+        mat.needsUpdate = true
+      })
       characterMeshes.push(obj)
     })
 

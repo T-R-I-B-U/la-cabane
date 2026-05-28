@@ -508,6 +508,12 @@ export async function buildCabane({
       configureLightPassingMaterial(obj)
       return
     }
+    forEachMaterial(obj.material, (mat) => {
+      if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
+      if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+      if ('envMapIntensity' in mat) mat.envMapIntensity = 0
+      mat.needsUpdate = true
+    })
     obj.receiveShadow = isShadowReceiverCandidate(obj)
     obj.castShadow = false
     if (!isShadowCasterCandidate(obj)) return
