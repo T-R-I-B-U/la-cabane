@@ -35,7 +35,7 @@ export function ContactPanel({ contact, onClose }) {
               y1="8"
               x2="42"
               y2="42"
-              stroke="#33330f"
+              stroke="#3b5866"
               strokeWidth="4"
               strokeLinecap="round"
             />
@@ -44,7 +44,7 @@ export function ContactPanel({ contact, onClose }) {
               y1="8"
               x2="8"
               y2="42"
-              stroke="#33330f"
+              stroke="#3b5866"
               strokeWidth="4"
               strokeLinecap="round"
             />

@@ -23,15 +23,15 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false })
                   alt=""
                   aria-hidden="true"
                 />
+                <p className="pfp-player-name">{playerName || 'Visiteur·se'}</p>
+              </div>
+              <div className="pfp-bottom-section">
                 <img
                   className="pfp-card-icon"
                   src="/player-panel/icon-card.svg"
                   alt=""
                   aria-hidden="true"
                 />
-                <p className="pfp-player-name">{playerName || 'Visiteur·se'}</p>
-              </div>
-              <div className="pfp-bottom-section">
                 <p className="pfp-role">Jury des Gobelins</p>
                 <p className="pfp-desc-label">Description</p>
                 <p className="pfp-desc-text">
