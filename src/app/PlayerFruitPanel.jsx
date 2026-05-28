@@ -20,7 +20,13 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false })
                 <img
                   className="pfp-fruit-img"
                   src="/player-panel/fruit.webp"
-                  alt="Fruit du joueur"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <img
+                  className="pfp-card-icon"
+                  src="/player-panel/icon-card.svg"
+                  alt=""
                   aria-hidden="true"
                 />
                 <p className="pfp-player-name">{playerName || 'Visiteur·se'}</p>
