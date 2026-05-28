@@ -241,10 +241,23 @@
 
 .pfp-leaf-slot--clickable {
   cursor: pointer;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .pfp-leaf-slot--clickable:hover {
   outline: 2px solid #b0cfd1;
+}
+
+.pfp-fav-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #33330f;
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  word-break: break-word;
 }
 
 .pfp-leaf-img {

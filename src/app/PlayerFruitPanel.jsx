@@ -148,12 +148,14 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false, o
                         onClick={fav ? () => onFavoriteClick?.(fav) : undefined}
                       >
                         {fav && (
-                          <img
-                            className="pfp-leaf-img"
-                            src={fav.drawingData ?? '/player-panel/leaf.webp'}
-                            alt={fav.title}
-                            title={fav.title}
-                          />
+                          <>
+                            <img
+                              className="pfp-leaf-img"
+                              src={fav.drawingData ?? '/player-panel/leaf.webp'}
+                              alt={fav.title}
+                            />
+                            <p className="pfp-fav-title">{fav.title}</p>
+                          </>
                         )}
                       </div>
                     )
