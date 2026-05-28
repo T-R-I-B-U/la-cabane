@@ -5,7 +5,6 @@ import { initKTX2Loader } from './ktx2Loader.js'
 import { Stats } from '@react-three/drei'
 import AudioManager from './audio/AudioManager'
 import { Floor } from './Floor'
-import { BackgroundPlanes } from '../world/entities/BackgroundPlanes'
 import { DEFAULT_HUT_POS } from './SceneConfig'
 import { StatsCollector } from './StatsCollector'
 import { SceneControls } from './scene/SceneControls'
@@ -158,7 +157,6 @@ export default function Scene({
       <SceneLighting activeHdriId={activeHdriId} shadowsEnabled={shadowsEnabled} />
 
       <Floor mainFloorRef={setMainFloorCollider} />
-      <BackgroundPlanes hutPosition={hutPosition} />
 
       {(zone === 'cabane' || zone === 'arbre') && (
         <Suspense fallback={null}>
