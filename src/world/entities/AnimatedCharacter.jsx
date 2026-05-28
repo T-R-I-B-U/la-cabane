@@ -43,8 +43,11 @@ export function AnimatedCharacter({
   const { animations } = useGLTF(animationUrl ?? url)
   const clonedScene = useMemo(() => {
     const cloned = clone(scene)
+    // SkeletonUtils.clone shares materials with the useGLTF cache — clone them so
+    // we can safely modify roughness/metalness without affecting other consumers.
     cloned.traverse((obj) => {
       if (!obj.isMesh) return
+      obj.material = cloneMeshMaterialShallow(obj.material)
       forEachMeshMaterial(obj.material, (mat) => {
         if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
         if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
