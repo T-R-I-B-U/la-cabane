@@ -2,6 +2,62 @@
   "globalVolume": 1,
   "tracks": [
     {
+      "id": "ambianceOutside",
+      "type": "sfx",
+      "src": "Ambiance-Outside.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
+      "id": "musicBeginning",
+      "type": "sfx",
+      "src": "Music-Beginning.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
+      "id": "musicEnd",
+      "type": "sfx",
+      "src": "Music-End.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
+      "id": "clickUi",
+      "type": "sfx",
+      "src": "Click.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
+    },
+    {
+      "id": "closeUi",
+      "type": "sfx",
+      "src": "Close.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
+    },
+    {
+      "id": "clickMagic",
+      "type": "sfx",
+      "src": "Click-Magic.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
+    },
+    {
+      "id": "musicIndoor",
+      "type": "sfx",
+      "src": "Music-Indoor.mp3",
+      "loop": true,
+      "volume": 0.7,
+      "autoplay": false
+    },
+    {
       "id": "ambianceWorkbench",
       "type": "sfx",
       "src": "Ambiance-Workbench.mp3",

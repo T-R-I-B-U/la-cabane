@@ -6,3 +6,10 @@ dist
 .github
 .githooks
 docs
+README.md
+Dockerfile
+GEMINI.md
+AGENTS.md
+CLAUDE.md
+SKILLS_CHEAT_SHEET.md
+Makefile

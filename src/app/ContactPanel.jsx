@@ -1,4 +1,5 @@
 import './ContactPanel.css'
+import { playOnce } from '../utils/audioStore'
 
 export function ContactPanel({ contact, onClose }) {
   const infoRows = [contact.role, contact.age, contact.neighborhood, contact.memberSince].filter(
@@ -16,7 +17,15 @@ export function ContactPanel({ contact, onClose }) {
         onPointerDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
       >
-        <button type="button" className="cp-back" onClick={onClose} aria-label="Fermer">
+        <button
+          type="button"
+          className="cp-back"
+          onClick={() => {
+            playOnce('closeUi')
+            onClose()
+          }}
+          aria-label="Fermer"
+        >
           <img src="/arrow.svg" alt="" aria-hidden="true" />
         </button>
 

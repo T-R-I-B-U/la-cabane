@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './PlayerFruitPanel.css'
+import { playOnce } from '../utils/audioStore'
 import { AddSavoirModal } from './AddSavoirModal'
 
 export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false }) {
@@ -58,7 +59,12 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false })
                 <button
                   type="button"
                   className={`pfp-add-savoir${hasSentSavoir ? ' pfp-add-savoir--sent' : ''}`}
-                  onClick={() => !hasSentSavoir && setIsAddSavoirOpen(true)}
+                  onClick={() => {
+                    if (!hasSentSavoir) {
+                      playOnce('clickUi')
+                      setIsAddSavoirOpen(true)
+                    }
+                  }}
                   disabled={hasSentSavoir}
                 >
                   <span className="pfp-add-icon">+</span>

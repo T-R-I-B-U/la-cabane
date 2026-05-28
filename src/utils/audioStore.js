@@ -423,6 +423,23 @@ export function stop(id) {
   track.audio.stop()
 }
 
+// Ambiance manager — one looping ambiance at a time with smooth crossfade.
+// Pass null to fade out the current ambiance without starting a new one.
+const AMBIANCE_FADE_MS = 1500
+let _currentAmbiance = null
+
+export function setAmbiance(id, fadeDuration = AMBIANCE_FADE_MS) {
+  if (_currentAmbiance === id) return
+  if (_currentAmbiance) fade(_currentAmbiance, 0, fadeDuration)
+  _currentAmbiance = id
+  if (id) fade(id, store.tracks[id]?.cfg.volume ?? 0.7, fadeDuration)
+}
+
+export function stopAmbiance() {
+  if (_currentAmbiance) stop(_currentAmbiance)
+  _currentAmbiance = null
+}
+
 export function stopAll() {
   for (const [id, track] of Object.entries(store.tracks)) {
     _clearFadeTimeout(id)
@@ -483,10 +500,16 @@ export function fade(id, to, duration = 500) {
     const now = ctx.currentTime
     const end = now + duration / 1000
 
-    if (!audio.isPlaying && to > 0) audio.play()
-
     gain.cancelScheduledValues(now)
-    gain.setValueAtTime(gain.value, now)
+
+    if (!audio.isPlaying && to > 0) {
+      // Start from silence so the fade-in is audible
+      gain.setValueAtTime(0, now)
+      audio.play()
+    } else {
+      gain.setValueAtTime(gain.value, now)
+    }
+
     gain.linearRampToValueAtTime(target, end)
 
     cfg.volume = to

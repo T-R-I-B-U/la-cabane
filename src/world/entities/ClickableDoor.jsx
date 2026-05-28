@@ -6,12 +6,18 @@ import { cursorStore } from '../../utils/cursorStore'
 
 const HOVER_EMISSIVE = new THREE.Color(0xfff1c2)
 const HOVER_EMISSIVE_INTENSITY = 0.45
+const INTRO_HUT = 'hut01'
 const INTRO_DOOR_PARENT = 'door01'
 
 function findIntroDoorMeshes(cabane) {
   if (!cabane) return []
 
-  const parent = cabane.getObjectByName(INTRO_DOOR_PARENT)
+  // Scope search to hut01 first — greenhouse.gltf also has a node named door01
+  // and its order in the scene can vary depending on cabane.json entry order.
+  const hut = cabane.getObjectByName(INTRO_HUT)
+  if (!hut) return []
+
+  const parent = hut.getObjectByName(INTRO_DOOR_PARENT)
   if (!parent) return []
 
   const meshes = []
@@ -80,6 +86,8 @@ export function ClickableDoor({ cabane, active, onDoorClick }) {
 
   const setDoorHover = useCallback(
     (isHovered) => {
+      cursorStore.setType(isHovered ? 'pointer' : 'default')
+
       doorMeshes.forEach((mesh) => {
         forEachMaterial(mesh.material, (material) => {
           const original = materialStatesRef.current.get(material)

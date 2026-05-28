@@ -41,7 +41,22 @@ export function AnimatedCharacter({
   const activeActionRef = useRef(null)
   const { scene } = useGLTF(url)
   const { animations } = useGLTF(animationUrl ?? url)
-  const clonedScene = useMemo(() => clone(scene), [scene])
+  const clonedScene = useMemo(() => {
+    const cloned = clone(scene)
+    // SkeletonUtils.clone shares materials with the useGLTF cache — clone them so
+    // we can safely modify roughness/metalness without affecting other consumers.
+    cloned.traverse((obj) => {
+      if (!obj.isMesh) return
+      obj.material = cloneMeshMaterialShallow(obj.material)
+      forEachMeshMaterial(obj.material, (mat) => {
+        if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
+        if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+        if ('envMapIntensity' in mat) mat.envMapIntensity = 0
+        mat.needsUpdate = true
+      })
+    })
+    return cloned
+  }, [scene])
   const { actions, names } = useAnimations(animations, group)
   const hoverMaterialsRef = useRef(null)
 
@@ -50,6 +65,8 @@ export function AnimatedCharacter({
     clonedScene.traverse((obj) => {
       if (!obj.isMesh) return
       obj.raycast = NO_RAYCAST
+      obj.castShadow = true
+      obj.receiveShadow = true
       // Skinned meshes need frustum culling disabled — rest-pose bbox desync causes invisible characters
       obj.frustumCulled = false
       obj.userData.isCharacter = true
@@ -108,7 +125,22 @@ export function AnimatedCharacter({
 
   useEffect(() => {
     if (!textureName) return
-    applyAutoTextures(clonedScene, textureName, textureBasePaths)
+    let cancelled = false
+    applyAutoTextures(clonedScene, textureName, textureBasePaths).then(() => {
+      if (cancelled) return
+      // Re-apply after texture load: applyAutoTextures re-sets roughnessMap/metalnessMap
+      // which overrides the fix applied in useMemo.
+      clonedScene.traverse((obj) => {
+        if (!obj.isMesh) return
+        forEachMeshMaterial(obj.material, (mat) => {
+          if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
+          if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+          if ('envMapIntensity' in mat) mat.envMapIntensity = 0
+          mat.needsUpdate = true
+        })
+      })
+    })
+    return () => { cancelled = true }
   }, [clonedScene, textureName, textureBasePaths])
 
   // Simple looping clip — used by characters without a sequence (e.g. Zoé idle)

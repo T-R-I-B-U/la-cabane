@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { subscribeSubtitles } from '../../utils/audioStore'
+import { cursorStore } from '../../utils/cursorStore'
 
 const SPEAKERS = {
-  marie: { label: 'MARIE', avatar: '/avatars/marie.svg' },
-  thomas: { label: 'THOMAS', avatar: '/avatars/thomas.svg' },
-  zoe: { label: 'ZOÉ', avatar: '/avatars/zoe.svg' },
-  tree: { label: 'VOTRE GUIDE', avatar: '/avatars/tree.svg' },
+  marie: { label: 'MARIE', avatar: '/avatars/marie.png' },
+  thomas: { label: 'THOMAS', avatar: '/avatars/thomas.png' },
+  zoe: { label: 'ZOÉ', avatar: '/avatars/zoe.png' },
+  tree: { label: 'VOTRE GUIDE', avatar: '/avatars/guide.png' },
 }
 
 const WRAP = {
@@ -78,18 +79,32 @@ const CHOICES = {
   pointerEvents: 'auto',
 }
 
-const CHOICE_BTN = {
-  background: '#e3e7b3',
-  border: 'none',
-  borderRadius: 360,
-  padding: '8px 20px',
-  fontFamily: "'citrus-gothic-rough', serif",
-  fontSize: 32,
-  fontWeight: 400,
-  color: '#8b8e50',
-  lineHeight: 1,
-  cursor: 'pointer',
-  whiteSpace: 'nowrap',
+function ChoiceButton({ label, onClick }) {
+  const ref = useRef(null)
+  const [hovered, setHovered] = useState(false)
+
+  useEffect(() => {
+    return cursorStore.subscribePos((x, y) => {
+      if (!ref.current) return
+      const rect = ref.current.getBoundingClientRect()
+      const isOver = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
+      setHovered((prev) => {
+        if (prev !== isOver) cursorStore.setType(isOver ? 'pointer' : 'default')
+        return isOver
+      })
+    })
+  }, [])
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      className={`dialogue-choice-btn${hovered ? ' dialogue-choice-btn--hovered' : ''}`}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  )
 }
 
 export default function Subtitles() {
@@ -115,15 +130,7 @@ export default function Subtitles() {
         {hasChoices && (
           <div style={CHOICES}>
             {choices.map(({ label, onClick }) => (
-              <button
-                key={label}
-                type="button"
-                className="dialogue-choice-btn"
-                style={CHOICE_BTN}
-                onClick={onClick}
-              >
-                {label}
-              </button>
+              <ChoiceButton key={label} label={label} onClick={onClick} />
             ))}
           </div>
         )}

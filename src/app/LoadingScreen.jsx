@@ -14,7 +14,7 @@ function buildFrameUrls() {
 
 const FRAME_URLS = buildFrameUrls()
 
-export function LoadingScreen({ status, error }) {
+export function LoadingScreen({ status, error, fading, onAnimationEnd }) {
   const [frameIndex, setFrameIndex] = useState(0)
   const [framesReady, setFramesReady] = useState(false)
 
@@ -63,7 +63,10 @@ export function LoadingScreen({ status, error }) {
   }, [framesReady])
 
   return (
-    <div className="loading-screen">
+    <div
+      className={`loading-screen${fading ? ' loading-screen--fading' : ''}`}
+      onAnimationEnd={fading ? onAnimationEnd : undefined}
+    >
       <img
         className="loading-screen__bg"
         src="/welcome/loading-bg.webp"
@@ -77,6 +80,14 @@ export function LoadingScreen({ status, error }) {
         </p>
       ) : (
         <div className="loading-screen__center">
+          <img
+            className="loading-screen__sequence"
+            src={FRAME_URLS[framesReady ? frameIndex : 0]}
+            width={160}
+            height={160}
+            alt=""
+            aria-hidden="true"
+          />
           <div className="loading-screen__logo-group">
             <img
               className="loading-screen__logo-main"
@@ -91,14 +102,6 @@ export function LoadingScreen({ status, error }) {
               alt="Altera 2050"
             />
           </div>
-          <img
-            className="loading-screen__sequence"
-            src={FRAME_URLS[framesReady ? frameIndex : 0]}
-            width={160}
-            height={160}
-            alt=""
-            aria-hidden="true"
-          />
         </div>
       )}
     </div>

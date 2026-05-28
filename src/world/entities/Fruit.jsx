@@ -1,4 +1,5 @@
 import { useMemo, useRef, useEffect } from 'react'
+import { playOnce } from '../../utils/audioStore'
 import { useGLTF } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
@@ -96,6 +97,7 @@ export function Fruit({
   useEffect(() => {
     const onMouseDown = () => {
       if (!hoveredRef.current || !activeRef.current || fruitHoverStore.onCooldown) return
+      playOnce('clickMagic')
       onFruitClickRef.current?.(fruitId)
     }
     window.addEventListener('mousedown', onMouseDown)

@@ -73,6 +73,7 @@ export function PlayerControls({
   collisionObjects = [],
   controlsRef,
   lockSelector,
+  pointerSpeed = 1,
 }) {
   const { camera } = useThree()
   const pressedKeysRef = useRef({})
@@ -258,5 +259,7 @@ export function PlayerControls({
     }
   })
 
-  return <PointerLockControls ref={controlsRef} selector={lockSelector} />
+  return (
+    <PointerLockControls ref={controlsRef} selector={lockSelector} pointerSpeed={pointerSpeed} />
+  )
 }

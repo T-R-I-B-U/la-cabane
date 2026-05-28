@@ -1,4 +1,5 @@
 import { use, useEffect, useRef, useMemo } from 'react'
+import { playOnce } from '../../utils/audioStore'
 import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { preferKtx2, loadStandaloneTexture } from '../cabane/textureResolver.js'
@@ -231,8 +232,12 @@ export function TreeLeaves({
   useEffect(() => {
     if (!leafMesh || !alphaMap || !originalProps) return
     const originalRaycast = leafMesh.raycast
+    const originalCastShadow = leafMesh.castShadow
+    const originalReceiveShadow = leafMesh.receiveShadow
 
     /* eslint-disable react-hooks/immutability */
+    leafMesh.castShadow = true
+    leafMesh.receiveShadow = true
     alphaMap.flipY = false
     alphaMap.colorSpace = THREE.LinearSRGBColorSpace
     alphaMap.needsUpdate = true
@@ -302,6 +307,8 @@ export function TreeLeaves({
 
     return () => {
       leafMesh.raycast = originalRaycast
+      leafMesh.castShadow = originalCastShadow
+      leafMesh.receiveShadow = originalReceiveShadow
       leafMesh.material = originalProps.material
       originalProps.material.side = originalProps.side
       originalProps.material.alphaMap = originalProps.alphaMap
@@ -352,6 +359,7 @@ export function TreeLeaves({
           // Use the id tracked by the manual center raycaster instead.
           const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId
           if (id === undefined || id < 0 || !inRangeRef.current?.[id]) return
+          playOnce('clickMagic')
           onLeafClick(id)
         }}
       />

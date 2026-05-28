@@ -46,7 +46,7 @@
   height: auto;
   aspect-ratio: 266.131 / 36.5021;
   margin-left: 68.87%;
-  margin-top: 25px;
+  margin-top: 9px;
 }
 
 /* Image sequence animation rendered frame by frame in React. */
@@ -56,6 +56,20 @@
   flex-shrink: 0;
   object-fit: contain;
   image-rendering: auto;
+}
+
+.loading-screen--fading {
+  animation: loading-fade-out 0.8s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes loading-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
 .loading-screen__error {
