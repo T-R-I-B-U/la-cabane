@@ -125,6 +125,7 @@ export default function App() {
   const {
     selectedSavoirAssignment,
     openSavoirForLeaf,
+    openSavoirDirect,
     closeSavoir: closeSavoirInternal,
   } = useSavoirAssignment()
   const {
@@ -659,6 +660,18 @@ export default function App() {
     handlePlayerFruitPanelClose()
     pointerControlsRef.current?.lock()
   }, [handlePlayerFruitPanelClose])
+
+  const handleOpenFavoriteFromPanel = useCallback(
+    (savoir) => {
+      setIsPlayerFruitPanelOpen(false)
+      fruitHoverStore.startCooldown()
+      openSavoirDirect(savoir)
+      isModalOpenRef.current = true
+      setIsSavoirInteractionActive(true)
+      setShouldRestorePointerLockAfterStoryUi(true)
+    },
+    [openSavoirDirect]
+  )
 
   useEffect(() => {
     if (!isPlayerFruitPanelOpen) return
@@ -1362,6 +1375,7 @@ export default function App() {
           playerName={playerName}
           onClose={handleClosePlayerFruitPanel}
           hasSentSavoir={hasSentSavoir}
+          onFavoriteClick={handleOpenFavoriteFromPanel}
         />
       )}
 

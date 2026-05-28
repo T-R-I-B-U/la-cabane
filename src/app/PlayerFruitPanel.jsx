@@ -4,7 +4,7 @@ import { playOnce } from '../utils/audioStore'
 import { AddSavoirModal } from './AddSavoirModal'
 import { useFavorites } from '../utils/favoritesStore'
 
-export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false }) {
+export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false, onFavoriteClick }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   const favorites = useFavorites()
   return (
@@ -142,7 +142,11 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false })
                   {Array.from({ length: 3 }).map((_, i) => {
                     const fav = favorites[i]
                     return (
-                      <div key={i} className={`pfp-leaf-slot pfp-leaf-slot--flex${!fav ? ' pfp-leaf-slot--empty' : ''}`}>
+                      <div
+                        key={i}
+                        className={`pfp-leaf-slot pfp-leaf-slot--flex${!fav ? ' pfp-leaf-slot--empty' : ' pfp-leaf-slot--clickable'}`}
+                        onClick={fav ? () => onFavoriteClick?.(fav) : undefined}
+                      >
                         {fav && (
                           <img
                             className="pfp-leaf-img"
