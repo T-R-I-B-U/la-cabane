@@ -41,7 +41,19 @@ export function AnimatedCharacter({
   const activeActionRef = useRef(null)
   const { scene } = useGLTF(url)
   const { animations } = useGLTF(animationUrl ?? url)
-  const clonedScene = useMemo(() => clone(scene), [scene])
+  const clonedScene = useMemo(() => {
+    const cloned = clone(scene)
+    cloned.traverse((obj) => {
+      if (!obj.isMesh) return
+      forEachMeshMaterial(obj.material, (mat) => {
+        if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
+        if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+        if ('envMapIntensity' in mat) mat.envMapIntensity = 0
+        mat.needsUpdate = true
+      })
+    })
+    return cloned
+  }, [scene])
   const { actions, names } = useAnimations(animations, group)
   const hoverMaterialsRef = useRef(null)
 
@@ -55,12 +67,6 @@ export function AnimatedCharacter({
       // Skinned meshes need frustum culling disabled — rest-pose bbox desync causes invisible characters
       obj.frustumCulled = false
       obj.userData.isCharacter = true
-      forEachMeshMaterial(obj.material, (mat) => {
-        if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
-        if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
-        if ('envMapIntensity' in mat) mat.envMapIntensity = 0
-        mat.needsUpdate = true
-      })
       characterMeshes.push(obj)
     })
 
