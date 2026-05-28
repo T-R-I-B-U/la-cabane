@@ -1,4 +1,4 @@
 1
 00:00:00,000 --> 00:00:07,000
-Nous sommes au pied de l'arbre du Savoir, dans lequel est inscrit tout le Savoir du cercle.
+Nous sommes au pied de l'arbre du savoir, dans lequel est inscrit tout le savoir du Cercle.
 

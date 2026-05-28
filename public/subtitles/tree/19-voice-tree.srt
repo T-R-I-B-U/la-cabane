@@ -1,7 +1,7 @@
 1
 00:00:00,000 --> 00:00:03,920
-Nous allons grimper dans l'arbre pour voir les feuilles de savoir,
+Nous allons grimper dans l'arbre pour voir les feuilles de savoir.
 
 2
 00:00:03,920 --> 00:00:04,920
-viens !
+Viens !
