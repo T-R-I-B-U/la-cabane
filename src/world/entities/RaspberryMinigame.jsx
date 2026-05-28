@@ -6,55 +6,45 @@ import { cursorStore } from '../../utils/cursorStore'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-// Where the basket.gltf scene origin is placed (group-local space).
-const BASKET_ORIGIN = [-0.1, -0.4, 0.2]
+// Static basket from cabane.json at world [-32.9799, 0.3203, -42.6757] scale [1,1,1].
+// basket.gltf bbox y_max = 0.239 → top opening at world y = 0.3203 + 0.239 = 0.5593.
+// BASKET_SNAP expressed in GROUP_WORLD_POS-local space.
+// local = world_basket_top - GROUP_WORLD_POS = [-32.98-(-38.5), 0.56-0.44, -42.68-(-42.4)]
+const BASKET_ORIGIN = [-32.9799, 0.3203, -42.6757]
+const BASKET_SNAP = [5.52, 0.12, -0.28]
+const BASKET_NDC_RADIUS = 0.15
 
-// basket.gltf has FruitCrate2 at translation [-0.350, 0.109, 0.807] — scale 0.75 applied.
-// Snap zone must be at the visual center of the crate opening, not at the scene origin.
-const BASKET_SNAP = [
-  BASKET_ORIGIN[0] + -0.35 * 0.75,
-  BASKET_ORIGIN[1] + 0.109 * 0.75 + 0.05,
-  BASKET_ORIGIN[2] + 0.807 * 0.75,
-]
-const BASKET_NDC_RADIUS = 0.2
-
-// Berry slots: offsets from BASKET_SNAP center
+// Berry slots: offsets inside the basket relative to BASKET_SNAP.
+// Basket interior ≈ ±0.2m in x/z at scale 1; berries sit slightly below the opening.
 const BASKET_SLOTS = [
-  [0.0, -0.03, 0.0],
-  [0.03, -0.03, 0.025],
-  [-0.03, -0.03, 0.025],
-  [0.025, -0.03, -0.025],
-  [-0.025, -0.03, -0.025],
-  [0.01, 0.01, 0.01],
-  [-0.025, 0.01, 0.01],
-  [0.02, 0.01, -0.02],
+  [0.0, -0.12, 0.0],
+  [0.1, -0.09, 0.09],
+  [-0.1, -0.09, 0.09],
+  [0.1, -0.09, -0.09],
+  [-0.1, -0.09, -0.09],
 ]
-const BASKET_SCALE_IN = 0.035
-const RIPE_COUNT = 8
+const BASKET_SCALE_IN = 0.9
+const RIPE_COUNT = 5
 
-// World position of the outsideplant03 cluster root, from cabane.json.
-// Used as group anchor — never derived from the nodeBuilder wrapper (which is at y≈0).
-const GROUP_WORLD_POS = [32.8189, 1.5645, -5.6124]
+// World anchor on the outsideplant03 row nearest the basket (cabane.json).
+// Row at z≈-42.7: plants at x=-38.53, -39.26, -40.13 / y≈0.44.
+const GROUP_WORLD_POS = [-35.5, 1.0, -41.0]
 
-// Hardcoded berry positions in GROUP_WORLD_POS-local space.
-// 3 clusters matching the 3 outsideplant03 sub-instances in the GLTF
-// (raspberry groups at offsets ~[-0.01,0.78,-0.24], [-0.23,0.78,0.12], [0.24,0.78,0.11]).
+// Berry positions derived from outsideplant03.gltf vertex clusters, rotation-corrected.
+// Each plant's euler rotation (from cabane.json) was applied to model-local cluster centers.
+// World y ≈ 0.95–1.18 = visual top of the raspberry plants.
 const RASPBERRY_DEFS = [
-  // cluster 1 — left stem, z≥0.20 to stay in front of leaves
-  { position: [-0.01, 0.05, 0.22], isRipe: true },
-  { position: [0.06, 0.18, 0.28], isRipe: true },
-  { position: [-0.08, -0.05, 0.2], isRipe: false },
-  { position: [0.02, 0.25, 0.25], isRipe: false },
-  // cluster 2 — center-left stem
-  { position: [-0.23, 0.05, 0.22], isRipe: true },
-  { position: [-0.17, 0.18, 0.26], isRipe: true },
-  { position: [-0.29, -0.05, 0.2], isRipe: true },
-  { position: [-0.2, 0.25, 0.24], isRipe: false },
-  // cluster 3 — right stem
-  { position: [0.24, 0.05, 0.22], isRipe: true },
-  { position: [0.3, 0.18, 0.26], isRipe: true },
-  { position: [0.18, -0.05, 0.2], isRipe: true },
-  { position: [0.26, 0.25, 0.24], isRipe: false },
+  // Plant 1 (world x≈-38.53) rot=(-1.537,-1.262,-1.807)
+  { position: [0.605, 0.52, 0.93], rotation: [0.2, 0.8, 0.3], isRipe: true },
+  { position: [0.627, 0.312, 0.78], rotation: [-0.3, 2.1, 0.1], isRipe: false },
+  // Plant 2 (world x≈-39.26) rot=(-1.604, 1.262, 1.335)
+  { position: [0.507, 0.54, 0.41], rotation: [0.1, 3.8, -0.2], isRipe: true },
+  { position: [0.42, 0.426, 0.37], rotation: [-0.2, 1.5, 0.4], isRipe: true },
+  { position: [0.395, 0.308, 0.42], rotation: [0.4, 4.2, -0.1], isRipe: false },
+  // Plant 3 (world x≈-40.13) rot=(-1.537,-1.262,-1.807)
+  { position: [0.996, 0.52, 0.42], rotation: [-0.1, 0.4, 0.5], isRipe: true },
+  { position: [0.96, 0.382, 0.38], rotation: [0.3, 2.7, -0.3], isRipe: true },
+  { position: [0.974, 0.312, 0.35], rotation: [-0.4, 5.1, 0.2], isRipe: false },
 ]
 
 // ── Hide static raspberry meshes in the cabane model during minigame ──────────
@@ -82,13 +72,13 @@ export function Basket({ position = BASKET_ORIGIN }) {
 }
 
 // ── Berry — uses R3F onPointerDown for reliable hit detection ─────────────────
-function RaspberryInstance({ definition, onMeshRef, onPointerDown }) {
+function RaspberryInstance({ definition, onMeshRef }) {
   const { scene } = useGLTF('/models/raspberry.gltf')
   const colorMapRaw = useTexture('/textures/raspberry-color.png')
   const roughnessMap = useTexture('/textures/raspberry-roughness.png')
   const metalnessMap = useTexture('/textures/raspberry-metallic.png')
 
-  const baseScale = definition.isRipe ? 0.07 : 0.06
+  const baseScale = 1.0
 
   const material = useMemo(() => {
     if (definition.isRipe) {
@@ -101,6 +91,8 @@ function RaspberryInstance({ definition, onMeshRef, onPointerDown }) {
         metalnessMap,
         roughness: 1.0,
         metalness: 0.1,
+        emissive: new THREE.Color(0, 0, 0),
+        emissiveIntensity: 0,
       })
     }
     return new THREE.MeshStandardMaterial({
@@ -109,6 +101,8 @@ function RaspberryInstance({ definition, onMeshRef, onPointerDown }) {
       metalnessMap,
       roughness: 0.85,
       metalness: 0.05,
+      emissive: new THREE.Color(0, 0, 0),
+      emissiveIntensity: 0,
     })
   }, [definition.isRipe, colorMapRaw, roughnessMap, metalnessMap])
 
@@ -119,15 +113,6 @@ function RaspberryInstance({ definition, onMeshRef, onPointerDown }) {
     })
     return c
   }, [scene, material])
-
-  useEffect(() => {
-    cloned.traverse((child) => {
-      if (!child.isMesh) return
-      child.material.depthTest = false
-      child.material.depthWrite = false
-      child.renderOrder = 10
-    })
-  }, [cloned])
 
   const callbackRef = useCallback(
     (node) => {
@@ -141,15 +126,15 @@ function RaspberryInstance({ definition, onMeshRef, onPointerDown }) {
       ref={callbackRef}
       object={cloned}
       position={definition.position}
+      rotation={definition.rotation}
       scale={baseScale}
-      onPointerDown={onPointerDown}
     />
   )
 }
 
 // ── Main component ────────────────────────────────────────────────────────────
 export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) {
-  const { camera, gl } = useThree()
+  const { camera, gl, scene } = useThree()
   const groupRef = useRef()
 
   // Hide the static raspberry meshes in the cabane model while minigame is active
@@ -170,7 +155,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
   useEffect(() => {
     posRefs.current = RASPBERRY_DEFS.map((d) => [...d.position])
     collectedSlots.current = RASPBERRY_DEFS.map(() => null)
-    animScales.current = RASPBERRY_DEFS.map((d) => (d.isRipe ? 0.07 : 0.06))
+    animScales.current = RASPBERRY_DEFS.map(() => 2.0)
     collectedCountRef.current = 0
   }, [])
 
@@ -187,15 +172,11 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
   const pointerNdcRef = useRef(new THREE.Vector2())
   const raycaster = useMemo(() => new THREE.Raycaster(), [])
   const _hit = useMemo(() => new THREE.Vector3(), [])
-  const _basketWorldPos = useMemo(
-    () =>
-      new THREE.Vector3(
-        GROUP_WORLD_POS[0] + BASKET_SNAP[0],
-        GROUP_WORLD_POS[1] + BASKET_SNAP[1],
-        GROUP_WORLD_POS[2] + BASKET_SNAP[2]
-      ),
-    []
-  )
+
+  // Basket position — resolved once from the scene's basket mesh (cabane model)
+  const basketMeshRef = useRef(null)
+  const _basketWorldPos = useRef(new THREE.Vector3())
+  const _basketLocalPos = useRef(new THREE.Vector3(...BASKET_SNAP))
 
   useEffect(() => {
     if (!isActive) return
@@ -217,27 +198,38 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
     [gl]
   )
 
-  // R3F onPointerDown per berry — avoids manual raycasting, fires naturally
-  const handleBerryPointerDown = useCallback(
-    (index, e) => {
-      e.stopPropagation()
-      if (
-        !isActive ||
-        collectedSlots.current[index] !== null ||
-        collectedCountRef.current >= RIPE_COUNT
-      )
-        return
-      const camDir = new THREE.Vector3()
-      camera.getWorldDirection(camDir)
-      dragPlane.current.setFromNormalAndCoplanarPoint(camDir.negate(), e.point)
-      draggedIndexRef.current = index
-      cursorStore.setType('grabbing')
-    },
-    [isActive, camera]
-  )
-
   // document-level move/up for drag tracking
   useEffect(() => {
+    const onPointerDown = (e) => {
+      if (!isActive || collectedCountRef.current >= RIPE_COUNT) return
+      toNDC(e)
+      raycaster.setFromCamera(pointerNdcRef.current, camera)
+      const pickable = meshRegistryRef.current.filter(
+        (m, i) => m && collectedSlots.current[i] === null
+      )
+      if (!pickable.length) return
+      const hits = raycaster.intersectObjects(pickable, true)
+      if (!hits.length) return
+      const hitObject = hits[0].object
+      let idx = -1
+      for (let i = 0; i < meshRegistryRef.current.length; i++) {
+        const root = meshRegistryRef.current[i]
+        if (!root) continue
+        root.traverse((child) => {
+          if (child === hitObject) idx = i
+        })
+        if (idx !== -1) break
+      }
+      if (idx === -1 || collectedSlots.current[idx] !== null) return
+      const camDir = new THREE.Vector3()
+      camera.getWorldDirection(camDir)
+      camDir.y = 0
+      camDir.normalize()
+      dragPlane.current.setFromNormalAndCoplanarPoint(camDir.negate(), hits[0].point)
+      draggedIndexRef.current = idx
+      cursorStore.setType('grabbing')
+    }
+
     const onPointerMove = (e) => {
       toNDC(e)
       const idx = draggedIndexRef.current
@@ -248,25 +240,25 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
 
       const local = groupRef.current.worldToLocal(_hit.clone())
       const nx = local.x
-      const ny = Math.max(local.y, BASKET_SNAP[1] - 0.1)
+      const ny = local.y
       const nz = local.z
       posRefs.current[idx] = [nx, ny, nz]
       meshRegistryRef.current[idx]?.position.set(nx, ny, nz)
     }
 
-    const onPointerUp = (e) => {
+    const onPointerUp = () => {
       const idx = draggedIndexRef.current
       if (idx === null) return
       draggedIndexRef.current = null
       cursorStore.setType('default')
-      toNDC(e)
 
-      const basketNdc = _basketWorldPos.clone().project(camera)
-      const dx = pointerNdcRef.current.x - basketNdc.x
-      const dy = pointerNdcRef.current.y - basketNdc.y
+      const berryWorldPos = groupRef.current
+        ? groupRef.current.localToWorld(new THREE.Vector3(...posRefs.current[idx]))
+        : new THREE.Vector3(...posRefs.current[idx])
+      const dist = berryWorldPos.distanceTo(_basketWorldPos.current)
       const def = RASPBERRY_DEFS[idx]
 
-      if (Math.sqrt(dx * dx + dy * dy) < BASKET_NDC_RADIUS) {
+      if (dist < 1.2) {
         if (!def.isRipe) {
           onUnripeAttempt?.()
           posRefs.current[idx] = [...def.position]
@@ -284,27 +276,50 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       }
     }
 
+    document.addEventListener('pointerdown', onPointerDown)
     document.addEventListener('pointermove', onPointerMove)
     document.addEventListener('pointerup', onPointerUp)
     return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
       document.removeEventListener('pointermove', onPointerMove)
       document.removeEventListener('pointerup', onPointerUp)
       cursorStore.setType('default')
     }
-  }, [
-    isActive,
-    camera,
-    gl,
-    toNDC,
-    raycaster,
-    onStateChange,
-    onUnripeAttempt,
-    _basketWorldPos,
-    _hit,
-  ])
+  }, [isActive, camera, gl, toNDC, raycaster, onStateChange, onUnripeAttempt, _hit])
 
-  // Hover cursor + basket-snap / scale animation
   useFrame(() => {
+    // basket is auto-instanced — position baked into instance matrices, not Group transform
+    if (!basketMeshRef.current) {
+      let found = null
+      scene.traverse((obj) => {
+        if (obj.name === 'basket') found = obj
+      })
+      if (found) {
+        const instancedMesh = found.children.find((c) => c.isInstancedMesh)
+        if (instancedMesh) {
+          const mat = new THREE.Matrix4()
+          const pos = new THREE.Vector3()
+          const _q = new THREE.Quaternion()
+          const _s = new THREE.Vector3()
+          let bestY = Infinity
+          for (let i = 0; i < instancedMesh.count; i++) {
+            instancedMesh.getMatrixAt(i, mat)
+            mat.decompose(pos, _q, _s)
+            if (pos.y < bestY) {
+              bestY = pos.y
+              _basketWorldPos.current.copy(pos)
+            }
+          }
+          basketMeshRef.current = found
+        }
+      }
+    }
+    if (basketMeshRef.current && groupRef.current) {
+      const local = _basketWorldPos.current.clone()
+      groupRef.current.worldToLocal(local)
+      _basketLocalPos.current.copy(local)
+    }
+
     const idx = draggedIndexRef.current
 
     if (idx === null && isActive && collectedCountRef.current < RIPE_COUNT) {
@@ -323,9 +338,9 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       if (!mesh) continue
 
       const s = BASKET_SLOTS[slot]
-      const tx = BASKET_SNAP[0] + s[0]
-      const ty = BASKET_SNAP[1] + s[1]
-      const tz = BASKET_SNAP[2] + s[2]
+      const tx = _basketLocalPos.current.x + s[0]
+      const ty = _basketLocalPos.current.y + s[1]
+      const tz = _basketLocalPos.current.z + s[2]
       const [cx, cy, cz] = posRefs.current[i]
       const dx = tx - cx,
         dy = ty - cy,
@@ -347,17 +362,13 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
   })
 
   return (
-    <group ref={groupRef} position={GROUP_WORLD_POS}>
-      <Basket />
-      {RASPBERRY_DEFS.map((def, i) => (
-        <RaspberryInstance
-          key={i}
-          definition={def}
-          onMeshRef={handleMeshRef(i)}
-          onPointerDown={(e) => handleBerryPointerDown(i, e)}
-        />
-      ))}
-    </group>
+    <>
+      <group ref={groupRef} position={GROUP_WORLD_POS}>
+        {RASPBERRY_DEFS.map((def, i) => (
+          <RaspberryInstance key={i} definition={def} onMeshRef={handleMeshRef(i)} />
+        ))}
+      </group>
+    </>
   )
 }
 
