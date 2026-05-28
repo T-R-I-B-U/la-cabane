@@ -10,7 +10,10 @@ export function ContactPanel({ contact, onClose }) {
     <div
       className="cp-overlay"
       onPointerDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
+      onClick={() => {
+        playOnce('closeUi')
+        onClose()
+      }}
     >
       <div
         className="cp-card"
@@ -26,7 +29,26 @@ export function ContactPanel({ contact, onClose }) {
           }}
           aria-label="Fermer"
         >
-          <img src="/arrow.svg" alt="" aria-hidden="true" />
+          <svg width="50" height="50" viewBox="0 0 50 50" fill="none" aria-hidden="true">
+            <line
+              x1="8"
+              y1="8"
+              x2="42"
+              y2="42"
+              stroke="#33330f"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+            <line
+              x1="42"
+              y1="8"
+              x2="8"
+              y2="42"
+              stroke="#33330f"
+              strokeWidth="4"
+              strokeLinecap="round"
+            />
+          </svg>
         </button>
 
         <div className="cp-body">
