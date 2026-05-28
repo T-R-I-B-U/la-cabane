@@ -435,7 +435,7 @@ const AMBIANCE_FADE_MS = 1500
 let _currentAmbiance = null
 
 // Duck the current ambiance during dialogue so speech is clearly audible.
-const DIALOGUE_DUCK_VOLUME = 0.12
+const DIALOGUE_DUCK_VOLUME = 0.3
 const DIALOGUE_DUCK_FADE_MS = 500
 let _preDialogueAmbianceVolume = null
 

@@ -526,7 +526,6 @@ export function useIntroFlow({ sceneReady }) {
     setThomasEtabliPhaseActive(false)
     setThomasAnimationPhase('talking')
     stop('ambianceWorkbench')
-    setAmbiance(null)
     isAtelierBetweenTransitionRef.current = true
     setStoryCameraTransition({ ...STORY_CAMERA_POVS.atelierBetween, duration: 1.0 })
   }, [])
