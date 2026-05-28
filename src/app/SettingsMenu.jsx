@@ -17,7 +17,10 @@ function RadioPills({ options, value, onChange }) {
           key={opt}
           type="button"
           className={`settings-pill${value === opt ? ' settings-pill--active' : ''}`}
-          onClick={() => { playOnce('clickUi'); onChange(opt) }}
+          onClick={() => {
+            playOnce('clickUi')
+            onChange(opt)
+          }}
         >
           {opt}
         </button>
@@ -73,7 +76,14 @@ export function SettingsMenu({
       >
         <div className="settings-card__header">
           <h2 className="settings-card__title">Réglages</h2>
-          <GearIcon variant="textured" onClick={() => { playOnce('closeUi'); onClose() }} ariaLabel="Fermer les réglages" />
+          <GearIcon
+            variant="textured"
+            onClick={() => {
+              playOnce('closeUi')
+              onClose()
+            }}
+            ariaLabel="Fermer les réglages"
+          />
         </div>
 
         <div
@@ -138,7 +148,14 @@ export function SettingsMenu({
           <RadioPills options={['Oui', 'Non']} value={shadowsEnabled} onChange={onShadowsChange} />
         </div>
 
-        <button type="button" className="settings-fullscreen-btn" onClick={() => { playOnce('clickUi'); toggleFullscreen() }}>
+        <button
+          type="button"
+          className="settings-fullscreen-btn"
+          onClick={() => {
+            playOnce('clickUi')
+            toggleFullscreen()
+          }}
+        >
           {isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
         </button>
       </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { CabaneMap } from './CabaneMap'
+import { LampLights } from './LampLights'
 import { TreeLeaves } from '../../world/entities/TreeLeaves'
 import { SceneCharacters } from './SceneCharacters'
 import { SceneInteractions } from './SceneInteractions'
@@ -10,6 +11,25 @@ import { setZone } from '../../utils/gameManagerStore'
 import { PLATFORM_POS } from '../SceneConfig'
 
 const ARBRE_TRIGGER_RADIUS = 10
+
+// Hidden in exterior view (only visible from inside).
+const INTERIOR_ONLY_ROOTS = new Set([
+  'raspberry',
+  'chair',
+  'chair-large',
+  'pepper',
+  'armchair',
+  'cushiow',
+  'computer',
+  'stool',
+  'basket',
+  'drawing',
+  'rug01',
+  'rug02',
+  'large-table',
+  'littletable',
+])
+
 
 export function CabaneScene({
   modelQuality,
@@ -65,6 +85,7 @@ export function CabaneScene({
   serreActive,
   zoePhaseActive,
   raspberryPhaseActive,
+  raspberryGameCompleted,
   juiceMachinePhaseActive,
   juicePipePlaying,
   juicePhaseActive,
@@ -85,6 +106,14 @@ export function CabaneScene({
     onCollisionReady?.([cabaneGroup])
     return () => onCollisionReady?.([])
   }, [cabaneGroup, onCollisionReady])
+
+  useEffect(() => {
+    if (!cabaneGroup) return
+    cabaneGroup.traverse((obj) => {
+      const base = obj.name.replace(/-\d+$/, '')
+      if (INTERIOR_ONLY_ROOTS.has(base)) obj.visible = firstPersonMode
+    })
+  }, [cabaneGroup, firstPersonMode])
 
   const handleCabaneMapReady = useCallback(
     (sceneInfo) => {
@@ -130,6 +159,8 @@ export function CabaneScene({
         onCabaneLoaded={handleCabaneGroupLoaded}
       />
 
+      <LampLights cabane={cabaneGroup} />
+
       <TreeLeaves
         leafMesh={leafMesh}
         active={interactionsEnabled}
@@ -173,6 +204,7 @@ export function CabaneScene({
         serreActive={serreActive}
         zoePhaseActive={zoePhaseActive}
         raspberryPhaseActive={raspberryPhaseActive}
+        raspberryGameCompleted={raspberryGameCompleted}
         juiceMachinePhaseActive={juiceMachinePhaseActive}
         juicePipePlaying={juicePipePlaying}
         juicePhaseActive={juicePhaseActive}

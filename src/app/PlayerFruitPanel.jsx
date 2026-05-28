@@ -59,7 +59,12 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false })
                 <button
                   type="button"
                   className={`pfp-add-savoir${hasSentSavoir ? ' pfp-add-savoir--sent' : ''}`}
-                  onClick={() => { if (!hasSentSavoir) { playOnce('clickUi'); setIsAddSavoirOpen(true) } }}
+                  onClick={() => {
+                    if (!hasSentSavoir) {
+                      playOnce('clickUi')
+                      setIsAddSavoirOpen(true)
+                    }
+                  }}
                   disabled={hasSentSavoir}
                 >
                   <span className="pfp-add-icon">+</span>

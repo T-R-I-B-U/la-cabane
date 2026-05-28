@@ -9,9 +9,6 @@ const INSIDE_POV = {
   target: { x: -12.5066, y: 1.7137, z: -5.2008 },
 }
 
-const RASPBERRY_TEMP_COMPLETE_COUNT = 8
-const RASPBERRY_TEMP_AUTO_COMPLETE_DELAY = 2000
-
 export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
@@ -40,6 +37,7 @@ export function useIntroFlow({ sceneReady }) {
   const [serreActive, setSerreActive] = useState(false)
   const [zoePhaseActive, setZoePhaseActive] = useState(false)
   const [raspberryPhaseActive, setRaspberryPhaseActive] = useState(false)
+  const [raspberryGameCompleted, setRaspberryGameCompleted] = useState(false)
   const [juiceMachinePhaseActive, setJuiceMachinePhaseActive] = useState(false)
   const [juicePipePlaying, setJuicePipePlaying] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
@@ -113,6 +111,7 @@ export function useIntroFlow({ sceneReady }) {
     setSerreActive(false)
     setZoePhaseActive(false)
     setRaspberryPhaseActive(false)
+    setRaspberryGameCompleted(false)
     setJuiceMachinePhaseActive(false)
     setJuicePhaseActive(false)
     setExitSerrePhaseActive(false)
@@ -384,7 +383,7 @@ export function useIntroFlow({ sceneReady }) {
         onDone: () => {
           if (isLast) {
             journalCompletedRef.current = true
-            setJournalCloseToken((t) => t + 1)
+            scheduleFlowTimeout(() => setJournalCloseToken((t) => t + 1), 3000)
             return
           }
 
@@ -392,7 +391,7 @@ export function useIntroFlow({ sceneReady }) {
         },
       })
     },
-    [playDialogue]
+    [playDialogue, scheduleFlowTimeout]
   )
 
   const handleJournalInteractionStart = useCallback(() => {}, [])
@@ -420,37 +419,31 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleTreeInteract = useCallback(() => {
     setTreePhaseActive(false)
-
-    if (treeClickPhaseRef.current === 1) {
-      playDialogue('treePiedDialogue', {
-        onDone: () => {
-          playDialogue('treeRacinesDialogue', {
-            onDone: () => {
-              setTimeatmPhaseActive(true)
-            },
-          })
-        },
-      })
-    } else {
-      playDialogue('treeArbreDialogue', {
-        onDone: () => {
-          playDialogue('treeOutroDialogue', {
-            onDone: unlockWorkbenchPhase,
-          })
-        },
-      })
-    }
-  }, [playDialogue, unlockWorkbenchPhase])
+    playDialogue('treePiedDialogue', {
+      onDone: () => {
+        playDialogue('treeRacinesDialogue', {
+          onDone: () => {
+            playDialogue('treeArbreDialogue', {
+              onDone: () => {
+                setTimeatmPhaseActive(true)
+              },
+            })
+          },
+        })
+      },
+    })
+  }, [playDialogue])
 
   const handleTimeatmInteract = useCallback(() => {
     setTimeatmPhaseActive(false)
     playDialogue('treeBorneDialogue', {
       onDone: () => {
-        treeClickPhaseRef.current = 2
-        setTreePhaseActive(true)
+        playDialogue('treeOutroDialogue', {
+          onDone: unlockWorkbenchPhase,
+        })
       },
     })
-  }, [playDialogue])
+  }, [playDialogue, unlockWorkbenchPhase])
 
   const handleWorkbenchInteract = useCallback(() => {
     setWorkbenchPhaseActive(false)
@@ -470,6 +463,7 @@ export function useIntroFlow({ sceneReady }) {
       setMinigameCount(state.count)
       if (!state.complete) return
       setRaspberryPhaseActive(false)
+      setRaspberryGameCompleted(true)
       setZoeClip('zoe-pointing')
       scheduleFlowTimeout(() => {
         playDialogue('zoeJuice', {
@@ -483,25 +477,6 @@ export function useIntroFlow({ sceneReady }) {
     },
     [playDialogue, scheduleFlowTimeout]
   )
-
-  useEffect(() => {
-    if (!raspberryPhaseActive) return undefined
-
-    const scheduledTimeouts = scheduledTimeoutsRef.current
-
-    const timeoutId = scheduleFlowTimeout(() => {
-      handleMinigameStateChange({
-        active: true,
-        count: RASPBERRY_TEMP_COMPLETE_COUNT,
-        complete: true,
-      })
-    }, RASPBERRY_TEMP_AUTO_COMPLETE_DELAY)
-
-    return () => {
-      clearTimeout(timeoutId)
-      scheduledTimeouts.delete(timeoutId)
-    }
-  }, [handleMinigameStateChange, raspberryPhaseActive, scheduleFlowTimeout])
 
   const handleUnripeAttempt = useCallback(() => {
     playDialogue('zoeUnripe')
@@ -766,6 +741,7 @@ export function useIntroFlow({ sceneReady }) {
     serreActive,
     zoePhaseActive,
     raspberryPhaseActive,
+    raspberryGameCompleted,
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,

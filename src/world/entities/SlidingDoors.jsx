@@ -7,6 +7,9 @@ const TRIGGER_DIST = 5
 const SLIDE_AMOUNT = 1.5
 const LERP_SPEED = 0.07
 const MAX_FRAME_DELTA = 0.05
+// Small inward offset to sink doors into the wall so the rounded hut edge hides the panel tip when open.
+// Adjust axis (x/y) and sign if the effect goes the wrong direction.
+const WALL_DEPTH_OFFSET = 0.08
 
 function getDoorProgress(progressRef, doorId) {
   return progressRef.current.get(doorId) ?? 0
@@ -97,6 +100,8 @@ function collectDoors(cabane, debug) {
       rightId: right.uuid,
       leftId: left.uuid,
       center: center.clone(),
+      rightOriginX: right.position.x,
+      leftOriginX: left.position.x,
       rightOriginZ: right.position.z,
       leftOriginZ: left.position.z,
     }
@@ -177,6 +182,8 @@ export function SlidingDoors({
 
       progressRef.current.set(door.id, nextProgress)
 
+      right.position.x = door.rightOriginX + WALL_DEPTH_OFFSET
+      left.position.x = door.leftOriginX + WALL_DEPTH_OFFSET
       right.position.z = door.rightOriginZ + nextProgress * SLIDE_AMOUNT
       left.position.z = door.leftOriginZ - nextProgress * SLIDE_AMOUNT
 

@@ -49,7 +49,7 @@ export function ClickableThomas({
   return (
     <mesh ref={meshRef} position={[position[0], position[1] + 0.9, position[2]]}>
       <boxGeometry args={[0.7, 1.8, 0.7]} />
-      <meshBasicMaterial transparent opacity={0} />
+      <meshBasicMaterial transparent opacity={0} depthWrite={false} />
     </mesh>
   )
 }

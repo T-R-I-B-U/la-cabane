@@ -35,6 +35,23 @@ const FORCED_SMALL_SHADOW_CASTER_ROOTS = new Set([
   'plant03',
   'plant04',
   'plant05',
+  'plant06',
+  'plant08',
+  'plant08-1',
+  'large-table',
+  'computer',
+  'cushiow',
+  'little-table-2',
+  'vase',
+  'wateringcan',
+  'wheelbarrow',
+  'bike',
+  'bikewheel',
+  'balloon',
+  'pepper',
+  'raspberry',
+  'tool01',
+  'tool02',
 ])
 const SHADOW_RECEIVER_ROOTS = new Set([
   ...SHARED_SHADOW_RECEIVER_ROOTS,
@@ -45,6 +62,8 @@ const SHADOW_RECEIVER_ROOTS = new Set([
   'house',
   'platform-hut',
   'workbench01',
+  'greenhouse_ground',
+  'ground-hut',
 ])
 const SHADOW_EXCLUDED_NAMES = [/plane/i, /^background$/i, /poster/i, /^outsideplant0[23]$/i]
 const LIGHT_PASSING_SURFACE_NAMES = new Set([
@@ -489,6 +508,12 @@ export async function buildCabane({
       configureLightPassingMaterial(obj)
       return
     }
+    forEachMaterial(obj.material, (mat) => {
+      if ('roughness' in mat) { mat.roughness = 1; mat.roughnessMap = null }
+      if ('metalness' in mat) { mat.metalness = 0; mat.metalnessMap = null }
+      if ('envMapIntensity' in mat) mat.envMapIntensity = 0
+      mat.needsUpdate = true
+    })
     obj.receiveShadow = isShadowReceiverCandidate(obj)
     obj.castShadow = false
     if (!isShadowCasterCandidate(obj)) return
