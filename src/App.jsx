@@ -1194,7 +1194,11 @@ export default function App() {
           fruitsDisabled:
             isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
           onGrowingFruitComplete: handleGrowingFruitComplete,
-          leafInteractionsEnabled: arbreLeafInteractionsEnabled,
+          leafInteractionsEnabled:
+            arbreLeafInteractionsEnabled &&
+            !isSavoirInteractionActive &&
+            !isContactInteractionActive &&
+            !isPlayerFruitPanelOpen,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={
