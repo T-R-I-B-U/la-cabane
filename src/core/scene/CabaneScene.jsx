@@ -85,6 +85,7 @@ export function CabaneScene({
   serreActive,
   zoePhaseActive,
   raspberryPhaseActive,
+  raspberryGameCompleted,
   juiceMachinePhaseActive,
   juicePipePlaying,
   juicePhaseActive,
@@ -203,6 +204,7 @@ export function CabaneScene({
         serreActive={serreActive}
         zoePhaseActive={zoePhaseActive}
         raspberryPhaseActive={raspberryPhaseActive}
+        raspberryGameCompleted={raspberryGameCompleted}
         juiceMachinePhaseActive={juiceMachinePhaseActive}
         juicePipePlaying={juicePipePlaying}
         juicePhaseActive={juicePhaseActive}
