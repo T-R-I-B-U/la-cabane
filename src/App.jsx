@@ -1197,7 +1197,12 @@ export default function App() {
           leafInteractionsEnabled: arbreLeafInteractionsEnabled,
         }}
         leafMaterialMode={leafMaterialMode}
-        interactionsEnabled={interactionsEnabled}
+        interactionsEnabled={
+          interactionsEnabled &&
+          !isSavoirInteractionActive &&
+          !isContactInteractionActive &&
+          !isPlayerFruitPanelOpen
+        }
         pointerControlsRef={pointerControlsRef}
         interactions={{
           onLeafClick: openSavoirFromLeaf,
