@@ -498,7 +498,7 @@ export default function CameraEditorPanel({ onClose }) {
 
   function handlePreviewGroup(group) {
     const groupCams = registry.cameras.filter((c) => c.group === group && c.position && c.target)
-    const steps = groupCams.map((c) => ({ cameraId: c.id, duration: 2, easing: 'easeInOut' }))
+    const steps = groupCams.map((c) => ({ cameraId: c.id, duration: c.duration, easing: c.easing }))
     if (steps.length < 2) return
     setEditorFlyMode(false)
     requestPreview(steps)
@@ -514,7 +514,7 @@ export default function CameraEditorPanel({ onClose }) {
       let msToTimeatm = 0
       for (const cam of groupCams) {
         if (cam.id === 'tree-story.timeatm') break
-        msToTimeatm += ((cam.delay ?? 0) + 2) * 1000
+        msToTimeatm += ((cam.delay ?? 0) + (cam.duration ?? 2)) * 1000
       }
       // 13 → 15 at timeatm + 1s
       setTimeout(

@@ -186,6 +186,9 @@ export default function App() {
     returnHallVisible,
     treePhaseActive,
     timeatmPhaseActive,
+    treeStoryCameras,
+    treeStoryPauseAt,
+    onTreeStoryComplete,
     workbenchPhaseActive,
     greenhousePhaseActive,
     thomasEtabliPhaseActive,
@@ -1151,6 +1154,9 @@ export default function App() {
           postIntroLocked: isStoryCameraControlEnabled,
           treePhaseActive,
           timeatmPhaseActive,
+          treeStoryCameras,
+          treeStoryPauseAt,
+          onTreeStoryComplete,
           receptionActive:
             currentStoryStepId === 'intro.goToReception' &&
             postIntro &&

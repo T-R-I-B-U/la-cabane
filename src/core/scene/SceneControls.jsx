@@ -8,6 +8,7 @@ import { CameraRegistrySync } from '../CameraRegistrySync'
 import { getEditorFlyMode, onEditorFlyModeChange } from '../cameraRegistry'
 import { PlayerControls } from '../PlayerControls'
 import { StoryCameraTransition } from '../StoryCameraTransition'
+import { StorySequencePlayer } from '../StorySequencePlayer'
 
 function OrbitTargetSync({ controlsRef, target }) {
   const { camera } = useThree()
@@ -37,6 +38,9 @@ export function SceneControls({
   introSpawn,
   storyCameraTransition,
   onStoryCameraTransitionComplete,
+  treeStoryCameras,
+  treeStoryPauseAt,
+  onTreeStoryComplete,
   arbreStoryCameraTransition,
   onArbreTransitionComplete,
   onIntroEvent,
@@ -128,6 +132,13 @@ export function SceneControls({
           <StoryCameraTransition
             transition={arbreStoryCameraTransition}
             onComplete={onArbreTransitionComplete}
+          />
+        )}
+        {treeStoryCameras && (
+          <StorySequencePlayer
+            cameras={treeStoryCameras}
+            pauseAtId={treeStoryPauseAt}
+            onComplete={onTreeStoryComplete}
           />
         )}
         {devSync}
