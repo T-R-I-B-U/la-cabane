@@ -27,7 +27,6 @@
   padding: 40px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .pfp-left-inner {

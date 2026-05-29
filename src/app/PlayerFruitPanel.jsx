@@ -24,20 +24,20 @@ export function PlayerFruitPanel({ playerName, hasSentSavoir = false }) {
             <div className="pfp-left-inner">
               <div className="pfp-top-section">
                 <img
+                  className="pfp-card-icon"
+                  src="/player-panel/icon-card.png"
+                  alt=""
+                  aria-hidden="true"
+                />
+                <p className="pfp-player-name">{playerName || 'Visiteur·se'}</p>
+                <img
                   className="pfp-fruit-img"
                   src="/player-panel/fruit.webp"
                   alt=""
                   aria-hidden="true"
                 />
-                <p className="pfp-player-name">{playerName || 'Visiteur·se'}</p>
               </div>
               <div className="pfp-bottom-section">
-                <img
-                  className="pfp-card-icon"
-                  src="/player-panel/icon-card.svg"
-                  alt=""
-                  aria-hidden="true"
-                />
                 <p className="pfp-role">Jury des Gobelins</p>
                 <p className="pfp-desc-label">Description</p>
                 <p className="pfp-desc-text">
@@ -59,7 +59,7 @@ export function PlayerFruitPanel({ playerName, hasSentSavoir = false }) {
                 <div className="pfp-card-header">
                   <img
                     className="pfp-card-icon"
-                    src="/player-panel/icon-passeur.svg"
+                    src="/player-panel/icon-passeur.png"
                     alt=""
                     aria-hidden="true"
                   />
@@ -89,7 +89,7 @@ export function PlayerFruitPanel({ playerName, hasSentSavoir = false }) {
                 <div className="pfp-card-header">
                   <img
                     className="pfp-card-icon"
-                    src="/player-panel/icon-apprenti.svg"
+                    src="/player-panel/icon-apprenti.png"
                     alt=""
                     aria-hidden="true"
                   />
@@ -134,7 +134,7 @@ export function PlayerFruitPanel({ playerName, hasSentSavoir = false }) {
                 <div className="pfp-card-header">
                   <img
                     className="pfp-card-icon"
-                    src="/player-panel/icon-favoris.svg"
+                    src="/player-panel/icon-favoris.png"
                     alt=""
                     aria-hidden="true"
                   />
