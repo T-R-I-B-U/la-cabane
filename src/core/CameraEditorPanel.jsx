@@ -4,6 +4,7 @@ import {
   addSequenceStep,
   captureCharacterFromCamera,
   captureCamera,
+  clearAllCameraStorage,
   duplicateCamera,
   exportAsJSON,
   getEditorFlyMode,
@@ -183,6 +184,34 @@ const S = {
     font: 'inherit',
   },
   empty: { color: '#7c8490', padding: 10, textAlign: 'center' },
+  stepCard: {
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: 10,
+    padding: '10px 12px',
+    background: 'rgba(255,255,255,0.04)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 8,
+  },
+  stepHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+  },
+  stepNum: {
+    fontWeight: 900,
+    color: '#9de3ff',
+    fontSize: 12,
+    minWidth: 24,
+    flexShrink: 0,
+  },
+  stepFieldLabel: {
+    color: '#8e99a8',
+    fontSize: 9,
+    fontWeight: 800,
+    textTransform: 'uppercase',
+    marginBottom: 3,
+  },
 }
 
 function fmt(v) {
@@ -293,6 +322,12 @@ export default function CameraEditorPanel({ onClose }) {
     dragRef.current = null
     setIsDragging(false)
     event.currentTarget.releasePointerCapture(event.pointerId)
+  }
+
+  function handleClearAll() {
+    clearAllCameraStorage()
+    setPanelPosition(INITIAL_PANEL_POSITION)
+    persistPanelPosition(INITIAL_PANEL_POSITION)
   }
 
   function handleClose() {
@@ -406,6 +441,9 @@ export default function CameraEditorPanel({ onClose }) {
           <button type="button" style={S.btn('warn')} onClick={resetCameraRegistry}>
             Reset local
           </button>
+          <button type="button" style={S.btn('danger')} onClick={handleClearAll}>
+            Reset tout localStorage
+          </button>
         </div>
 
         <div style={S.live}>
@@ -497,66 +535,26 @@ export default function CameraEditorPanel({ onClose }) {
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {introSteps.map((step, index) => {
                 const camera = registry.cameras.find((item) => item.id === step.cameraId)
                 return (
-                  <div key={`${step.cameraId}-${index}`} style={S.step}>
-                    <strong>#{index + 1}</strong>
-                    <select
-                      style={S.smallInput}
-                      value={step.cameraId}
-                      onChange={(e) =>
-                        updateSequenceStep('intro', index, { cameraId: e.target.value })
-                      }
-                    >
-                      {registry.cameras.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.label}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      style={S.smallInput}
-                      type="number"
-                      step="0.1"
-                      value={step.duration ?? 1.2}
-                      title="Durée"
-                      onChange={(e) =>
-                        updateSequenceStep('intro', index, { duration: Number(e.target.value) })
-                      }
-                    />
-                    <input
-                      style={S.smallInput}
-                      type="number"
-                      step="0.1"
-                      value={step.delay ?? 0}
-                      title="Delay"
-                      onChange={(e) =>
-                        updateSequenceStep('intro', index, { delay: Number(e.target.value) })
-                      }
-                    />
-                    <input
-                      style={S.smallInput}
-                      value={step.event ?? ''}
-                      placeholder="event"
-                      onChange={(e) =>
-                        updateSequenceStep('intro', index, { event: e.target.value })
-                      }
-                    />
-                    <label
-                      style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#c7d0dc' }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={Boolean(step.waitForInput)}
+                  <div key={`${step.cameraId}-${index}`} style={S.stepCard}>
+                    <div style={S.stepHeader}>
+                      <span style={S.stepNum}>#{index + 1}</span>
+                      <select
+                        style={{ ...S.smallInput, flex: 1 }}
+                        value={step.cameraId}
                         onChange={(e) =>
-                          updateSequenceStep('intro', index, { waitForInput: e.target.checked })
+                          updateSequenceStep('intro', index, { cameraId: e.target.value })
                         }
-                      />
-                      wait
-                    </label>
-                    <div style={S.btnRow}>
+                      >
+                        {registry.cameras.map((item) => (
+                          <option key={item.id} value={item.id}>
+                            {item.label}
+                          </option>
+                        ))}
+                      </select>
                       <button
                         type="button"
                         style={S.btn()}
@@ -579,9 +577,92 @@ export default function CameraEditorPanel({ onClose }) {
                         ×
                       </button>
                     </div>
-                    <span style={{ gridColumn: '2 / -1', color: '#7e8793', fontSize: 10 }}>
-                      {camera?.id ?? step.cameraId}
-                    </span>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+                      <div>
+                        <div style={S.stepFieldLabel}>Durée (s)</div>
+                        <input
+                          style={S.smallInput}
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          value={step.duration ?? 1.2}
+                          onChange={(e) =>
+                            updateSequenceStep('intro', index, { duration: Number(e.target.value) })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <div style={S.stepFieldLabel}>Délai (s)</div>
+                        <input
+                          style={S.smallInput}
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          value={step.delay ?? 0}
+                          onChange={(e) =>
+                            updateSequenceStep('intro', index, { delay: Number(e.target.value) })
+                          }
+                        />
+                      </div>
+                      <div>
+                        <div style={S.stepFieldLabel}>Easing</div>
+                        <select
+                          style={S.smallInput}
+                          value={step.easing ?? 'easeInOut'}
+                          onChange={(e) =>
+                            updateSequenceStep('intro', index, { easing: e.target.value })
+                          }
+                        >
+                          <option value="easeInOut">easeInOut</option>
+                          <option value="easeIn">easeIn</option>
+                          <option value="easeOut">easeOut</option>
+                          <option value="linear">linear</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr auto',
+                        gap: 8,
+                        alignItems: 'center',
+                      }}
+                    >
+                      <div>
+                        <div style={S.stepFieldLabel}>Évènement</div>
+                        <input
+                          style={S.smallInput}
+                          value={step.event ?? ''}
+                          placeholder="ex: doors:open"
+                          onChange={(e) =>
+                            updateSequenceStep('intro', index, { event: e.target.value })
+                          }
+                        />
+                      </div>
+                      <label
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 5,
+                          color: '#c7d0dc',
+                          whiteSpace: 'nowrap',
+                          paddingTop: 16,
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={Boolean(step.waitForInput)}
+                          onChange={(e) =>
+                            updateSequenceStep('intro', index, { waitForInput: e.target.checked })
+                          }
+                        />
+                        Attendre input
+                      </label>
+                    </div>
+
+                    {camera && <div style={{ color: '#7e8793', fontSize: 10 }}>{camera.id}</div>}
                   </div>
                 )
               })}

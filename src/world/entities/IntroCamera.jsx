@@ -3,8 +3,15 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { getIntroWaypoints, onRegistryChange } from '../../core/cameraRegistry'
 
-function easeInOut(t) {
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+const EASINGS = {
+  linear: (t) => t,
+  easeIn: (t) => t * t,
+  easeOut: (t) => t * (2 - t),
+  easeInOut: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
+}
+
+function getEasing(name) {
+  return EASINGS[name] ?? EASINGS.easeInOut
 }
 
 function toWaypoint(step) {
@@ -105,7 +112,7 @@ export default function IntroCamera({ active, shouldAdvance, onEvent }) {
     }
 
     progressRef.current = Math.min(progressRef.current + delta / to.duration, 1)
-    const t = easeInOut(progressRef.current)
+    const t = getEasing(to.easing)(progressRef.current)
 
     frameCamera.position.lerpVectors(from.position, to.position, t)
     const lookAt = new THREE.Vector3().lerpVectors(from.target, to.target, t)

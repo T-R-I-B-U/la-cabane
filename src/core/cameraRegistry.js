@@ -89,6 +89,23 @@ export function resetCameraRegistry() {
   save(clone(DEFAULT_CONFIG))
 }
 
+export function clearAllCameraStorage() {
+  const keys = [
+    STORAGE_KEY,
+    'lacabane:camera-editor-panel-position',
+    'lacabane:cinematic-presets:v1',
+  ]
+  keys.forEach((key) => {
+    try {
+      localStorage.removeItem(key)
+    } catch {
+      // localStorage unavailable (private browsing, quota exceeded)
+    }
+  })
+  _state = clone(DEFAULT_CONFIG)
+  notify()
+}
+
 export function getCameraPose(id) {
   return _state.cameras.find((camera) => camera.id === id) ?? null
 }
