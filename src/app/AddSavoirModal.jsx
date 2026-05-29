@@ -36,11 +36,17 @@ export function AddSavoirModal() {
                 aria-hidden="true"
               />
             </div>
-            {/* Figma: absolute left-[443px] size-[199px] top-[90px] */}
+            {/* Figma: two overlapping QR layers at left-[443px] top-[90px] size-[199px] */}
             <img
               className="asm-qr"
-              src="/player-panel/add-savoir-qr.svg"
+              src="/player-panel/add-savoir-qr1.svg"
               alt="QR code — scannez pour ajouter un savoir"
+            />
+            <img
+              className="asm-qr"
+              src="/player-panel/add-savoir-qr2.svg"
+              alt=""
+              aria-hidden="true"
             />
           </div>
         </div>
