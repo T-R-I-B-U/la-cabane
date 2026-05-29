@@ -290,14 +290,8 @@ export function useIntroFlow({ sceneReady }) {
       greenhouseTransitionStageRef.current = null
       setAmbiance('ambianceOutside')
       scheduleFlowTimeout(() => {
-        playDialogue('18-voice-tree', {
-          onDone: () =>
-            playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
-        })
-        scheduleFlowTimeout(() => {
-          greenhouseTransitionStageRef.current = 'arbreStairs1'
-          setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
-        }, 2000)
+        greenhouseTransitionStageRef.current = 'arbreStairs1'
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
       }, 500)
       return
     }
@@ -312,6 +306,10 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'arbreStairs2') {
       greenhouseTransitionStageRef.current = null
+      playDialogue('18-voice-tree', {
+        onDone: () =>
+          playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
+      })
       return
     }
 
