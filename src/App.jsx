@@ -1197,14 +1197,16 @@ export default function App() {
             isContactInteractionActive ||
             isPlayerFruitPanelOpen ||
             isSavoirInteractionActive ||
-            leafArriving,
+            leafArriving ||
+            !!incomingSavoir,
           onGrowingFruitComplete: handleGrowingFruitComplete,
           leafInteractionsEnabled:
             arbreLeafInteractionsEnabled &&
             !isSavoirInteractionActive &&
             !isContactInteractionActive &&
             !isPlayerFruitPanelOpen &&
-            !leafArriving,
+            !leafArriving &&
+            !incomingSavoir,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={
@@ -1212,7 +1214,8 @@ export default function App() {
           !isSavoirInteractionActive &&
           !isContactInteractionActive &&
           !isPlayerFruitPanelOpen &&
-          !leafArriving
+          !leafArriving &&
+          !incomingSavoir
         }
         pointerControlsRef={pointerControlsRef}
         interactions={{
