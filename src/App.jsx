@@ -759,8 +759,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const onEscape = (e) => {
-      if (e.key !== 'Escape') return
+    const onTab = (e) => {
+      if (e.key !== 'Tab') return
       if (!isInGameplayRef.current) return
       if (
         isModalOpenRef.current ||
@@ -768,6 +768,7 @@ export default function App() {
         isMinigameActiveRef.current
       )
         return
+      e.preventDefault()
       e.stopImmediatePropagation()
       if (showSettings) {
         setShowSettings(false)
@@ -776,8 +777,8 @@ export default function App() {
         setShouldRestorePointerLockAfterStoryUi(true)
       }
     }
-    document.addEventListener('keydown', onEscape, { capture: true })
-    return () => document.removeEventListener('keydown', onEscape, { capture: true })
+    document.addEventListener('keydown', onTab, { capture: true })
+    return () => document.removeEventListener('keydown', onTab, { capture: true })
   }, [showSettings])
 
   useEffect(() => {

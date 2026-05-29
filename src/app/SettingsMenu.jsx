@@ -151,6 +151,10 @@ export function SettingsMenu({
         >
           {isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
         </button>
+
+        <p className="settings-tab-hint">
+          <kbd className="settings-tab-key">Tab</kbd> pour ouvrir / fermer
+        </p>
       </div>
     </div>
   )

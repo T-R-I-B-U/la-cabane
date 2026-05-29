@@ -163,3 +163,27 @@
 .settings-fullscreen-btn:hover {
   opacity: 0.75;
 }
+
+.settings-tab-hint {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 13px;
+  color: #33330f;
+  opacity: 0.5;
+  margin: 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.settings-tab-key {
+  font-family: 'Albert Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  background: #33330f;
+  color: #e3e7b3;
+  border-radius: 4px;
+  padding: 2px 7px;
+  letter-spacing: 0.05em;
+}
