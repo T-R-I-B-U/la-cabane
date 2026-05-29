@@ -83,51 +83,78 @@ function resolveArbrePovs(platformPosition) {
       target: { x: -18.168, y: 8.8642, z: 32.0839 },
       duration: 2.0,
     },
-    // Outro reverse journey — mirrors the intro WP sequence
-    outroStairs02Top: {
-      cameraId: 'arbre.stairs02Top',
-      reverseCamera: true,
-      position: { x: -15.5754, y: 12.1331, z: 13.8407 },
-      target: getReverseTarget(
-        { x: -15.5754, y: 12.1331, z: 13.8407 },
-        { x: -15.8063, y: 12.0721, z: 14.28 }
-      ),
-      duration: 2.0,
+    // Outro cameras
+    outroNest1: {
+      cameraId: 'outro.outro.nest.1',
+      position: { x: -82.782, y: 11.5867, z: -24.7316 },
+      target: { x: -81.0478, y: 9.1486, z: -28.7377 },
+      duration: 3,
+      delay: 0,
+      easing: 'linear',
     },
-    outroStairs02Down: {
-      cameraId: 'arbre.stairs02Down',
-      reverseCamera: true,
-      position: { x: -7.685, y: 4.3005, z: 2.2315 },
-      target: getReverseTarget(
-        { x: -7.685, y: 4.3005, z: 2.2315 },
-        { x: -23.7066, y: 6.2533, z: 8.2345 }
-      ),
-      duration: 1.5,
+    outroNest2: {
+      cameraId: 'outro.outro.nest.2',
+      position: { x: -77.1038, y: 4.8585, z: -37.9987 },
+      target: { x: -73.429, y: 4.4921, z: -41.3694 },
+      duration: 4,
+      delay: 0.2,
+      easing: 'linear',
     },
-    // WP4 position, camera looking back out toward WP3
-    outroWP4: {
-      cameraId: 'arbre.outroWP4',
-      position: { x: -14.3667, y: 1.3785, z: -5.1169 },
-      target: { x: -23.7944, y: 1.5695, z: -5.3764 },
-      duration: 2.5,
+    outroNest3: {
+      cameraId: 'outro.outro.nest.3',
+      position: { x: -70.5549, y: 4.8585, z: -37.4258 },
+      target: { x: -67.7681, y: 2.2138, z: -40.6256 },
+      duration: 2,
+      delay: 0.2,
+      easing: 'linear',
     },
-    outroWP3: {
-      cameraId: 'arbre.outroWP3',
-      position: { x: -23.7944, y: 1.5695, z: -5.3764 },
-      target: { x: -12.4469, y: 0.5678, z: -5.3619 },
-      duration: 2.5,
+    outroNest4: {
+      cameraId: 'outro.outro.nest.4',
+      position: { x: -66.1831, y: 1.5028, z: -42.1445 },
+      target: { x: -68.309, y: 1.3161, z: -46.6663 },
+      duration: 2,
+      delay: 0.2,
+      easing: 'linear',
     },
-    outroWP1: {
-      cameraId: 'arbre.outroWP1',
-      position: { x: -39.8198, y: 7.2813, z: -8.6382 },
-      target: { x: -11.3697, y: 0.642, z: -1.0329 },
-      duration: 3.5,
+    outroNest5: {
+      cameraId: 'outro.outro.nest.5',
+      position: { x: -73.5367, y: 1.5028, z: -51.2307 },
+      target: { x: -78.1896, y: 1.456, z: -49.4008 },
+      duration: 3,
+      delay: 0.2,
+      easing: 'linear',
     },
-    outroWP0: {
-      cameraId: 'arbre.outroWP0',
-      position: { x: -84.2679, y: 25.15, z: -24.166 },
-      target: { x: -9.4607, y: 7.3604, z: -2.0887 },
-      duration: 3.0,
+    outroNest6: {
+      cameraId: 'outro.outro.nest.6',
+      position: { x: -82.8537, y: 1.5028, z: -45.5178 },
+      target: { x: -87.8533, y: 1.496, z: -45.4544 },
+      duration: 2,
+      delay: 0.2,
+      easing: 'linear',
+    },
+    outroNest9: {
+      cameraId: 'outro.outro.nest.9',
+      position: { x: -88.2225, y: 1.5028, z: -45.4497 },
+      target: { x: -93.2225, y: 1.496, z: -45.4363 },
+      duration: 2,
+      delay: 0.2,
+      easing: 'linear',
+    },
+    outroNest10: {
+      cameraId: 'outro.outro.nest.10',
+      position: { x: -102.8809, y: 7.5657, z: -50.1046 },
+      target: { x: -98.0656, y: 6.9306, z: -48.9174 },
+      duration: 4,
+      delay: 0.2,
+      easing: 'easeOut',
+    },
+    outroNest11: {
+      cameraId: 'outro.outro.nest.11',
+      position: { x: -135.0204, y: 24.1487, z: -59.2075 },
+      target: { x: -130.3654, y: 23.0802, z: -57.728 },
+      duration: 6,
+      delay: 0.2,
+      easing: 'easeInOut',
     },
     atPlatform: {
       cameraId: 'arbre.atPlatform',
@@ -143,8 +170,9 @@ function resolveArbrePovs(platformPosition) {
     },
     outroPlatformTop: {
       cameraId: 'arbre.atPlatform',
+      reverseCamera: true,
       position: { x: px, y: spawnY - 0.5, z: pz },
-      target: { x: px, y: spawnY, z: fruitZ },
+      target: getReverseTarget({ x: px, y: spawnY - 0.5, z: pz }, { x: px, y: spawnY, z: fruitZ }),
       duration: 1.8,
     },
     outroPlatformLadderTop: {
@@ -334,19 +362,12 @@ export function useArbreFlow({
           completeStep('arbre.nestDialogue1')
           completeStep('arbre.nestInteraction')
           setArbreDialogueActive(true)
-          playDialogue('marieNid2', {
+          playDialogue('treeDialogue25', {
             onDone: () => {
               setArbreDialogueActive(false)
-              completeStep('arbre.nestDialogue2')
-              setArbreDialogueActive(true)
-              playDialogue('treeDialogue25', {
-                onDone: () => {
-                  setArbreDialogueActive(false)
-                  completeStep('arbre.treeDialogue25')
-                  setAmbiance('musicEnd')
-                  setArbreStoryCameraTransition({ ...povs.outroStairs02Top })
-                },
-              })
+              completeStep('arbre.treeDialogue25')
+              setAmbiance('musicEnd')
+              setArbreStoryCameraTransition({ ...povs.outroNest1 })
             },
           })
         },
@@ -360,26 +381,35 @@ export function useArbreFlow({
           setArbreDialogueActive(false)
           completeStep('arbre.treeDialogue25')
           setAmbiance('musicEnd')
-          setArbreStoryCameraTransition({ ...povs.outroStairs02Top })
+          setArbreStoryCameraTransition({ ...povs.outroNest1 })
         },
       })
-    } else if (currentStepId === 'arbre.outroStairs02Top') {
-      completeStep('arbre.outroStairs02Top')
-      setArbreStoryCameraTransition({ ...povs.outroStairs02Down })
-    } else if (currentStepId === 'arbre.outroStairs02Down') {
-      completeStep('arbre.outroStairs02Down')
-      setArbreStoryCameraTransition({ ...povs.outroWP4 })
-    } else if (currentStepId === 'arbre.outroWP4') {
-      completeStep('arbre.outroWP4')
-      setArbreStoryCameraTransition({ ...povs.outroWP3 })
-    } else if (currentStepId === 'arbre.outroWP3') {
-      completeStep('arbre.outroWP3')
-      setArbreStoryCameraTransition({ ...povs.outroWP1 })
-    } else if (currentStepId === 'arbre.outroWP1') {
-      completeStep('arbre.outroWP1')
-      setArbreStoryCameraTransition({ ...povs.outroWP0 })
-    } else if (currentStepId === 'arbre.outroWP0') {
-      completeStep('arbre.outroWP0')
+    } else if (currentStepId === 'arbre.outroNest1') {
+      completeStep('arbre.outroNest1')
+      setArbreStoryCameraTransition({ ...povs.outroNest2 })
+    } else if (currentStepId === 'arbre.outroNest2') {
+      completeStep('arbre.outroNest2')
+      setArbreStoryCameraTransition({ ...povs.outroNest3 })
+    } else if (currentStepId === 'arbre.outroNest3') {
+      completeStep('arbre.outroNest3')
+      setArbreStoryCameraTransition({ ...povs.outroNest4 })
+    } else if (currentStepId === 'arbre.outroNest4') {
+      completeStep('arbre.outroNest4')
+      setArbreStoryCameraTransition({ ...povs.outroNest5 })
+    } else if (currentStepId === 'arbre.outroNest5') {
+      completeStep('arbre.outroNest5')
+      setArbreStoryCameraTransition({ ...povs.outroNest6 })
+    } else if (currentStepId === 'arbre.outroNest6') {
+      completeStep('arbre.outroNest6')
+      setArbreStoryCameraTransition({ ...povs.outroNest9 })
+    } else if (currentStepId === 'arbre.outroNest9') {
+      completeStep('arbre.outroNest9')
+      setArbreStoryCameraTransition({ ...povs.outroNest10 })
+    } else if (currentStepId === 'arbre.outroNest10') {
+      completeStep('arbre.outroNest10')
+      setArbreStoryCameraTransition({ ...povs.outroNest11 })
+    } else if (currentStepId === 'arbre.outroNest11') {
+      completeStep('arbre.outroNest11')
       setArbreStoryCameraTransition(null)
       exitArbre()
       onOutroComplete?.()
@@ -389,6 +419,7 @@ export function useArbreFlow({
         setArbreStoryCameraTransition({ ...povs.ladderTop })
       }, 1000)
     } else if (currentStepId === 'arbre.toLadderTop') {
+      setAmbiance('ambianceOutside')
       scheduleFlowTimeout(() => {
         completeStep('arbre.toLadderTop')
         setArbreStoryCameraTransition({ ...povs.atPlatform })
@@ -561,7 +592,7 @@ export function useArbreFlow({
           onDone: () => {
             setArbreDialogueActive(false)
             completeStep('arbre.treeDialogue25')
-            setArbreStoryCameraTransition({ ...povs.outroStairs02Top })
+            setArbreStoryCameraTransition({ ...povs.outroNest1 })
           },
         })
       },

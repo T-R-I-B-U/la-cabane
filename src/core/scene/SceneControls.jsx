@@ -98,7 +98,7 @@ export function SceneControls({
           eyeHeight={playerEyeHeight}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
-          pointerSpeed={sensitivity}
+          pointerSpeed={arbreStoryCameraTransition ? 0 : sensitivity}
         />
         {arbreStoryCameraTransition && (
           <StoryCameraTransition

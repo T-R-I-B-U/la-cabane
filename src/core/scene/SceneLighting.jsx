@@ -1,9 +1,9 @@
 import { Environment } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { use, useEffect, useMemo, useRef } from 'react'
+import { use, useRef } from 'react'
 import * as THREE from 'three'
 import { getHdriOption } from './hdriOptions'
-import { preferKtx2, loadStandaloneTexture } from '../../world/cabane/textureResolver.js'
+import { loadStandaloneTexture } from '../../world/cabane/textureResolver.js'
 
 const SUN_POSITION = [-84, 72, -34]
 const SUN_SHADOW_BOUNDS = 65
@@ -15,20 +15,10 @@ const SHADOW_WARMUP_FRAMES = 180
 export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
   const warmup = useRef(SHADOW_WARMUP_FRAMES)
   const skyTexture = use(
-    loadStandaloneTexture(preferKtx2('/textures/sky.png'), { colorSpace: THREE.SRGBColorSpace })
+    loadStandaloneTexture('/textures/sky.png', { colorSpace: THREE.SRGBColorSpace })
   )
   const activeHdri = getHdriOption(activeHdriId)
   const environmentIntensity = activeHdri?.file ? (activeHdri.intensity ?? 0.32) : 0.28
-  const backgroundTexture = useMemo(() => {
-    if (!skyTexture) return null
-    const texture = skyTexture.clone()
-    texture.colorSpace = THREE.SRGBColorSpace
-    return texture
-  }, [skyTexture])
-
-  useEffect(() => {
-    return () => backgroundTexture?.dispose()
-  }, [backgroundTexture])
 
   useFrame(({ gl }) => {
     if (warmup.current > 0) {
@@ -41,7 +31,7 @@ export function SceneLighting({ activeHdriId, shadowsEnabled = true }) {
 
   return (
     <>
-      {backgroundTexture && <primitive attach="background" object={backgroundTexture} />}
+      {skyTexture && <primitive attach="background" object={skyTexture} />}
       {activeHdri?.file ? (
         <Environment files={activeHdri.file} environmentIntensity={environmentIntensity} />
       ) : (

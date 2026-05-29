@@ -4,64 +4,128 @@
       "id": "intro.start",
       "label": "Vue d'ensemble",
       "group": "intro",
-      "position": { "x": -138.0319, "y": 23.3841, "z": -53.2986 },
-      "target": { "x": -133.1716, "y": 22.3842, "z": -52.6841 },
+      "position": {
+        "x": -138.0319,
+        "y": 23.3841,
+        "z": -53.2986
+      },
+      "target": {
+        "x": -133.1716,
+        "y": 22.3842,
+        "z": -52.6841
+      },
       "fov": 60
     },
     {
       "id": "intro.doorApproach",
       "label": "Approche porte",
       "group": "intro",
-      "position": { "x": -112.445, "y": 10.7332, "z": -51.1511 },
-      "target": { "x": -107.6601, "y": 9.861, "z": -49.9914 },
+      "position": {
+        "x": -112.445,
+        "y": 10.7332,
+        "z": -51.1511
+      },
+      "target": {
+        "x": -107.6601,
+        "y": 9.861,
+        "z": -49.9914
+      },
       "fov": 60
     },
     {
       "id": "intro.doorWait",
       "label": "Devant la porte",
       "group": "intro",
-      "position": { "x": -97.186, "y": 4.0785, "z": -47.7863 },
-      "target": { "x": -92.4927, "y": 3.6922, "z": -46.1061 },
+      "position": {
+        "x": -97.186,
+        "y": 4.0785,
+        "z": -47.7863
+      },
+      "target": {
+        "x": -92.4927,
+        "y": 3.6922,
+        "z": -46.1061
+      },
       "fov": 60
     },
     {
       "id": "intro.doorOpen",
       "label": "Porte s'ouvre",
       "group": "intro",
-      "position": { "x": -91.7634, "y": 1.342, "z": -45.8359 },
-      "target": { "x": -86.7744, "y": 1.4853, "z": -45.5373 },
+      "position": {
+        "x": -91.7634,
+        "y": 1.342,
+        "z": -45.8359
+      },
+      "target": {
+        "x": -86.7744,
+        "y": 1.4853,
+        "z": -45.5373
+      },
       "fov": 60
     },
     {
       "id": "intro.inside",
       "label": "Intérieur arrivée",
       "group": "intro",
-      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
-      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
+      "position": {
+        "x": -80.9135,
+        "y": 1.342,
+        "z": -45.9432
+      },
+      "target": {
+        "x": -76.0307,
+        "y": 2.2798,
+        "z": -45.415
+      },
       "fov": 60
     },
     {
       "id": "story.accueil",
       "label": "Accueil",
       "group": "welcome",
-      "position": { "x": -79.3877, "y": 1.342, "z": -47.2564 },
-      "target": { "x": -81.863, "y": 2.0331, "z": -51.5453 },
+      "position": {
+        "x": -79.3877,
+        "y": 1.342,
+        "z": -47.2564
+      },
+      "target": {
+        "x": -81.863,
+        "y": 2.0331,
+        "z": -51.5453
+      },
       "fov": 60
     },
     {
       "id": "story.apres.accueil",
       "label": "Après Accueil",
       "group": "welcome",
-      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
-      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
+      "position": {
+        "x": -80.9135,
+        "y": 1.342,
+        "z": -45.9432
+      },
+      "target": {
+        "x": -76.0307,
+        "y": 2.2798,
+        "z": -45.415
+      },
       "fov": 60
     },
     {
       "id": "tree-story.start-tree-camera",
       "label": "start-tree-camera",
       "group": "tree-story",
-      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
-      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
+      "position": {
+        "x": -80.9135,
+        "y": 1.342,
+        "z": -45.9432
+      },
+      "target": {
+        "x": -76.0307,
+        "y": 2.2798,
+        "z": -45.415
+      },
       "fov": 60,
       "delay": 5,
       "easing": "linear"
@@ -70,8 +134,16 @@
       "id": "tree.story.tree.story.1",
       "label": "tree-story-1",
       "group": "tree-story",
-      "position": { "x": -80.2074, "y": 1.342, "z": -42.7306 },
-      "target": { "x": -82.5042, "y": 0.4896, "z": -38.3719 },
+      "position": {
+        "x": -80.2074,
+        "y": 1.342,
+        "z": -42.7306
+      },
+      "target": {
+        "x": -82.5042,
+        "y": 0.4896,
+        "z": -38.3719
+      },
       "fov": 60,
       "delay": 3,
       "duration": 2,
@@ -81,8 +153,16 @@
       "id": "tree.story.tree.story.2",
       "label": "tree-story-2",
       "group": "tree-story",
-      "position": { "x": -71.8169, "y": 1.342, "z": -37.9217 },
-      "target": { "x": -68.0776, "y": 1.2454, "z": -34.6038 },
+      "position": {
+        "x": -71.8169,
+        "y": 1.342,
+        "z": -37.9217
+      },
+      "target": {
+        "x": -68.0776,
+        "y": 1.2454,
+        "z": -34.6038
+      },
       "fov": 60,
       "delay": 2,
       "duration": 2,
@@ -92,8 +172,16 @@
       "id": "tree.story.tree.story.3",
       "label": "tree-story-3",
       "group": "tree-story",
-      "position": { "x": -72.2346, "y": 1.342, "z": -39.0159 },
-      "target": { "x": -73.736, "y": 0.5093, "z": -43.7119 },
+      "position": {
+        "x": -72.2346,
+        "y": 1.342,
+        "z": -39.0159
+      },
+      "target": {
+        "x": -73.736,
+        "y": 0.5093,
+        "z": -43.7119
+      },
       "fov": 60,
       "delay": 2,
       "duration": 2,
@@ -103,216 +191,368 @@
       "id": "story.atelier",
       "label": "Atelier",
       "group": "workshop",
-      "position": { "x": -74.8894, "y": 1.4846, "z": -52.2994 },
-      "target": { "x": -70.8225, "y": 1.1781, "z": -55.1919 },
+      "position": {
+        "x": -74.8894,
+        "y": 1.4846,
+        "z": -52.2994
+      },
+      "target": {
+        "x": -70.8225,
+        "y": 1.1781,
+        "z": -55.1919
+      },
       "fov": 60
     },
     {
       "id": "story.atelier.between",
       "label": "atelier_between",
       "group": "workshop",
-      "position": { "x": -72.4337, "y": 1.6492, "z": -52.1121 },
-      "target": { "x": -69.2288, "y": 0.2226, "z": -55.6749 },
+      "position": {
+        "x": -72.4337,
+        "y": 1.6492,
+        "z": -52.1121
+      },
+      "target": {
+        "x": -69.2288,
+        "y": 0.2226,
+        "z": -55.6749
+      },
       "fov": 60
     },
     {
       "id": "story.thomas",
       "label": "Thomas établi",
       "group": "workshop",
-      "position": { "x": -69.3189, "y": 1.4846, "z": -52.2221 },
-      "target": { "x": -67.0993, "y": 1.238, "z": -56.6957 },
+      "position": {
+        "x": -69.3189,
+        "y": 1.4846,
+        "z": -52.2221
+      },
+      "target": {
+        "x": -67.0993,
+        "y": 1.238,
+        "z": -56.6957
+      },
       "fov": 60
     },
     {
       "id": "story.greenhouseFrontDoor",
       "label": "Porte serre",
       "group": "greenhouse",
-      "position": { "x": -64.992, "y": 1.4846, "z": -45.4722 },
-      "target": { "x": -59.9947, "y": 1.6479, "z": -45.4973 },
+      "position": {
+        "x": -64.992,
+        "y": 1.4846,
+        "z": -45.4722
+      },
+      "target": {
+        "x": -59.9947,
+        "y": 1.6479,
+        "z": -45.4973
+      },
       "fov": 60
     },
     {
       "id": "story.greenhouseCorridor",
       "label": "Couloir serre",
       "group": "greenhouse",
-      "position": { "x": -58.0455, "y": 1.4846, "z": -45.4848 },
-      "target": { "x": -53.0589, "y": 1.8476, "z": -45.5258 },
+      "position": {
+        "x": -58.0455,
+        "y": 1.4846,
+        "z": -45.4848
+      },
+      "target": {
+        "x": -53.0589,
+        "y": 1.8476,
+        "z": -45.5258
+      },
       "fov": 60
     },
     {
       "id": "story.greenhouseInside",
       "label": "Intérieur serre",
       "group": "greenhouse",
-      "position": { "x": -47.2998, "y": 1.4846, "z": -45.5307 },
-      "target": { "x": -42.3028, "y": 1.6579, "z": -45.5119 },
+      "position": {
+        "x": -47.2998,
+        "y": 1.4846,
+        "z": -45.5307
+      },
+      "target": {
+        "x": -42.3028,
+        "y": 1.6579,
+        "z": -45.5119
+      },
       "fov": 60
     },
     {
       "id": "story.serreZoe",
       "label": "Serre Zoe",
       "group": "greenhouse",
-      "position": { "x": -35.3907, "y": 1.4846, "z": -45.2265 },
-      "target": { "x": -30.7443, "y": 0.2702, "z": -43.8351 },
+      "position": {
+        "x": -35.3907,
+        "y": 1.4846,
+        "z": -45.2265
+      },
+      "target": {
+        "x": -30.7443,
+        "y": 0.2702,
+        "z": -43.8351
+      },
       "fov": 60
     },
     {
       "id": "story.serreRaspberry",
       "label": "Serre framboises",
       "group": "greenhouse",
-      "position": { "x": -32.0576, "y": 1.4846, "z": -39.7233 },
-      "target": { "x": -34.5, "y": 0.55, "z": -42 },
+      "position": {
+        "x": -32.0576,
+        "y": 1.4846,
+        "z": -39.7233
+      },
+      "target": {
+        "x": -34.5,
+        "y": 0.55,
+        "z": -42
+      },
       "fov": 60
     },
     {
       "id": "story.serreJuice",
       "label": "Serre machine à jus",
       "group": "greenhouse",
-      "position": { "x": -32.2422, "y": 1.7274, "z": -44.7169 },
-      "target": { "x": -27.4089, "y": 0.4646, "z": -44.5051 },
+      "position": {
+        "x": -32.2422,
+        "y": 1.7274,
+        "z": -44.7169
+      },
+      "target": {
+        "x": -27.4089,
+        "y": 0.4646,
+        "z": -44.5051
+      },
       "fov": 60
     },
     {
       "id": "story.serreJuiceDrink",
       "label": "Serre verre de jus",
       "group": "greenhouse",
-      "position": { "x": -30.4841, "y": 1.4846, "z": -47.2507 },
-      "target": { "x": -25.6693, "y": 0.2217, "z": -46.7785 },
+      "position": {
+        "x": -30.4841,
+        "y": 1.4846,
+        "z": -47.2507
+      },
+      "target": {
+        "x": -25.6693,
+        "y": 0.2217,
+        "z": -46.7785
+      },
       "fov": 60
     },
     {
       "id": "story.greenhouseInsideExit",
       "label": "Sortie serre intérieur",
       "group": "greenhouse",
-      "position": { "x": -47.2998, "y": 1.4846, "z": -45.5307 },
-      "target": { "x": -52.2986, "y": 1.3779, "z": -45.5175 },
+      "position": {
+        "x": -47.2998,
+        "y": 1.4846,
+        "z": -45.5307
+      },
+      "target": {
+        "x": -52.2986,
+        "y": 1.3779,
+        "z": -45.5175
+      },
       "fov": 60
     },
     {
       "id": "story.greenhouseCorridorExit",
       "label": "Sortie couloir serre",
       "group": "greenhouse",
-      "position": { "x": -58.0455, "y": 1.4846, "z": -45.4848 },
-      "target": { "x": -63.0455, "y": 1.4679, "z": -45.4917 },
+      "position": {
+        "x": -58.0455,
+        "y": 1.4846,
+        "z": -45.4848
+      },
+      "target": {
+        "x": -63.0455,
+        "y": 1.4679,
+        "z": -45.4917
+      },
       "fov": 60
     },
     {
       "id": "story.greenhouseFrontDoorExit",
       "label": "Sortie porte serre",
       "group": "greenhouse",
-      "position": { "x": -64.992, "y": 1.4846, "z": -45.4722 },
-      "target": { "x": -69.2936, "y": 1.5779, "z": -42.9251 },
+      "position": {
+        "x": -64.992,
+        "y": 1.4846,
+        "z": -45.4722
+      },
+      "target": {
+        "x": -69.2936,
+        "y": 1.5779,
+        "z": -42.9251
+      },
       "fov": 60
     },
     {
       "id": "story.stairs01Floor",
       "label": "Escalier 01 bas",
       "group": "tree",
-      "position": { "x": -66.0203, "y": 1.4846, "z": -42.3821 },
-      "target": { "x": -69.2894, "y": 2.0865, "z": -38.6471 },
+      "position": {
+        "x": -66.0203,
+        "y": 1.4846,
+        "z": -42.3821
+      },
+      "target": {
+        "x": -69.2894,
+        "y": 2.0865,
+        "z": -38.6471
+      },
       "fov": 60
     },
     {
       "id": "story.stairs01Top",
       "label": "Escalier 01 haut",
       "group": "tree",
-      "position": { "x": -71.8511, "y": 4.643, "z": -36.89 },
-      "target": { "x": -72.9442, "y": 4.8662, "z": -41.7639 },
+      "position": {
+        "x": -71.8511,
+        "y": 4.643,
+        "z": -36.89
+      },
+      "target": {
+        "x": -72.9442,
+        "y": 4.8662,
+        "z": -41.7639
+      },
       "fov": 60
     },
     {
       "id": "arbre.ladderDown",
       "label": "Arbre - bas échelle",
       "group": "tree",
-      "position": { "x": -70.2701, "y": 4.643, "z": -42.5707 },
-      "target": { "x": -71.8225, "y": 9.2519, "z": -43.7317 },
+      "position": {
+        "x": -70.2701,
+        "y": 4.643,
+        "z": -42.5707
+      },
+      "target": {
+        "x": -71.8225,
+        "y": 9.2519,
+        "z": -43.7317
+      },
       "fov": 60
     },
     {
       "id": "arbre.arbre.haut.echelle",
       "label": "Arbre - haut échelle",
       "group": "tree",
-      "position": { "x": -70.6362, "y": 21.0595, "z": -42.8321 },
-      "target": { "x": -74.7044, "y": 21.1527, "z": -45.7373 },
+      "position": {
+        "x": -70.6362,
+        "y": 21.0595,
+        "z": -42.8321
+      },
+      "target": {
+        "x": -74.7044,
+        "y": 21.1527,
+        "z": -45.7373
+      },
       "fov": 60
     },
     {
       "id": "arbre.atPlatform",
       "label": "Arbre - milieu plateforme haute",
       "group": "tree",
-      "position": { "x": -74.2247, "y": 21.0595, "z": -45.3948 },
-      "target": { "x": -78.293, "y": 21.1527, "z": -48.3 },
+      "position": {
+        "x": -74.2247,
+        "y": 21.0595,
+        "z": -45.3948
+      },
+      "target": {
+        "x": -78.293,
+        "y": 21.1527,
+        "z": -48.3
+      },
       "fov": 60
     },
     {
       "id": "arbre.atFruitFocus",
       "label": "Arbre - focus fruit plateforme",
       "group": "tree",
-      "position": { "x": -74.2247, "y": 24.6595, "z": -45.3948 },
-      "target": { "x": -77.5277, "y": 25.1917, "z": -49.1105 },
+      "position": {
+        "x": -74.2247,
+        "y": 24.6595,
+        "z": -45.3948
+      },
+      "target": {
+        "x": -77.5277,
+        "y": 25.1917,
+        "z": -49.1105
+      },
       "fov": 60
     },
     {
       "id": "arbre.stairs02Down",
       "label": "Arbre - escalier 02 bas",
       "group": "nest",
-      "position": { "x": -76.1321, "y": 4.643, "z": -38.0978 },
-      "target": { "x": -78.4494, "y": 6.0759, "z": -33.9053 },
+      "position": {
+        "x": -76.1321,
+        "y": 4.643,
+        "z": -38.0978
+      },
+      "target": {
+        "x": -78.4494,
+        "y": 6.0759,
+        "z": -33.9053
+      },
       "fov": 60
     },
     {
       "id": "arbre.stairs02Top",
       "label": "Arbre - escalier 02 haut",
       "group": "nest",
-      "position": { "x": -82.4339, "y": 11.5867, "z": -25.8515 },
-      "target": { "x": -84.5678, "y": 11.6, "z": -21.3298 },
+      "position": {
+        "x": -82.4339,
+        "y": 11.5867,
+        "z": -25.8515
+      },
+      "target": {
+        "x": -84.5678,
+        "y": 11.6,
+        "z": -21.3298
+      },
       "fov": 60
     },
     {
       "id": "arbre.nest",
       "label": "Arbre - nid",
       "group": "nest",
-      "position": { "x": -86.2501, "y": 11.5867, "z": -25.4644 },
-      "target": { "x": -86.4017, "y": 10.5867, "z": -20.5678 },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP4",
-      "label": "Arbre fin - intérieur",
-      "group": "outro",
-      "position": { "x": -82.0272, "y": 1.342, "z": -44.9512 },
-      "target": { "x": -86.9924, "y": 1.5054, "z": -45.5164 },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP3",
-      "label": "Arbre fin - porte",
-      "group": "outro",
-      "position": { "x": -91.7634, "y": 1.342, "z": -45.8359 },
-      "target": { "x": -96.4432, "y": 2.1122, "z": -47.4189 },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP1",
-      "label": "Arbre fin - recul",
-      "group": "outro",
-      "position": { "x": -112.445, "y": 10.7332, "z": -51.1511 },
-      "target": { "x": -107.6602, "y": 9.861, "z": -49.9914 },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP0",
-      "label": "Arbre fin - extérieur",
-      "group": "outro",
-      "position": { "x": -138.0319, "y": 23.3841, "z": -53.2986 },
-      "target": { "x": -133.1716, "y": 22.3842, "z": -52.6841 },
+      "position": {
+        "x": -86.2501,
+        "y": 11.5867,
+        "z": -25.4644
+      },
+      "target": {
+        "x": -86.4017,
+        "y": 10.5867,
+        "z": -20.5678
+      },
       "fov": 60
     },
     {
       "id": "tree-story.map",
       "label": "map",
       "group": "tree-story",
-      "position": { "x": -81.2882, "y": 1.342, "z": -37.8453 },
-      "target": { "x": -85.07, "y": 2.1913, "z": -34.6867 },
+      "position": {
+        "x": -81.2882,
+        "y": 1.342,
+        "z": -37.8453
+      },
+      "target": {
+        "x": -85.07,
+        "y": 2.1913,
+        "z": -34.6867
+      },
       "fov": 60,
       "delay": 5,
       "duration": 2,
@@ -322,8 +562,16 @@
       "id": "tree.story.tree.story.4",
       "label": "tree-story-4",
       "group": "tree-story",
-      "position": { "x": -79.16, "y": 1.342, "z": -44.8825 },
-      "target": { "x": -80.9656, "y": 1.735, "z": -49.5285 },
+      "position": {
+        "x": -79.16,
+        "y": 1.342,
+        "z": -44.8825
+      },
+      "target": {
+        "x": -80.9656,
+        "y": 1.735,
+        "z": -49.5285
+      },
       "fov": 60,
       "duration": 2,
       "delay": 2,
@@ -333,8 +581,16 @@
       "id": "tree.story.tree.story.5",
       "label": "tree-story-5",
       "group": "tree-story",
-      "position": { "x": -81.4476, "y": 1.342, "z": -44.0634 },
-      "target": { "x": -77.0391, "y": 3.5109, "z": -44.9914 },
+      "position": {
+        "x": -81.4476,
+        "y": 1.342,
+        "z": -44.0634
+      },
+      "target": {
+        "x": -77.0391,
+        "y": 3.5109,
+        "z": -44.9914
+      },
       "fov": 60,
       "duration": 2,
       "delay": 2,
@@ -344,8 +600,16 @@
       "id": "tree.story.tree.story.6",
       "label": "tree-story-6",
       "group": "tree-story",
-      "position": { "x": -79.0195, "y": 1.342, "z": -54.4029 },
-      "target": { "x": -74.3738, "y": 1.934, "z": -52.6515 },
+      "position": {
+        "x": -79.0195,
+        "y": 1.342,
+        "z": -54.4029
+      },
+      "target": {
+        "x": -74.3738,
+        "y": 1.934,
+        "z": -52.6515
+      },
       "fov": 60,
       "easing": "linear",
       "duration": 2,
@@ -355,8 +619,16 @@
       "id": "tree.story.tree.story.7",
       "label": "tree-story-7",
       "group": "tree-story",
-      "position": { "x": -80.9098, "y": 1.342, "z": -48.171 },
-      "target": { "x": -76.8881, "y": 2.2208, "z": -45.333 },
+      "position": {
+        "x": -80.9098,
+        "y": 1.342,
+        "z": -48.171
+      },
+      "target": {
+        "x": -76.8881,
+        "y": 2.2208,
+        "z": -45.333
+      },
       "fov": 60,
       "duration": 2,
       "delay": 2,
@@ -366,8 +638,16 @@
       "id": "tree-story.timeatm",
       "label": "timeatm",
       "group": "tree-story",
-      "position": { "x": -79.2544, "y": 1.7822, "z": -42.3355 },
-      "target": { "x": -74.9127, "y": 0.6943, "z": -44.5641 },
+      "position": {
+        "x": -79.2544,
+        "y": 1.7822,
+        "z": -42.3355
+      },
+      "target": {
+        "x": -74.9127,
+        "y": 0.6943,
+        "z": -44.5641
+      },
       "fov": 60,
       "easing": "linear",
       "duration": 2,
@@ -377,8 +657,16 @@
       "id": "tree.story.tree.story.8",
       "label": "tree-story-8",
       "group": "tree-story",
-      "position": { "x": -73.6095, "y": 1.7822, "z": -39.7673 },
-      "target": { "x": -69.9375, "y": 1.366, "z": -43.1353 },
+      "position": {
+        "x": -73.6095,
+        "y": 1.7822,
+        "z": -39.7673
+      },
+      "target": {
+        "x": -69.9375,
+        "y": 1.366,
+        "z": -43.1353
+      },
       "fov": 60,
       "easing": "linear",
       "duration": 2,
@@ -388,8 +676,16 @@
       "id": "tree.story.tree.story.9",
       "label": "tree-story-9",
       "group": "tree-story",
-      "position": { "x": -67.9246, "y": 1.4673, "z": -44.4102 },
-      "target": { "x": -67.1525, "y": 1.5406, "z": -39.4707 },
+      "position": {
+        "x": -67.9246,
+        "y": 1.4673,
+        "z": -44.4102
+      },
+      "target": {
+        "x": -67.1525,
+        "y": 1.5406,
+        "z": -39.4707
+      },
       "fov": 60,
       "duration": 2,
       "easing": "linear",
@@ -399,8 +695,16 @@
       "id": "tree.story.tree.story.10",
       "label": "tree-story-10",
       "group": "tree-story",
-      "position": { "x": -66.0444, "y": 1.4673, "z": -42.4527 },
-      "target": { "x": -69.2194, "y": 2.9767, "z": -38.8973 },
+      "position": {
+        "x": -66.0444,
+        "y": 1.4673,
+        "z": -42.4527
+      },
+      "target": {
+        "x": -69.2194,
+        "y": 2.9767,
+        "z": -38.8973
+      },
       "fov": 60,
       "duration": 2,
       "delay": 1,
@@ -410,8 +714,16 @@
       "id": "tree.story.tree.story.11",
       "label": "tree-story-11",
       "group": "tree-story",
-      "position": { "x": -71.8801, "y": 4.3713, "z": -36.7504 },
-      "target": { "x": -70.4825, "y": 4.2746, "z": -41.5501 },
+      "position": {
+        "x": -71.8801,
+        "y": 4.3713,
+        "z": -36.7504
+      },
+      "target": {
+        "x": -70.4825,
+        "y": 4.2746,
+        "z": -41.5501
+      },
       "fov": 60,
       "duration": 2,
       "delay": 2,
@@ -421,8 +733,16 @@
       "id": "tree.story.tree.story.12",
       "label": "tree-story-12",
       "group": "tree-story",
-      "position": { "x": -69.0697, "y": 4.3713, "z": -44.3697 },
-      "target": { "x": -67.5002, "y": 4.2846, "z": -49.1162 },
+      "position": {
+        "x": -69.0697,
+        "y": 4.3713,
+        "z": -44.3697
+      },
+      "target": {
+        "x": -67.5002,
+        "y": 4.2846,
+        "z": -49.1162
+      },
       "fov": 60,
       "duration": 2,
       "delay": 3,
@@ -432,8 +752,16 @@
       "id": "tree.story.tree.story.13",
       "label": "tree-story-13",
       "group": "tree-story",
-      "position": { "x": -73.452, "y": 4.3713, "z": -40.2603 },
-      "target": { "x": -73.8668, "y": 8.9526, "z": -42.2197 },
+      "position": {
+        "x": -73.452,
+        "y": 4.3713,
+        "z": -40.2603
+      },
+      "target": {
+        "x": -73.8668,
+        "y": 8.9526,
+        "z": -42.2197
+      },
       "fov": 60,
       "duration": 2,
       "delay": 3,
@@ -443,8 +771,16 @@
       "id": "tree.story.tree.story.14",
       "label": "tree-story-14",
       "group": "tree-story",
-      "position": { "x": -71.0346, "y": 4.3713, "z": -36.8302 },
-      "target": { "x": -68.0285, "y": 2.707, "z": -40.4625 },
+      "position": {
+        "x": -71.0346,
+        "y": 4.3713,
+        "z": -36.8302
+      },
+      "target": {
+        "x": -68.0285,
+        "y": 2.707,
+        "z": -40.4625
+      },
       "fov": 60,
       "duration": 2,
       "delay": 1,
@@ -454,8 +790,16 @@
       "id": "tree.story.tree.story.15",
       "label": "tree-story-15",
       "group": "tree-story",
-      "position": { "x": -66.2493, "y": 1.1913, "z": -42.2627 },
-      "target": { "x": -68.2269, "y": 1.1546, "z": -46.8549 },
+      "position": {
+        "x": -66.2493,
+        "y": 1.1913,
+        "z": -42.2627
+      },
+      "target": {
+        "x": -68.2269,
+        "y": 1.1546,
+        "z": -46.8549
+      },
       "fov": 60,
       "easing": "linear",
       "delay": 1,
@@ -465,18 +809,206 @@
       "id": "tree.story.tree.story.16",
       "label": "tree-story-16",
       "group": "tree-story",
-      "position": { "x": -81.2966, "y": 1.1913, "z": -42.7747 },
-      "target": { "x": -79.243, "y": 1.3046, "z": -47.3321 },
+      "position": {
+        "x": -81.2966,
+        "y": 1.1913,
+        "z": -42.7747
+      },
+      "target": {
+        "x": -79.243,
+        "y": 1.3046,
+        "z": -47.3321
+      },
       "fov": 60,
       "duration": 2,
       "delay": 5,
       "easing": "linear"
+    },
+    {
+      "id": "outro.outro.nest.1",
+      "label": "outro_nest_1",
+      "group": "outro",
+      "position": {
+        "x": -82.782,
+        "y": 11.5867,
+        "z": -24.7316
+      },
+      "target": {
+        "x": -81.0478,
+        "y": 9.1486,
+        "z": -28.7377
+      },
+      "fov": 60,
+      "easing": "linear",
+      "duration": 3,
+      "delay": 0
+    },
+    {
+      "id": "outro.outro.nest.2",
+      "label": "outro_nest_2",
+      "group": "outro",
+      "position": {
+        "x": -77.1038,
+        "y": 4.8585,
+        "z": -37.9987
+      },
+      "target": {
+        "x": -73.429,
+        "y": 4.4921,
+        "z": -41.3694
+      },
+      "fov": 60,
+      "duration": 4,
+      "easing": "linear",
+      "delay": 0.2
+    },
+    {
+      "id": "outro.outro.nest.3",
+      "label": "outro_nest_3",
+      "group": "outro",
+      "position": {
+        "x": -70.5549,
+        "y": 4.8585,
+        "z": -37.4258
+      },
+      "target": {
+        "x": -67.7681,
+        "y": 2.2138,
+        "z": -40.6256
+      },
+      "fov": 60,
+      "duration": 2,
+      "easing": "linear",
+      "delay": 0.2
+    },
+    {
+      "id": "outro.outro.nest.4",
+      "label": "outro_nest_4",
+      "group": "outro",
+      "position": {
+        "x": -66.1831,
+        "y": 1.5028,
+        "z": -42.1445
+      },
+      "target": {
+        "x": -68.309,
+        "y": 1.3161,
+        "z": -46.6663
+      },
+      "fov": 60,
+      "duration": 2,
+      "delay": 0.2,
+      "easing": "linear"
+    },
+    {
+      "id": "outro.outro.nest.5",
+      "label": "outro_nest_5",
+      "group": "outro",
+      "position": {
+        "x": -73.5367,
+        "y": 1.5028,
+        "z": -51.2307
+      },
+      "target": {
+        "x": -78.1896,
+        "y": 1.456,
+        "z": -49.4008
+      },
+      "fov": 60,
+      "duration": 3,
+      "delay": 0.2,
+      "easing": "linear"
+    },
+    {
+      "id": "outro.outro.nest.6",
+      "label": "outro_nest_6",
+      "group": "outro",
+      "position": {
+        "x": -82.8537,
+        "y": 1.5028,
+        "z": -45.5178
+      },
+      "target": {
+        "x": -87.8533,
+        "y": 1.496,
+        "z": -45.4544
+      },
+      "fov": 60,
+      "duration": 2,
+      "delay": 0.2,
+      "easing": "linear"
+    },
+    {
+      "id": "outro.outro.nest.9",
+      "label": "outro_nest_9",
+      "group": "outro",
+      "position": {
+        "x": -88.2225,
+        "y": 1.5028,
+        "z": -45.4497
+      },
+      "target": {
+        "x": -93.2225,
+        "y": 1.496,
+        "z": -45.4363
+      },
+      "fov": 60,
+      "duration": 2,
+      "delay": 0.2,
+      "easing": "linear"
+    },
+    {
+      "id": "outro.outro.nest.10",
+      "label": "outro_nest_10",
+      "group": "outro",
+      "position": {
+        "x": -102.8809,
+        "y": 7.5657,
+        "z": -50.1046
+      },
+      "target": {
+        "x": -98.0656,
+        "y": 6.9306,
+        "z": -48.9174
+      },
+      "fov": 60,
+      "duration": 4,
+      "delay": 0.2,
+      "easing": "easeOut"
+    },
+    {
+      "id": "outro.outro.nest.11",
+      "label": "outro_nest_11",
+      "group": "outro",
+      "position": {
+        "x": -135.0204,
+        "y": 24.1487,
+        "z": -59.2075
+      },
+      "target": {
+        "x": -130.3654,
+        "y": 23.0802,
+        "z": -57.728
+      },
+      "fov": 60,
+      "duration": 6,
+      "delay": 0.2,
+      "easing": "easeInOut"
     }
   ],
   "sequences": {
     "intro": [
-      { "cameraId": "intro.start", "duration": 0, "delay": 2, "easing": "easeIn" },
-      { "cameraId": "intro.doorApproach", "duration": 3.5, "easing": "easeInOut" },
+      {
+        "cameraId": "intro.start",
+        "duration": 0,
+        "delay": 2,
+        "easing": "easeIn"
+      },
+      {
+        "cameraId": "intro.doorApproach",
+        "duration": 3.5,
+        "easing": "easeInOut"
+      },
       {
         "cameraId": "intro.doorWait",
         "duration": 3.5,
@@ -484,15 +1016,28 @@
         "waitForInput": true,
         "easing": "easeInOut"
       },
-      { "cameraId": "intro.doorOpen", "duration": 2, "event": "door:open", "delay": 0.5 },
-      { "cameraId": "intro.inside", "duration": 2.5, "event": "inside" }
+      {
+        "cameraId": "intro.doorOpen",
+        "duration": 2,
+        "event": "door:open",
+        "delay": 0.5
+      },
+      {
+        "cameraId": "intro.inside",
+        "duration": 2.5,
+        "event": "inside"
+      }
     ]
   },
   "characters": [
     {
       "id": "thomas",
       "label": "Thomas",
-      "position": { "x": -68.5716, "y": 0.04, "z": -53.7935 },
+      "position": {
+        "x": -68.5716,
+        "y": 0.04,
+        "z": -53.7935
+      },
       "floorY": 0.04,
       "rotationY": 2.6179938779914944,
       "scale": 9
@@ -500,7 +1045,11 @@
     {
       "id": "marie",
       "label": "Marie",
-      "position": { "x": -88.7959, "y": 9.34, "z": -20.3969 },
+      "position": {
+        "x": -88.7959,
+        "y": 9.34,
+        "z": -20.3969
+      },
       "floorY": 9.15,
       "rotationY": 2.48252680319093,
       "scale": 9
@@ -508,7 +1057,11 @@
     {
       "id": "zoe",
       "label": "Zoe",
-      "position": { "x": -33.3146, "y": 0.04, "z": -45.1228 },
+      "position": {
+        "x": -33.3146,
+        "y": 0.04,
+        "z": -45.1228
+      },
       "floorY": 0.04,
       "rotationY": -1.5707963267948966,
       "scale": 11

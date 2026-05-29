@@ -774,6 +774,7 @@ export default function App() {
     const onTab = (e) => {
       if (e.key !== 'p' && e.key !== 'P') return
       if (showWelcome) return
+      if (showNameInput) return
       if (cinematicActive) return
       e.preventDefault()
       e.stopImmediatePropagation()
@@ -786,7 +787,7 @@ export default function App() {
     }
     document.addEventListener('keydown', onTab, { capture: true })
     return () => document.removeEventListener('keydown', onTab, { capture: true })
-  }, [showSettings, showWelcome, cinematicActive])
+  }, [showSettings, showWelcome, showNameInput, cinematicActive])
 
   useEffect(() => {
     if (showSettings) pauseAudio()

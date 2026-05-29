@@ -431,20 +431,18 @@ function GroupSection({ group, cameras, live }) {
             </div>
           ))}
 
-          {group === 'tree-story' && (
-            <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-              <input
-                style={{ ...S.input, flex: 1, fontSize: 11, padding: '5px 8px' }}
-                placeholder="Nom de la caméra…"
-                value={addLabel}
-                onChange={(e) => setAddLabel(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-              />
-              <button type="button" style={S.btn('good')} onClick={handleAdd}>
-                + Ajouter
-              </button>
-            </div>
-          )}
+          <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+            <input
+              style={{ ...S.input, flex: 1, fontSize: 11, padding: '5px 8px' }}
+              placeholder="Nom de la caméra…"
+              value={addLabel}
+              onChange={(e) => setAddLabel(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+            />
+            <button type="button" style={S.btn('good')} onClick={handleAdd}>
+              + Ajouter
+            </button>
+          </div>
         </div>
       )}
     </div>
