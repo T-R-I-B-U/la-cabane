@@ -239,14 +239,9 @@
   opacity: 0.35;
 }
 
-.pfp-leaf-slot--clickable {
-  cursor: pointer;
+.pfp-leaf-slot:has(.pfp-fav-title) {
   flex-direction: column;
   gap: 6px;
-}
-
-.pfp-leaf-slot--clickable:hover {
-  outline: 2px solid #b0cfd1;
 }
 
 .pfp-fav-title {

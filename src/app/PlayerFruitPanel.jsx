@@ -4,12 +4,16 @@ import { playOnce } from '../utils/audioStore'
 import { AddSavoirModal } from './AddSavoirModal'
 import { useFavorites } from '../utils/favoritesStore'
 
-export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false, onFavoriteClick }) {
+export function PlayerFruitPanel({ playerName, hasSentSavoir = false }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   const favorites = useFavorites()
   return (
     <>
-      <div className="pfp-overlay" onPointerDown={(e) => e.stopPropagation()} onClick={onClose}>
+      <div
+        className="pfp-overlay"
+        onPointerDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div
           className="pfp-content"
           onPointerDown={(e) => e.stopPropagation()}
@@ -144,8 +148,7 @@ export function PlayerFruitPanel({ playerName, onClose, hasSentSavoir = false, o
                     return (
                       <div
                         key={i}
-                        className={`pfp-leaf-slot pfp-leaf-slot--flex${!fav ? ' pfp-leaf-slot--empty' : ' pfp-leaf-slot--clickable'}`}
-                        onClick={fav ? () => onFavoriteClick?.(fav) : undefined}
+                        className={`pfp-leaf-slot pfp-leaf-slot--flex${!fav ? ' pfp-leaf-slot--empty' : ''}`}
                       >
                         {fav && (
                           <>

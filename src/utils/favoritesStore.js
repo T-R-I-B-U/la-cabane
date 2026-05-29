@@ -1,25 +1,12 @@
 import { useState, useEffect } from 'react'
 
 const MAX_FAVORITES = 3
-const STORAGE_KEY = 'la-cabane-favorites'
 
-function _load() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]')
-  } catch {
-    return []
-  }
-}
-
-let _favorites = _load()
+let _favorites = []
 const _listeners = new Set()
 
 function _notify() {
   _listeners.forEach((fn) => fn([..._favorites]))
-}
-
-function _save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(_favorites))
 }
 
 export const favoritesStore = {
@@ -46,7 +33,6 @@ export const favoritesStore = {
         },
       ]
     }
-    _save()
     _notify()
   },
   subscribe(fn) {
