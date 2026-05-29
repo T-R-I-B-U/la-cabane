@@ -31,6 +31,7 @@ export function CameraPreviewPlayer() {
   const waypointsRef = useRef([])
   const stepRef = useRef(0)
   const progressRef = useRef(0)
+  const delayRef = useRef(0)
 
   useEffect(
     () =>
@@ -44,6 +45,7 @@ export function CameraPreviewPlayer() {
         waypointsRef.current = waypoints
         stepRef.current = 0
         progressRef.current = 0
+        delayRef.current = 0
         activeRef.current = true
         camera.position.copy(waypoints[0].position)
         camera.lookAt(waypoints[0].target)
@@ -67,6 +69,12 @@ export function CameraPreviewPlayer() {
     }
     const from = waypoints[step]
     const to = waypoints[step + 1]
+
+    if (from.delay && delayRef.current < from.delay) {
+      delayRef.current += delta
+      return
+    }
+
     const duration = to.duration ?? 2
     if (duration === 0) {
       frameCamera.position.copy(to.position)
@@ -77,6 +85,7 @@ export function CameraPreviewPlayer() {
       }
       stepRef.current += 1
       progressRef.current = 0
+      delayRef.current = 0
       return
     }
     progressRef.current = Math.min(progressRef.current + delta / duration, 1)
@@ -91,6 +100,7 @@ export function CameraPreviewPlayer() {
     if (progressRef.current >= 1) {
       stepRef.current += 1
       progressRef.current = 0
+      delayRef.current = 0
     }
   })
 
