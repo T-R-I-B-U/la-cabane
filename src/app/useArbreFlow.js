@@ -410,8 +410,9 @@ export function useArbreFlow({
       setArbreStoryCameraTransition({ ...povs.outroNest11 })
     } else if (currentStepId === 'arbre.outroNest11') {
       completeStep('arbre.outroNest11')
-      // Keep camera frozen on last frame — cleanup happens after fade in onOutroComplete
       onOutroComplete?.()
+      // Camera stays frozen — clean up arbre state after FinalScreen fade-in (1.2s)
+      scheduleFlowTimeout(exitArbre, 1200)
     } else if (currentStepId === 'arbre.ladderDown') {
       scheduleFlowTimeout(() => {
         completeStep('arbre.ladderDown')
@@ -444,6 +445,7 @@ export function useArbreFlow({
   }, [
     currentStepId,
     completeStep,
+    exitArbre,
     onBackAtBase,
     onOutroComplete,
     onPlatformSpawn,

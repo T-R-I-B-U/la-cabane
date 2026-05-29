@@ -77,7 +77,6 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [showFinal, setShowFinal] = useState(false)
-  const [showFadeToBlack, setShowFadeToBlack] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [loadingFading, setLoadingFading] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
@@ -345,7 +344,6 @@ export default function App() {
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
-    exitArbre,
   } = useArbreFlow({
     platformPosition: sceneLoadInfo?.platformPosition,
     flyMode: isFlyModeActive,
@@ -353,8 +351,13 @@ export default function App() {
     onPlatformSpawn: spawnAtPlatform,
     onBackAtBase: spawnAtLadderDown,
     onOutroComplete: useCallback(() => {
-      setShowFadeToBlack(true)
-    }, []),
+      setShowFinal(true)
+      setTimeout(() => {
+        setIsPlayerModeActive(false)
+        setIsFlyModeActive(false)
+        exitIntro()
+      }, 1200)
+    }, [exitIntro]),
   })
 
   const openSavoirFromLeaf = useCallback(
@@ -1422,20 +1425,6 @@ export default function App() {
 
       {!cinematicActive && <CustomCursor visible={isCustomCursorVisible} />}
 
-      {showFadeToBlack && !showFinal && (
-        <div
-          className="fade-to-black"
-          onAnimationEnd={() => {
-            setShowFinal(true)
-            setShowFadeToBlack(false)
-            setIsPlayerModeActive(false)
-            setIsFlyModeActive(false)
-            exitIntro()
-            exitArbre()
-          }}
-        />
-      )}
-
       {!cinematicActive && showFinal && <FinalScreen />}
 
       {!cinematicActive && (welcomeFading || !showWelcome) && !readyToShow && (
@@ -1468,7 +1457,7 @@ export default function App() {
         />
       )}
 
-      {!cinematicActive && !showSettings && !showFadeToBlack && !showFinal && (
+      {!cinematicActive && !showSettings && !showFinal && (
         <div className="app-gear-btn">
           <GearIcon
             onClick={() => {
