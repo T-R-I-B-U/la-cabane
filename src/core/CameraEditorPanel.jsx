@@ -368,6 +368,7 @@ export default function CameraEditorPanel({ onClose }) {
   const [newLabel, setNewLabel] = useState('Nouvelle caméra')
   const [copied, setCopied] = useState(false)
   const [flyMode, setFlyModeState] = useState(getEditorFlyMode)
+  const [showIntro, setShowIntro] = useState(true)
   const [showChars, setShowChars] = useState(false)
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(() => !!getPreviewSteps())
 
@@ -433,7 +434,10 @@ export default function CameraEditorPanel({ onClose }) {
       setTimeout(() => setCopied(false), 1400)
     }
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(text).then(confirm).catch(() => fallbackCopy(text, confirm))
+      navigator.clipboard
+        .writeText(text)
+        .then(confirm)
+        .catch(() => fallbackCopy(text, confirm))
     } else {
       fallbackCopy(text, confirm)
     }
@@ -588,24 +592,31 @@ export default function CameraEditorPanel({ onClose }) {
           <div style={S.sectionHeader}>
             <span style={S.sectionTitle}>Séquence intro · {introSteps.length} étapes</span>
             <div style={S.addRow}>
-              <input
-                style={{ ...S.smallInput, width: 180 }}
-                value={newLabel}
-                onChange={(e) => setNewLabel(e.target.value)}
-                placeholder="Nom de la caméra"
-                onPointerDown={(e) => e.stopPropagation()}
-              />
-              <button type="button" style={S.btn('primary')} onClick={handleAddToSequence}>
-                + Ajouter
+              {showIntro && (
+                <>
+                  <input
+                    style={{ ...S.smallInput, width: 180 }}
+                    value={newLabel}
+                    onChange={(e) => setNewLabel(e.target.value)}
+                    placeholder="Nom de la caméra"
+                    onPointerDown={(e) => e.stopPropagation()}
+                  />
+                  <button type="button" style={S.btn('primary')} onClick={handleAddToSequence}>
+                    + Ajouter
+                  </button>
+                </>
+              )}
+              <button type="button" style={S.btn('ghost')} onClick={() => setShowIntro((v) => !v)}>
+                {showIntro ? '▾ Masquer' : '▸ Afficher'}
               </button>
             </div>
           </div>
 
-          {introSteps.length === 0 && (
+          {showIntro && introSteps.length === 0 && (
             <div style={S.empty}>Aucune caméra dans la séquence — ajoute une caméra ci-dessus</div>
           )}
 
-          {introSteps.map((step, index) => {
+          {showIntro && introSteps.map((step, index) => {
             const camera = registry.cameras.find((c) => c.id === step.cameraId)
             return (
               <div key={`${step.cameraId}-${index}`} style={S.stepCard}>
