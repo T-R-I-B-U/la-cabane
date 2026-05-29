@@ -291,6 +291,18 @@ function stopScenePointerEvent(event) {
   event.stopPropagation()
 }
 
+function fallbackCopy(text, onDone) {
+  const ta = document.createElement('textarea')
+  ta.value = text
+  ta.style.cssText = 'position:fixed;opacity:0;pointer-events:none'
+  document.body.appendChild(ta)
+  ta.focus()
+  ta.select()
+  document.execCommand('copy')
+  document.body.removeChild(ta)
+  onDone()
+}
+
 function GroupSection({ group, cameras, live }) {
   const [open, setOpen] = useState(false)
 
@@ -415,10 +427,16 @@ export default function CameraEditorPanel({ onClose }) {
   }
 
   function handleExport() {
-    navigator.clipboard.writeText(exportAsJSON()).then(() => {
+    const text = exportAsJSON()
+    const confirm = () => {
       setCopied(true)
       setTimeout(() => setCopied(false), 1400)
-    })
+    }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(confirm).catch(() => fallbackCopy(text, confirm))
+    } else {
+      fallbackCopy(text, confirm)
+    }
   }
 
   function handleClearAll() {
