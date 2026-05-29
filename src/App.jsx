@@ -1100,7 +1100,8 @@ export default function App() {
             !isContactInteractionActive &&
             !isJournalInteractionActive &&
             !raspberryPhaseActive &&
-            !isPlayerFruitPanelOpen
+            !isPlayerFruitPanelOpen &&
+            !leafArriving
           }
           active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
         />
