@@ -79,8 +79,8 @@ function resolveArbrePovs(platformPosition) {
     },
     nest: {
       cameraId: 'arbre.nest',
-      position: { x: -20.9313, y: 12.1483, z: 17.147 },
-      target: { x: -18.168, y: 8.8642, z: 32.0839 },
+      position: { x: -86.2501, y: 11.5867, z: -25.4644 },
+      target: { x: -86.4017, y: 10.5867, z: -20.5678 },
       duration: 2.0,
     },
     // Outro cameras
@@ -410,8 +410,7 @@ export function useArbreFlow({
       setArbreStoryCameraTransition({ ...povs.outroNest11 })
     } else if (currentStepId === 'arbre.outroNest11') {
       completeStep('arbre.outroNest11')
-      setArbreStoryCameraTransition(null)
-      exitArbre()
+      // Keep camera frozen on last frame — cleanup happens after fade in onOutroComplete
       onOutroComplete?.()
     } else if (currentStepId === 'arbre.ladderDown') {
       scheduleFlowTimeout(() => {
@@ -445,7 +444,6 @@ export function useArbreFlow({
   }, [
     currentStepId,
     completeStep,
-    exitArbre,
     onBackAtBase,
     onOutroComplete,
     onPlatformSpawn,

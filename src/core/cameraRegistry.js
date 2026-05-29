@@ -1,6 +1,6 @@
 import defaultConfig from '../cameras.json'
 
-const STORAGE_KEY = 'lacabane:camera-registry:v2'
+const STORAGE_KEY = 'lacabane:camera-registry:v3'
 
 const DEFAULT_CONFIG = defaultConfig
 

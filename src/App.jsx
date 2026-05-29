@@ -345,6 +345,7 @@ export default function App() {
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
+    exitArbre,
   } = useArbreFlow({
     platformPosition: sceneLoadInfo?.platformPosition,
     flyMode: isFlyModeActive,
@@ -353,10 +354,7 @@ export default function App() {
     onBackAtBase: spawnAtLadderDown,
     onOutroComplete: useCallback(() => {
       setShowFadeToBlack(true)
-      setIsPlayerModeActive(false)
-      setIsFlyModeActive(false)
-      exitIntro()
-    }, [exitIntro]),
+    }, []),
   })
 
   const openSavoirFromLeaf = useCallback(
@@ -1430,6 +1428,10 @@ export default function App() {
           onAnimationEnd={() => {
             setShowFinal(true)
             setShowFadeToBlack(false)
+            setIsPlayerModeActive(false)
+            setIsFlyModeActive(false)
+            exitIntro()
+            exitArbre()
           }}
         />
       )}
@@ -1466,7 +1468,7 @@ export default function App() {
         />
       )}
 
-      {!cinematicActive && !showSettings && (
+      {!cinematicActive && !showSettings && !showFadeToBlack && !showFinal && (
         <div className="app-gear-btn">
           <GearIcon
             onClick={() => {
