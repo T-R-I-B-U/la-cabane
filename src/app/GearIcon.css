@@ -2,18 +2,24 @@
   width: 60px;
   height: 60px;
   border: none;
-  background: none;
-  padding: 0;
+  background: #b0cfd1;
+  border-radius: 6px;
+  padding: 10px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: filter 0.15s ease;
+}
+
+.gear-icon:hover {
+  filter: brightness(0.9);
 }
 
 .gear-icon__img {
-  width: 60px;
-  height: 60px;
+  width: 35px;
+  height: 35px;
   display: block;
   pointer-events: none;
 }

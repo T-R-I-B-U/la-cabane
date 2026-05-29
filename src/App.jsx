@@ -1437,7 +1437,7 @@ export default function App() {
         />
       )}
 
-      {!cinematicActive && (
+      {!cinematicActive && !showSettings && (
         <div className="app-gear-btn">
           <GearIcon
             onClick={() => {
