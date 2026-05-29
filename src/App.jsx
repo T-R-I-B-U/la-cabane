@@ -1192,20 +1192,25 @@ export default function App() {
           growingFruitPlaying: arbreGrowingFruitPlaying,
           growingFruitClickable: arbreGrowingFruitClickable,
           fruitsDisabled:
-            isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
+            isContactInteractionActive ||
+            isPlayerFruitPanelOpen ||
+            isSavoirInteractionActive ||
+            leafArriving,
           onGrowingFruitComplete: handleGrowingFruitComplete,
           leafInteractionsEnabled:
             arbreLeafInteractionsEnabled &&
             !isSavoirInteractionActive &&
             !isContactInteractionActive &&
-            !isPlayerFruitPanelOpen,
+            !isPlayerFruitPanelOpen &&
+            !leafArriving,
         }}
         leafMaterialMode={leafMaterialMode}
         interactionsEnabled={
           interactionsEnabled &&
           !isSavoirInteractionActive &&
           !isContactInteractionActive &&
-          !isPlayerFruitPanelOpen
+          !isPlayerFruitPanelOpen &&
+          !leafArriving
         }
         pointerControlsRef={pointerControlsRef}
         interactions={{
