@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
+.app-gear-btn {
+  position: fixed;
+  top: 60px;
+  right: 60px;
+  z-index: 1200;
+  pointer-events: auto;
+}
+
 .viewer-page {
   position: relative;
   width: 100vw;

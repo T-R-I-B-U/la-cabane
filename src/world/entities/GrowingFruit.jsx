@@ -4,6 +4,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { disposeObject3D } from '../../core/disposeObject3D'
 import { fruitHoverStore } from '../../utils/fruitHoverStore'
+import { playOnce } from '../../utils/audioStore'
 import { applyAutoTextures } from '../cabane/textureResolver'
 import {
   createOutlineGeometry,
@@ -155,6 +156,7 @@ export function GrowingFruit({
             onPointerDown={(e) => {
               if (!active || fruitHoverStore.onCooldown) return
               e.stopPropagation()
+              playOnce('clickMagic')
               onFruitClick?.()
             }}
           />

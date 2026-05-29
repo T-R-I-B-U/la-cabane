@@ -1,0 +1,765 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 199 199" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Calque_1" clip-path="url(#clip0_0_257)">
+<g id="Vector">
+<path d="M6.86722 0H0V13.7344H6.86722V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_2">
+<path d="M6.86722 13.7344H0V27.4689H6.86722V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_3">
+<path d="M6.86722 27.439H0V48.0407H6.86722V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_4">
+<path d="M6.86722 54.9079H0V61.7751H6.86722V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_5">
+<path d="M6.86722 75.4797H0V82.3469H6.86722V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_6">
+<path d="M6.86722 109.786H0V144.092H6.86722V109.786Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_7">
+<path d="M6.86722 150.959H0V199H6.86722V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_8">
+<path d="M13.7344 0H6.86722V6.86722H13.7344V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_9">
+<path d="M13.7344 41.1734H6.86722V48.0407H13.7344V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_10">
+<path d="M13.7344 61.7751H6.86722V75.5095H13.7344V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_11">
+<path d="M13.7344 82.3469H6.86722V96.0813H13.7344V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_12">
+<path d="M13.7344 102.949H6.86722V109.816H13.7344V102.949Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_13">
+<path d="M13.7344 116.653H6.86722V123.52H13.7344V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_14">
+<path d="M13.7344 150.959H6.86722V157.827H13.7344V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_15">
+<path d="M13.7344 192.133H6.86722V199H13.7344V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_16">
+<path d="M20.6017 0H13.7344V6.86722H20.6017V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_17">
+<path d="M20.6017 13.7344H13.7344V27.4689H20.6017V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_18">
+<path d="M20.6017 27.439H13.7344V34.3062H20.6017V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_19">
+<path d="M20.6017 41.1734H13.7344V48.0407H20.6017V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_20">
+<path d="M20.6017 54.9079H13.7344V61.7751H20.6017V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_21">
+<path d="M20.6017 68.6124H13.7344V75.4797H20.6017V68.6124Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_22">
+<path d="M20.6017 89.2141H13.7344V109.816H20.6017V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_23">
+<path d="M20.6017 123.52H13.7344V130.388H20.6017V123.52Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_24">
+<path d="M20.6017 137.255H13.7344V144.122H20.6017V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_25">
+<path d="M20.6017 150.959H13.7344V157.827H20.6017V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_26">
+<path d="M20.6017 164.694H13.7344V185.295H20.6017V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_27">
+<path d="M20.6017 192.133H13.7344V199H20.6017V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_28">
+<path d="M27.439 0H20.5718V6.86722H27.439V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_29">
+<path d="M27.439 13.7344H20.5718V27.4689H27.439V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_30">
+<path d="M27.439 27.439H20.5718V34.3062H27.439V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_31">
+<path d="M27.439 41.1734H20.5718V48.0407H27.439V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_32">
+<path d="M27.439 54.9079H20.5718V68.6423H27.439V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_33">
+<path d="M27.439 75.4797H20.5718V82.3469H27.439V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_34">
+<path d="M27.439 96.0813H20.5718V123.52H27.439V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_35">
+<path d="M27.439 130.388H20.5718V144.122H27.439V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_36">
+<path d="M27.439 150.959H20.5718V157.827H27.439V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_37">
+<path d="M27.439 164.694H20.5718V185.295H27.439V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_38">
+<path d="M27.439 192.133H20.5718V199H27.439V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_39">
+<path d="M34.3062 0H27.439V6.86722H34.3062V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_40">
+<path d="M34.3062 13.7344H27.439V27.4689H34.3062V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_41">
+<path d="M34.3062 27.439H27.439V34.3062H34.3062V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_42">
+<path d="M34.3062 41.1734H27.439V48.0407H34.3062V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_43">
+<path d="M34.3062 54.9079H27.439V68.6423H34.3062V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_44">
+<path d="M34.3062 82.3469H27.439V109.786H34.3062V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_45">
+<path d="M34.3062 130.388H27.439V144.122H34.3062V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_46">
+<path d="M34.3062 150.959H27.439V157.827H34.3062V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_47">
+<path d="M34.3062 164.694H27.439V185.295H34.3062V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_48">
+<path d="M34.3062 192.133H27.439V199H34.3062V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_49">
+<path d="M41.1734 0H34.3062V6.86722H41.1734V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_50">
+<path d="M41.1734 41.1734H34.3062V48.0407H41.1734V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_51">
+<path d="M41.1734 54.9079H34.3062V61.7751H41.1734V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_52">
+<path d="M41.1734 75.4797H34.3062V82.3469H41.1734V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_53">
+<path d="M41.1734 96.0813H34.3062V109.816H41.1734V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_54">
+<path d="M41.1734 130.388H34.3062V137.255H41.1734V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_55">
+<path d="M41.1734 150.959H34.3062V157.827H41.1734V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_56">
+<path d="M41.1734 192.133H34.3062V199H41.1734V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_57">
+<path d="M48.0407 0H41.1734V13.7344H48.0407V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_58">
+<path d="M48.0407 13.7344H41.1734V27.4689H48.0407V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_59">
+<path d="M48.0407 27.439H41.1734V48.0407H48.0407V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_60">
+<path d="M48.0407 54.9079H41.1734V61.7751H48.0407V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_61">
+<path d="M48.0407 68.6124H41.1734V75.4797H48.0407V68.6124Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_62">
+<path d="M48.0407 82.3469H41.1734V89.2141H48.0407V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_63">
+<path d="M48.0407 96.0813H41.1734V102.949H48.0407V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_64">
+<path d="M48.0407 109.786H41.1734V116.653H48.0407V109.786Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_65">
+<path d="M48.0407 123.52H41.1734V130.388H48.0407V123.52Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_66">
+<path d="M48.0407 137.255H41.1734V144.122H48.0407V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_67">
+<path d="M48.0407 150.959H41.1734V199H48.0407V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_68">
+<path d="M54.9079 61.7751H48.0407V75.5095H54.9079V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_69">
+<path d="M54.9079 82.3469H48.0407V89.2141H54.9079V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_70">
+<path d="M54.9079 96.0813H48.0407V102.949H54.9079V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_71">
+<path d="M54.9079 123.52H48.0407V130.388H54.9079V123.52Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_72">
+<path d="M54.9079 137.255H48.0407V144.122H54.9079V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_73">
+<path d="M61.7751 13.7344H54.9079V27.4689H61.7751V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_74">
+<path d="M61.7751 27.439H54.9079V54.878H61.7751V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_75">
+<path d="M61.7751 61.7751H54.9079V68.6423H61.7751V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_76">
+<path d="M61.7751 75.4797H54.9079V102.919H61.7751V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_77">
+<path d="M61.7751 137.255H54.9079V150.989H61.7751V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_78">
+<path d="M61.7751 157.827H54.9079V185.266H61.7751V157.827Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_79">
+<path d="M61.7751 192.133H54.9079V199H61.7751V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_80">
+<path d="M68.6423 6.86722H61.7751V13.7344H68.6423V6.86722Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_81">
+<path d="M68.6423 13.7344H61.7751V20.6017H68.6423V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_82">
+<path d="M68.6423 34.3062H61.7751V41.1734H68.6423V34.3062Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_83">
+<path d="M68.6423 48.0407H61.7751V61.7751H68.6423V48.0407Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_84">
+<path d="M68.6423 75.4797H61.7751V82.3469H68.6423V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_85">
+<path d="M68.6423 89.2141H61.7751V96.0813H68.6423V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_86">
+<path d="M68.6423 109.786H61.7751V123.52H68.6423V109.786Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_87">
+<path d="M68.6423 137.255H61.7751V171.561H68.6423V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_88">
+<path d="M68.6423 178.428H61.7751V185.295H68.6423V178.428Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_89">
+<path d="M75.4797 0H68.6124V6.86722H75.4797V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_90">
+<path d="M75.4797 27.439H68.6124V48.0407H75.4797V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_91">
+<path d="M75.4797 68.6124H68.6124V89.2141H75.4797V68.6124Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_92">
+<path d="M75.4797 130.388H68.6124V150.989H75.4797V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_93">
+<path d="M75.4797 171.561H68.6124V178.428H75.4797V171.561Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_94">
+<path d="M82.3469 0H75.4797V13.7344H82.3469V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_95">
+<path d="M82.3469 13.7344H75.4797V20.6017H82.3469V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_96">
+<path d="M82.3469 34.3062H75.4797V41.1734H82.3469V34.3062Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_97">
+<path d="M82.3469 48.0407H75.4797V54.9079H82.3469V48.0407Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_98">
+<path d="M82.3469 61.7751H75.4797V75.5095H82.3469V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_99">
+<path d="M82.3469 82.3469H75.4797V89.2141H82.3469V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_100">
+<path d="M82.3469 96.0813H75.4797V102.949H82.3469V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_101">
+<path d="M82.3469 116.653H75.4797V130.388H82.3469V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_102">
+<path d="M82.3469 150.959H75.4797V164.694H82.3469V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_103">
+<path d="M82.3469 185.295H75.4797V199.03H82.3469V185.295Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_104">
+<path d="M89.2141 0H82.3469V6.86722H89.2141V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_105">
+<path d="M89.2141 13.7344H82.3469V20.6017H89.2141V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_106">
+<path d="M89.2141 34.3062H82.3469V61.7452H89.2141V34.3062Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_107">
+<path d="M89.2141 68.6124H82.3469V75.4797H89.2141V68.6124Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_108">
+<path d="M89.2141 82.3469H82.3469V89.2141H89.2141V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_109">
+<path d="M89.2141 96.0813H82.3469V109.816H89.2141V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_110">
+<path d="M89.2141 130.388H82.3469V137.255H89.2141V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_111">
+<path d="M89.2141 171.561H82.3469V185.295H89.2141V171.561Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_112">
+<path d="M96.0813 27.439H89.2141V41.1734H96.0813V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_113">
+<path d="M96.0813 48.0407H89.2141V54.9079H96.0813V48.0407Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_114">
+<path d="M96.0813 89.2141H89.2141V109.816H96.0813V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_115">
+<path d="M96.0813 144.122H89.2141V164.724H96.0813V144.122Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_116">
+<path d="M96.0813 171.561H89.2141V178.428H96.0813V171.561Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_117">
+<path d="M96.0813 192.133H89.2141V199H96.0813V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_118">
+<path d="M102.949 13.7344H96.0813V20.6017H102.949V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_119">
+<path d="M102.949 27.439H96.0813V48.0407H102.949V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_120">
+<path d="M102.949 54.9079H96.0813V61.7751H102.949V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_121">
+<path d="M102.949 75.4797H96.0813V82.3469H102.949V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_122">
+<path d="M102.949 89.2141H96.0813V102.949H102.949V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_123">
+<path d="M102.949 109.786H96.0813V116.653H102.949V109.786Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_124">
+<path d="M102.949 130.388H96.0813V137.255H102.949V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_125">
+<path d="M102.949 144.122H96.0813V157.856H102.949V144.122Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_126">
+<path d="M102.949 164.694H96.0813V171.561H102.949V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_127">
+<path d="M102.949 178.428H96.0813V192.163H102.949V178.428Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_128">
+<path d="M109.816 0H102.949V6.86722H109.816V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_129">
+<path d="M109.816 27.439H102.949V41.1734H109.816V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_130">
+<path d="M109.816 48.0407H102.949V61.7751H109.816V48.0407Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_131">
+<path d="M109.816 68.6124H102.949V82.3469H109.816V68.6124Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_132">
+<path d="M109.816 96.0813H102.949V109.816H109.816V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_133">
+<path d="M109.816 123.52H102.949V130.388H109.816V123.52Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_134">
+<path d="M109.816 137.255H102.949V144.122H109.816V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_135">
+<path d="M109.816 150.959H102.949V157.827H109.816V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_136">
+<path d="M109.816 178.428H102.949V192.163H109.816V178.428Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_137">
+<path d="M116.653 0H109.786V6.86722H116.653V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_138">
+<path d="M116.653 13.7344H109.786V20.6017H116.653V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_139">
+<path d="M116.653 34.3062H109.786V54.9079H116.653V34.3062Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_140">
+<path d="M116.653 61.7751H109.786V68.6423H116.653V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_141">
+<path d="M116.653 75.4797H109.786V82.3469H116.653V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_142">
+<path d="M116.653 89.2141H109.786V102.949H116.653V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_143">
+<path d="M116.653 116.653H109.786V123.52H116.653V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_144">
+<path d="M116.653 144.122H109.786V164.724H116.653V144.122Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_145">
+<path d="M116.653 171.561H109.786V192.163H116.653V171.561Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_146">
+<path d="M123.52 0H116.653V13.7344H123.52V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_147">
+<path d="M123.52 20.6017H116.653V27.4689H123.52V20.6017Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_148">
+<path d="M123.52 27.439H116.653V41.1734H123.52V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_149">
+<path d="M123.52 54.9079H116.653V68.6423H123.52V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_150">
+<path d="M123.52 82.3469H116.653V102.949H123.52V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_151">
+<path d="M123.52 109.786H116.653V116.653H123.52V109.786Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_152">
+<path d="M123.52 137.255H116.653V144.122H123.52V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_153">
+<path d="M123.52 164.694H116.653V178.428H123.52V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_154">
+<path d="M123.52 192.133H116.653V199H123.52V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_155">
+<path d="M130.388 0H123.52V6.86722H130.388V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_156">
+<path d="M130.388 20.6017H123.52V27.4689H130.388V20.6017Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_157">
+<path d="M130.388 41.1734H123.52V48.0407H130.388V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_158">
+<path d="M130.388 61.7751H123.52V68.6423H130.388V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_159">
+<path d="M130.388 89.2141H123.52V96.0813H130.388V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_160">
+<path d="M130.388 116.653H123.52V123.52H130.388V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_161">
+<path d="M130.388 130.388H123.52V137.255H130.388V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_162">
+<path d="M130.388 144.122H123.52V150.989H130.388V144.122Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_163">
+<path d="M130.388 164.694H123.52V171.561H130.388V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_164">
+<path d="M137.255 0H130.388V6.86722H137.255V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_165">
+<path d="M137.255 20.6017H130.388V27.4689H137.255V20.6017Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_166">
+<path d="M137.255 27.439H130.388V34.3062H137.255V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_167">
+<path d="M137.255 48.0407H130.388V54.9079H137.255V48.0407Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_168">
+<path d="M137.255 61.7751H130.388V68.6423H137.255V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_169">
+<path d="M137.255 89.2141H130.388V96.0813H137.255V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_170">
+<path d="M137.255 116.653H130.388V123.52H137.255V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_171">
+<path d="M137.255 130.388H130.388V144.122H137.255V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_172">
+<path d="M137.255 150.959H130.388V157.827H137.255V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_173">
+<path d="M137.255 171.561H130.388V185.295H137.255V171.561Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_174">
+<path d="M137.255 192.133H130.388V199H137.255V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_175">
+<path d="M144.122 27.439H137.255V48.0407H144.122V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_176">
+<path d="M144.122 61.7751H137.255V82.3767H144.122V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_177">
+<path d="M144.122 89.2141H137.255V96.0813H144.122V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_178">
+<path d="M144.122 102.949H137.255V123.55H144.122V102.949Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_179">
+<path d="M144.122 130.388H137.255V171.561H144.122V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_180">
+<path d="M144.122 185.295H137.255V192.163H144.122V185.295Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_181">
+<path d="M150.989 61.7751H144.122V75.5095H150.989V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_182">
+<path d="M150.989 89.2141H144.122V109.816H150.989V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_183">
+<path d="M150.989 116.653H144.122V130.388H150.989V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_184">
+<path d="M150.989 137.255H144.122V144.122H150.989V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_185">
+<path d="M150.989 164.694H144.122V171.561H150.989V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_186">
+<path d="M150.989 178.428H144.122V185.295H150.989V178.428Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_187">
+<path d="M150.989 192.133H144.122V199H150.989V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_188">
+<path d="M157.827 0H150.959V13.7344H157.827V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_189">
+<path d="M157.827 13.7344H150.959V27.4689H157.827V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_190">
+<path d="M157.827 27.439H150.959V48.0407H157.827V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_191">
+<path d="M157.827 54.9079H150.959V68.6423H157.827V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_192">
+<path d="M157.827 89.2141H150.959V96.0813H157.827V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_193">
+<path d="M157.827 102.949H150.959V109.816H157.827V102.949Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_194">
+<path d="M157.827 116.653H150.959V123.52H157.827V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_195">
+<path d="M157.827 137.255H150.959V144.122H157.827V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_196">
+<path d="M157.827 150.959H150.959V157.827H157.827V150.959Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_197">
+<path d="M157.827 164.694H150.959V171.561H157.827V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_198">
+<path d="M157.827 178.428H150.959V199.03H157.827V178.428Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_199">
+<path d="M164.694 0H157.827V6.86722H164.694V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_200">
+<path d="M164.694 41.1734H157.827V48.0407H164.694V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_201">
+<path d="M164.694 54.9079H157.827V75.5095H164.694V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_202">
+<path d="M164.694 89.2141H157.827V109.816H164.694V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_203">
+<path d="M164.694 123.52H157.827V130.388H164.694V123.52Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_204">
+<path d="M164.694 137.255H157.827V144.122H164.694V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_205">
+<path d="M164.694 164.694H157.827V171.561H164.694V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_206">
+<path d="M164.694 178.428H157.827V185.295H164.694V178.428Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_207">
+<path d="M164.694 192.133H157.827V199H164.694V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_208">
+<path d="M171.561 0H164.694V6.86722H171.561V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_209">
+<path d="M171.561 13.7344H164.694V27.4689H171.561V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_210">
+<path d="M171.561 27.439H164.694V34.3062H171.561V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_211">
+<path d="M171.561 41.1734H164.694V48.0407H171.561V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_212">
+<path d="M171.561 54.9079H164.694V68.6423H171.561V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_213">
+<path d="M171.561 75.4797H164.694V82.3469H171.561V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_214">
+<path d="M171.561 89.2141H164.694V102.949H171.561V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_215">
+<path d="M171.561 116.653H164.694V171.561H171.561V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_216">
+<path d="M171.561 178.428H164.694V192.163H171.561V178.428Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_217">
+<path d="M178.428 0H171.561V6.86722H178.428V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_218">
+<path d="M178.428 13.7344H171.561V27.4689H178.428V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_219">
+<path d="M178.428 27.439H171.561V34.3062H178.428V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_220">
+<path d="M178.428 41.1734H171.561V48.0407H178.428V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_221">
+<path d="M178.428 54.9079H171.561V61.7751H178.428V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_222">
+<path d="M178.428 75.4797H171.561V89.2141H178.428V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_223">
+<path d="M178.428 96.0813H171.561V102.949H178.428V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_224">
+<path d="M178.428 109.786H171.561V116.653H178.428V109.786Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_225">
+<path d="M178.428 144.122H171.561V157.856H178.428V144.122Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_226">
+<path d="M178.428 171.561H171.561V192.163H178.428V171.561Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_227">
+<path d="M185.295 0H178.428V6.86722H185.295V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_228">
+<path d="M185.295 13.7344H178.428V27.4689H185.295V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_229">
+<path d="M185.295 27.439H178.428V34.3062H185.295V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_230">
+<path d="M185.295 41.1734H178.428V48.0407H185.295V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_231">
+<path d="M185.295 54.9079H178.428V61.7751H185.295V54.9079Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_232">
+<path d="M185.295 82.3469H178.428V89.2141H185.295V82.3469Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_233">
+<path d="M185.295 96.0813H178.428V102.949H185.295V96.0813Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_234">
+<path d="M185.295 109.786H178.428V130.388H185.295V109.786Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_235">
+<path d="M185.295 137.255H178.428V157.856H185.295V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_236">
+<path d="M185.295 164.694H178.428V185.295H185.295V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_237">
+<path d="M185.295 192.133H178.428V199H185.295V192.133Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_238">
+<path d="M192.163 0H185.295V6.86722H192.163V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_239">
+<path d="M192.163 41.1734H185.295V48.0407H192.163V41.1734Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_240">
+<path d="M192.163 75.4797H185.295V82.3469H192.163V75.4797Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_241">
+<path d="M192.163 102.949H185.295V109.816H192.163V102.949Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_242">
+<path d="M192.163 130.388H185.295V150.989H192.163V130.388Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_243">
+<path d="M192.163 164.694H185.295V192.133H192.163V164.694Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_244">
+<path d="M199 0H192.133V13.7344H199V0Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_245">
+<path d="M199 13.7344H192.133V27.4689H199V13.7344Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_246">
+<path d="M199 27.439H192.133V48.0407H199V27.439Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_247">
+<path d="M199 61.7751H192.133V68.6423H199V61.7751Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_248">
+<path d="M199 89.2141H192.133V96.0813H199V89.2141Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_249">
+<path d="M199 116.653H192.133V123.52H199V116.653Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_250">
+<path d="M199 137.255H192.133V150.989H199V137.255Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_251">
+<path d="M199 157.827H192.133V164.694H199V157.827Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+<g id="Vector_252">
+<path d="M199 171.561H192.133V178.428H199V171.561Z" fill="var(--fill-0, white)" style="mix-blend-mode:soft-light"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_257">
+<rect width="199" height="199" fill="white"/>
+</clipPath>
+</defs>
+</svg>
