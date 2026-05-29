@@ -309,22 +309,26 @@
       {
         "cameraId": "intro.start",
         "duration": 0,
-        "delay": 2
+        "delay": 2,
+        "easing": "easeIn"
       },
       {
         "cameraId": "intro.doorApproach",
-        "duration": 3.5
+        "duration": 3.5,
+        "easing": "easeInOut"
       },
       {
         "cameraId": "intro.doorWait",
-        "duration": 2.5,
+        "duration": 3.5,
         "event": "wait:door",
-        "waitForInput": true
+        "waitForInput": true,
+        "easing": "easeInOut"
       },
       {
         "cameraId": "intro.doorOpen",
         "duration": 2,
-        "event": "door:open"
+        "event": "door:open",
+        "delay": 0.5
       },
       {
         "cameraId": "intro.inside",
