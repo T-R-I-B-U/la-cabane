@@ -27,7 +27,6 @@
   padding: 40px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 .pfp-left-inner {
@@ -102,7 +101,6 @@
   font-family: 'Albert Sans', sans-serif;
   font-size: 20px;
   font-weight: 500;
-  font-style: italic;
   color: #33330f;
   line-height: 1.4;
   margin: 0;
@@ -236,6 +234,26 @@
   width: auto;
 }
 
+.pfp-leaf-slot--empty {
+  opacity: 0.35;
+}
+
+.pfp-leaf-slot:has(.pfp-fav-title) {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pfp-fav-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #33330f;
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  word-break: break-word;
+}
+
 .pfp-leaf-img {
   /* 70% laisse la marge nécessaire pour rotate(-31deg) sans clipper */
   width: 70%;
@@ -290,6 +308,91 @@
   color: #8b8e50;
   margin: 0;
   text-transform: uppercase;
+}
+
+/* ── Layout "après envoi" ── */
+.pfp-content--sent {
+  align-items: stretch;
+}
+
+.pfp-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 530px;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.pfp-left-profile-card {
+  flex: 1 0 0;
+  min-height: 0;
+  gap: 20px;
+  justify-content: flex-end;
+  align-items: flex-start;
+  overflow: visible;
+}
+
+.pfp-close-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pfp-profile-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-height: 0;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  position: relative;
+}
+
+.pfp-fruit-img--sent {
+  position: absolute;
+  left: 0;
+  top: -35px;
+  width: 229px;
+  height: 310px;
+  object-fit: cover;
+}
+
+/* override padding-top from default layout so name is visible in sent card */
+.pfp-left-profile-card .pfp-player-name {
+  padding-top: 0;
+}
+
+.pfp-sent-leaf-slot {
+  background: #e3e7b3;
+  border-radius: 6px;
+  padding: 10px;
+  width: 102px;
+  height: 102px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pfp-sent-leaf-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #33330f;
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  word-break: break-word;
 }
 
 @media (max-width: 900px) {

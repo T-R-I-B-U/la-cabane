@@ -221,6 +221,18 @@ function _whenReady(id, fn) {
 
 function _resumeContext() {
   const ctx = store.listener && store.listener.context
+  if (ctx && ctx.state === 'suspended' && !store.manuallyPaused) ctx.resume()
+}
+
+export function pauseAudio() {
+  const ctx = store.listener && store.listener.context
+  store.manuallyPaused = true
+  if (ctx && ctx.state === 'running') ctx.suspend()
+}
+
+export function resumeAudio() {
+  const ctx = store.listener && store.listener.context
+  store.manuallyPaused = false
   if (ctx && ctx.state === 'suspended') ctx.resume()
 }
 
@@ -342,22 +354,29 @@ export function holdSubtitle() {
 export function playDialogue(id, { onDone, onLastCue } = {}) {
   _whenReady(id, () => {
     _stopCurrentDialogue()
+    _duckAmbiance()
     const track = _getTrack(id)
     if (!track) {
+      _unduckAmbiance()
       onDone?.()
       return
     }
 
+    const wrappedOnDone = onDone
+      ? () => {
+          _unduckAmbiance()
+          onDone()
+        }
+      : _unduckAmbiance
+
     const cues = track.cfg.subtitles
 
     if (track.audio) {
-      if (onDone) {
-        const prev = track.audio.onEnded
-        track.audio.onEnded = function () {
-          _runPreviousOnEnded(prev, this)
-          track.audio.onEnded = prev
-          onDone()
-        }
+      const prev = track.audio.onEnded
+      track.audio.onEnded = function () {
+        _runPreviousOnEnded(prev, this)
+        track.audio.onEnded = prev
+        wrappedOnDone()
       }
       _resumeContext()
       if (track.audio.isPlaying) track.audio.stop()
@@ -368,7 +387,7 @@ export function playDialogue(id, { onDone, onLastCue } = {}) {
 
     // Text-only : setTimeout calés sur les timings SRT
     if (!cues || cues.length === 0) {
-      onDone?.()
+      wrappedOnDone()
       return
     }
 
@@ -380,14 +399,13 @@ export function playDialogue(id, { onDone, onLastCue } = {}) {
       subtitleState.textTimers.push(setTimeout(() => _emitSubtitle('', null), cue.to * 1000))
     })
 
-    if (onDone) {
-      subtitleState.textTimers.push(setTimeout(onDone, cues[cues.length - 1].to * 1000))
-    }
+    subtitleState.textTimers.push(setTimeout(wrappedOnDone, cues[cues.length - 1].to * 1000))
   })
 }
 
 export function stopDialogue() {
   _stopCurrentDialogue()
+  _unduckAmbiance()
   _emitSubtitle('')
 }
 
@@ -427,6 +445,26 @@ export function stop(id) {
 // Pass null to fade out the current ambiance without starting a new one.
 const AMBIANCE_FADE_MS = 1500
 let _currentAmbiance = null
+
+// Duck the current ambiance during dialogue so speech is clearly audible.
+const DIALOGUE_DUCK_VOLUME = 0.2
+const DIALOGUE_DUCK_FADE_MS = 500
+let _preDialogueAmbianceVolume = null
+
+function _duckAmbiance() {
+  if (!_currentAmbiance) return
+  const track = _getTrack(_currentAmbiance)
+  if (!track) return
+  if (_preDialogueAmbianceVolume === null) _preDialogueAmbianceVolume = track.cfg.volume
+  fade(_currentAmbiance, Math.min(track.cfg.volume, DIALOGUE_DUCK_VOLUME), DIALOGUE_DUCK_FADE_MS)
+}
+
+function _unduckAmbiance() {
+  if (_preDialogueAmbianceVolume === null) return
+  const vol = _preDialogueAmbianceVolume
+  _preDialogueAmbianceVolume = null
+  if (_currentAmbiance) fade(_currentAmbiance, vol, DIALOGUE_DUCK_FADE_MS)
+}
 
 export function setAmbiance(id, fadeDuration = AMBIANCE_FADE_MS) {
   if (_currentAmbiance === id) return

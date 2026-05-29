@@ -122,6 +122,7 @@
   width: 199px;
   height: 199px;
   object-fit: contain;
+  mix-blend-mode: soft-light;
 }
 
 /* ── Enfant 3 : SCAN-MOI ! ── */

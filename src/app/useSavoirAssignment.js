@@ -39,9 +39,14 @@ export function useSavoirAssignment() {
     return true
   }, [])
 
+  const openSavoirDirect = useCallback((savoir) => {
+    setSelectedSavoirAssignment({ instanceId: null, savoir })
+    return true
+  }, [])
+
   const closeSavoir = useCallback(() => {
     setSelectedSavoirAssignment(null)
   }, [])
 
-  return { selectedSavoirAssignment, openSavoirForLeaf, closeSavoir }
+  return { selectedSavoirAssignment, openSavoirForLeaf, openSavoirDirect, closeSavoir }
 }

@@ -1,6 +1,6 @@
 1
 00:00:00,000 --> 00:00:09,000
-Sur l'arbre, chaque fruit représente un membre de la cabane et chaque feuille, un savoir proposé par un passeur.
+Dans l'arbre, chaque fruit représente un membre de la cabane et chaque feuille, un savoir proposé par un passeur.
 
 2
 00:00:09,000 --> 00:00:15,000
