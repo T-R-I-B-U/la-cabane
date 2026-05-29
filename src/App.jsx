@@ -1101,7 +1101,8 @@ export default function App() {
             !isJournalInteractionActive &&
             !raspberryPhaseActive &&
             !isPlayerFruitPanelOpen &&
-            !leafArriving
+            !leafArriving &&
+            !incomingSavoir
           }
           active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
         />
@@ -1377,6 +1378,7 @@ export default function App() {
           onClose={handleCloseIncomingSavoir}
           leafColRef={savoirLeafColRef}
           pendingLeaf={leafArriving}
+          hideFavorites
         />
       )}
 

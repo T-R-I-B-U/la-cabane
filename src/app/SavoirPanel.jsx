@@ -3,7 +3,7 @@ import './SavoirPanel.css'
 import { playOnce } from '../utils/audioStore'
 import { favoritesStore } from '../utils/favoritesStore'
 
-export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf }) {
+export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf, hideFavorites = false }) {
   const [isFav, setIsFav] = useState(() => favoritesStore.isFavorite(savoir.id))
   const [isFull, setIsFull] = useState(() => favoritesStore.isFull())
 
@@ -78,7 +78,7 @@ export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf }) {
               <p className="savoir-text">{savoir.text}</p>
             </div>
 
-            {savoir.slots && savoir.slots.length > 0 && (
+            {!hideFavorites && savoir.slots && savoir.slots.length > 0 && (
               <div className="savoir-avail-col">
                 <div className="savoir-avail-top">
                   <p className="savoir-avail-label">Disponibilité</p>
