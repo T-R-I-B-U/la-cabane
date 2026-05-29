@@ -291,6 +291,61 @@ function stopScenePointerEvent(event) {
   event.stopPropagation()
 }
 
+function GroupSection({ group, cameras, live }) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div style={S.section}>
+      <div style={S.sectionHeader}>
+        <span style={S.sectionTitle}>
+          {group} · {cameras.length}
+        </span>
+        <button type="button" style={S.btn('ghost')} onClick={() => setOpen((v) => !v)}>
+          {open ? '▾ Masquer' : '▸ Afficher'}
+        </button>
+      </div>
+
+      {open && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {cameras.map((camera) => (
+            <div key={camera.id} style={S.camLibRow}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={S.camLibLabel}>{camera.label}</div>
+                <div style={S.camLibId}>{camera.id}</div>
+              </div>
+              <div style={S.btnRow}>
+                <button
+                  type="button"
+                  style={S.btn('good')}
+                  onClick={() => captureCamera(camera.id, live)}
+                >
+                  Capturer
+                </button>
+                {camera.position && (
+                  <button
+                    type="button"
+                    style={S.btn('primary')}
+                    onClick={() => requestTeleport(camera.position, camera.target, camera.fov)}
+                  >
+                    Aller
+                  </button>
+                )}
+                <button
+                  type="button"
+                  style={S.btn('danger')}
+                  onClick={() => removeCamera(camera.id)}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function CameraEditorPanel({ onClose }) {
   const panelRef = useRef(null)
   const dragRef = useRef(null)
@@ -301,7 +356,6 @@ export default function CameraEditorPanel({ onClose }) {
   const [newLabel, setNewLabel] = useState('Nouvelle caméra')
   const [copied, setCopied] = useState(false)
   const [flyMode, setFlyModeState] = useState(getEditorFlyMode)
-  const [showOtherCams, setShowOtherCams] = useState(false)
   const [showChars, setShowChars] = useState(false)
   const [isPreviewPlaying, setIsPreviewPlaying] = useState(() => !!getPreviewSteps())
 
@@ -311,14 +365,9 @@ export default function CameraEditorPanel({ onClose }) {
   useEffect(() => onPreviewChange((steps) => setIsPreviewPlaying(!!steps)), [])
 
   const introSteps = registry.sequences?.intro ?? []
-  const sequencedIds = useMemo(() => new Set(introSteps.map((s) => s.cameraId)), [introSteps])
-  const otherCameras = useMemo(
-    () => registry.cameras.filter((c) => !sequencedIds.has(c.id)),
-    [registry.cameras, sequencedIds]
-  )
 
-  // Unique groups in array order, excluding 'intro' (handled by the sequence)
-  const previewGroups = useMemo(() => {
+  // Groups in array order, excluding 'intro' (handled by the sequence above)
+  const nonIntroGroups = useMemo(() => {
     const seen = new Set()
     const result = []
     for (const cam of registry.cameras) {
@@ -329,6 +378,17 @@ export default function CameraEditorPanel({ onClose }) {
     }
     return result
   }, [registry.cameras])
+
+  const camerasByGroup = useMemo(() => {
+    const map = {}
+    for (const group of nonIntroGroups) {
+      map[group] = registry.cameras.filter((c) => c.group === group)
+    }
+    return map
+  }, [registry.cameras, nonIntroGroups])
+
+  // Alias for preview bar (same list)
+  const previewGroups = nonIntroGroups
 
   function handlePreviewGroup(group) {
     const steps = registry.cameras
@@ -694,67 +754,10 @@ export default function CameraEditorPanel({ onClose }) {
 
         <div style={S.divider} />
 
-        {/* ── Autres caméras ─────────────────────────────────────── */}
-        <div style={S.section}>
-          <div style={S.sectionHeader}>
-            <span style={S.sectionTitle}>Autres caméras · {otherCameras.length}</span>
-            <button
-              type="button"
-              style={S.btn('ghost')}
-              onClick={() => setShowOtherCams((v) => !v)}
-            >
-              {showOtherCams ? '▾ Masquer' : '▸ Afficher'}
-            </button>
-          </div>
-
-          {showOtherCams && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              {otherCameras.length === 0 && (
-                <div style={S.empty}>Toutes les caméras sont déjà dans la séquence</div>
-              )}
-              {otherCameras.map((camera) => (
-                <div key={camera.id} style={S.camLibRow}>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={S.camLibLabel}>{camera.label}</div>
-                    <div style={S.camLibId}>{camera.id}</div>
-                  </div>
-                  <div style={S.btnRow}>
-                    <button
-                      type="button"
-                      style={S.btn('good')}
-                      onClick={() => captureCamera(camera.id, live)}
-                    >
-                      Capturer
-                    </button>
-                    {camera.position && (
-                      <button
-                        type="button"
-                        style={S.btn('primary')}
-                        onClick={() => requestTeleport(camera.position, camera.target, camera.fov)}
-                      >
-                        Aller
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      style={S.btn()}
-                      onClick={() => addSequenceStep('intro', camera.id)}
-                    >
-                      + Séquence
-                    </button>
-                    <button
-                      type="button"
-                      style={S.btn('danger')}
-                      onClick={() => removeCamera(camera.id)}
-                    >
-                      ×
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* ── Caméras par groupe ─────────────────────────────────── */}
+        {nonIntroGroups.map((group) => (
+          <GroupSection key={group} group={group} cameras={camerasByGroup[group]} live={live} />
+        ))}
 
         <div style={S.divider} />
 
