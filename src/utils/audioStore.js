@@ -221,6 +221,18 @@ function _whenReady(id, fn) {
 
 function _resumeContext() {
   const ctx = store.listener && store.listener.context
+  if (ctx && ctx.state === 'suspended' && !store.manuallyPaused) ctx.resume()
+}
+
+export function pauseAudio() {
+  const ctx = store.listener && store.listener.context
+  store.manuallyPaused = true
+  if (ctx && ctx.state === 'running') ctx.suspend()
+}
+
+export function resumeAudio() {
+  const ctx = store.listener && store.listener.context
+  store.manuallyPaused = false
   if (ctx && ctx.state === 'suspended') ctx.resume()
 }
 

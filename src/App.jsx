@@ -36,6 +36,8 @@ import {
   playOnce,
   setGlobalVolume,
   getGlobalVolume,
+  pauseAudio,
+  resumeAudio,
 } from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
 import { fruitHoverStore } from './utils/fruitHoverStore'
@@ -775,6 +777,11 @@ export default function App() {
     document.addEventListener('keydown', onTab, { capture: true })
     return () => document.removeEventListener('keydown', onTab, { capture: true })
   }, [showSettings, showWelcome, cinematicActive])
+
+  useEffect(() => {
+    if (showSettings) pauseAudio()
+    else resumeAudio()
+  }, [showSettings])
 
   useEffect(() => {
     if (!receptionChoiceVisible) return
