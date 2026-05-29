@@ -68,6 +68,7 @@ export default function App() {
   const [leafArriving, setLeafArriving] = useState(false)
   const [hasSentSavoir, setHasSentSavoir] = useState(false)
   const [sentSavoirDrawing, setSentSavoirDrawing] = useState(null)
+  const [sentSavoirTitle, setSentSavoirTitle] = useState(null)
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
@@ -982,6 +983,7 @@ export default function App() {
         drawingData: data.drawingData ?? null,
       }
       setSentSavoirDrawing(data.drawingData ?? null)
+      setSentSavoirTitle(data.title ?? data.theme ?? null)
       setTimeout(() => {
         setIsPlayerFruitPanelOpen(false)
         setIncomingSavoir(savoir)
@@ -1375,6 +1377,7 @@ export default function App() {
           onClose={handleClosePlayerFruitPanel}
           hasSentSavoir={hasSentSavoir}
           sentSavoirDrawing={sentSavoirDrawing}
+          sentSavoirTitle={sentSavoirTitle}
         />
       )}
 

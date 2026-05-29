@@ -9,6 +9,7 @@ export function PlayerFruitPanel({
   onClose,
   hasSentSavoir = false,
   sentSavoirDrawing = null,
+  sentSavoirTitle = null,
 }) {
   const [isAddSavoirOpen, setIsAddSavoirOpen] = useState(false)
   const favorites = useFavorites()
@@ -84,6 +85,7 @@ export function PlayerFruitPanel({
                     alt=""
                     aria-hidden="true"
                   />
+                  {sentSavoirTitle && <p className="pfp-sent-leaf-title">{sentSavoirTitle}</p>}
                 </div>
               </div>
             </div>

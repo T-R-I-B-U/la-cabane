@@ -365,16 +365,34 @@
   object-fit: cover;
 }
 
+/* override padding-top from default layout so name is visible in sent card */
+.pfp-left-profile-card .pfp-player-name {
+  padding-top: 0;
+}
+
 .pfp-sent-leaf-slot {
   background: #e3e7b3;
   border-radius: 6px;
   padding: 10px;
-  width: 192px;
-  height: 192px;
+  width: 102px;
+  height: 102px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   flex-shrink: 0;
+}
+
+.pfp-sent-leaf-title {
+  font-family: 'citrus-gothic-rough', serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: #33330f;
+  line-height: 1.2;
+  text-align: center;
+  margin: 0;
+  word-break: break-word;
 }
 
 @media (max-width: 900px) {
