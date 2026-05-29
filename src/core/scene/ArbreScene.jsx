@@ -87,7 +87,7 @@ export function ArbreScene({
       <GrowingFruit
         position={playerFruit}
         playing={growingFruitPlaying}
-        active={growingFruitClickable}
+        active={growingFruitClickable && !fruitsDisabled}
         onComplete={onGrowingFruitComplete}
         onFruitClick={() => onFruitClick?.('fruit_player')}
         onFruitHover={onFruitHover}

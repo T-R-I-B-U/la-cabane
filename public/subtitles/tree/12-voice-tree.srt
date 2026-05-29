@@ -1,6 +1,6 @@
 1
 00:00:00,000 --> 00:00:07,000
-Chaque savoir proposée par les passeurs de tout âge sont encodés dans l'ADN des cellules de l'arbre.
+Chaque savoirs proposés par les Passeurs de tout âge sont encodés dans l'ADN des cellules de l'arbre.
 
 2
 00:00:07,000 --> 00:00:13,000
@@ -8,5 +8,5 @@ Là où nous sommes, au niveau des racines, nous plaçons le savoir historique d
 
 3
 00:00:13,000 --> 00:00:18,000
-son passé le plus exact possible pour guider l'avenir de l'éco-cartier.
+son passé le plus exact possible pour guider l'avenir de l'éco-quartier.
 

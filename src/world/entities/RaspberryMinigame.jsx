@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useGLTF, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { cursorStore } from '../../utils/cursorStore'
+import { playOnce } from '../../utils/audioStore'
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -227,6 +228,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       camDir.normalize()
       dragPlane.current.setFromNormalAndCoplanarPoint(camDir.negate(), hits[0].point)
       draggedIndexRef.current = idx
+      playOnce('clickMagic')
       cursorStore.setType('grabbing')
     }
 

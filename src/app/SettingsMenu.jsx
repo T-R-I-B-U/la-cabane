@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import './SettingsMenu.css'
-import { GearIcon } from './GearIcon'
 import { playOnce } from '../utils/audioStore'
+import { GearIcon } from './GearIcon'
 
 const QUALITY_OPTIONS = [
   { label: 'Faible', value: 'compressed2' },
@@ -76,14 +76,7 @@ export function SettingsMenu({
       >
         <div className="settings-card__header">
           <h2 className="settings-card__title">Réglages</h2>
-          <GearIcon
-            variant="textured"
-            onClick={() => {
-              playOnce('closeUi')
-              onClose()
-            }}
-            ariaLabel="Fermer les réglages"
-          />
+          <GearIcon onClick={onClose} ariaLabel="Fermer les réglages" />
         </div>
 
         <div
@@ -158,6 +151,10 @@ export function SettingsMenu({
         >
           {isFullscreen ? 'Quitter le plein écran' : 'Plein écran'}
         </button>
+
+        <p className="settings-tab-hint">
+          <kbd className="settings-tab-key">P</kbd> pour ouvrir / fermer
+        </p>
       </div>
     </div>
   )

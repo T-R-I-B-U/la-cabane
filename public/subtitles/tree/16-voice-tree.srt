@@ -1,6 +1,6 @@
 1
 00:00:00,000 --> 00:00:06,280
-Ici, c'est l'établi, au lieu de pratiquer de toutes sortes de savoir artisanaux utiles
+Ici, c'est l'établi, haut lieu de pratique de toutes sortes de savoir artisanaux utiles
 
 2
 00:00:06,280 --> 00:00:08,720
@@ -12,9 +12,9 @@ Ici, l'objectif c'est pratiquer pour apprendre.
 
 4
 00:00:12,120 --> 00:00:14,320
-N'hésite pas à parler avec Thomas.
+N'hésite pas à parler avec Thomas,
 
 5
 00:00:14,320 --> 00:00:16,640
-Oui, c'est l'un de nos passeurs.
+oui, c'est l'un de nos Passeurs.
 

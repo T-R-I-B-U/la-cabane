@@ -419,7 +419,7 @@ export function MobileView() {
           <div className="mv-s6-bottom">
             <p className="mv-s6-title">J&apos;envoi mon savoir</p>
             <div className="mv-s6-arrow-wrap">
-              <img className="mv-s6-arrow" src="/phone/arrow-up.svg" alt="" aria-hidden="true" />
+              <img className="mv-s6-arrow" src="/phone/arrow-up.webp" alt="" aria-hidden="true" />
             </div>
           </div>
         </div>

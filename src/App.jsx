@@ -15,6 +15,7 @@ import {
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
+import { GearIcon } from './app/GearIcon'
 import { PlayerFruitPanel } from './app/PlayerFruitPanel'
 import { RaspberryCounter } from './app/RaspberryCounter'
 import { useContactAssignment } from './app/useContactAssignment'
@@ -32,8 +33,11 @@ import Subtitles from './core/audio/Subtitles'
 import {
   setSubtitleChoices,
   unlockAndPlay,
+  playOnce,
   setGlobalVolume,
   getGlobalVolume,
+  pauseAudio,
+  resumeAudio,
 } from './utils/audioStore'
 import { cursorStore } from './utils/cursorStore'
 import { fruitHoverStore } from './utils/fruitHoverStore'
@@ -67,6 +71,8 @@ export default function App() {
   const [incomingSavoir, setIncomingSavoir] = useState(null)
   const [leafArriving, setLeafArriving] = useState(false)
   const [hasSentSavoir, setHasSentSavoir] = useState(false)
+  const [sentSavoirDrawing, setSentSavoirDrawing] = useState(null)
+  const [sentSavoirTitle, setSentSavoirTitle] = useState(null)
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
@@ -179,6 +185,11 @@ export default function App() {
     returnHallVisible,
     treePhaseActive,
     timeatmPhaseActive,
+    treeStoryCameras,
+    treeStoryPauseAt,
+    treeStoryCameraLocked,
+    onTreeStoryPause,
+    onTreeStoryComplete,
     workbenchPhaseActive,
     greenhousePhaseActive,
     thomasEtabliPhaseActive,
@@ -341,9 +352,11 @@ export default function App() {
     onBackAtBase: spawnAtLadderDown,
     onOutroComplete: useCallback(() => {
       setShowFinal(true)
-      setIsPlayerModeActive(false)
-      setIsFlyModeActive(false)
-      exitIntro()
+      setTimeout(() => {
+        setIsPlayerModeActive(false)
+        setIsFlyModeActive(false)
+        exitIntro()
+      }, 1200)
     }, [exitIntro]),
   })
 
@@ -746,6 +759,10 @@ export default function App() {
   }, [isPlayerModeActive, postIntro])
 
   useEffect(() => {
+    if (introMovementLocked) pointerControlsRef.current?.unlock()
+  }, [introMovementLocked])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -755,15 +772,12 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    const onEscape = (e) => {
-      if (e.key !== 'Escape') return
-      if (!isInGameplayRef.current) return
-      if (
-        isModalOpenRef.current ||
-        isJournalInteractionActiveRef.current ||
-        isMinigameActiveRef.current
-      )
-        return
+    const onTab = (e) => {
+      if (e.key !== 'p' && e.key !== 'P') return
+      if (showWelcome) return
+      if (showNameInput) return
+      if (cinematicActive) return
+      e.preventDefault()
       e.stopImmediatePropagation()
       if (showSettings) {
         setShowSettings(false)
@@ -772,8 +786,13 @@ export default function App() {
         setShouldRestorePointerLockAfterStoryUi(true)
       }
     }
-    document.addEventListener('keydown', onEscape, { capture: true })
-    return () => document.removeEventListener('keydown', onEscape, { capture: true })
+    document.addEventListener('keydown', onTab, { capture: true })
+    return () => document.removeEventListener('keydown', onTab, { capture: true })
+  }, [showSettings, showWelcome, showNameInput, cinematicActive])
+
+  useEffect(() => {
+    if (showSettings) pauseAudio()
+    else resumeAudio()
   }, [showSettings])
 
   useEffect(() => {
@@ -980,6 +999,8 @@ export default function App() {
         slots: data.availability ?? [],
         drawingData: data.drawingData ?? null,
       }
+      setSentSavoirDrawing(data.drawingData ?? null)
+      setSentSavoirTitle(data.title ?? data.theme ?? null)
       setTimeout(() => {
         setIsPlayerFruitPanelOpen(false)
         setIncomingSavoir(savoir)
@@ -1100,7 +1121,9 @@ export default function App() {
             !isContactInteractionActive &&
             !isJournalInteractionActive &&
             !raspberryPhaseActive &&
-            !isPlayerFruitPanelOpen
+            !isPlayerFruitPanelOpen &&
+            !leafArriving &&
+            !incomingSavoir
           }
           active={(interactionsEnabled && isLeafHovered) || isFruitHovered || isStairsHovered}
         />
@@ -1139,6 +1162,11 @@ export default function App() {
           postIntroLocked: isStoryCameraControlEnabled,
           treePhaseActive,
           timeatmPhaseActive,
+          treeStoryCameras,
+          treeStoryPauseAt,
+          treeStoryCameraLocked,
+          onTreeStoryPause,
+          onTreeStoryComplete,
           receptionActive:
             currentStoryStepId === 'intro.goToReception' &&
             postIntro &&
@@ -1192,12 +1220,29 @@ export default function App() {
           growingFruitPlaying: arbreGrowingFruitPlaying,
           growingFruitClickable: arbreGrowingFruitClickable,
           fruitsDisabled:
-            isContactInteractionActive || isPlayerFruitPanelOpen || isSavoirInteractionActive,
+            isContactInteractionActive ||
+            isPlayerFruitPanelOpen ||
+            isSavoirInteractionActive ||
+            leafArriving ||
+            !!incomingSavoir,
           onGrowingFruitComplete: handleGrowingFruitComplete,
-          leafInteractionsEnabled: arbreLeafInteractionsEnabled,
+          leafInteractionsEnabled:
+            arbreLeafInteractionsEnabled &&
+            !isSavoirInteractionActive &&
+            !isContactInteractionActive &&
+            !isPlayerFruitPanelOpen &&
+            !leafArriving &&
+            !incomingSavoir,
         }}
         leafMaterialMode={leafMaterialMode}
-        interactionsEnabled={interactionsEnabled}
+        interactionsEnabled={
+          interactionsEnabled &&
+          !isSavoirInteractionActive &&
+          !isContactInteractionActive &&
+          !isPlayerFruitPanelOpen &&
+          !leafArriving &&
+          !incomingSavoir
+        }
         pointerControlsRef={pointerControlsRef}
         interactions={{
           onLeafClick: openSavoirFromLeaf,
@@ -1353,6 +1398,8 @@ export default function App() {
           playerName={playerName}
           onClose={handleClosePlayerFruitPanel}
           hasSentSavoir={hasSentSavoir}
+          sentSavoirDrawing={sentSavoirDrawing}
+          sentSavoirTitle={sentSavoirTitle}
         />
       )}
 
@@ -1362,6 +1409,7 @@ export default function App() {
           onClose={handleCloseIncomingSavoir}
           leafColRef={savoirLeafColRef}
           pendingLeaf={leafArriving}
+          hideFavorites
         />
       )}
 
@@ -1406,9 +1454,19 @@ export default function App() {
             if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
           onAnimationEnd={() => setShowWelcome(false)}
-          onOpenSettings={() => setShowSettings(true)}
-          settingsOpen={showSettings}
         />
+      )}
+
+      {!cinematicActive && !showSettings && !showFinal && (
+        <div className="app-gear-btn">
+          <GearIcon
+            onClick={() => {
+              playOnce(showSettings ? 'closeUi' : 'clickUi')
+              setShowSettings((v) => !v)
+            }}
+            ariaLabel={showSettings ? 'Fermer les réglages' : 'Ouvrir les réglages'}
+          />
+        </div>
       )}
 
       {!cinematicActive && (

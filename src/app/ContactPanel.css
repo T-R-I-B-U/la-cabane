@@ -31,10 +31,8 @@
   margin-bottom: -8px;
 }
 
-.cp-back img {
+.cp-back svg {
   display: block;
-  height: 50px;
-  width: auto;
 }
 
 .cp-body {
@@ -52,7 +50,9 @@
   flex-direction: column;
   justify-content: center;
   gap: 40px;
-  padding-right: 40px;
+  margin-right: -80px;
+  position: relative;
+  z-index: 0;
 }
 
 .cp-name-section {
@@ -95,6 +95,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+  z-index: 1;
+  margin-right: -80px;
 }
 
 .cp-fruit-img {
@@ -111,8 +114,8 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0;
-  padding-left: 40px;
+  position: relative;
+  z-index: 0;
 }
 
 .cp-info-row {

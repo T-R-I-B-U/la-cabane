@@ -3,10 +3,12 @@ import { OrbitControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import IntroCamera from '../../world/entities/IntroCamera'
 import CameraEditorFlyControls from '../CameraEditorFlyControls'
+import { CameraPreviewPlayer } from '../CameraPreviewPlayer'
 import { CameraRegistrySync } from '../CameraRegistrySync'
 import { getEditorFlyMode, onEditorFlyModeChange } from '../cameraRegistry'
 import { PlayerControls } from '../PlayerControls'
 import { StoryCameraTransition } from '../StoryCameraTransition'
+import { StorySequencePlayer } from '../StorySequencePlayer'
 
 function OrbitTargetSync({ controlsRef, target }) {
   const { camera } = useThree()
@@ -36,6 +38,11 @@ export function SceneControls({
   introSpawn,
   storyCameraTransition,
   onStoryCameraTransitionComplete,
+  treeStoryCameras,
+  treeStoryPauseAt,
+  treeStoryCameraLocked,
+  onTreeStoryPause,
+  onTreeStoryComplete,
   arbreStoryCameraTransition,
   onArbreTransitionComplete,
   onIntroEvent,
@@ -62,6 +69,7 @@ export function SceneControls({
     <>
       <CameraRegistrySync controlsRef={controlsRef} />
       <CameraEditorFlyControls />
+      <CameraPreviewPlayer />
     </>
   ) : null
 
@@ -90,7 +98,7 @@ export function SceneControls({
           eyeHeight={playerEyeHeight}
           collisionObjects={collisionObjects}
           controlsRef={pointerControlsRef}
-          pointerSpeed={sensitivity}
+          pointerSpeed={arbreStoryCameraTransition ? 0 : sensitivity}
         />
         {arbreStoryCameraTransition && (
           <StoryCameraTransition
@@ -106,16 +114,15 @@ export function SceneControls({
   if (postIntro) {
     return postIntroLocked ? (
       <>
-        {/* cameraFixed: skip PlayerControls/PointerLock during minigame so pointer events work */}
         {!cameraFixed && (
           <PlayerControls
-            canMove={!movementLocked}
+            canMove={!movementLocked && !treeStoryCameraLocked}
             flyMode={flyMode}
             spawnAt={introSpawn?.position}
             lookAtTarget={introSpawn?.target}
             collisionObjects={collisionObjects}
             controlsRef={pointerControlsRef}
-            pointerSpeed={sensitivity}
+            pointerSpeed={treeStoryCameraLocked ? 0 : sensitivity}
           />
         )}
         <StoryCameraTransition
@@ -126,6 +133,14 @@ export function SceneControls({
           <StoryCameraTransition
             transition={arbreStoryCameraTransition}
             onComplete={onArbreTransitionComplete}
+          />
+        )}
+        {treeStoryCameras && (
+          <StorySequencePlayer
+            cameras={treeStoryCameras}
+            pauseAtId={treeStoryPauseAt}
+            onPause={onTreeStoryPause}
+            onComplete={onTreeStoryComplete}
           />
         )}
         {devSync}
