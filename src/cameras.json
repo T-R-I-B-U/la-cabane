@@ -40,7 +40,6 @@
       "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
       "fov": 60
     },
-
     {
       "id": "story.accueil",
       "label": "Accueil",
@@ -57,21 +56,20 @@
       "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
       "fov": 60
     },
-
     {
       "id": "tree-story.start-tree-camera",
       "label": "start-tree-camera",
       "group": "tree-story",
-      "position": null,
-      "target": null,
+      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
+      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
       "fov": 60
     },
     {
       "id": "tree-story.timeatm",
       "label": "timeatm",
       "group": "tree-story",
-      "position": null,
-      "target": null,
+      "position": { "x": -79.2544, "y": 1.7822, "z": -42.3355 },
+      "target": { "x": -74.9127, "y": 0.6943, "z": -44.5641 },
       "fov": 60
     },
     {
@@ -86,11 +84,10 @@
       "id": "tree-story.end-tree-camera",
       "label": "end-tree-camera",
       "group": "tree-story",
-      "position": null,
-      "target": null,
+      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
+      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
       "fov": 60
     },
-
     {
       "id": "story.atelier",
       "label": "Atelier",
@@ -115,13 +112,12 @@
       "target": { "x": -67.0993, "y": 1.238, "z": -56.6957 },
       "fov": 60
     },
-
     {
       "id": "story.greenhouseFrontDoor",
       "label": "Porte serre",
       "group": "greenhouse",
       "position": { "x": -64.992, "y": 1.4846, "z": -45.4722 },
-      "target": { "x": -69.4163, "y": 1.8077, "z": -43.1654 },
+      "target": { "x": -59.9947, "y": 1.6479, "z": -45.4973 },
       "fov": 60
     },
     {
@@ -153,7 +149,7 @@
       "label": "Serre framboises",
       "group": "greenhouse",
       "position": { "x": -32.0576, "y": 1.4846, "z": -39.7233 },
-      "target": { "x": -34.5, "y": 0.55, "z": -42.0 },
+      "target": { "x": -34.5, "y": 0.55, "z": -42 },
       "fov": 60
     },
     {
@@ -176,8 +172,8 @@
       "id": "story.greenhouseInsideExit",
       "label": "Sortie serre intérieur",
       "group": "greenhouse",
-      "position": { "x": -46.3221, "y": 1.4846, "z": -45.5156 },
-      "target": { "x": -51.319, "y": 1.308, "z": -45.5025 },
+      "position": { "x": -47.2998, "y": 1.4846, "z": -45.5307 },
+      "target": { "x": -52.2986, "y": 1.3779, "z": -45.5175 },
       "fov": 60
     },
     {
@@ -185,18 +181,17 @@
       "label": "Sortie couloir serre",
       "group": "greenhouse",
       "position": { "x": -58.0455, "y": 1.4846, "z": -45.4848 },
-      "target": { "x": -63.0424, "y": 1.308, "z": -45.4717 },
+      "target": { "x": -63.0455, "y": 1.4679, "z": -45.4917 },
       "fov": 60
     },
     {
       "id": "story.greenhouseFrontDoorExit",
       "label": "Sortie porte serre",
       "group": "greenhouse",
-      "position": { "x": -65.0261, "y": 1.4846, "z": -43.8229 },
-      "target": { "x": -69.7916, "y": 1.6979, "z": -42.3246 },
+      "position": { "x": -64.992, "y": 1.4846, "z": -45.4722 },
+      "target": { "x": -69.2936, "y": 1.5779, "z": -42.9251 },
       "fov": 60
     },
-
     {
       "id": "story.stairs01Floor",
       "label": "Escalier 01 bas",
@@ -245,7 +240,6 @@
       "target": { "x": -77.5277, "y": 25.1917, "z": -49.1105 },
       "fov": 60
     },
-
     {
       "id": "arbre.stairs02Down",
       "label": "Arbre - escalier 02 bas",
@@ -266,11 +260,10 @@
       "id": "arbre.nest",
       "label": "Arbre - nid",
       "group": "nest",
-      "position": { "x": -86.7296, "y": 11.5867, "z": -24.8536 },
-      "target": { "x": -86.914, "y": 11.3001, "z": -19.8652 },
+      "position": { "x": -86.2501, "y": 11.5867, "z": -25.4644 },
+      "target": { "x": -86.4017, "y": 10.5867, "z": -20.5678 },
       "fov": 60
     },
-
     {
       "id": "arbre.outroWP4",
       "label": "Arbre fin - intérieur",
@@ -349,7 +342,7 @@
     {
       "id": "marie",
       "label": "Marie",
-      "position": { "x": -88.3342, "y": 9.15, "z": -12.3431 },
+      "position": { "x": -88.7959, "y": 9.15, "z": -20.3969 },
       "floorY": 9.15,
       "rotationY": 2.792526803190927,
       "scale": 9
