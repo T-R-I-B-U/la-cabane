@@ -77,6 +77,7 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [showFinal, setShowFinal] = useState(false)
+  const [showFadeToBlack, setShowFadeToBlack] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [loadingFading, setLoadingFading] = useState(false)
   const [readyToShow, setReadyToShow] = useState(false)
@@ -346,7 +347,7 @@ export default function App() {
     onPlatformSpawn: spawnAtPlatform,
     onBackAtBase: spawnAtLadderDown,
     onOutroComplete: useCallback(() => {
-      setShowFinal(true)
+      setShowFadeToBlack(true)
       setIsPlayerModeActive(false)
       setIsFlyModeActive(false)
       exitIntro()
@@ -1407,6 +1408,16 @@ export default function App() {
       {!cinematicActive && raspberryPhaseActive && <RaspberryCounter count={minigameCount} />}
 
       {!cinematicActive && <CustomCursor visible={isCustomCursorVisible} />}
+
+      {showFadeToBlack && !showFinal && (
+        <div
+          className="fade-to-black"
+          onAnimationEnd={() => {
+            setShowFinal(true)
+            setShowFadeToBlack(false)
+          }}
+        />
+      )}
 
       {!cinematicActive && showFinal && <FinalScreen />}
 
