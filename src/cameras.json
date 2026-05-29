@@ -4,528 +4,303 @@
       "id": "intro.start",
       "label": "Vue d'ensemble",
       "group": "intro",
-      "position": {
-        "x": -138.0319,
-        "y": 23.3841,
-        "z": -53.2986
-      },
-      "target": {
-        "x": -133.1716,
-        "y": 22.3842,
-        "z": -52.6841
-      },
+      "position": { "x": -138.0319, "y": 23.3841, "z": -53.2986 },
+      "target": { "x": -133.1716, "y": 22.3842, "z": -52.6841 },
       "fov": 60
     },
     {
       "id": "intro.doorApproach",
       "label": "Approche porte",
       "group": "intro",
-      "position": {
-        "x": -112.445,
-        "y": 10.7332,
-        "z": -51.1511
-      },
-      "target": {
-        "x": -107.6601,
-        "y": 9.861,
-        "z": -49.9914
-      },
+      "position": { "x": -112.445, "y": 10.7332, "z": -51.1511 },
+      "target": { "x": -107.6601, "y": 9.861, "z": -49.9914 },
       "fov": 60
     },
     {
       "id": "intro.doorWait",
       "label": "Devant la porte",
       "group": "intro",
-      "position": {
-        "x": -97.186,
-        "y": 4.0785,
-        "z": -47.7863
-      },
-      "target": {
-        "x": -92.4927,
-        "y": 3.6922,
-        "z": -46.1061
-      },
+      "position": { "x": -97.186, "y": 4.0785, "z": -47.7863 },
+      "target": { "x": -92.4927, "y": 3.6922, "z": -46.1061 },
       "fov": 60
     },
     {
       "id": "intro.doorOpen",
       "label": "Porte s'ouvre",
       "group": "intro",
-      "position": {
-        "x": -91.7634,
-        "y": 1.342,
-        "z": -45.8359
-      },
-      "target": {
-        "x": -86.7744,
-        "y": 1.4853,
-        "z": -45.5373
-      },
+      "position": { "x": -91.7634, "y": 1.342, "z": -45.8359 },
+      "target": { "x": -86.7744, "y": 1.4853, "z": -45.5373 },
       "fov": 60
     },
     {
       "id": "intro.inside",
       "label": "Intérieur arrivée",
       "group": "intro",
-      "position": {
-        "x": -80.9135,
-        "y": 1.342,
-        "z": -45.9432
-      },
-      "target": {
-        "x": -76.0307,
-        "y": 2.2798,
-        "z": -45.415
-      },
+      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
+      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
       "fov": 60
     },
+
     {
       "id": "story.accueil",
       "label": "Accueil",
-      "group": "story",
-      "position": {
-        "x": -79.3877,
-        "y": 1.342,
-        "z": -47.2564
-      },
-      "target": {
-        "x": -81.863,
-        "y": 2.0331,
-        "z": -51.5453
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.atelier",
-      "label": "Atelier",
-      "group": "story",
-      "position": {
-        "x": -74.8894,
-        "y": 1.4846,
-        "z": -52.2994
-      },
-      "target": {
-        "x": -70.8225,
-        "y": 1.1781,
-        "z": -55.1919
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.thomas",
-      "label": "Thomas établi",
-      "group": "story",
-      "position": {
-        "x": -69.3189,
-        "y": 1.4846,
-        "z": -52.2221
-      },
-      "target": {
-        "x": -67.0993,
-        "y": 1.238,
-        "z": -56.6957
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.greenhouseFrontDoor",
-      "label": "Porte serre",
-      "group": "story",
-      "position": {
-        "x": -64.992,
-        "y": 1.4846,
-        "z": -45.4722
-      },
-      "target": {
-        "x": -69.4163,
-        "y": 1.8077,
-        "z": -43.1654
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.greenhouseCorridor",
-      "label": "Couloir serre",
-      "group": "story",
-      "position": {
-        "x": -58.0455,
-        "y": 1.4846,
-        "z": -45.4848
-      },
-      "target": {
-        "x": -53.0589,
-        "y": 1.8476,
-        "z": -45.5258
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.greenhouseInside",
-      "label": "Intérieur serre",
-      "group": "story",
-      "position": {
-        "x": -47.2998,
-        "y": 1.4846,
-        "z": -45.5307
-      },
-      "target": {
-        "x": -42.3028,
-        "y": 1.6579,
-        "z": -45.5119
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.greenhouseInsideExit",
-      "label": "Sortie serre intérieur",
-      "group": "story",
-      "position": {
-        "x": -46.3221,
-        "y": 1.4846,
-        "z": -45.5156
-      },
-      "target": {
-        "x": -51.319,
-        "y": 1.308,
-        "z": -45.5025
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.stairs01Floor",
-      "label": "Escalier 01 bas",
-      "group": "story",
-      "position": {
-        "x": -66.0203,
-        "y": 1.4846,
-        "z": -42.3821
-      },
-      "target": {
-        "x": -69.2894,
-        "y": 2.0865,
-        "z": -38.6471
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.stairs01Top",
-      "label": "Escalier 01 haut",
-      "group": "story",
-      "position": {
-        "x": -71.8511,
-        "y": 4.643,
-        "z": -36.89
-      },
-      "target": {
-        "x": -72.9442,
-        "y": 4.8662,
-        "z": -41.7639
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.greenhouseCorridorExit",
-      "label": "Sortie couloir serre",
-      "group": "story",
-      "position": {
-        "x": -58.0455,
-        "y": 1.4846,
-        "z": -45.4848
-      },
-      "target": {
-        "x": -63.0424,
-        "y": 1.308,
-        "z": -45.4717
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.greenhouseFrontDoorExit",
-      "label": "Sortie porte serre",
-      "group": "story",
-      "position": {
-        "x": -65.0261,
-        "y": 1.4846,
-        "z": -43.8229
-      },
-      "target": {
-        "x": -69.7916,
-        "y": 1.6979,
-        "z": -42.3246
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.serreZoe",
-      "label": "Serre Zoe",
-      "group": "story",
-      "position": {
-        "x": -35.3907,
-        "y": 1.4846,
-        "z": -45.2265
-      },
-      "target": {
-        "x": -30.7443,
-        "y": 0.2702,
-        "z": -43.8351
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.serreRaspberry",
-      "label": "Serre framboises",
-      "group": "story",
-      "position": {
-        "x": -32.0576,
-        "y": 1.4846,
-        "z": -39.7233
-      },
-      "target": {
-        "x": -34.5,
-        "y": 0.55,
-        "z": -42.0
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.serreJuice",
-      "label": "Serre machine à jus",
-      "group": "story",
-      "position": {
-        "x": -32.2422,
-        "y": 1.7274,
-        "z": -44.7169
-      },
-      "target": {
-        "x": -27.4089,
-        "y": 0.4646,
-        "z": -44.5051
-      },
-      "fov": 60
-    },
-    {
-      "id": "story.serreJuiceDrink",
-      "label": "Serre verre de jus",
-      "group": "story",
-      "position": {
-        "x": -30.4841,
-        "y": 1.4846,
-        "z": -47.2507
-      },
-      "target": {
-        "x": -25.6693,
-        "y": 0.2217,
-        "z": -46.7785
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.ladderDown",
-      "label": "Arbre - bas échelle",
-      "group": "arbre",
-      "position": {
-        "x": -70.2701,
-        "y": 4.643,
-        "z": -42.5707
-      },
-      "target": {
-        "x": -71.8225,
-        "y": 9.2519,
-        "z": -43.7317
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.atPlatform",
-      "label": "Arbre - milieu plateforme haute",
-      "group": "arbre",
-      "position": {
-        "x": -74.2247,
-        "y": 21.0595,
-        "z": -45.3948
-      },
-      "target": {
-        "x": -78.293,
-        "y": 21.1527,
-        "z": -48.3
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.atFruitFocus",
-      "label": "Arbre - focus fruit plateforme",
-      "group": "arbre",
-      "position": {
-        "x": -74.2247,
-        "y": 24.6595,
-        "z": -45.3948
-      },
-      "target": {
-        "x": -77.5277,
-        "y": 25.1917,
-        "z": -49.1105
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.stairs02Down",
-      "label": "Arbre - escalier 02 bas",
-      "group": "arbre",
-      "position": {
-        "x": -76.1321,
-        "y": 4.643,
-        "z": -38.0978
-      },
-      "target": {
-        "x": -78.4494,
-        "y": 6.0759,
-        "z": -33.9053
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.stairs02Top",
-      "label": "Arbre - escalier 02 haut",
-      "group": "arbre",
-      "position": {
-        "x": -82.4339,
-        "y": 11.5867,
-        "z": -25.8515
-      },
-      "target": {
-        "x": -84.5678,
-        "y": 11.6,
-        "z": -21.3298
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.nest",
-      "label": "Arbre - nid",
-      "group": "arbre",
-      "position": {
-        "x": -86.7296,
-        "y": 11.5867,
-        "z": -24.8536
-      },
-      "target": {
-        "x": -86.914,
-        "y": 11.3001,
-        "z": -19.8652
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP4",
-      "label": "Arbre fin - intérieur",
-      "group": "arbre",
-      "position": {
-        "x": -82.0272,
-        "y": 1.342,
-        "z": -44.9512
-      },
-      "target": {
-        "x": -86.9924,
-        "y": 1.5054,
-        "z": -45.5164
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP3",
-      "label": "Arbre fin - porte",
-      "group": "arbre",
-      "position": {
-        "x": -91.7634,
-        "y": 1.342,
-        "z": -45.8359
-      },
-      "target": {
-        "x": -96.4432,
-        "y": 2.1122,
-        "z": -47.4189
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP1",
-      "label": "Arbre fin - recul",
-      "group": "arbre",
-      "position": {
-        "x": -112.445,
-        "y": 10.7332,
-        "z": -51.1511
-      },
-      "target": {
-        "x": -107.6602,
-        "y": 9.861,
-        "z": -49.9914
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.outroWP0",
-      "label": "Arbre fin - extérieur",
-      "group": "arbre",
-      "position": {
-        "x": -138.0319,
-        "y": 23.3841,
-        "z": -53.2986
-      },
-      "target": {
-        "x": -133.1716,
-        "y": 22.3842,
-        "z": -52.6841
-      },
-      "fov": 60
-    },
-    {
-      "id": "arbre.arbre.haut.echelle",
-      "label": "Arbre - haut échelle",
-      "group": "arbre",
-      "position": {
-        "x": -70.6362,
-        "y": 21.0595,
-        "z": -42.8321
-      },
-      "target": {
-        "x": -74.7044,
-        "y": 21.1527,
-        "z": -45.7373
-      },
+      "group": "welcome",
+      "position": { "x": -79.3877, "y": 1.342, "z": -47.2564 },
+      "target": { "x": -81.863, "y": 2.0331, "z": -51.5453 },
       "fov": 60
     },
     {
       "id": "story.apres.accueil",
       "label": "Après Accueil",
-      "group": "story",
-      "position": {
-        "x": -80.9135,
-        "y": 1.342,
-        "z": -45.9432
-      },
-      "target": {
-        "x": -76.0307,
-        "y": 2.2798,
-        "z": -45.415
-      },
+      "group": "welcome",
+      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
+      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
+      "fov": 60
+    },
+
+    {
+      "id": "tree-story.start-tree-camera",
+      "label": "start-tree-camera",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.timeatm",
+      "label": "timeatm",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.map",
+      "label": "map",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.end-tree-camera",
+      "label": "end-tree-camera",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+
+    {
+      "id": "story.atelier",
+      "label": "Atelier",
+      "group": "workshop",
+      "position": { "x": -74.8894, "y": 1.4846, "z": -52.2994 },
+      "target": { "x": -70.8225, "y": 1.1781, "z": -55.1919 },
       "fov": 60
     },
     {
       "id": "story.atelier.between",
       "label": "atelier_between",
-      "group": "story",
-      "position": {
-        "x": -72.4337,
-        "y": 1.6492,
-        "z": -52.1121
-      },
-      "target": {
-        "x": -69.2288,
-        "y": 0.2226,
-        "z": -55.6749
-      },
+      "group": "workshop",
+      "position": { "x": -72.4337, "y": 1.6492, "z": -52.1121 },
+      "target": { "x": -69.2288, "y": 0.2226, "z": -55.6749 },
+      "fov": 60
+    },
+    {
+      "id": "story.thomas",
+      "label": "Thomas établi",
+      "group": "workshop",
+      "position": { "x": -69.3189, "y": 1.4846, "z": -52.2221 },
+      "target": { "x": -67.0993, "y": 1.238, "z": -56.6957 },
+      "fov": 60
+    },
+
+    {
+      "id": "story.greenhouseFrontDoor",
+      "label": "Porte serre",
+      "group": "greenhouse",
+      "position": { "x": -64.992, "y": 1.4846, "z": -45.4722 },
+      "target": { "x": -69.4163, "y": 1.8077, "z": -43.1654 },
+      "fov": 60
+    },
+    {
+      "id": "story.greenhouseCorridor",
+      "label": "Couloir serre",
+      "group": "greenhouse",
+      "position": { "x": -58.0455, "y": 1.4846, "z": -45.4848 },
+      "target": { "x": -53.0589, "y": 1.8476, "z": -45.5258 },
+      "fov": 60
+    },
+    {
+      "id": "story.greenhouseInside",
+      "label": "Intérieur serre",
+      "group": "greenhouse",
+      "position": { "x": -47.2998, "y": 1.4846, "z": -45.5307 },
+      "target": { "x": -42.3028, "y": 1.6579, "z": -45.5119 },
+      "fov": 60
+    },
+    {
+      "id": "story.serreZoe",
+      "label": "Serre Zoe",
+      "group": "greenhouse",
+      "position": { "x": -35.3907, "y": 1.4846, "z": -45.2265 },
+      "target": { "x": -30.7443, "y": 0.2702, "z": -43.8351 },
+      "fov": 60
+    },
+    {
+      "id": "story.serreRaspberry",
+      "label": "Serre framboises",
+      "group": "greenhouse",
+      "position": { "x": -32.0576, "y": 1.4846, "z": -39.7233 },
+      "target": { "x": -34.5, "y": 0.55, "z": -42.0 },
+      "fov": 60
+    },
+    {
+      "id": "story.serreJuice",
+      "label": "Serre machine à jus",
+      "group": "greenhouse",
+      "position": { "x": -32.2422, "y": 1.7274, "z": -44.7169 },
+      "target": { "x": -27.4089, "y": 0.4646, "z": -44.5051 },
+      "fov": 60
+    },
+    {
+      "id": "story.serreJuiceDrink",
+      "label": "Serre verre de jus",
+      "group": "greenhouse",
+      "position": { "x": -30.4841, "y": 1.4846, "z": -47.2507 },
+      "target": { "x": -25.6693, "y": 0.2217, "z": -46.7785 },
+      "fov": 60
+    },
+    {
+      "id": "story.greenhouseInsideExit",
+      "label": "Sortie serre intérieur",
+      "group": "greenhouse",
+      "position": { "x": -46.3221, "y": 1.4846, "z": -45.5156 },
+      "target": { "x": -51.319, "y": 1.308, "z": -45.5025 },
+      "fov": 60
+    },
+    {
+      "id": "story.greenhouseCorridorExit",
+      "label": "Sortie couloir serre",
+      "group": "greenhouse",
+      "position": { "x": -58.0455, "y": 1.4846, "z": -45.4848 },
+      "target": { "x": -63.0424, "y": 1.308, "z": -45.4717 },
+      "fov": 60
+    },
+    {
+      "id": "story.greenhouseFrontDoorExit",
+      "label": "Sortie porte serre",
+      "group": "greenhouse",
+      "position": { "x": -65.0261, "y": 1.4846, "z": -43.8229 },
+      "target": { "x": -69.7916, "y": 1.6979, "z": -42.3246 },
+      "fov": 60
+    },
+
+    {
+      "id": "story.stairs01Floor",
+      "label": "Escalier 01 bas",
+      "group": "tree",
+      "position": { "x": -66.0203, "y": 1.4846, "z": -42.3821 },
+      "target": { "x": -69.2894, "y": 2.0865, "z": -38.6471 },
+      "fov": 60
+    },
+    {
+      "id": "story.stairs01Top",
+      "label": "Escalier 01 haut",
+      "group": "tree",
+      "position": { "x": -71.8511, "y": 4.643, "z": -36.89 },
+      "target": { "x": -72.9442, "y": 4.8662, "z": -41.7639 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.ladderDown",
+      "label": "Arbre - bas échelle",
+      "group": "tree",
+      "position": { "x": -70.2701, "y": 4.643, "z": -42.5707 },
+      "target": { "x": -71.8225, "y": 9.2519, "z": -43.7317 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.arbre.haut.echelle",
+      "label": "Arbre - haut échelle",
+      "group": "tree",
+      "position": { "x": -70.6362, "y": 21.0595, "z": -42.8321 },
+      "target": { "x": -74.7044, "y": 21.1527, "z": -45.7373 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.atPlatform",
+      "label": "Arbre - milieu plateforme haute",
+      "group": "tree",
+      "position": { "x": -74.2247, "y": 21.0595, "z": -45.3948 },
+      "target": { "x": -78.293, "y": 21.1527, "z": -48.3 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.atFruitFocus",
+      "label": "Arbre - focus fruit plateforme",
+      "group": "tree",
+      "position": { "x": -74.2247, "y": 24.6595, "z": -45.3948 },
+      "target": { "x": -77.5277, "y": 25.1917, "z": -49.1105 },
+      "fov": 60
+    },
+
+    {
+      "id": "arbre.stairs02Down",
+      "label": "Arbre - escalier 02 bas",
+      "group": "nest",
+      "position": { "x": -76.1321, "y": 4.643, "z": -38.0978 },
+      "target": { "x": -78.4494, "y": 6.0759, "z": -33.9053 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.stairs02Top",
+      "label": "Arbre - escalier 02 haut",
+      "group": "nest",
+      "position": { "x": -82.4339, "y": 11.5867, "z": -25.8515 },
+      "target": { "x": -84.5678, "y": 11.6, "z": -21.3298 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.nest",
+      "label": "Arbre - nid",
+      "group": "nest",
+      "position": { "x": -86.7296, "y": 11.5867, "z": -24.8536 },
+      "target": { "x": -86.914, "y": 11.3001, "z": -19.8652 },
+      "fov": 60
+    },
+
+    {
+      "id": "arbre.outroWP4",
+      "label": "Arbre fin - intérieur",
+      "group": "outro",
+      "position": { "x": -82.0272, "y": 1.342, "z": -44.9512 },
+      "target": { "x": -86.9924, "y": 1.5054, "z": -45.5164 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.outroWP3",
+      "label": "Arbre fin - porte",
+      "group": "outro",
+      "position": { "x": -91.7634, "y": 1.342, "z": -45.8359 },
+      "target": { "x": -96.4432, "y": 2.1122, "z": -47.4189 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.outroWP1",
+      "label": "Arbre fin - recul",
+      "group": "outro",
+      "position": { "x": -112.445, "y": 10.7332, "z": -51.1511 },
+      "target": { "x": -107.6602, "y": 9.861, "z": -49.9914 },
+      "fov": 60
+    },
+    {
+      "id": "arbre.outroWP0",
+      "label": "Arbre fin - extérieur",
+      "group": "outro",
+      "position": { "x": -138.0319, "y": 23.3841, "z": -53.2986 },
+      "target": { "x": -133.1716, "y": 22.3842, "z": -52.6841 },
       "fov": 60
     }
   ],
@@ -562,11 +337,7 @@
     {
       "id": "thomas",
       "label": "Thomas",
-      "position": {
-        "x": -68.5716,
-        "y": 0.04,
-        "z": -53.7935
-      },
+      "position": { "x": -68.5716, "y": 0.04, "z": -53.7935 },
       "floorY": 0.04,
       "rotationY": 2.6179938779914944,
       "scale": 9
@@ -574,11 +345,7 @@
     {
       "id": "marie",
       "label": "Marie",
-      "position": {
-        "x": -88.3342,
-        "y": 9.15,
-        "z": -12.3431
-      },
+      "position": { "x": -88.3342, "y": 9.15, "z": -12.3431 },
       "floorY": 9.15,
       "rotationY": 2.792526803190927,
       "scale": 9
@@ -586,11 +353,7 @@
     {
       "id": "zoe",
       "label": "Zoe",
-      "position": {
-        "x": -33.3146,
-        "y": 0.04,
-        "z": -45.1228
-      },
+      "position": { "x": -33.3146, "y": 0.04, "z": -45.1228 },
       "floorY": 0.04,
       "rotationY": -1.5707963267948966,
       "scale": 11
