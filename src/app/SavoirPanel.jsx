@@ -95,6 +95,7 @@ export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf, hideFavo
                   className={`savoir-fav-btn${isFav ? ' savoir-fav-btn--active' : ''}${!isFav && isFull ? ' savoir-fav-btn--disabled' : ''}`}
                   onClick={() => {
                     if (!isFav && isFull) return
+                    playOnce('clickUi')
                     favoritesStore.toggle(savoir)
                   }}
                   disabled={!isFav && isFull}
