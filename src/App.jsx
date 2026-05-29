@@ -761,13 +761,8 @@ export default function App() {
   useEffect(() => {
     const onTab = (e) => {
       if (e.key !== 'p' && e.key !== 'P') return
-      if (!isInGameplayRef.current) return
-      if (
-        isModalOpenRef.current ||
-        isJournalInteractionActiveRef.current ||
-        isMinigameActiveRef.current
-      )
-        return
+      if (showWelcome) return
+      if (cinematicActive) return
       e.preventDefault()
       e.stopImmediatePropagation()
       if (showSettings) {
@@ -779,7 +774,7 @@ export default function App() {
     }
     document.addEventListener('keydown', onTab, { capture: true })
     return () => document.removeEventListener('keydown', onTab, { capture: true })
-  }, [showSettings])
+  }, [showSettings, showWelcome, cinematicActive])
 
   useEffect(() => {
     if (!receptionChoiceVisible) return
