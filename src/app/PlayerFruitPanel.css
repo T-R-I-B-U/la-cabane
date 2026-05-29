@@ -310,6 +310,73 @@
   text-transform: uppercase;
 }
 
+/* ── Layout "après envoi" ── */
+.pfp-content--sent {
+  align-items: stretch;
+}
+
+.pfp-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 530px;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.pfp-left-profile-card {
+  flex: 1 0 0;
+  min-height: 0;
+  gap: 20px;
+  justify-content: flex-end;
+  align-items: flex-start;
+  overflow: visible;
+}
+
+.pfp-close-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pfp-profile-inner {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-height: 0;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  position: relative;
+}
+
+.pfp-fruit-img--sent {
+  position: absolute;
+  left: 0;
+  top: -35px;
+  width: 229px;
+  height: 310px;
+  object-fit: cover;
+}
+
+.pfp-sent-leaf-slot {
+  background: #e3e7b3;
+  border-radius: 6px;
+  padding: 10px;
+  width: 192px;
+  height: 192px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 @media (max-width: 900px) {
   .pfp-content {
     flex-direction: column;
