@@ -328,12 +328,23 @@ function GroupSection({ group, cameras, live }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
                 <span style={S.fieldLabel}>Durée (s)</span>
                 <input
-                  style={{ ...S.smallInput, width: 56 }}
+                  style={{ ...S.smallInput, width: 52 }}
                   type="number"
                   step="0.1"
                   min="0"
                   value={camera.duration ?? 1.2}
                   onChange={(e) => updateCamera(camera.id, { duration: Number(e.target.value) })}
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                <span style={S.fieldLabel}>Délai (s)</span>
+                <input
+                  style={{ ...S.smallInput, width: 52 }}
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  value={camera.delay ?? 0}
+                  onChange={(e) => updateCamera(camera.id, { delay: Number(e.target.value) })}
                 />
               </div>
               <div style={S.btnRow}>

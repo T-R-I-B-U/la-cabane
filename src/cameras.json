@@ -89,6 +89,86 @@
       "fov": 60
     },
     {
+      "id": "tree-story.tree-story-1",
+      "label": "tree-story-1",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-2",
+      "label": "tree-story-2",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-3",
+      "label": "tree-story-3",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-4",
+      "label": "tree-story-4",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-5",
+      "label": "tree-story-5",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-6",
+      "label": "tree-story-6",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-7",
+      "label": "tree-story-7",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-8",
+      "label": "tree-story-8",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-9",
+      "label": "tree-story-9",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
+      "id": "tree-story.tree-story-10",
+      "label": "tree-story-10",
+      "group": "tree-story",
+      "position": null,
+      "target": null,
+      "fov": 60
+    },
+    {
       "id": "story.atelier",
       "label": "Atelier",
       "group": "workshop",
