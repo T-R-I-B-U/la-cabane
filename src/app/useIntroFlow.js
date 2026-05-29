@@ -35,6 +35,7 @@ export function useIntroFlow({ sceneReady }) {
   const [timeatmPhaseActive, setTimeatmPhaseActive] = useState(false)
   const [treeStoryCameras, setTreeStoryCameras] = useState(null)
   const [treeStoryPauseAt, setTreeStoryPauseAt] = useState(null)
+  const [treeStoryCameraLocked, setTreeStoryCameraLocked] = useState(false)
   const [, setEtabliPhaseActive] = useState(false)
   const [workbenchPhaseActive, setWorkbenchPhaseActive] = useState(false)
   const [greenhousePhaseActive, setGreenhousePhaseActive] = useState(false)
@@ -424,10 +425,13 @@ export function useIntroFlow({ sceneReady }) {
   const unlockWorkbenchPhase = useCallback(() => {
     setEtabliPhaseActive(true)
     setWorkbenchPhaseActive(true)
+    setTreeStoryCameraLocked(false)
   }, [])
 
   const handleTreeInteract = useCallback(() => {
     setTreePhaseActive(false)
+    setIntroMovementLocked(true)
+    setTreeStoryCameraLocked(true)
     playDialogue('treePiedDialogue', {
       onDone: () => {
         playDialogue('treeRacinesDialogue', {
@@ -452,6 +456,8 @@ export function useIntroFlow({ sceneReady }) {
   const handleTimeatmInteract = useCallback(() => {
     setTimeatmPhaseActive(false)
     setTreeStoryCameras(null)
+    setTreeStoryCameraLocked(true)
+    setIntroMovementLocked(true)
     playDialogue('treeBorneDialogue', {
       onDone: () => {
         playDialogue('treeOutroDialogue', {
@@ -762,7 +768,14 @@ export function useIntroFlow({ sceneReady }) {
     timeatmPhaseActive,
     treeStoryCameras,
     treeStoryPauseAt,
-    onTreeStoryComplete: () => setTreeStoryCameras(null),
+    treeStoryCameraLocked,
+    onTreeStoryPause: () => {
+      setTreeStoryCameraLocked(false)
+    },
+    onTreeStoryComplete: () => {
+      setTreeStoryCameras(null)
+      setTreeStoryCameraLocked(false)
+    },
     workbenchPhaseActive,
     thomasEtabliPhaseActive,
     greenhousePhaseActive,

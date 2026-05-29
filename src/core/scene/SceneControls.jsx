@@ -40,6 +40,8 @@ export function SceneControls({
   onStoryCameraTransitionComplete,
   treeStoryCameras,
   treeStoryPauseAt,
+  treeStoryCameraLocked,
+  onTreeStoryPause,
   onTreeStoryComplete,
   arbreStoryCameraTransition,
   onArbreTransitionComplete,
@@ -112,16 +114,15 @@ export function SceneControls({
   if (postIntro) {
     return postIntroLocked ? (
       <>
-        {/* cameraFixed: skip PlayerControls/PointerLock during minigame so pointer events work */}
         {!cameraFixed && (
           <PlayerControls
-            canMove={!movementLocked}
+            canMove={!movementLocked && !treeStoryCameraLocked}
             flyMode={flyMode}
             spawnAt={introSpawn?.position}
             lookAtTarget={introSpawn?.target}
             collisionObjects={collisionObjects}
             controlsRef={pointerControlsRef}
-            pointerSpeed={sensitivity}
+            pointerSpeed={treeStoryCameraLocked ? 0 : sensitivity}
           />
         )}
         <StoryCameraTransition
@@ -138,6 +139,7 @@ export function SceneControls({
           <StorySequencePlayer
             cameras={treeStoryCameras}
             pauseAtId={treeStoryPauseAt}
+            onPause={onTreeStoryPause}
             onComplete={onTreeStoryComplete}
           />
         )}

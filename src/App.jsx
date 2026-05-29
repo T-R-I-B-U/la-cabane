@@ -188,6 +188,8 @@ export default function App() {
     timeatmPhaseActive,
     treeStoryCameras,
     treeStoryPauseAt,
+    treeStoryCameraLocked,
+    onTreeStoryPause,
     onTreeStoryComplete,
     workbenchPhaseActive,
     greenhousePhaseActive,
@@ -756,6 +758,10 @@ export default function App() {
   }, [isPlayerModeActive, postIntro])
 
   useEffect(() => {
+    if (introMovementLocked) pointerControlsRef.current?.unlock()
+  }, [introMovementLocked])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -1156,6 +1162,8 @@ export default function App() {
           timeatmPhaseActive,
           treeStoryCameras,
           treeStoryPauseAt,
+          treeStoryCameraLocked,
+          onTreeStoryPause,
           onTreeStoryComplete,
           receptionActive:
             currentStoryStepId === 'intro.goToReception' &&

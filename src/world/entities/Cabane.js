@@ -117,6 +117,27 @@ function assignTexturePool(nodes, baseName, textures) {
     node.textureName = pool[i]
   })
 }
+
+// Index 0 = red, 1 = green, 2 = blue (from debug color order)
+const FIXED_POSTER_ASSIGNMENTS = { 0: 'poster6', 1: 'poster2', 2: 'poster1' }
+
+function assignPosterTextures(nodes) {
+  const targets = nodes.filter((n) => modelBaseName(n.name) === 'poster')
+  const fixedSet = new Set(Object.values(FIXED_POSTER_ASSIGNMENTS))
+  const randomPool = POSTER_TEXTURES.filter((t) => !fixedSet.has(t))
+  let prev = null
+  targets.forEach((node, i) => {
+    if (FIXED_POSTER_ASSIGNMENTS[i] !== undefined) {
+      node.textureName = FIXED_POSTER_ASSIGNMENTS[i]
+      prev = node.textureName
+    } else {
+      const available = randomPool.filter((t) => t !== prev)
+      const pick = available[Math.floor(Math.random() * available.length)]
+      node.textureName = pick
+      prev = pick
+    }
+  })
+}
 const FORCE_ASSET_GROUPING = new Set(['outsideplant03'])
 const MAIN_GROUND_Y_OFFSET = -0.02
 
@@ -444,7 +465,7 @@ export async function buildCabane({
   const nodes = Array.isArray(data) ? data : [data]
   root.userData.hutPosition = findNodePosition(nodes, 'hut01')
   assignTexturePool(nodes, 'house', HOUSE_TEXTURES)
-  assignTexturePool(nodes, 'poster', POSTER_TEXTURES)
+  assignPosterTextures(nodes)
 
   // Group same-name non-InstancedMesh nodes for auto-instancing.
   // Nodes with ≥2 occurrences share one InstancedMesh group instead of N separate draw calls.

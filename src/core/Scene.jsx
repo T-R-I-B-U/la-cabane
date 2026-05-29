@@ -68,6 +68,8 @@ export default function Scene({
     timeatmPhaseActive,
     treeStoryCameras,
     treeStoryPauseAt,
+    treeStoryCameraLocked,
+    onTreeStoryPause,
     onTreeStoryComplete,
     workbenchPhaseActive,
     greenhousePhaseActive,
@@ -260,6 +262,8 @@ export default function Scene({
         onStoryCameraTransitionComplete={onStoryCameraTransitionComplete}
         treeStoryCameras={treeStoryCameras}
         treeStoryPauseAt={treeStoryPauseAt}
+        treeStoryCameraLocked={treeStoryCameraLocked}
+        onTreeStoryPause={onTreeStoryPause}
         onTreeStoryComplete={onTreeStoryComplete}
         arbreStoryCameraTransition={arbreStoryCameraTransition}
         onArbreTransitionComplete={onArbreTransitionComplete}
