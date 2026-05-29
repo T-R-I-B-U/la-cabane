@@ -415,15 +415,10 @@ export default function CameraEditorPanel({ onClose }) {
   }
 
   function handleExport() {
-    const blob = new Blob([exportAsJSON()], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'cameras.json'
-    a.click()
-    URL.revokeObjectURL(url)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1400)
+    navigator.clipboard.writeText(exportAsJSON()).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1400)
+    })
   }
 
   function handleClearAll() {
