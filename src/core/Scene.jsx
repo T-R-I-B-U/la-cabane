@@ -2,7 +2,6 @@ import { useState, useRef, useMemo, Suspense, lazy } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
 import { initKTX2Loader } from './ktx2Loader.js'
-import { Stats } from '@react-three/drei'
 import AudioManager from './audio/AudioManager'
 import { Floor } from './Floor'
 import { DEFAULT_HUT_POS } from './SceneConfig'
@@ -66,6 +65,11 @@ export default function Scene({
     receptionActive,
     treePhaseActive,
     timeatmPhaseActive,
+    treeStoryCameras,
+    treeStoryPauseAt,
+    treeStoryCameraLocked,
+    onTreeStoryPause,
+    onTreeStoryComplete,
     workbenchPhaseActive,
     greenhousePhaseActive,
     exitSerrePhaseActive,
@@ -151,7 +155,6 @@ export default function Scene({
       onCreated={({ gl }) => initKTX2Loader(gl)}
     >
       <StatsCollector onStats={onStats} />
-      <Stats />
       <AudioManager />
 
       <SceneLighting activeHdriId={activeHdriId} shadowsEnabled={shadowsEnabled} />
@@ -255,6 +258,11 @@ export default function Scene({
         introSpawn={introSpawn}
         storyCameraTransition={storyCameraTransition}
         onStoryCameraTransitionComplete={onStoryCameraTransitionComplete}
+        treeStoryCameras={treeStoryCameras}
+        treeStoryPauseAt={treeStoryPauseAt}
+        treeStoryCameraLocked={treeStoryCameraLocked}
+        onTreeStoryPause={onTreeStoryPause}
+        onTreeStoryComplete={onTreeStoryComplete}
         arbreStoryCameraTransition={arbreStoryCameraTransition}
         onArbreTransitionComplete={onArbreTransitionComplete}
         onIntroEvent={onIntroEvent}

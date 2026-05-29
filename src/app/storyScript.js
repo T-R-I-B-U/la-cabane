@@ -119,47 +119,56 @@ export const STORY_SCRIPT = {
     id: 'arbre.nestInteraction',
     type: 'objective',
     objective: 'Trier les feuilles par couleurs',
-    next: 'arbre.nestDialogue2',
-  },
-  'arbre.nestDialogue2': {
-    id: 'arbre.nestDialogue2',
-    type: 'dialogue',
-    dialogueId: 'marieNid2',
     next: 'arbre.treeDialogue25',
   },
   'arbre.treeDialogue25': {
     id: 'arbre.treeDialogue25',
     type: 'dialogue',
     dialogueId: 'treeDialogue25',
-    next: 'arbre.outroStairs02Top',
+    next: 'arbre.outroNest1',
   },
-  'arbre.outroStairs02Top': {
-    id: 'arbre.outroStairs02Top',
+  'arbre.outroNest1': {
+    id: 'arbre.outroNest1',
     type: 'cinematic',
-    next: 'arbre.outroStairs02Down',
+    next: 'arbre.outroNest2',
   },
-  'arbre.outroStairs02Down': {
-    id: 'arbre.outroStairs02Down',
+  'arbre.outroNest2': {
+    id: 'arbre.outroNest2',
     type: 'cinematic',
-    next: 'arbre.outroWP4',
+    next: 'arbre.outroNest3',
   },
-  'arbre.outroWP4': {
-    id: 'arbre.outroWP4',
+  'arbre.outroNest3': {
+    id: 'arbre.outroNest3',
     type: 'cinematic',
-    next: 'arbre.outroWP3',
+    next: 'arbre.outroNest4',
   },
-  'arbre.outroWP3': {
-    id: 'arbre.outroWP3',
+  'arbre.outroNest4': {
+    id: 'arbre.outroNest4',
     type: 'cinematic',
-    next: 'arbre.outroWP1',
+    next: 'arbre.outroNest5',
   },
-  'arbre.outroWP1': {
-    id: 'arbre.outroWP1',
+  'arbre.outroNest5': {
+    id: 'arbre.outroNest5',
     type: 'cinematic',
-    next: 'arbre.outroWP0',
+    next: 'arbre.outroNest6',
   },
-  'arbre.outroWP0': {
-    id: 'arbre.outroWP0',
+  'arbre.outroNest6': {
+    id: 'arbre.outroNest6',
+    type: 'cinematic',
+    next: 'arbre.outroNest9',
+  },
+  'arbre.outroNest9': {
+    id: 'arbre.outroNest9',
+    type: 'cinematic',
+    next: 'arbre.outroNest10',
+  },
+  'arbre.outroNest10': {
+    id: 'arbre.outroNest10',
+    type: 'cinematic',
+    next: 'arbre.outroNest11',
+  },
+  'arbre.outroNest11': {
+    id: 'arbre.outroNest11',
     type: 'cinematic',
     next: null,
   },

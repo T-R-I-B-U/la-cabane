@@ -110,9 +110,9 @@ export function CabaneScene({
     if (!cabaneGroup) return
     cabaneGroup.traverse((obj) => {
       const base = obj.name.replace(/-\d+$/, '')
-      if (INTERIOR_ONLY_ROOTS.has(base)) obj.visible = firstPersonMode
+      if (INTERIOR_ONLY_ROOTS.has(base)) obj.visible = firstPersonMode || forceOpenDoor
     })
-  }, [cabaneGroup, firstPersonMode])
+  }, [cabaneGroup, firstPersonMode, forceOpenDoor])
 
   const handleCabaneMapReady = useCallback(
     (sceneInfo) => {

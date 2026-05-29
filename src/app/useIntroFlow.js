@@ -3,6 +3,10 @@ import { useNpcDialogue } from './useNpcDialogue'
 import { DEFAULT_STORY_CAMERA_POVS, STORY_CAMERA_POVS } from './storyCameraPovs'
 import { useStoryFlow } from './useStoryFlow'
 import { setAmbiance, stopAmbiance, fade, play, stop } from '../utils/audioStore'
+import { getRegistry } from '../core/cameraRegistry'
+
+const TREE_STORY_PHASE1_END = 'tree.story.tree.story.7'
+const TREE_STORY_PHASE2_START = 'tree-story.timeatm'
 
 const INSIDE_POV = {
   position: { x: -14.3667, y: 1.3785, z: -5.1169 },
@@ -29,6 +33,9 @@ export function useIntroFlow({ sceneReady }) {
   const [returnHallVisible, setReturnHallVisible] = useState(false)
   const [treePhaseActive, setTreePhaseActive] = useState(false)
   const [timeatmPhaseActive, setTimeatmPhaseActive] = useState(false)
+  const [treeStoryCameras, setTreeStoryCameras] = useState(null)
+  const [treeStoryPauseAt, setTreeStoryPauseAt] = useState(null)
+  const [treeStoryCameraLocked, setTreeStoryCameraLocked] = useState(false)
   const [, setEtabliPhaseActive] = useState(false)
   const [workbenchPhaseActive, setWorkbenchPhaseActive] = useState(false)
   const [greenhousePhaseActive, setGreenhousePhaseActive] = useState(false)
@@ -273,6 +280,7 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'exitCorridor') {
       greenhouseTransitionStageRef.current = 'exitFront'
+      setAmbiance('musicIndoor')
       scheduleFlowTimeout(() => {
         setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseFrontDoorExit, duration: 2.5 })
       }, 1000)
@@ -281,16 +289,9 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'exitFront') {
       greenhouseTransitionStageRef.current = null
-      setAmbiance('ambianceOutside')
       scheduleFlowTimeout(() => {
-        playDialogue('18-voice-tree', {
-          onDone: () =>
-            playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
-        })
-        scheduleFlowTimeout(() => {
-          greenhouseTransitionStageRef.current = 'arbreStairs1'
-          setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
-        }, 2000)
+        greenhouseTransitionStageRef.current = 'arbreStairs1'
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.stairs01Floor, duration: 2.0 })
       }, 500)
       return
     }
@@ -305,6 +306,9 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'arbreStairs2') {
       greenhouseTransitionStageRef.current = null
+      playDialogue('18-voice-tree', {
+        onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
+      })
       return
     }
 
@@ -418,10 +422,13 @@ export function useIntroFlow({ sceneReady }) {
   const unlockWorkbenchPhase = useCallback(() => {
     setEtabliPhaseActive(true)
     setWorkbenchPhaseActive(true)
+    setTreeStoryCameraLocked(false)
   }, [])
 
   const handleTreeInteract = useCallback(() => {
     setTreePhaseActive(false)
+    setIntroMovementLocked(true)
+    setTreeStoryCameraLocked(true)
     playDialogue('treePiedDialogue', {
       onDone: () => {
         playDialogue('treeRacinesDialogue', {
@@ -435,10 +442,19 @@ export function useIntroFlow({ sceneReady }) {
         })
       },
     })
+    const allCams = getRegistry().cameras.filter(
+      (c) => c.group === 'tree-story' && c.position && c.target
+    )
+    const phase1 = allCams.slice(0, allCams.findIndex((c) => c.id === TREE_STORY_PHASE1_END) + 1)
+    setTreeStoryCameras(phase1)
+    setTreeStoryPauseAt(TREE_STORY_PHASE1_END)
   }, [playDialogue])
 
   const handleTimeatmInteract = useCallback(() => {
     setTimeatmPhaseActive(false)
+    setTreeStoryCameras(null)
+    setTreeStoryCameraLocked(true)
+    setIntroMovementLocked(true)
     playDialogue('treeBorneDialogue', {
       onDone: () => {
         playDialogue('treeOutroDialogue', {
@@ -446,6 +462,14 @@ export function useIntroFlow({ sceneReady }) {
         })
       },
     })
+    const allCams = getRegistry().cameras.filter(
+      (c) => c.group === 'tree-story' && c.position && c.target
+    )
+    const phase1EndIdx = allCams.findIndex((c) => c.id === TREE_STORY_PHASE1_END)
+    // Start from story-7 (delay:0) so camera transitions smoothly from its current position
+    const phase2 = [{ ...allCams[phase1EndIdx], delay: 0 }, ...allCams.slice(phase1EndIdx + 1)]
+    setTreeStoryCameras(phase2)
+    setTreeStoryPauseAt(null)
   }, [playDialogue, unlockWorkbenchPhase])
 
   const handleWorkbenchInteract = useCallback(() => {
@@ -739,6 +763,16 @@ export function useIntroFlow({ sceneReady }) {
     returnHallVisible,
     treePhaseActive,
     timeatmPhaseActive,
+    treeStoryCameras,
+    treeStoryPauseAt,
+    treeStoryCameraLocked,
+    onTreeStoryPause: () => {
+      setTreeStoryCameraLocked(false)
+    },
+    onTreeStoryComplete: () => {
+      setTreeStoryCameras(null)
+      setTreeStoryCameraLocked(false)
+    },
     workbenchPhaseActive,
     thomasEtabliPhaseActive,
     greenhousePhaseActive,

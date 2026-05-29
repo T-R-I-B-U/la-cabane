@@ -1,6 +1,6 @@
 import defaultConfig from '../cameras.json'
 
-const STORAGE_KEY = 'lacabane:camera-registry:v2'
+const STORAGE_KEY = 'lacabane:camera-registry:v3'
 
 const DEFAULT_CONFIG = defaultConfig
 
@@ -89,6 +89,23 @@ export function resetCameraRegistry() {
   save(clone(DEFAULT_CONFIG))
 }
 
+export function clearAllCameraStorage() {
+  const keys = [
+    STORAGE_KEY,
+    'lacabane:camera-editor-panel-position',
+    'lacabane:cinematic-presets:v1',
+  ]
+  keys.forEach((key) => {
+    try {
+      localStorage.removeItem(key)
+    } catch {
+      // localStorage unavailable (private browsing, quota exceeded)
+    }
+  })
+  _state = clone(DEFAULT_CONFIG)
+  notify()
+}
+
 export function getCameraPose(id) {
   return _state.cameras.find((camera) => camera.id === id) ?? null
 }
@@ -165,6 +182,23 @@ export function duplicateCamera(id) {
     fov: source.fov,
   })
   return camera
+}
+
+export function moveCameraInGroup(id, direction) {
+  const cam = _state.cameras.find((c) => c.id === id)
+  if (!cam) return
+  const groupIndices = _state.cameras
+    .map((c, i) => ({ c, i }))
+    .filter(({ c }) => c.group === cam.group)
+    .map(({ i }) => i)
+  const posInGroup = groupIndices.findIndex((gi) => _state.cameras[gi].id === id)
+  const nextPos = posInGroup + direction
+  if (nextPos < 0 || nextPos >= groupIndices.length) return
+  const arr = [..._state.cameras]
+  const idxA = groupIndices[posInGroup]
+  const idxB = groupIndices[nextPos]
+  ;[arr[idxA], arr[idxB]] = [arr[idxB], arr[idxA]]
+  save({ ..._state, cameras: arr })
 }
 
 export function removeCamera(id) {
@@ -296,5 +330,42 @@ export function onEditorFlyModeChange(fn) {
   _flyModeListeners.push(fn)
   return () => {
     _flyModeListeners = _flyModeListeners.filter((l) => l !== fn)
+  }
+}
+
+let _previewSteps = null
+let _previewListeners = []
+
+let _stepListeners = []
+
+export function notifyPreviewStep(cameraId) {
+  _stepListeners.forEach((fn) => fn(cameraId))
+}
+
+export function onPreviewStep(fn) {
+  _stepListeners.push(fn)
+  return () => {
+    _stepListeners = _stepListeners.filter((l) => l !== fn)
+  }
+}
+
+export function requestPreview(steps) {
+  _previewSteps = steps
+  _previewListeners.forEach((fn) => fn(steps))
+}
+
+export function clearPreview() {
+  _previewSteps = null
+  _previewListeners.forEach((fn) => fn(null))
+}
+
+export function getPreviewSteps() {
+  return _previewSteps
+}
+
+export function onPreviewChange(fn) {
+  _previewListeners.push(fn)
+  return () => {
+    _previewListeners = _previewListeners.filter((l) => l !== fn)
   }
 }

@@ -185,6 +185,11 @@ export default function App() {
     returnHallVisible,
     treePhaseActive,
     timeatmPhaseActive,
+    treeStoryCameras,
+    treeStoryPauseAt,
+    treeStoryCameraLocked,
+    onTreeStoryPause,
+    onTreeStoryComplete,
     workbenchPhaseActive,
     greenhousePhaseActive,
     thomasEtabliPhaseActive,
@@ -347,9 +352,11 @@ export default function App() {
     onBackAtBase: spawnAtLadderDown,
     onOutroComplete: useCallback(() => {
       setShowFinal(true)
-      setIsPlayerModeActive(false)
-      setIsFlyModeActive(false)
-      exitIntro()
+      setTimeout(() => {
+        setIsPlayerModeActive(false)
+        setIsFlyModeActive(false)
+        exitIntro()
+      }, 1200)
     }, [exitIntro]),
   })
 
@@ -752,6 +759,10 @@ export default function App() {
   }, [isPlayerModeActive, postIntro])
 
   useEffect(() => {
+    if (introMovementLocked) pointerControlsRef.current?.unlock()
+  }, [introMovementLocked])
+
+  useEffect(() => {
     const blockPointerLock = (e) => {
       if (isJournalInteractionActiveRef.current || isMinigameActiveRef.current)
         e.stopImmediatePropagation()
@@ -764,6 +775,7 @@ export default function App() {
     const onTab = (e) => {
       if (e.key !== 'p' && e.key !== 'P') return
       if (showWelcome) return
+      if (showNameInput) return
       if (cinematicActive) return
       e.preventDefault()
       e.stopImmediatePropagation()
@@ -776,7 +788,7 @@ export default function App() {
     }
     document.addEventListener('keydown', onTab, { capture: true })
     return () => document.removeEventListener('keydown', onTab, { capture: true })
-  }, [showSettings, showWelcome, cinematicActive])
+  }, [showSettings, showWelcome, showNameInput, cinematicActive])
 
   useEffect(() => {
     if (showSettings) pauseAudio()
@@ -1150,6 +1162,11 @@ export default function App() {
           postIntroLocked: isStoryCameraControlEnabled,
           treePhaseActive,
           timeatmPhaseActive,
+          treeStoryCameras,
+          treeStoryPauseAt,
+          treeStoryCameraLocked,
+          onTreeStoryPause,
+          onTreeStoryComplete,
           receptionActive:
             currentStoryStepId === 'intro.goToReception' &&
             postIntro &&
@@ -1440,7 +1457,7 @@ export default function App() {
         />
       )}
 
-      {!cinematicActive && !showSettings && (
+      {!cinematicActive && !showSettings && !showFinal && (
         <div className="app-gear-btn">
           <GearIcon
             onClick={() => {
