@@ -760,7 +760,7 @@ export default function App() {
 
   useEffect(() => {
     const onTab = (e) => {
-      if (e.key !== 'Tab') return
+      if (e.key !== 'p' && e.key !== 'P') return
       if (!isInGameplayRef.current) return
       if (
         isModalOpenRef.current ||

@@ -153,7 +153,7 @@ export function SettingsMenu({
         </button>
 
         <p className="settings-tab-hint">
-          <kbd className="settings-tab-key">Tab</kbd> pour ouvrir / fermer
+          <kbd className="settings-tab-key">P</kbd> pour ouvrir / fermer
         </p>
       </div>
     </div>
