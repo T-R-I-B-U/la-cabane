@@ -16,6 +16,7 @@ import {
   onLiveCameraChange,
   onPreviewChange,
   onRegistryChange,
+  moveCameraInGroup,
   moveSequenceStep,
   removeCamera,
   removeSequenceStep,
@@ -27,6 +28,9 @@ import {
   updateCharacter,
   updateSequenceStep,
 } from './cameraRegistry'
+import { playDialogue, stopDialogue } from '../utils/audioStore'
+
+const TREE_STORY_DIALOGUES = ['treePiedDialogue', 'treeRacinesDialogue', 'treeArbreDialogue']
 
 const INITIAL_PANEL_POSITION = { x: 20, y: 20 }
 const PANEL_POSITION_KEY = 'lacabane:camera-editor-panel-position'
@@ -305,6 +309,13 @@ function fallbackCopy(text, onDone) {
 
 function GroupSection({ group, cameras, live }) {
   const [open, setOpen] = useState(false)
+  const [addLabel, setAddLabel] = useState('')
+
+  function handleAdd() {
+    const label = addLabel.trim() || 'Nouvelle caméra'
+    addCamera({ label, group })
+    setAddLabel('')
+  }
 
   return (
     <div style={S.section}>
@@ -319,10 +330,42 @@ function GroupSection({ group, cameras, live }) {
 
       {open && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {cameras.map((camera) => (
+          {cameras.map((camera, idx) => (
             <div key={camera.id} style={{ ...S.camLibRow, flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2, flexShrink: 0 }}>
+                <button
+                  type="button"
+                  style={{
+                    ...S.btn('ghost'),
+                    padding: '2px 6px',
+                    fontSize: 10,
+                    opacity: idx === 0 ? 0.3 : 1,
+                  }}
+                  disabled={idx === 0}
+                  onClick={() => moveCameraInGroup(camera.id, -1)}
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  style={{
+                    ...S.btn('ghost'),
+                    padding: '2px 6px',
+                    fontSize: 10,
+                    opacity: idx === cameras.length - 1 ? 0.3 : 1,
+                  }}
+                  disabled={idx === cameras.length - 1}
+                  onClick={() => moveCameraInGroup(camera.id, 1)}
+                >
+                  ↓
+                </button>
+              </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={S.camLibLabel}>{camera.label}</div>
+                <input
+                  style={{ ...S.stepLabelInput, fontSize: 12, fontWeight: 600 }}
+                  value={camera.label}
+                  onChange={(e) => updateCamera(camera.id, { label: e.target.value })}
+                />
                 <div style={S.camLibId}>{camera.id}</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
@@ -346,6 +389,19 @@ function GroupSection({ group, cameras, live }) {
                   value={camera.delay ?? 0}
                   onChange={(e) => updateCamera(camera.id, { delay: Number(e.target.value) })}
                 />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                <span style={S.fieldLabel}>Easing</span>
+                <select
+                  style={{ ...S.smallInput, width: 90 }}
+                  value={camera.easing ?? 'easeInOut'}
+                  onChange={(e) => updateCamera(camera.id, { easing: e.target.value })}
+                >
+                  <option value="easeInOut">easeInOut</option>
+                  <option value="easeIn">easeIn</option>
+                  <option value="easeOut">easeOut</option>
+                  <option value="linear">linear</option>
+                </select>
               </div>
               <div style={S.btnRow}>
                 <button
@@ -374,6 +430,21 @@ function GroupSection({ group, cameras, live }) {
               </div>
             </div>
           ))}
+
+          {group === 'tree-story' && (
+            <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+              <input
+                style={{ ...S.input, flex: 1, fontSize: 11, padding: '5px 8px' }}
+                placeholder="Nom de la caméra…"
+                value={addLabel}
+                onChange={(e) => setAddLabel(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              />
+              <button type="button" style={S.btn('good')} onClick={handleAdd}>
+                + Ajouter
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -426,12 +497,32 @@ export default function CameraEditorPanel({ onClose }) {
   const previewGroups = nonIntroGroups
 
   function handlePreviewGroup(group) {
-    const steps = registry.cameras
-      .filter((c) => c.group === group && c.position && c.target)
-      .map((c) => ({ cameraId: c.id, duration: 2, easing: 'easeInOut' }))
+    const groupCams = registry.cameras.filter((c) => c.group === group && c.position && c.target)
+    const steps = groupCams.map((c) => ({ cameraId: c.id, duration: 2, easing: 'easeInOut' }))
     if (steps.length < 2) return
     setEditorFlyMode(false)
     requestPreview(steps)
+    if (group === 'tree-story') {
+      // 11 → 12 → 14 start immediately
+      playDialogue('treePiedDialogue', {
+        onDone: () =>
+          playDialogue('treeRacinesDialogue', {
+            onDone: () => playDialogue('treeArbreDialogue'),
+          }),
+      })
+      // Calculate ms to reach timeatm (sum of delay + 2s transition for each cam before it)
+      let msToTimeatm = 0
+      for (const cam of groupCams) {
+        if (cam.id === 'tree-story.timeatm') break
+        msToTimeatm += ((cam.delay ?? 0) + 2) * 1000
+      }
+      // 13 → 15 at timeatm + 1s
+      setTimeout(
+        () =>
+          playDialogue('treeBorneDialogue', { onDone: () => playDialogue('treeOutroDialogue') }),
+        msToTimeatm + 1000
+      )
+    }
   }
 
   function handlePreviewIntro() {
@@ -601,7 +692,10 @@ export default function CameraEditorPanel({ onClose }) {
           <button
             type="button"
             style={{ ...S.btn('danger'), marginLeft: 'auto' }}
-            onClick={clearPreview}
+            onClick={() => {
+              clearPreview()
+              stopDialogue()
+            }}
           >
             ■ Stop
           </button>

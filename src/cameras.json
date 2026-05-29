@@ -62,111 +62,42 @@
       "group": "tree-story",
       "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
       "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
-      "fov": 60
+      "fov": 60,
+      "delay": 5,
+      "easing": "linear"
     },
     {
-      "id": "tree-story.timeatm",
-      "label": "timeatm",
-      "group": "tree-story",
-      "position": { "x": -79.2544, "y": 1.7822, "z": -42.3355 },
-      "target": { "x": -74.9127, "y": 0.6943, "z": -44.5641 },
-      "fov": 60
-    },
-    {
-      "id": "tree-story.map",
-      "label": "map",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.end-tree-camera",
-      "label": "end-tree-camera",
-      "group": "tree-story",
-      "position": { "x": -80.9135, "y": 1.342, "z": -45.9432 },
-      "target": { "x": -76.0307, "y": 2.2798, "z": -45.415 },
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-1",
+      "id": "tree.story.tree.story.1",
       "label": "tree-story-1",
       "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
+      "position": { "x": -80.2074, "y": 1.342, "z": -42.7306 },
+      "target": { "x": -82.5042, "y": 0.4896, "z": -38.3719 },
+      "fov": 60,
+      "delay": 3,
+      "duration": 3,
+      "easing": "linear"
     },
     {
-      "id": "tree-story.tree-story-2",
+      "id": "tree.story.tree.story.2",
       "label": "tree-story-2",
       "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
+      "position": { "x": -71.8169, "y": 1.342, "z": -37.9217 },
+      "target": { "x": -68.0776, "y": 1.2454, "z": -34.6038 },
+      "fov": 60,
+      "delay": 2,
+      "duration": 3,
+      "easing": "linear"
     },
     {
-      "id": "tree-story.tree-story-3",
+      "id": "tree.story.tree.story.3",
       "label": "tree-story-3",
       "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-4",
-      "label": "tree-story-4",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-5",
-      "label": "tree-story-5",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-6",
-      "label": "tree-story-6",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-7",
-      "label": "tree-story-7",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-8",
-      "label": "tree-story-8",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-9",
-      "label": "tree-story-9",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
-    },
-    {
-      "id": "tree-story.tree-story-10",
-      "label": "tree-story-10",
-      "group": "tree-story",
-      "position": null,
-      "target": null,
-      "fov": 60
+      "position": { "x": -72.2346, "y": 1.342, "z": -39.0159 },
+      "target": { "x": -73.736, "y": 0.5093, "z": -43.7119 },
+      "fov": 60,
+      "delay": 2,
+      "duration": 3,
+      "easing": "linear"
     },
     {
       "id": "story.atelier",
@@ -375,21 +306,177 @@
       "position": { "x": -138.0319, "y": 23.3841, "z": -53.2986 },
       "target": { "x": -133.1716, "y": 22.3842, "z": -52.6841 },
       "fov": 60
+    },
+    {
+      "id": "tree-story.map",
+      "label": "map",
+      "group": "tree-story",
+      "position": { "x": -81.2882, "y": 1.342, "z": -37.8453 },
+      "target": { "x": -85.07, "y": 2.1913, "z": -34.6867 },
+      "fov": 60,
+      "delay": 5,
+      "duration": 3,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.4",
+      "label": "tree-story-4",
+      "group": "tree-story",
+      "position": { "x": -79.16, "y": 1.342, "z": -44.8825 },
+      "target": { "x": -80.9656, "y": 1.735, "z": -49.5285 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 2,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.5",
+      "label": "tree-story-5",
+      "group": "tree-story",
+      "position": { "x": -81.4476, "y": 1.342, "z": -44.0634 },
+      "target": { "x": -77.0391, "y": 3.5109, "z": -44.9914 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 2,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.6",
+      "label": "tree-story-6",
+      "group": "tree-story",
+      "position": { "x": -79.0195, "y": 1.342, "z": -54.4029 },
+      "target": { "x": -74.3738, "y": 1.934, "z": -52.6515 },
+      "fov": 60,
+      "easing": "linear",
+      "duration": 3,
+      "delay": 2
+    },
+    {
+      "id": "tree.story.tree.story.7",
+      "label": "tree-story-7",
+      "group": "tree-story",
+      "position": { "x": -80.9098, "y": 1.342, "z": -48.171 },
+      "target": { "x": -76.8881, "y": 2.2208, "z": -45.333 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 2,
+      "easing": "linear"
+    },
+    {
+      "id": "tree-story.timeatm",
+      "label": "timeatm",
+      "group": "tree-story",
+      "position": { "x": -79.2544, "y": 1.7822, "z": -42.3355 },
+      "target": { "x": -74.9127, "y": 0.6943, "z": -44.5641 },
+      "fov": 60,
+      "easing": "linear",
+      "duration": 3,
+      "delay": 5
+    },
+    {
+      "id": "tree.story.tree.story.8",
+      "label": "tree-story-8",
+      "group": "tree-story",
+      "position": { "x": -73.6095, "y": 1.7822, "z": -39.7673 },
+      "target": { "x": -69.9375, "y": 1.366, "z": -43.1353 },
+      "fov": 60,
+      "easing": "linear",
+      "duration": 3,
+      "delay": 1
+    },
+    {
+      "id": "tree.story.tree.story.9",
+      "label": "tree-story-9",
+      "group": "tree-story",
+      "position": { "x": -67.9246, "y": 1.4673, "z": -44.4102 },
+      "target": { "x": -67.1525, "y": 1.5406, "z": -39.4707 },
+      "fov": 60,
+      "duration": 3,
+      "easing": "linear",
+      "delay": 1
+    },
+    {
+      "id": "tree.story.tree.story.10",
+      "label": "tree-story-10",
+      "group": "tree-story",
+      "position": { "x": -66.0444, "y": 1.4673, "z": -42.4527 },
+      "target": { "x": -69.2194, "y": 2.9767, "z": -38.8973 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 1,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.11",
+      "label": "tree-story-11",
+      "group": "tree-story",
+      "position": { "x": -71.8801, "y": 4.3713, "z": -36.7504 },
+      "target": { "x": -70.4825, "y": 4.2746, "z": -41.5501 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 2,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.12",
+      "label": "tree-story-12",
+      "group": "tree-story",
+      "position": { "x": -69.0697, "y": 4.3713, "z": -44.3697 },
+      "target": { "x": -67.5002, "y": 4.2846, "z": -49.1162 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 3,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.13",
+      "label": "tree-story-13",
+      "group": "tree-story",
+      "position": { "x": -73.452, "y": 4.3713, "z": -40.2603 },
+      "target": { "x": -73.8668, "y": 8.9526, "z": -42.2197 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 3,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.14",
+      "label": "tree-story-14",
+      "group": "tree-story",
+      "position": { "x": -71.0346, "y": 4.3713, "z": -36.8302 },
+      "target": { "x": -68.0285, "y": 2.707, "z": -40.4625 },
+      "fov": 60,
+      "duration": 3,
+      "delay": 1,
+      "easing": "linear"
+    },
+    {
+      "id": "tree.story.tree.story.15",
+      "label": "tree-story-15",
+      "group": "tree-story",
+      "position": { "x": -66.2493, "y": 1.1913, "z": -42.2627 },
+      "target": { "x": -68.2269, "y": 1.1546, "z": -46.8549 },
+      "fov": 60,
+      "easing": "linear",
+      "delay": 1,
+      "duration": 3
+    },
+    {
+      "id": "tree.story.tree.story.16",
+      "label": "tree-story-16",
+      "group": "tree-story",
+      "position": { "x": -81.2966, "y": 1.1913, "z": -42.7747 },
+      "target": { "x": -79.243, "y": 1.3046, "z": -47.3321 },
+      "fov": 60,
+      "duration": 4,
+      "delay": 5,
+      "easing": "linear"
     }
   ],
   "sequences": {
     "intro": [
-      {
-        "cameraId": "intro.start",
-        "duration": 0,
-        "delay": 2,
-        "easing": "easeIn"
-      },
-      {
-        "cameraId": "intro.doorApproach",
-        "duration": 3.5,
-        "easing": "easeInOut"
-      },
+      { "cameraId": "intro.start", "duration": 0, "delay": 2, "easing": "easeIn" },
+      { "cameraId": "intro.doorApproach", "duration": 3.5, "easing": "easeInOut" },
       {
         "cameraId": "intro.doorWait",
         "duration": 3.5,
@@ -397,17 +484,8 @@
         "waitForInput": true,
         "easing": "easeInOut"
       },
-      {
-        "cameraId": "intro.doorOpen",
-        "duration": 2,
-        "event": "door:open",
-        "delay": 0.5
-      },
-      {
-        "cameraId": "intro.inside",
-        "duration": 2.5,
-        "event": "inside"
-      }
+      { "cameraId": "intro.doorOpen", "duration": 2, "event": "door:open", "delay": 0.5 },
+      { "cameraId": "intro.inside", "duration": 2.5, "event": "inside" }
     ]
   },
   "characters": [

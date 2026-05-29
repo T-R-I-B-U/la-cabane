@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
-import { getCameraPose, onPreviewChange } from './cameraRegistry'
+import { getCameraPose, notifyPreviewStep, onPreviewChange } from './cameraRegistry'
 
 const EASINGS = {
   linear: (t) => t,
@@ -20,6 +20,8 @@ function buildWaypoints(steps) {
         position: new THREE.Vector3(cam.position.x, cam.position.y, cam.position.z),
         target: new THREE.Vector3(cam.target.x, cam.target.y, cam.target.z),
         fov: cam.fov ?? 60,
+        delay: step.delay ?? cam.delay,
+        easing: step.easing ?? cam.easing,
       }
     })
     .filter(Boolean)
@@ -86,6 +88,8 @@ export function CameraPreviewPlayer() {
       stepRef.current += 1
       progressRef.current = 0
       delayRef.current = 0
+      const next = waypoints[stepRef.current]
+      if (next) notifyPreviewStep(next.cameraId)
       return
     }
     progressRef.current = Math.min(progressRef.current + delta / duration, 1)
@@ -101,6 +105,8 @@ export function CameraPreviewPlayer() {
       stepRef.current += 1
       progressRef.current = 0
       delayRef.current = 0
+      const next = waypoints[stepRef.current]
+      if (next) notifyPreviewStep(next.cameraId)
     }
   })
 
