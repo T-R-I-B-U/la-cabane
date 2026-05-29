@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import './SettingsMenu.css'
-import { GearIcon } from './GearIcon'
 import { playOnce } from '../utils/audioStore'
 
 const QUALITY_OPTIONS = [
@@ -76,14 +75,6 @@ export function SettingsMenu({
       >
         <div className="settings-card__header">
           <h2 className="settings-card__title">Réglages</h2>
-          <GearIcon
-            variant="textured"
-            onClick={() => {
-              playOnce('closeUi')
-              onClose()
-            }}
-            ariaLabel="Fermer les réglages"
-          />
         </div>
 
         <div

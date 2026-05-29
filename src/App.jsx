@@ -15,6 +15,7 @@ import {
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
+import { GearIcon } from './app/GearIcon'
 import { PlayerFruitPanel } from './app/PlayerFruitPanel'
 import { RaspberryCounter } from './app/RaspberryCounter'
 import { useContactAssignment } from './app/useContactAssignment'
@@ -32,6 +33,7 @@ import Subtitles from './core/audio/Subtitles'
 import {
   setSubtitleChoices,
   unlockAndPlay,
+  playOnce,
   setGlobalVolume,
   getGlobalVolume,
 } from './utils/audioStore'
@@ -1432,9 +1434,19 @@ export default function App() {
             if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
           }}
           onAnimationEnd={() => setShowWelcome(false)}
-          onOpenSettings={() => setShowSettings(true)}
-          settingsOpen={showSettings}
         />
+      )}
+
+      {!cinematicActive && (
+        <div className="app-gear-btn">
+          <GearIcon
+            onClick={() => {
+              playOnce(showSettings ? 'closeUi' : 'clickUi')
+              setShowSettings((v) => !v)
+            }}
+            ariaLabel={showSettings ? 'Fermer les réglages' : 'Ouvrir les réglages'}
+          />
+        </div>
       )}
 
       {!cinematicActive && (
