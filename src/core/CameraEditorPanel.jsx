@@ -5,17 +5,21 @@ import {
   captureCharacterFromCamera,
   captureCamera,
   clearAllCameraStorage,
+  clearPreview,
   duplicateCamera,
   exportAsJSON,
   getEditorFlyMode,
   getLiveCamera,
+  getPreviewSteps,
   getRegistry,
   onEditorFlyModeChange,
   onLiveCameraChange,
+  onPreviewChange,
   onRegistryChange,
   moveSequenceStep,
   removeCamera,
   removeSequenceStep,
+  requestPreview,
   requestTeleport,
   resetCameraRegistry,
   setEditorFlyMode,
@@ -299,10 +303,12 @@ export default function CameraEditorPanel({ onClose }) {
   const [flyMode, setFlyModeState] = useState(getEditorFlyMode)
   const [showOtherCams, setShowOtherCams] = useState(false)
   const [showChars, setShowChars] = useState(false)
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(() => !!getPreviewSteps())
 
   useEffect(() => onRegistryChange(setRegistry), [])
   useEffect(() => onLiveCameraChange(setLive), [])
   useEffect(() => onEditorFlyModeChange(setFlyModeState), [])
+  useEffect(() => onPreviewChange((steps) => setIsPreviewPlaying(!!steps)), [])
 
   const introSteps = registry.sequences?.intro ?? []
   const sequencedIds = useMemo(() => new Set(introSteps.map((s) => s.cameraId)), [introSteps])
@@ -310,6 +316,38 @@ export default function CameraEditorPanel({ onClose }) {
     () => registry.cameras.filter((c) => !sequencedIds.has(c.id)),
     [registry.cameras, sequencedIds]
   )
+
+  // Unique groups in array order, excluding 'intro' (handled by the sequence)
+  const previewGroups = useMemo(() => {
+    const seen = new Set()
+    const result = []
+    for (const cam of registry.cameras) {
+      if (cam.group !== 'intro' && !seen.has(cam.group)) {
+        seen.add(cam.group)
+        result.push(cam.group)
+      }
+    }
+    return result
+  }, [registry.cameras])
+
+  function handlePreviewGroup(group) {
+    const steps = registry.cameras
+      .filter((c) => c.group === group && c.position && c.target)
+      .map((c) => ({ cameraId: c.id, duration: 2, easing: 'easeInOut' }))
+    if (steps.length < 2) return
+    setEditorFlyMode(false)
+    requestPreview(steps)
+  }
+
+  function handlePreviewIntro() {
+    const steps = (registry.sequences?.intro ?? []).filter((s) => {
+      const cam = registry.cameras.find((c) => c.id === s.cameraId)
+      return cam?.position && cam?.target
+    })
+    if (steps.length < 2) return
+    setEditorFlyMode(false)
+    requestPreview(steps)
+  }
 
   function handleAddToSequence() {
     const camera = addCamera({ label: newLabel.trim() || 'Nouvelle caméra', group: 'intro' })
@@ -426,6 +464,43 @@ export default function CameraEditorPanel({ onClose }) {
         <span style={{ color: '#334455', marginLeft: 'auto' }}>
           ZQSD + souris · Échap pour sortir
         </span>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: 6,
+          padding: '8px 16px',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          background: 'rgba(255,255,255,0.015)',
+          flexShrink: 0,
+        }}
+      >
+        <span style={{ ...S.sectionTitle, marginRight: 4 }}>Prévisualiser</span>
+        <button type="button" style={S.btn('primary')} onClick={handlePreviewIntro}>
+          ▶ intro
+        </button>
+        {previewGroups.map((group) => (
+          <button
+            key={group}
+            type="button"
+            style={S.btn()}
+            onClick={() => handlePreviewGroup(group)}
+          >
+            ▶ {group}
+          </button>
+        ))}
+        {isPreviewPlaying && (
+          <button
+            type="button"
+            style={{ ...S.btn('danger'), marginLeft: 'auto' }}
+            onClick={clearPreview}
+          >
+            ■ Stop
+          </button>
+        )}
       </div>
 
       <div style={S.body}>

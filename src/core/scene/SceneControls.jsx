@@ -3,6 +3,7 @@ import { OrbitControls } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import IntroCamera from '../../world/entities/IntroCamera'
 import CameraEditorFlyControls from '../CameraEditorFlyControls'
+import { CameraPreviewPlayer } from '../CameraPreviewPlayer'
 import { CameraRegistrySync } from '../CameraRegistrySync'
 import { getEditorFlyMode, onEditorFlyModeChange } from '../cameraRegistry'
 import { PlayerControls } from '../PlayerControls'
@@ -62,6 +63,7 @@ export function SceneControls({
     <>
       <CameraRegistrySync controlsRef={controlsRef} />
       <CameraEditorFlyControls />
+      <CameraPreviewPlayer />
     </>
   ) : null
 

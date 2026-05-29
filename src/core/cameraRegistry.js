@@ -315,3 +315,27 @@ export function onEditorFlyModeChange(fn) {
     _flyModeListeners = _flyModeListeners.filter((l) => l !== fn)
   }
 }
+
+let _previewSteps = null
+let _previewListeners = []
+
+export function requestPreview(steps) {
+  _previewSteps = steps
+  _previewListeners.forEach((fn) => fn(steps))
+}
+
+export function clearPreview() {
+  _previewSteps = null
+  _previewListeners.forEach((fn) => fn(null))
+}
+
+export function getPreviewSteps() {
+  return _previewSteps
+}
+
+export function onPreviewChange(fn) {
+  _previewListeners.push(fn)
+  return () => {
+    _previewListeners = _previewListeners.filter((l) => l !== fn)
+  }
+}
