@@ -3,10 +3,10 @@ import { subscribeSubtitles } from '../../utils/audioStore'
 import { cursorStore } from '../../utils/cursorStore'
 
 const SPEAKERS = {
-  marie: { label: 'MARIE', avatar: '/avatars/marie.png' },
-  thomas: { label: 'THOMAS', avatar: '/avatars/thomas.png' },
-  zoe: { label: 'ZOÉ', avatar: '/avatars/zoe.png' },
-  tree: { label: 'VOTRE GUIDE', avatar: '/avatars/guide.png' },
+  marie: { label: 'MARIE', avatar: '/avatars/marie.webp' },
+  thomas: { label: 'THOMAS', avatar: '/avatars/thomas.webp' },
+  zoe: { label: 'ZOÉ', avatar: '/avatars/zoe.webp' },
+  tree: { label: 'VOTRE GUIDE', avatar: '/avatars/guide.webp' },
 }
 
 const WRAP = {
