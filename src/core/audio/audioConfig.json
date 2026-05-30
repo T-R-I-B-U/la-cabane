@@ -391,19 +391,21 @@
       "id": "zoeIntro",
       "type": "dialogue",
       "speaker": "zoe",
+      "src": "zoe/zoe-intro.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "zoe-intro.srt"
+      "subtitles": "zoe/zoe-intro.srt"
     },
     {
       "id": "zoeJuice",
       "type": "dialogue",
       "speaker": "zoe",
+      "src": "zoe/zoe-juice.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "zoe-juice.srt"
+      "subtitles": "zoe/zoe-juice.srt"
     },
     {
       "id": "zoeFarewell",
@@ -412,16 +414,17 @@
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "zoe-farewell.srt"
+      "subtitles": "zoe/zoe-farewell.srt"
     },
     {
       "id": "zoeUnripe",
       "type": "dialogue",
       "speaker": "zoe",
+      "src": "zoe/zoe-unripe.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
-      "subtitles": "zoe-unripe.srt"
+      "subtitles": "zoe/zoe-unripe.srt"
     },
     {
       "id": "juiceMachine",
