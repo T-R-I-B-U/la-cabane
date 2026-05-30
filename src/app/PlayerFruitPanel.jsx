@@ -50,7 +50,7 @@ export function PlayerFruitPanel({
                 <div className="pfp-profile-inner">
                   <img
                     className="pfp-card-icon"
-                    src="/player-panel/icon-card.png"
+                    src="/player-panel/icon-card.webp"
                     alt=""
                     aria-hidden="true"
                   />
@@ -69,7 +69,7 @@ export function PlayerFruitPanel({
                 <div className="pfp-card-header">
                   <img
                     className="pfp-card-icon"
-                    src="/player-panel/icon-apprenti.png"
+                    src="/player-panel/icon-apprenti.webp"
                     alt=""
                     aria-hidden="true"
                   />
@@ -99,7 +99,7 @@ export function PlayerFruitPanel({
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
-                      src="/player-panel/icon-passeur.png"
+                      src="/player-panel/icon-passeur.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -119,7 +119,7 @@ export function PlayerFruitPanel({
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
-                      src="/player-panel/icon-favoris.png"
+                      src="/player-panel/icon-favoris.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -179,7 +179,7 @@ export function PlayerFruitPanel({
                 <div className="pfp-top-section">
                   <img
                     className="pfp-card-icon"
-                    src="/player-panel/icon-card.png"
+                    src="/player-panel/icon-card.webp"
                     alt=""
                     aria-hidden="true"
                   />
@@ -213,7 +213,7 @@ export function PlayerFruitPanel({
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
-                      src="/player-panel/icon-passeur.png"
+                      src="/player-panel/icon-passeur.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -240,7 +240,7 @@ export function PlayerFruitPanel({
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
-                      src="/player-panel/icon-apprenti.png"
+                      src="/player-panel/icon-apprenti.webp"
                       alt=""
                       aria-hidden="true"
                     />
@@ -285,7 +285,7 @@ export function PlayerFruitPanel({
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
-                      src="/player-panel/icon-favoris.png"
+                      src="/player-panel/icon-favoris.webp"
                       alt=""
                       aria-hidden="true"
                     />
