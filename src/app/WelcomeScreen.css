@@ -52,8 +52,10 @@
 .welcome-screen__logo-group {
   display: flex;
   flex-direction: column;
-  width: clamp(280px, 59%, 897px);
+  width: clamp(220px, 34vw, 520px);
   flex-shrink: 0;
+  margin-left: -20px;
+  margin-bottom: -16px;
 }
 
 .welcome-screen__logo-main {
@@ -139,7 +141,9 @@
   }
 
   .welcome-screen__logo-group {
-    width: clamp(240px, 85%, 600px);
+    width: clamp(190px, 68%, 360px);
+    margin-left: -8px;
+    margin-bottom: -8px;
   }
 
   .welcome-screen__btn {

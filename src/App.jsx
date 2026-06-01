@@ -90,7 +90,7 @@ export default function App() {
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
-  const [shaderRadius, setShaderRadius] = useState(3)
+  const [shaderRadius, setShaderRadius] = useState(2)
   const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
   const [shadowsEnabled, setShadowsEnabled] = useState(true)
   const [mouseSensitivity, setMouseSensitivity] = useState(1)
@@ -830,6 +830,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (!isDevBuild) return
+
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
@@ -872,10 +874,12 @@ export default function App() {
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [exitIntro, setReadyToShow, cinematicActive])
+  }, [exitIntro, setReadyToShow, cinematicActive, isDevBuild])
 
   useEffect(() => {
+    if (!isDevBuild) return
     if (!dialogueActive && !arbreDialogueActive) return
+
     const onKeyDown = (event) => {
       if (event.code === 'Space') {
         event.preventDefault()
@@ -884,7 +888,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
+  }, [dialogueActive, arbreDialogueActive, handleSkipDialogue, isDevBuild])
 
   const startLoadingRevealCountdown = useCallback(() => {
     if (loadingRevealScheduledRef.current) return
@@ -1052,13 +1056,14 @@ export default function App() {
 
   const explorationReady = false
   const showDevOverlays =
+    isDevBuild &&
     !cinematicActive &&
     !showWelcome &&
     !introPending &&
     !introActive &&
     !postIntro &&
-    (isDevBuild || isViewerControlsVisible || showCameraEditor || showStoryDebug)
-  const showCameraEditorOverlay = !introPending && !introActive && showCameraEditor
+    (isViewerControlsVisible || showCameraEditor || showStoryDebug)
+  const showCameraEditorOverlay = isDevBuild && !introPending && !introActive && showCameraEditor
 
   const closeCameraEditor = useCallback(() => {
     setEditorFlyMode(false)
@@ -1298,7 +1303,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {showCinematicPanel && (
+      {isDevBuild && showCinematicPanel && (
         <Suspense fallback={null}>
           <CinematicPanel
             onLaunch={(keypoints) => {
