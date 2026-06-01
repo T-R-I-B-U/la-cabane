@@ -10,6 +10,9 @@ const MAX_FRAME_DELTA = 0.05
 // Small inward offset to sink doors into the wall so the rounded hut edge hides the panel tip when open.
 // Adjust axis (x/y) and sign if the effect goes the wrong direction.
 const WALL_DEPTH_OFFSET = 0.08
+const DOOR_ROOT_OFFSETS = {
+  door02: { x: 0, y: 0, z: -0.1 },
+}
 
 function getDoorProgress(progressRef, doorId) {
   return progressRef.current.get(doorId) ?? 0
@@ -79,18 +82,19 @@ function collectDoors(cabane, debug) {
     if (!right || !left) continue
 
     let node = parent
-    let isDoorModel = false
+    let doorRootName = null
+    let doorRoot = null
 
     while (node) {
       if (/^door/i.test(node.name)) {
-        isDoorModel = true
-        break
+        doorRootName = node.name
+        doorRoot = node
       }
 
       node = node.parent
     }
 
-    if (!isDoorModel) continue
+    if (!doorRootName || !doorRoot) continue
 
     const center = new THREE.Vector3()
     right.getWorldPosition(center)
@@ -99,11 +103,16 @@ function collectDoors(cabane, debug) {
       id: `${right.uuid}:${left.uuid}`,
       rightId: right.uuid,
       leftId: left.uuid,
+      rootId: doorRoot.uuid,
       center: center.clone(),
+      rootOriginX: doorRoot.position.x,
+      rootOriginY: doorRoot.position.y,
+      rootOriginZ: doorRoot.position.z,
       rightOriginX: right.position.x,
       leftOriginX: left.position.x,
       rightOriginZ: right.position.z,
       leftOriginZ: left.position.z,
+      rootOffset: DOOR_ROOT_OFFSETS[doorRootName] ?? { x: 0, y: 0, z: 0 },
     }
 
     entries.push(entry)
@@ -111,6 +120,7 @@ function collectDoors(cabane, debug) {
     if (debug) {
       console.log(
         `[SlidingDoors] porte — parent: "${parent.name}"`,
+        `| root: "${doorRootName}"`,
         `| center: ${center.toArray().map((v) => v.toFixed(2))}`,
         `| rightOriginZ: ${right.position.z.toFixed(3)}`,
         `| leftOriginZ:  ${left.position.z.toFixed(3)}`
@@ -162,9 +172,10 @@ export function SlidingDoors({
     let shouldPlayDoorSound = false
 
     for (const door of doors) {
+      const root = cabane?.getObjectByProperty('uuid', door.rootId)
       const right = cabane?.getObjectByProperty('uuid', door.rightId)
       const left = cabane?.getObjectByProperty('uuid', door.leftId)
-      if (!right || !left) continue
+      if (!root || !right || !left) continue
 
       const dist = viewerPos.distanceTo(door.center)
       const isTargetOpen = forceOpen || dist < TRIGGER_DIST
@@ -182,6 +193,9 @@ export function SlidingDoors({
 
       progressRef.current.set(door.id, nextProgress)
 
+      root.position.x = door.rootOriginX + door.rootOffset.x
+      root.position.y = door.rootOriginY + door.rootOffset.y
+      root.position.z = door.rootOriginZ + door.rootOffset.z
       right.position.x = door.rightOriginX + WALL_DEPTH_OFFSET
       left.position.x = door.leftOriginX + WALL_DEPTH_OFFSET
       right.position.z = door.rightOriginZ + nextProgress * SLIDE_AMOUNT
