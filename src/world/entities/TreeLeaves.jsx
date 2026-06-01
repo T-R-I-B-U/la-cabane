@@ -64,6 +64,14 @@ export function TreeLeaves({
     loadStandaloneTexture(preferKtx2('/textures/detailedleaf-alphamap.png'), { flipY: false })
   )
 
+  // Template glb ships geometry only (no material) — supply the leaf color map here.
+  const colorMap = use(
+    loadStandaloneTexture(preferKtx2('/textures/detailedleaf-color.png'), {
+      flipY: false,
+      colorSpace: THREE.SRGBColorSpace,
+    })
+  )
+
   // Cache original material values to restore them on unmount or mode change
   const originalProps = useMemo(() => {
     if (!leafMesh) return null
@@ -255,6 +263,19 @@ export function TreeLeaves({
 
   useOutlineResolution(gl, _outlineMaterial)
 
+  // Cheap material for the distant canopy (cabane zone): plain diffuse + color
+  // texture, no env-map / PBR per fragment. Full-screen PBR foliage is what
+  // saturates fill-rate, so swap it out when the player isn't up in the tree.
+  const lambertMaterial = useMemo(() => {
+    if (!leafMesh) return null
+    return new THREE.MeshLambertMaterial({
+      color: leafMesh.material.color?.clone() ?? new THREE.Color(0xffffff),
+      side: THREE.DoubleSide,
+    })
+  }, [leafMesh])
+
+  useEffect(() => () => lambertMaterial?.dispose(), [lambertMaterial])
+
   useEffect(() => {
     if (!leafMesh || !alphaMap || !originalProps) return
     const originalRaycast = leafMesh.raycast
@@ -263,6 +284,22 @@ export function TreeLeaves({
 
     /* eslint-disable react-hooks/immutability */
     leafMesh.castShadow = true
+
+    // Outside the tree zone: distant canopy -> cheap Lambert, no shadow receive.
+    if (!inArbreZone && lambertMaterial) {
+      lambertMaterial.map = colorMap
+      lambertMaterial.needsUpdate = true
+      leafMesh.material = lambertMaterial
+      leafMesh.receiveShadow = false
+      return () => {
+        leafMesh.raycast = originalRaycast
+        leafMesh.castShadow = originalCastShadow
+        leafMesh.receiveShadow = originalReceiveShadow
+        leafMesh.material = originalProps.material
+        originalProps.material.needsUpdate = true
+      }
+    }
+
     leafMesh.receiveShadow = true
     alphaMap.flipY = false
     alphaMap.colorSpace = THREE.LinearSRGBColorSpace
@@ -293,6 +330,7 @@ export function TreeLeaves({
     }
 
     const mat = leafMesh.material
+    mat.map = colorMap
 
     if (leafMaterialMode === 'physical') {
       // Option 1: Physical Translucency
@@ -345,7 +383,7 @@ export function TreeLeaves({
       originalProps.material.emissiveIntensity = originalProps.emissiveIntensity
       originalProps.material.needsUpdate = true
     }
-  }, [leafMesh, alphaMap, leafMaterialMode, originalProps])
+  }, [leafMesh, alphaMap, colorMap, lambertMaterial, inArbreZone, leafMaterialMode, originalProps])
 
   if (!leafMesh || !edgesGeometry) return null
 
