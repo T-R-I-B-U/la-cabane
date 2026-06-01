@@ -441,6 +441,14 @@
       "loop": false,
       "volume": 0.85,
       "autoplay": false
+    },
+    {
+      "id": "drinking",
+      "type": "sfx",
+      "src": "Drinking.mp3",
+      "loop": false,
+      "volume": 0.9,
+      "autoplay": false
     }
   ]
 }

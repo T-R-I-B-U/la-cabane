@@ -4,6 +4,7 @@ import { ClickableDoor } from '../../world/entities/ClickableDoor'
 import { ClickableJuiceTable } from '../../world/entities/ClickableJuiceTable'
 import { ClickableJuiceMachine } from '../../world/entities/ClickableJuiceMachine'
 import { JuicePipeFill } from '../../world/entities/JuicePipeFill'
+import { JuiceDrink } from '../../world/entities/JuiceDrink'
 import { ClickableGreenhouseDoor } from '../../world/entities/ClickableGreenhouseDoor'
 import { ClickableSerreCorridorDoor } from '../../world/entities/ClickableSerreCorridorDoor'
 import { ClickableLadder } from '../../world/entities/ClickableLadder'
@@ -75,6 +76,7 @@ export function SceneInteractions({
   juiceMachinePhaseActive,
   juicePipePlaying,
   juicePhaseActive,
+  juiceDrinking,
   zoeClip,
   onZoeTalk,
   onMinigameStateChange,
@@ -82,6 +84,7 @@ export function SceneInteractions({
   onJuiceMachineInteract,
   onJuicePipeComplete,
   onJuiceInteract,
+  onJuiceDrinkComplete,
   serrePreview,
   modelQuality,
 }) {
@@ -207,6 +210,8 @@ export function SceneInteractions({
         isInteractable={juicePhaseActive}
         onInteract={onJuiceInteract}
       />
+
+      <JuiceDrink cabane={cabane} playing={juiceDrinking} onComplete={onJuiceDrinkComplete} />
 
       {(raspberryPhaseActive || raspberryGameCompleted) && (
         <RaspberryMinigame
