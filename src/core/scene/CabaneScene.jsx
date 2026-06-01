@@ -89,6 +89,7 @@ export function CabaneScene({
   juiceMachinePhaseActive,
   juicePipePlaying,
   juicePhaseActive,
+  juiceDrinking,
   zoeClip,
   onZoeTalk,
   onMinigameStateChange,
@@ -96,6 +97,7 @@ export function CabaneScene({
   onJuiceMachineInteract,
   onJuicePipeComplete,
   onJuiceInteract,
+  onJuiceDrinkComplete,
   serrePreview,
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
@@ -210,6 +212,7 @@ export function CabaneScene({
         juiceMachinePhaseActive={juiceMachinePhaseActive}
         juicePipePlaying={juicePipePlaying}
         juicePhaseActive={juicePhaseActive}
+        juiceDrinking={juiceDrinking}
         zoeClip={zoeClip}
         onZoeTalk={onZoeTalk}
         onMinigameStateChange={onMinigameStateChange}
@@ -217,6 +220,7 @@ export function CabaneScene({
         onJuiceMachineInteract={onJuiceMachineInteract}
         onJuicePipeComplete={onJuicePipeComplete}
         onJuiceInteract={onJuiceInteract}
+        onJuiceDrinkComplete={onJuiceDrinkComplete}
         serrePreview={serrePreview}
         modelQuality={modelQuality}
         onJournalStart={onJournalStart}

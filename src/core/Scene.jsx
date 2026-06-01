@@ -92,6 +92,7 @@ export default function Scene({
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,
+    juiceDrinking,
     zoeClip,
     onZoeTalk,
     onMinigameStateChange,
@@ -99,6 +100,7 @@ export default function Scene({
     onJuiceMachineInteract,
     onJuicePipeComplete,
     onJuiceInteract,
+    onJuiceDrinkComplete,
     cameraFixed,
     serrePreview,
   } = intro
@@ -208,6 +210,7 @@ export default function Scene({
             juiceMachinePhaseActive={juiceMachinePhaseActive}
             juicePipePlaying={juicePipePlaying}
             juicePhaseActive={juicePhaseActive}
+            juiceDrinking={juiceDrinking}
             zoeClip={zoeClip}
             onZoeTalk={onZoeTalk}
             onMinigameStateChange={onMinigameStateChange}
@@ -215,6 +218,7 @@ export default function Scene({
             onJuiceMachineInteract={onJuiceMachineInteract}
             onJuicePipeComplete={onJuicePipeComplete}
             onJuiceInteract={onJuiceInteract}
+            onJuiceDrinkComplete={onJuiceDrinkComplete}
             serrePreview={serrePreview}
             playerMode={playerMode}
             postIntro={postIntro}
