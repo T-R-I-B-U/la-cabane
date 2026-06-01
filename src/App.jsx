@@ -90,7 +90,7 @@ export default function App() {
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
   const [shaderEnabled, setShaderEnabled] = useState(false)
-  const [shaderRadius, setShaderRadius] = useState(3)
+  const [shaderRadius, setShaderRadius] = useState(2)
   const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
   const [shadowsEnabled, setShadowsEnabled] = useState(true)
   const [mouseSensitivity, setMouseSensitivity] = useState(1)
