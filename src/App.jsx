@@ -76,6 +76,7 @@ export default function App() {
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const [isUiHidden, setIsUiHidden] = useState(false)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [loadingFading, setLoadingFading] = useState(false)
@@ -201,6 +202,7 @@ export default function App() {
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,
+    juiceDrinking,
     exitSerrePhaseActive,
     arbreLadderPending,
     zoeClip,
@@ -240,6 +242,7 @@ export default function App() {
     handleJuiceMachineInteract,
     handleJuicePipeComplete,
     handleJuiceInteract,
+    handleJuiceDrinkComplete,
     handleReceptionChoice: handleReceptionChoiceInternal,
     handleReceptionInteract,
     handleReturnToHall,
@@ -861,6 +864,9 @@ export default function App() {
         } else {
           setShowCinematicPanel((current) => !current)
         }
+      } else if (event.code === 'F6') {
+        event.preventDefault()
+        setIsUiHidden((current) => !current)
       }
     }
 
@@ -1108,7 +1114,7 @@ export default function App() {
       />
       {!cinematicActive && <Subtitles />}
 
-      {!cinematicActive && (
+      {!cinematicActive && !isUiHidden && (
         <Crosshair
           visible={
             (isPlayerModeActive || isStoryCameraControlEnabled) &&
@@ -1197,6 +1203,7 @@ export default function App() {
           juiceMachinePhaseActive,
           juicePipePlaying,
           juicePhaseActive,
+          juiceDrinking,
           zoeClip,
           onZoeTalk: handleZoeTalk,
           onMinigameStateChange: handleMinigameStateChange,
@@ -1204,6 +1211,7 @@ export default function App() {
           onJuiceMachineInteract: handleJuiceMachineInteract,
           onJuicePipeComplete: handleJuicePipeComplete,
           onJuiceInteract: handleJuiceInteract,
+          onJuiceDrinkComplete: handleJuiceDrinkComplete,
           cameraFixed: raspberryPhaseActive,
           serrePreview: isPlayerModeActive && !postIntro,
         }}
@@ -1457,7 +1465,7 @@ export default function App() {
         />
       )}
 
-      {!cinematicActive && !showSettings && !showFinal && (
+      {!cinematicActive && !isUiHidden && !showSettings && !showFinal && (
         <div className="app-gear-btn">
           <GearIcon
             onClick={() => {
@@ -1469,7 +1477,7 @@ export default function App() {
         </div>
       )}
 
-      {!cinematicActive && (
+      {!cinematicActive && !isUiHidden && (
         <SettingsMenu
           open={showSettings}
           onClose={() => setShowSettings(false)}

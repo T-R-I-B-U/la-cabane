@@ -48,6 +48,7 @@ export function useIntroFlow({ sceneReady }) {
   const [juiceMachinePhaseActive, setJuiceMachinePhaseActive] = useState(false)
   const [juicePipePlaying, setJuicePipePlaying] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
+  const [juiceDrinking, setJuiceDrinking] = useState(false)
   const [exitSerrePhaseActive, setExitSerrePhaseActive] = useState(false)
   const [arbreLadderPending, setArbreLadderPending] = useState(false)
   const [zoeClip, setZoeClip] = useState(null)
@@ -524,6 +525,11 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleJuiceInteract = useCallback(() => {
     setJuicePhaseActive(false)
+    setJuiceDrinking(true)
+  }, [])
+
+  const handleJuiceDrinkComplete = useCallback(() => {
+    setJuiceDrinking(false)
     playDialogue('zoeFarewell', {
       onDone: () => setExitSerrePhaseActive(true),
     })
@@ -784,6 +790,7 @@ export function useIntroFlow({ sceneReady }) {
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,
+    juiceDrinking,
     exitSerrePhaseActive,
     arbreLadderPending,
     zoeClip,
@@ -819,6 +826,7 @@ export function useIntroFlow({ sceneReady }) {
     handleJuiceMachineInteract,
     handleJuicePipeComplete,
     handleJuiceInteract,
+    handleJuiceDrinkComplete,
     handleJournalEnd,
     handleTreeInteract,
     handleTimeatmInteract,

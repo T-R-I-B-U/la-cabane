@@ -94,7 +94,7 @@ const HUT_SKYLIGHT_PATTERNS = [/hut-verr/i]
 // Objects appearing ≥2 times in cabane.json are auto-instanced, except those on this list.
 // Exclusions are objects with mesh-level interactions that would break if merged into InstancedMesh
 // (e.g. workbench01 is found by getObjectByName for ClickableWorkbench).
-const SKIP_GROUPING = new Set(['workbench01', 'house', 'poster'])
+const SKIP_GROUPING = new Set(['workbench01', 'house', 'poster', 'juiceglass'])
 
 const HOUSE_TEXTURES = ['house1', 'house2', 'house3']
 const POSTER_TEXTURES = ['poster1', 'poster2', 'poster3', 'poster4', 'poster5', 'poster6']
