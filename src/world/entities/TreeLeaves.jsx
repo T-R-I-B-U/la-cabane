@@ -10,6 +10,7 @@ import {
 } from '../materials/outlineEffect'
 import { useHoverEffect } from '../interactions/useHoverEffect'
 import { fruitHoverStore } from '../../utils/fruitHoverStore'
+import { useActiveZone } from '../../utils/gameManagerStore'
 
 const _instanceMatrix = new THREE.Matrix4()
 const _worldMatrix = new THREE.Matrix4()
@@ -53,6 +54,11 @@ export function TreeLeaves({
   const proxyRef = useRef(null)
   const inRangeRef = useRef(null)
   const { gl } = useThree()
+
+  // Leaf animation + hover raycast only matter when the player is in the tree zone.
+  // Outside it, skip both per-frame loops (32k instances) entirely.
+  const inArbreZone = useActiveZone() === 'arbre'
+  const wasAnimatingRef = useRef(false)
 
   const alphaMap = use(
     loadStandaloneTexture(preferKtx2('/textures/detailedleaf-alphamap.png'), { flipY: false })
@@ -137,7 +143,13 @@ export function TreeLeaves({
   const _leafHoveredRef = useRef(false)
   const _lastHoveredIdRef = useRef(-1)
   useFrame(({ camera }) => {
-    if (!leafMesh || !active || !document.pointerLockElement || fruitHoverStore.anyHovered) {
+    if (
+      !leafMesh ||
+      !active ||
+      !inArbreZone ||
+      !document.pointerLockElement ||
+      fruitHoverStore.anyHovered
+    ) {
       if (_leafHoveredRef.current) {
         _leafHoveredRef.current = false
         _lastHoveredIdRef.current = -1
@@ -182,6 +194,20 @@ export function TreeLeaves({
   /* eslint-disable react-hooks/immutability */
   useFrame((state) => {
     if (!leafMesh || !baseMatrices || !profileIndex || !basePositions) return
+
+    // Outside the tree zone: stop animating. Reset to rest matrices once on exit
+    // so leaves don't stay frozen mid-sway.
+    if (!inArbreZone) {
+      if (wasAnimatingRef.current) {
+        for (let i = 0; i < leafMesh.count; i++) leafMesh.setMatrixAt(i, baseMatrices[i])
+        leafMesh.instanceMatrix.needsUpdate = true
+        inRangeRef.current?.fill(0)
+        wasAnimatingRef.current = false
+      }
+      return
+    }
+    wasAnimatingRef.current = true
+
     if (!inRangeRef.current) inRangeRef.current = new Uint8Array(leafMesh.count)
 
     // Transform camera to local space for LOD distance check
