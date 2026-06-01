@@ -13,3 +13,18 @@
   height: 100%;
   object-fit: cover;
 }
+
+.mobile-landing-video__play {
+  position: absolute;
+  left: 50%;
+  bottom: 12vh;
+  transform: translateX(-50%);
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 999px;
+  padding: 0.9rem 1.4rem;
+  background: rgb(0 0 0 / 0.52);
+  color: #fff;
+  font: inherit;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(10px);
+}
