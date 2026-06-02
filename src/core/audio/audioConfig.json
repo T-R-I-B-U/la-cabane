@@ -448,7 +448,7 @@
       "type": "sfx",
       "src": "Drinking.mp3",
       "loop": false,
-      "volume": 1.2,
+      "volume": 5.5,
       "autoplay": false
     }
   ]

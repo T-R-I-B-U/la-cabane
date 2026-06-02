@@ -27,6 +27,18 @@ const BASKET_SLOTS = [
 const BASKET_SCALE_IN = 0.9
 const RIPE_COUNT = 5
 
+// Same hover emissive as ladder/tree/workbench (useCenterScreenMeshInteraction).
+const HOVER_EMISSIVE = 0xffefbf
+const HOVER_EMISSIVE_INTENSITY = 0.35
+
+function setBerryEmissive(root, on) {
+  root?.traverse((c) => {
+    if (!c.isMesh || !c.material?.emissive) return
+    c.material.emissive.setHex(on ? HOVER_EMISSIVE : 0x000000)
+    c.material.emissiveIntensity = on ? HOVER_EMISSIVE_INTENSITY : 0
+  })
+}
+
 // World anchor on the outsideplant03 row nearest the basket (cabane.json).
 // Row at z≈-42.7: plants at x=-38.53, -39.26, -40.13 / y≈0.44.
 const GROUP_WORLD_POS = [-35.5, 1.0, -41.0]
@@ -268,6 +280,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
           const slot = collectedCountRef.current
           collectedCountRef.current += 1
           collectedSlots.current[idx] = slot
+          setBerryEmissive(meshRegistryRef.current[idx], false)
           const count = collectedCountRef.current
           onStateChange?.({ active: true, count, complete: count >= RIPE_COUNT })
         }
@@ -330,6 +343,23 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       )
       const hits = pickable.length ? raycaster.intersectObjects(pickable, true) : []
       cursorStore.setType(hits.length ? 'grab' : 'default')
+
+      let hoveredIdx = -1
+      if (hits.length) {
+        const hitObject = hits[0].object
+        for (let i = 0; i < meshRegistryRef.current.length; i++) {
+          const root = meshRegistryRef.current[i]
+          if (!root) continue
+          root.traverse((child) => {
+            if (child === hitObject) hoveredIdx = i
+          })
+          if (hoveredIdx !== -1) break
+        }
+      }
+      for (let i = 0; i < meshRegistryRef.current.length; i++) {
+        if (collectedSlots.current[i] !== null) continue
+        setBerryEmissive(meshRegistryRef.current[i], i === hoveredIdx)
+      }
     }
 
     for (let i = 0; i < RASPBERRY_DEFS.length; i++) {
