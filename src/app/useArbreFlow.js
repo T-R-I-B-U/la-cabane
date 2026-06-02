@@ -40,7 +40,7 @@ function getReverseTarget(position, target) {
   }
 }
 
-function getCloserPov(basePov, distance = 0.9) {
+function getCloserPov(basePov, distance = 2.4) {
   if (!basePov?.position || !basePov?.target) return basePov
 
   const dx = basePov.target.x - basePov.position.x
@@ -215,8 +215,9 @@ function resolveArbrePovs(platformPosition) {
   )
 
   resolvedPovs.nestMarie = {
-    ...getCloserPov(resolvedPovs.nest, 0.9),
-    duration: 1.2,
+    ...getCloserPov(resolvedPovs.nest, 2.4),
+    fov: 52,
+    duration: 1.35,
   }
 
   return resolvedPovs
