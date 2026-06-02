@@ -7,6 +7,7 @@ const SPEAKERS = {
   thomas: { label: 'THOMAS', avatar: '/avatars/thomas.webp' },
   zoe: { label: 'ZOÉ', avatar: '/avatars/zoe.webp' },
   tree: { label: 'VOTRE GUIDE', avatar: '/avatars/guide.webp' },
+  docteur: { label: 'DOCTEUR JUIPHE', avatar: '/avatars/docteur-juiphe.webp' },
 }
 
 // raised lifts the banner above the raspberry counter (bottom:32 + ~77 height)

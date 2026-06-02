@@ -409,6 +409,93 @@ export function stopDialogue() {
   _emitSubtitle('')
 }
 
+// ── Konami overlay ────────────────────────────────────────────────────────────
+// Easter egg: suspend the whole story audio in place (THREE AudioContext) and
+// overlay an independent sound + its own subtitles. The konami clip plays through
+// an HTMLAudioElement so it stays audible while the THREE context is suspended.
+const konamiState = {
+  audio: null,
+  cues: [],
+  rafId: 0,
+  storyActiveId: null,
+  storyElapsed: 0,
+}
+
+export function isKonamiActive() {
+  return konamiState.audio !== null
+}
+
+export function startKonamiOverlay() {
+  if (konamiState.audio) return
+
+  // Freeze the running story subtitle so it can resume at the same cue afterwards.
+  if (subtitleState.rafId) {
+    cancelAnimationFrame(subtitleState.rafId)
+    subtitleState.rafId = 0
+    konamiState.storyActiveId = subtitleState.activeId
+    konamiState.storyElapsed = performance.now() - subtitleState.startedAt
+  } else {
+    konamiState.storyActiveId = null
+  }
+
+  // Suspend THREE audio (pauses every story track in place); manuallyPaused
+  // prevents any _resumeContext() call from un-suspending it while frozen.
+  store.manuallyPaused = true
+  const ctx = store.listener && store.listener.context
+  if (ctx && ctx.state === 'running') ctx.suspend()
+
+  const audio = new Audio('/audio/konami-code.mp3')
+  audio.volume = store.globalVolume
+  konamiState.audio = audio
+  konamiState.cues = []
+
+  fetch('/subtitles/konami-code.srt')
+    .then((r) => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`)
+      return r.text()
+    })
+    .then((txt) => {
+      konamiState.cues = _parseSRT(txt)
+    })
+    .catch((error) => _warnAudio(`Cannot load konami subtitles: ${error}`))
+
+  audio.play().catch(() => {})
+
+  const tick = () => {
+    const t = audio.currentTime
+    const cue = konamiState.cues.find((c) => t >= c.from && t < c.to)
+    _emitSubtitle(cue ? cue.text : '', 'docteur')
+    konamiState.rafId = requestAnimationFrame(tick)
+  }
+  konamiState.rafId = requestAnimationFrame(tick)
+}
+
+export function stopKonamiOverlay() {
+  if (!konamiState.audio) return
+
+  if (konamiState.rafId) {
+    cancelAnimationFrame(konamiState.rafId)
+    konamiState.rafId = 0
+  }
+  konamiState.audio.pause()
+  konamiState.audio.src = ''
+  konamiState.audio = null
+
+  // Resume the story audio exactly where it was suspended.
+  store.manuallyPaused = false
+  const ctx = store.listener && store.listener.context
+  if (ctx && ctx.state === 'suspended') ctx.resume()
+
+  // Resume the story subtitle at the same cue if it is still the active track.
+  if (konamiState.storyActiveId && subtitleState.activeId === konamiState.storyActiveId) {
+    subtitleState.startedAt = performance.now() - konamiState.storyElapsed
+    if (!subtitleState.rafId) subtitleState.rafId = requestAnimationFrame(_tickSubtitles)
+  } else {
+    _emitSubtitle('', null)
+  }
+  konamiState.storyActiveId = null
+}
+
 export function play(id) {
   _whenReady(id, () => {
     const track = _getAudioTrack(id)
