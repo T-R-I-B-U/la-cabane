@@ -89,7 +89,7 @@ export default function App() {
   const [isFlyModeActive, setIsFlyModeActive] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
-  const [shaderEnabled, setShaderEnabled] = useState(false)
+  const [shaderEnabled, setShaderEnabled] = useState(true)
   const [shaderRadius, setShaderRadius] = useState(2)
   const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
   const [shadowsEnabled, setShadowsEnabled] = useState(true)
