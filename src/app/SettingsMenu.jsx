@@ -42,6 +42,8 @@ export function SettingsMenu({
   onSensitivityChange,
   modelQuality,
   onModelQualityChange,
+  performanceMode,
+  onPerformanceChange,
   sceneLoaded,
 }) {
   const ao = 'Non'
@@ -79,8 +81,17 @@ export function SettingsMenu({
           <GearIcon onClick={onClose} ariaLabel="Fermer les réglages" />
         </div>
 
+        <div className="settings-card__section">
+          <p className="settings-card__label">Performance</p>
+          <RadioPills
+            options={['Oui', 'Non']}
+            value={performanceMode}
+            onChange={onPerformanceChange}
+          />
+        </div>
+
         <div
-          className={`settings-card__section${sceneLoaded ? ' settings-card__section--disabled' : ''}`}
+          className={`settings-card__section${sceneLoaded || performanceMode === 'Oui' ? ' settings-card__section--disabled' : ''}`}
         >
           <p className="settings-card__label">Qualité des modèles</p>
           <RadioPills

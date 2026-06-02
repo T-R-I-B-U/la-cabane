@@ -1542,6 +1542,14 @@ export default function App() {
           onSensitivityChange={setMouseSensitivity}
           modelQuality={modelQuality}
           onModelQualityChange={setModelQuality}
+          performanceMode={leafMaterialMode === 'performance' ? 'Oui' : 'Non'}
+          onPerformanceChange={(v) => {
+            const enabled = v === 'Oui'
+            setLeafMaterialMode(enabled ? 'performance' : 'standard')
+            // Forcer la qualité basse seulement avant le chargement — sinon changer
+            // modelQuality reconstruit toute la scène en pleine partie.
+            if (enabled && showWelcome) setModelQuality('compressed2')
+          }}
           sceneLoaded={!showWelcome}
         />
       )}
