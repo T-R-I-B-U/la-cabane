@@ -326,6 +326,7 @@ export function useArbreFlow({
       playDialogue('arbreFinal', {
         onDone: () => {
           setArbreDialogueActive(false)
+          setArbreStoryCameraTransition(null)
           setLadderClickActive(true)
           setLadderOutroMode(true)
         },
