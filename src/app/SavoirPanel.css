@@ -194,6 +194,7 @@
   color: #3b5866;
   line-height: 1;
   flex-shrink: 0;
+  transform: translateY(-12px);
 }
 
 @media (max-width: 900px) {
