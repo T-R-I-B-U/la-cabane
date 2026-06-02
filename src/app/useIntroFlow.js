@@ -76,6 +76,7 @@ export function useIntroFlow({ sceneReady }) {
   const [minigameCount, setMinigameCount] = useState(0)
   const [playerName, setPlayerName] = useState('')
   const raspberryPhaseActiveRef = useRef(false)
+  const unripeAttemptCountRef = useRef(0)
   const journalPlacedCountRef = useRef(0)
   const journalCompletedRef = useRef(false)
   const isPostBookTransitionRef = useRef(false)
@@ -573,7 +574,9 @@ export function useIntroFlow({ sceneReady }) {
   )
 
   const handleUnripeAttempt = useCallback(() => {
-    playDialogue('zoeUnripe')
+    unripeAttemptCountRef.current += 1
+    // Au-delà de 5 tentatives, Zoé perd patience : son custom + sous-titre moqueur.
+    playDialogue(unripeAttemptCountRef.current >= 5 ? 'zoeRoast' : 'zoeUnripe')
   }, [playDialogue])
 
   const handleJuiceMachineInteract = useCallback(() => {

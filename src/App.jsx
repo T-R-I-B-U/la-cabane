@@ -12,6 +12,7 @@ import {
   SettingsMenu,
   WelcomeScreen,
   useIntroFlow,
+  useKonamiCode,
   useSavoirAssignment,
 } from './app/index'
 import { ContactPanel } from './app/ContactPanel'
@@ -104,6 +105,7 @@ export default function App() {
   const [isJournalInteractionActive, setIsJournalInteractionActive] = useState(false)
   const isMinigameActiveRef = useRef(false)
   const arbreActiveRef = useRef(false)
+  useKonamiCode()
   const [isSavoirInteractionActive, setIsSavoirInteractionActive] = useState(false)
   const [isSavoirPanelOpen, setIsSavoirPanelOpen] = useState(false)
   const [isContactInteractionActive, setIsContactInteractionActive] = useState(false)
