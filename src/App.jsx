@@ -395,7 +395,7 @@ export default function App() {
   const [showCinematicPanel, setShowCinematicPanel] = useState(false)
   const [cinematicActive, setCinematicActive] = useState(false)
   const [cinematicKeypoints, setCinematicKeypoints] = useState([])
-  const [leafMaterialMode, setLeafMaterialMode] = useState('standard')
+  const [leafMaterialMode, setLeafMaterialMode] = useState('performance')
 
   const requestPointerLockIfSceneControlAllowed = useCallback(() => {
     if (

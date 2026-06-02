@@ -216,7 +216,7 @@ export function ViewerControls({
               Interactions feuilles/fruits
             </button>
 
-            {['standard', 'physical', 'emissive'].map((mode) => (
+            {['standard', 'physical', 'emissive', 'performance'].map((mode) => (
               <button
                 key={mode}
                 type="button"
