@@ -339,9 +339,11 @@ export function useArbreFlow({
       playDialogue('arbreFeuilles', {
         onDone: () => {
           setArbreDialogueActive(false)
+          setArbreMovementLocked(false)
           setGrowingFruitClickable(true)
           completeStep('arbre.leavesDialogue')
           pendingPlatformReturnAfterIncomingSavoirRef.current = true
+          setArbreStoryCameraTransition(null)
         },
       })
     } else if (currentStepId === 'arbre.backAtBase') {
