@@ -29,6 +29,15 @@
   flex-direction: column;
 }
 
+.pfp-left-card--paper {
+  background-image: url('/player-panel/profile-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
 .pfp-left-inner {
   display: flex;
   flex-direction: column;
@@ -135,6 +144,15 @@
   overflow: hidden;
 }
 
+.pfp-card--paper {
+  background-image: url('/player-panel/section-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
 .pfp-card-header {
   display: flex;
   gap: 20px;
@@ -175,6 +193,7 @@
 /* Passeur "add" button */
 .pfp-add-savoir {
   background: #b0cfd1;
+  border: none;
   border-radius: 18px;
   padding: 20px 40px;
   display: flex;
@@ -184,6 +203,16 @@
   gap: 12px;
   flex-shrink: 0;
   cursor: pointer;
+}
+
+.pfp-add-savoir--paper {
+  background-image: url('/player-panel/add-savoir-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+  min-height: 69px;
 }
 
 .pfp-add-icon {

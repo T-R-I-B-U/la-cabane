@@ -174,7 +174,7 @@ export function PlayerFruitPanel({
           /* ── Layout par défaut ── */
           <div className="pfp-content">
             {/* Left card */}
-            <div className="pfp-left-card">
+            <div className="pfp-left-card pfp-left-card--paper">
               <div className="pfp-left-inner">
                 <div className="pfp-top-section">
                   <img
@@ -209,7 +209,7 @@ export function PlayerFruitPanel({
               {/* Top row */}
               <div className="pfp-row">
                 {/* Passeur card */}
-                <div className="pfp-card">
+                <div className="pfp-card pfp-card--paper">
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
@@ -224,7 +224,7 @@ export function PlayerFruitPanel({
                   </div>
                   <button
                     type="button"
-                    className="pfp-add-savoir"
+                    className="pfp-add-savoir pfp-add-savoir--paper"
                     onClick={() => {
                       playOnce('clickUi')
                       setIsAddSavoirOpen(true)
@@ -236,7 +236,7 @@ export function PlayerFruitPanel({
                 </div>
 
                 {/* Apprenti card */}
-                <div className="pfp-card">
+                <div className="pfp-card pfp-card--paper">
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
@@ -281,7 +281,7 @@ export function PlayerFruitPanel({
               {/* Bottom row */}
               <div className="pfp-row">
                 {/* Favoris card */}
-                <div className="pfp-card">
+                <div className="pfp-card pfp-card--paper">
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
