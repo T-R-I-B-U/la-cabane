@@ -54,19 +54,11 @@
   pointer-events: none;
   z-index: 9999;
   will-change: transform;
-  width: 0;
-  height: 0;
-  overflow: visible;
-}
-
-.custom-cursor::before,
-.custom-cursor::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
   transform: translate(-50%, -50%);
-  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  background: url('/cursor.png') center / contain no-repeat;
+  filter: drop-shadow(0 1px 3px rgba(24, 39, 48, 0.14));
   transition:
     width 0.1s ease,
     height 0.1s ease,
@@ -74,49 +66,16 @@
     transform 0.1s ease;
 }
 
-.custom-cursor::before {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    transparent 0 26%,
-    #476576 26% 37%,
-    rgba(255, 255, 255, 0.96) 37% 72%,
-    #476576 72% 84%,
-    transparent 84%
-  );
-  filter: drop-shadow(0 1px 3px rgba(24, 39, 48, 0.14));
-}
-
-.custom-cursor::after {
-  width: 0;
-  height: 0;
-  background: transparent;
-  box-shadow: none;
-}
-
-.custom-cursor--pointer::before {
+.custom-cursor--pointer {
   width: 18px;
   height: 18px;
   opacity: 0.96;
 }
 
-.custom-cursor--pointer::after {
-  width: 0;
-  height: 0;
-}
-
-.custom-cursor--grabbing::before {
+.custom-cursor--grabbing {
   width: 14px;
   height: 14px;
   opacity: 0.92;
-}
-
-.custom-cursor--grabbing::after {
-  width: 0;
-  height: 0;
-  opacity: 0.9;
 }
 
 /* ── App loader ──────────────────────────────────────────────────── */
