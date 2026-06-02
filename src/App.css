@@ -55,8 +55,8 @@
   z-index: 9999;
   will-change: transform;
   transform: translate(-50%, -50%);
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   background: url('/cursor.png') center / contain no-repeat;
   filter: drop-shadow(0 1px 3px rgba(24, 39, 48, 0.14));
   transition:
@@ -67,14 +67,14 @@
 }
 
 .custom-cursor--pointer {
-  width: 18px;
-  height: 18px;
+  width: 15px;
+  height: 15px;
   opacity: 0.96;
 }
 
 .custom-cursor--grabbing {
-  width: 14px;
-  height: 14px;
+  width: 11px;
+  height: 11px;
   opacity: 0.92;
 }
 
