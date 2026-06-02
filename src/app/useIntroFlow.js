@@ -13,6 +13,27 @@ const INSIDE_POV = {
   target: { x: -12.5066, y: 1.7137, z: -5.2008 },
 }
 
+function getPulledBackPov(pov, distance = 1.2) {
+  if (!pov?.position || !pov?.target) return null
+
+  const dx = pov.position.x - pov.target.x
+  const dy = pov.position.y - pov.target.y
+  const dz = pov.position.z - pov.target.z
+  const length = Math.hypot(dx, dy, dz)
+
+  if (!length) return null
+
+  return {
+    position: {
+      x: pov.position.x + (dx / length) * distance,
+      y: pov.position.y + (dy / length) * distance,
+      z: pov.position.z + (dz / length) * distance,
+    },
+    target: pov.target,
+    fov: pov.fov,
+  }
+}
+
 export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
@@ -61,6 +82,7 @@ export function useIntroFlow({ sceneReady }) {
   const treeClickPhaseRef = useRef(1)
   const isEtabliTransitionRef = useRef(false)
   const isThomasTransitionRef = useRef(false)
+  const isThomasPullbackTransitionRef = useRef(false)
   const isAtelierBetweenTransitionRef = useRef(false)
   const isSerreZoeTransitionRef = useRef(false)
   const isSerreRaspberryTransitionRef = useRef(false)
@@ -131,6 +153,7 @@ export function useIntroFlow({ sceneReady }) {
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
+    isThomasPullbackTransitionRef.current = false
     isSerreZoeTransitionRef.current = false
     isSerreRaspberryTransitionRef.current = false
     isSerreJuiceTransitionRef.current = false
@@ -238,9 +261,24 @@ export function useIntroFlow({ sceneReady }) {
             fade('musicIndoor', 0.15, 1500)
             play('ambianceWorkbench')
           }, 2000)
+
+          const thomasPullbackPov = getPulledBackPov(STORY_CAMERA_POVS.talkThomas)
+
+          if (thomasPullbackPov) {
+            isThomasPullbackTransitionRef.current = true
+            setStoryCameraTransition({ ...thomasPullbackPov, duration: 1.1 })
+            return
+          }
+
           setGreenhousePhaseActive(true)
         },
       })
+      return
+    }
+
+    if (isThomasPullbackTransitionRef.current) {
+      isThomasPullbackTransitionRef.current = false
+      setGreenhousePhaseActive(true)
       return
     }
 
@@ -306,6 +344,14 @@ export function useIntroFlow({ sceneReady }) {
     }
 
     if (greenhouseTransitionStageRef.current === 'arbreStairs2') {
+      greenhouseTransitionStageRef.current = 'arbreLadderIntro'
+      scheduleFlowTimeout(() => {
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.treeStory12, duration: 2.0 })
+      }, 300)
+      return
+    }
+
+    if (greenhouseTransitionStageRef.current === 'arbreLadderIntro') {
       greenhouseTransitionStageRef.current = null
       playDialogue('18-voice-tree', {
         onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
