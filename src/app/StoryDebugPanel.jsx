@@ -14,6 +14,7 @@ export function StoryDebugPanel({
   onGoToArbreBase,
   onGoToArbreTop,
   onGoToSentSavoirDebug,
+  onGoToAutoNestOutro,
   onGoToNestStairs,
   onGoToNestDialogue25,
 }) {
@@ -65,6 +66,9 @@ export function StoryDebugPanel({
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToSentSavoirDebug}>
           Feuille envoyee debug
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToAutoNestOutro}>
+          Descente auto nid
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToNestStairs}>
           Escalier vers nid
