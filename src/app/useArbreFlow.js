@@ -330,6 +330,31 @@ export function useArbreFlow({
     }
   }, [ladderOutroMode, completeStep, playDialogue, goToStep, povs])
 
+  const startLadderOutro = useCallback(() => {
+    setArbreDialogueActive(true)
+    playDialogue('arbreFinal', {
+      onDone: () => {
+        setArbreDialogueActive(false)
+
+        if (autoNestPathRef.current) {
+          setArbreDialogueActive(true)
+          playDialogue('arbreOutro', {
+            onDone: () => {
+              setArbreDialogueActive(false)
+              goToStep('arbre.outroPlatformTop')
+              setArbreStoryCameraTransition({ ...povs.outroPlatformTop })
+            },
+          })
+          return
+        }
+
+        setArbreStoryCameraTransition(null)
+        setLadderClickActive(true)
+        setLadderOutroMode(true)
+      },
+    })
+  }, [goToStep, playDialogue, povs])
+
   const handleArbreTransitionComplete = useCallback(() => {
     if (pendingNestOutroAfterMarieRef.current) {
       pendingNestOutroAfterMarieRef.current = false
@@ -348,15 +373,7 @@ export function useArbreFlow({
 
     if (pendingPlatformReturnOutroRef.current) {
       pendingPlatformReturnOutroRef.current = false
-      setArbreDialogueActive(true)
-      playDialogue('arbreFinal', {
-        onDone: () => {
-          setArbreDialogueActive(false)
-          setArbreStoryCameraTransition(null)
-          setLadderClickActive(true)
-          setLadderOutroMode(true)
-        },
-      })
+      startLadderOutro()
       return
     }
 
@@ -498,6 +515,7 @@ export function useArbreFlow({
     playDialogue,
     povs,
     scheduleFlowTimeout,
+    startLadderOutro,
   ])
 
   const handleFruitClickDuringLeaves = useCallback(() => {
@@ -538,15 +556,8 @@ export function useArbreFlow({
       return
     }
 
-    setArbreDialogueActive(true)
-    playDialogue('arbreFinal', {
-      onDone: () => {
-        setArbreDialogueActive(false)
-        setLadderClickActive(true)
-        setLadderOutroMode(true)
-      },
-    })
-  }, [arbreActive, playDialogue, povs])
+    startLadderOutro()
+  }, [arbreActive, povs, startLadderOutro])
 
   const arbreLeafInteractionsEnabled =
     (currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase) && !fruitsClickActive
