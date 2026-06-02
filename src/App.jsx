@@ -344,6 +344,7 @@ export default function App() {
     handlePlayerFruitPanelClose,
     triggerArbreBase,
     triggerArbreTop,
+    triggerAutoNestOutro,
     triggerNestStairs,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
@@ -594,6 +595,29 @@ export default function App() {
 
     triggerArbreTop()
   }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
+  const handleGoToAutoNestOutro = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(true)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+
+    triggerAutoNestOutro()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerAutoNestOutro])
 
   const handleGoToNestStairs = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -1376,6 +1400,7 @@ export default function App() {
             onGoToArbreBase={handleGoToArbreBase}
             onGoToArbreTop={handleGoToArbreTop}
             onGoToSentSavoirDebug={handleGoToSentSavoirDebug}
+            onGoToAutoNestOutro={handleGoToAutoNestOutro}
             onGoToNestStairs={handleGoToNestStairs}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
