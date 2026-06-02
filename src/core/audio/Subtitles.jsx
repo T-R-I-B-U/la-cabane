@@ -9,17 +9,19 @@ const SPEAKERS = {
   tree: { label: 'VOTRE GUIDE', avatar: '/avatars/guide.webp' },
 }
 
-const WRAP = {
+// raised lifts the banner above the raspberry counter (bottom:32 + ~77 height)
+// so the two banners stack instead of overlapping during the minigame.
+const WRAP = (raised) => ({
   position: 'fixed',
   left: 0,
   right: 0,
-  bottom: 0,
+  bottom: raised ? 90 : 0,
   display: 'flex',
   justifyContent: 'center',
   padding: '60px 200px',
   zIndex: 900,
   pointerEvents: 'none',
-}
+})
 
 const BOX = (visible) => ({
   width: '100%',
@@ -120,7 +122,7 @@ function ChoiceButton({ label, onClick }) {
   )
 }
 
-export default function Subtitles() {
+export default function Subtitles({ raised = false }) {
   const [state, setState] = useState({ text: '', speaker: null, choices: null })
 
   useEffect(() => subscribeSubtitles(setState), [])
@@ -131,7 +133,7 @@ export default function Subtitles() {
   const speakerInfo = speaker ? SPEAKERS[speaker] : null
 
   return (
-    <div style={WRAP}>
+    <div style={WRAP(raised)}>
       <div style={BOX(visible)}>
         <div style={CONTENT}>
           <div aria-hidden="true" style={CONTENT_OFFSET} />

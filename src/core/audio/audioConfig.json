@@ -393,7 +393,7 @@
       "speaker": "zoe",
       "src": "zoe/zoe-intro.mp3",
       "loop": false,
-      "volume": 1,
+      "volume": 0.7,
       "autoplay": false,
       "subtitles": "zoe/zoe-intro.srt"
     },
@@ -403,7 +403,7 @@
       "speaker": "zoe",
       "src": "zoe/zoe-juice.mp3",
       "loop": false,
-      "volume": 1,
+      "volume": 0.7,
       "autoplay": false,
       "subtitles": "zoe/zoe-juice.srt"
     },
@@ -413,7 +413,7 @@
       "speaker": "zoe",
       "src": "zoe/zoe-farewell.mp3",
       "loop": false,
-      "volume": 1,
+      "volume": 0.7,
       "autoplay": false,
       "subtitles": "zoe/zoe-farewell.srt"
     },
@@ -423,7 +423,7 @@
       "speaker": "zoe",
       "src": "zoe/zoe-unripe.mp3",
       "loop": false,
-      "volume": 1,
+      "volume": 0.7,
       "autoplay": false,
       "subtitles": "zoe/zoe-unripe.srt"
     },
@@ -448,7 +448,7 @@
       "type": "sfx",
       "src": "Drinking.mp3",
       "loop": false,
-      "volume": 0.9,
+      "volume": 5.5,
       "autoplay": false
     }
   ]

@@ -1158,7 +1158,7 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      {!cinematicActive && <Subtitles />}
+      {!cinematicActive && <Subtitles raised={raspberryPhaseActive} />}
 
       {!cinematicActive && !isUiHidden && (
         <Crosshair
