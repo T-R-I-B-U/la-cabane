@@ -1,20 +1,27 @@
 1
-00:00:00,000 --> 00:00:05,520
-Hey salut, tu vas bien ? Je vois que tu viens explorer la cabane. Tu veux connaître mes impressions sur le concept de Cabane ?
+00:00:00,000 --> 00:00:03,200
+Hey salut, tu vas bien ? Je vois que tu viens explorer la cabane.
 
 2
-00:00:05,840 --> 00:00:09,120
-Moi perso, depuis le temps que je viens ici, j'ai largement trouvé mon compte.
+00:00:03,200 --> 00:00:05,800
+Tu veux connaître mes impressions sur le concept de Cabane ?
 
 3
-00:00:09,360 --> 00:00:16,360
-Je viens plusieurs fois par semaine pour enseigner la réparation et l'amélioration des vélos. En échange, j'apprends à faire des semis de tomates avec Audrey.
+00:00:05,800 --> 00:00:09,300
+Moi perso, depuis le temps que je viens ici, j'ai largement trouvé mon compte.
 
 4
-00:00:16,360 --> 00:00:20,160
-C'est une voisine du bâtiment d'en face. Je ne doute pas que tu trouveras de quoi faire ici !
+00:00:09,300 --> 00:00:13,200
+Je viens plusieurs fois par semaine pour enseigner la réparation et l'amélioration des vélos.
 
 5
+00:00:13,200 --> 00:00:16,360
+En échange, j'apprends à faire des semis de tomates avec Audrey.
+
+6
+00:00:16,360 --> 00:00:20,400
+C'est une voisine du bâtiment d'en face. Je ne doute pas que tu trouveras de quoi faire ici !
+
+7
 00:00:20,400 --> 00:00:22,400
 Bonne visite et pis à bientôt !
-

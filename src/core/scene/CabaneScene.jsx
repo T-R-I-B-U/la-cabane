@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { CabaneMap } from './CabaneMap'
 import { LampLights } from './LampLights'
+import { SerreLight } from './SerreLight'
 import { TreeLeaves } from '../../world/entities/TreeLeaves'
 import { SceneCharacters } from './SceneCharacters'
 import { SceneInteractions } from './SceneInteractions'
@@ -88,6 +89,7 @@ export function CabaneScene({
   juiceMachinePhaseActive,
   juicePipePlaying,
   juicePhaseActive,
+  juiceDrinking,
   zoeClip,
   onZoeTalk,
   onMinigameStateChange,
@@ -95,6 +97,7 @@ export function CabaneScene({
   onJuiceMachineInteract,
   onJuicePipeComplete,
   onJuiceInteract,
+  onJuiceDrinkComplete,
   serrePreview,
 }) {
   const [cabaneGroup, setCabaneGroup] = useState(null)
@@ -160,6 +163,8 @@ export function CabaneScene({
 
       <LampLights cabane={cabaneGroup} />
 
+      <SerreLight />
+
       <TreeLeaves
         leafMesh={leafMesh}
         active={interactionsEnabled}
@@ -207,6 +212,7 @@ export function CabaneScene({
         juiceMachinePhaseActive={juiceMachinePhaseActive}
         juicePipePlaying={juicePipePlaying}
         juicePhaseActive={juicePhaseActive}
+        juiceDrinking={juiceDrinking}
         zoeClip={zoeClip}
         onZoeTalk={onZoeTalk}
         onMinigameStateChange={onMinigameStateChange}
@@ -214,6 +220,7 @@ export function CabaneScene({
         onJuiceMachineInteract={onJuiceMachineInteract}
         onJuicePipeComplete={onJuicePipeComplete}
         onJuiceInteract={onJuiceInteract}
+        onJuiceDrinkComplete={onJuiceDrinkComplete}
         serrePreview={serrePreview}
         modelQuality={modelQuality}
         onJournalStart={onJournalStart}

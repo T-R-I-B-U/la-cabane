@@ -103,6 +103,18 @@ export function ViewerControls({
           </span>
           Rendu aquarelle
         </button>
+        <label className="controls-slider-row">
+          <span>Intensité aquarelle</span>
+          <input
+            type="range"
+            min="0"
+            max="5"
+            step="1"
+            value={shaderRadius}
+            onChange={(e) => onShaderRadiusChange(Number.parseInt(e.target.value, 10))}
+          />
+          <span className="controls-slider-value">{shaderRadius}</span>
+        </label>
       </PanelSection>
 
       <PanelSection title="Navigation" eyebrow="Camera">
@@ -154,20 +166,6 @@ export function ViewerControls({
 
       {import.meta.env.DEV && (
         <PanelSection title="Devtools" eyebrow="Runtime">
-          <DevSection title="Aquarelle">
-            <label className="controls-slider-row">
-              <span>Rayon</span>
-              <input
-                type="range"
-                min="0"
-                max="5"
-                step="1"
-                value={shaderRadius}
-                onChange={(e) => onShaderRadiusChange(Number.parseInt(e.target.value, 10))}
-              />
-              <span className="controls-slider-value">{shaderRadius}</span>
-            </label>
-          </DevSection>
           <DevSection title="HDRI">
             <button
               type="button"
@@ -218,7 +216,7 @@ export function ViewerControls({
               Interactions feuilles/fruits
             </button>
 
-            {['standard', 'physical', 'emissive'].map((mode) => (
+            {['standard', 'physical', 'emissive', 'performance'].map((mode) => (
               <button
                 key={mode}
                 type="button"

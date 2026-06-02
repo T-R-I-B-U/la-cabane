@@ -76,6 +76,7 @@ export default function App() {
   const savoirLeafColRef = useRef(null)
   const [showWelcome, setShowWelcome] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
+  const [isUiHidden, setIsUiHidden] = useState(false)
   const [showFinal, setShowFinal] = useState(false)
   const [welcomeFading, setWelcomeFading] = useState(false)
   const [loadingFading, setLoadingFading] = useState(false)
@@ -88,8 +89,8 @@ export default function App() {
   const [isFlyModeActive, setIsFlyModeActive] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
-  const [shaderEnabled, setShaderEnabled] = useState(false)
-  const [shaderRadius, setShaderRadius] = useState(3)
+  const [shaderEnabled, setShaderEnabled] = useState(true)
+  const [shaderRadius, setShaderRadius] = useState(2)
   const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
   const [shadowsEnabled, setShadowsEnabled] = useState(true)
   const [mouseSensitivity, setMouseSensitivity] = useState(1)
@@ -201,6 +202,7 @@ export default function App() {
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,
+    juiceDrinking,
     exitSerrePhaseActive,
     arbreLadderPending,
     zoeClip,
@@ -240,6 +242,7 @@ export default function App() {
     handleJuiceMachineInteract,
     handleJuicePipeComplete,
     handleJuiceInteract,
+    handleJuiceDrinkComplete,
     handleReceptionChoice: handleReceptionChoiceInternal,
     handleReceptionInteract,
     handleReturnToHall,
@@ -341,6 +344,8 @@ export default function App() {
     handlePlayerFruitPanelClose,
     triggerArbreBase,
     triggerArbreTop,
+    triggerAutoNestOutro,
+    triggerNestStairs,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
@@ -557,6 +562,69 @@ export default function App() {
     }
     triggerArbreTop()
   }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
+  const handleGoToSentSavoirDebug = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(true)
+    setPostIntro(true)
+    setIncomingSavoir(null)
+    setLeafArriving(false)
+    setIsSavoirInteractionActive(false)
+    setIsSavoirPanelOpen(false)
+    setIsContactInteractionActive(false)
+    setIsContactPanelOpen(false)
+    setHasSentSavoir(true)
+    setSentSavoirDrawing('/savoir-leaf.webp')
+    setSentSavoirTitle('Feuille debug envoyee')
+    setIsPlayerFruitPanelOpen(true)
+
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+
+    triggerArbreTop()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
+  const handleGoToAutoNestOutro = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(true)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+
+    triggerAutoNestOutro()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerAutoNestOutro])
+
+  const handleGoToNestStairs = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerNestStairs()
+  }, [setPostIntro, triggerNestStairs])
 
   const handleGoToNestDialogue25 = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -827,6 +895,8 @@ export default function App() {
   }, [])
 
   useEffect(() => {
+    if (!isDevBuild) return
+
     const onKeyDown = (event) => {
       if (event.code === 'F1') {
         event.preventDefault()
@@ -861,15 +931,20 @@ export default function App() {
         } else {
           setShowCinematicPanel((current) => !current)
         }
+      } else if (event.code === 'F6') {
+        event.preventDefault()
+        setIsUiHidden((current) => !current)
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [exitIntro, setReadyToShow, cinematicActive])
+  }, [exitIntro, setReadyToShow, cinematicActive, isDevBuild])
 
   useEffect(() => {
+    if (!isDevBuild) return
     if (!dialogueActive && !arbreDialogueActive) return
+
     const onKeyDown = (event) => {
       if (event.code === 'Space') {
         event.preventDefault()
@@ -878,7 +953,7 @@ export default function App() {
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [dialogueActive, arbreDialogueActive, handleSkipDialogue])
+  }, [dialogueActive, arbreDialogueActive, handleSkipDialogue, isDevBuild])
 
   const startLoadingRevealCountdown = useCallback(() => {
     if (loadingRevealScheduledRef.current) return
@@ -1046,13 +1121,14 @@ export default function App() {
 
   const explorationReady = false
   const showDevOverlays =
+    isDevBuild &&
     !cinematicActive &&
     !showWelcome &&
     !introPending &&
     !introActive &&
     !postIntro &&
-    (isDevBuild || isViewerControlsVisible || showCameraEditor || showStoryDebug)
-  const showCameraEditorOverlay = !introPending && !introActive && showCameraEditor
+    (isViewerControlsVisible || showCameraEditor || showStoryDebug)
+  const showCameraEditorOverlay = isDevBuild && !introPending && !introActive && showCameraEditor
 
   const closeCameraEditor = useCallback(() => {
     setEditorFlyMode(false)
@@ -1106,9 +1182,9 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      {!cinematicActive && <Subtitles />}
+      {!cinematicActive && <Subtitles raised={raspberryPhaseActive} />}
 
-      {!cinematicActive && (
+      {!cinematicActive && !isUiHidden && (
         <Crosshair
           visible={
             (isPlayerModeActive || isStoryCameraControlEnabled) &&
@@ -1197,6 +1273,7 @@ export default function App() {
           juiceMachinePhaseActive,
           juicePipePlaying,
           juicePhaseActive,
+          juiceDrinking,
           zoeClip,
           onZoeTalk: handleZoeTalk,
           onMinigameStateChange: handleMinigameStateChange,
@@ -1204,6 +1281,7 @@ export default function App() {
           onJuiceMachineInteract: handleJuiceMachineInteract,
           onJuicePipeComplete: handleJuicePipeComplete,
           onJuiceInteract: handleJuiceInteract,
+          onJuiceDrinkComplete: handleJuiceDrinkComplete,
           cameraFixed: raspberryPhaseActive,
           serrePreview: isPlayerModeActive && !postIntro,
         }}
@@ -1290,7 +1368,7 @@ export default function App() {
         </Suspense>
       )}
 
-      {showCinematicPanel && (
+      {isDevBuild && showCinematicPanel && (
         <Suspense fallback={null}>
           <CinematicPanel
             onLaunch={(keypoints) => {
@@ -1321,6 +1399,9 @@ export default function App() {
             onGoToSortieSerre={jumpToSortieSerre}
             onGoToArbreBase={handleGoToArbreBase}
             onGoToArbreTop={handleGoToArbreTop}
+            onGoToSentSavoirDebug={handleGoToSentSavoirDebug}
+            onGoToAutoNestOutro={handleGoToAutoNestOutro}
+            onGoToNestStairs={handleGoToNestStairs}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>
@@ -1457,7 +1538,7 @@ export default function App() {
         />
       )}
 
-      {!cinematicActive && !showSettings && !showFinal && (
+      {!cinematicActive && !isUiHidden && !showSettings && !showFinal && (
         <div className="app-gear-btn">
           <GearIcon
             onClick={() => {
@@ -1469,7 +1550,7 @@ export default function App() {
         </div>
       )}
 
-      {!cinematicActive && (
+      {!cinematicActive && !isUiHidden && (
         <SettingsMenu
           open={showSettings}
           onClose={() => setShowSettings(false)}
@@ -1486,6 +1567,14 @@ export default function App() {
           onSensitivityChange={setMouseSensitivity}
           modelQuality={modelQuality}
           onModelQualityChange={setModelQuality}
+          performanceMode={leafMaterialMode === 'performance' ? 'Oui' : 'Non'}
+          onPerformanceChange={(v) => {
+            const enabled = v === 'Oui'
+            setLeafMaterialMode(enabled ? 'performance' : 'standard')
+            // Forcer la qualité basse seulement avant le chargement — sinon changer
+            // modelQuality reconstruit toute la scène en pleine partie.
+            if (enabled && showWelcome) setModelQuality('compressed2')
+          }}
           sceneLoaded={!showWelcome}
         />
       )}

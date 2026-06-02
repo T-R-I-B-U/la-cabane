@@ -13,6 +13,27 @@ const INSIDE_POV = {
   target: { x: -12.5066, y: 1.7137, z: -5.2008 },
 }
 
+function getPulledBackPov(pov, distance = 1.2) {
+  if (!pov?.position || !pov?.target) return null
+
+  const dx = pov.position.x - pov.target.x
+  const dy = pov.position.y - pov.target.y
+  const dz = pov.position.z - pov.target.z
+  const length = Math.hypot(dx, dy, dz)
+
+  if (!length) return null
+
+  return {
+    position: {
+      x: pov.position.x + (dx / length) * distance,
+      y: pov.position.y + (dy / length) * distance,
+      z: pov.position.z + (dz / length) * distance,
+    },
+    target: pov.target,
+    fov: pov.fov,
+  }
+}
+
 export function useIntroFlow({ sceneReady }) {
   const [introActive, setIntroActive] = useState(false)
   const [introDoorOpen, setIntroDoorOpen] = useState(false)
@@ -48,6 +69,7 @@ export function useIntroFlow({ sceneReady }) {
   const [juiceMachinePhaseActive, setJuiceMachinePhaseActive] = useState(false)
   const [juicePipePlaying, setJuicePipePlaying] = useState(false)
   const [juicePhaseActive, setJuicePhaseActive] = useState(false)
+  const [juiceDrinking, setJuiceDrinking] = useState(false)
   const [exitSerrePhaseActive, setExitSerrePhaseActive] = useState(false)
   const [arbreLadderPending, setArbreLadderPending] = useState(false)
   const [zoeClip, setZoeClip] = useState(null)
@@ -60,7 +82,9 @@ export function useIntroFlow({ sceneReady }) {
   const treeClickPhaseRef = useRef(1)
   const isEtabliTransitionRef = useRef(false)
   const isThomasTransitionRef = useRef(false)
+  const isThomasPullbackTransitionRef = useRef(false)
   const isAtelierBetweenTransitionRef = useRef(false)
+  const isSerreMiddleTransitionRef = useRef(false)
   const isSerreZoeTransitionRef = useRef(false)
   const isSerreRaspberryTransitionRef = useRef(false)
   const isSerreJuiceTransitionRef = useRef(false)
@@ -130,6 +154,8 @@ export function useIntroFlow({ sceneReady }) {
     journalPlacedCountRef.current = 0
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
+    isThomasPullbackTransitionRef.current = false
+    isSerreMiddleTransitionRef.current = false
     isSerreZoeTransitionRef.current = false
     isSerreRaspberryTransitionRef.current = false
     isSerreJuiceTransitionRef.current = false
@@ -237,9 +263,30 @@ export function useIntroFlow({ sceneReady }) {
             fade('musicIndoor', 0.15, 1500)
             play('ambianceWorkbench')
           }, 2000)
+
+          const thomasPullbackPov = getPulledBackPov(STORY_CAMERA_POVS.talkThomas)
+
+          if (thomasPullbackPov) {
+            isThomasPullbackTransitionRef.current = true
+            setStoryCameraTransition({ ...thomasPullbackPov, duration: 1.9 })
+            return
+          }
+
           setGreenhousePhaseActive(true)
         },
       })
+      return
+    }
+
+    if (isThomasPullbackTransitionRef.current) {
+      isThomasPullbackTransitionRef.current = false
+      setGreenhousePhaseActive(true)
+      return
+    }
+
+    if (isSerreMiddleTransitionRef.current) {
+      isSerreMiddleTransitionRef.current = false
+      setZoePhaseActive(true)
       return
     }
 
@@ -305,6 +352,14 @@ export function useIntroFlow({ sceneReady }) {
     }
 
     if (greenhouseTransitionStageRef.current === 'arbreStairs2') {
+      greenhouseTransitionStageRef.current = 'arbreLadderIntro'
+      scheduleFlowTimeout(() => {
+        setStoryCameraTransition({ ...STORY_CAMERA_POVS.treeStory12, duration: 2.0 })
+      }, 300)
+      return
+    }
+
+    if (greenhouseTransitionStageRef.current === 'arbreLadderIntro') {
       greenhouseTransitionStageRef.current = null
       playDialogue('18-voice-tree', {
         onDone: () => playDialogue('19-voice-tree', { onDone: () => setArbreLadderPending(true) }),
@@ -314,18 +369,26 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'front') {
       greenhouseTransitionStageRef.current = 'corridor'
+      setAmbiance('ambianceGreenhouse')
       scheduleFlowTimeout(() => {
-        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseCorridor, duration: 2.5 })
+        setStoryCameraTransition({
+          ...STORY_CAMERA_POVS.greenhouseCorridor,
+          duration: 2.5,
+          easing: 'easeIn',
+        })
       }, 1000)
       return
     }
 
     if (greenhouseTransitionStageRef.current === 'corridor') {
       greenhouseTransitionStageRef.current = 'inside'
-      setAmbiance('ambianceGreenhouse')
-      scheduleFlowTimeout(() => {
-        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInside, duration: 2.5 })
-      }, 1000)
+      // No pause: chain straight to inside with matching velocity (easeIn → easeOut,
+      // equal durations) so the camera flows through the corridor without stopping.
+      setStoryCameraTransition({
+        ...STORY_CAMERA_POVS.greenhouseInside,
+        duration: 2.5,
+        easing: 'easeOut',
+      })
       return
     }
 
@@ -333,7 +396,10 @@ export function useIntroFlow({ sceneReady }) {
       greenhouseTransitionStageRef.current = null
       scheduleFlowTimeout(() => {
         playDialogue('serreNarration', {
-          onDone: () => setZoePhaseActive(true),
+          onDone: () => {
+            isSerreMiddleTransitionRef.current = true
+            setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreMiddle, duration: 1.5 })
+          },
         })
       }, 500)
       return
@@ -524,6 +590,11 @@ export function useIntroFlow({ sceneReady }) {
 
   const handleJuiceInteract = useCallback(() => {
     setJuicePhaseActive(false)
+    setJuiceDrinking(true)
+  }, [])
+
+  const handleJuiceDrinkComplete = useCallback(() => {
+    setJuiceDrinking(false)
     playDialogue('zoeFarewell', {
       onDone: () => setExitSerrePhaseActive(true),
     })
@@ -784,6 +855,7 @@ export function useIntroFlow({ sceneReady }) {
     juiceMachinePhaseActive,
     juicePipePlaying,
     juicePhaseActive,
+    juiceDrinking,
     exitSerrePhaseActive,
     arbreLadderPending,
     zoeClip,
@@ -819,6 +891,7 @@ export function useIntroFlow({ sceneReady }) {
     handleJuiceMachineInteract,
     handleJuicePipeComplete,
     handleJuiceInteract,
+    handleJuiceDrinkComplete,
     handleJournalEnd,
     handleTreeInteract,
     handleTimeatmInteract,

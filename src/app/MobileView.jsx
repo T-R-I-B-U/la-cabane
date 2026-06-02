@@ -381,7 +381,7 @@ export function MobileView() {
                 ))}
               </div>
             </div>
-            <p className="mv-s5-subtitle">Donne un aspect unique à ton savoir&nbsp;!</p>
+            <p className="mv-s5-subtitle">Coloris ton savoir&nbsp;!</p>
           </div>
           <button className="mv-s5-btn" onClick={submit}>
             <img className="mv-s5-btn-bg" src="/phone/btn-dark.webp" alt="" aria-hidden="true" />

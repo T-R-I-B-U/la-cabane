@@ -1,0 +1,20 @@
+1
+00:00:00,000 --> 00:00:03,680
+Hey salut je m'appelle Zoé, je suis une des apprentis du passeur Jack la main verte,
+
+2
+00:00:03,680 --> 00:00:07,400
+c'est le pro des plantes ici, ils connaît tellement de choses.
+
+3
+00:00:07,400 --> 00:00:10,320
+J'apprends à cultiver et récolter les framboises avec lui.
+
+4
+00:00:10,320 --> 00:00:13,920
+On en fait des jus mais aussi des purées, tu peux m'aider si tu veux.
+
+5
+00:00:13,920 --> 00:00:18,280
+Il faut ramasser celle du plan là bas, par contre ramassent juste les bien mûres.
+

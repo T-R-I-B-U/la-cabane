@@ -29,6 +29,15 @@
   flex-direction: column;
 }
 
+.pfp-left-card--paper {
+  background-image: url('/player-panel/profile-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
 .pfp-left-inner {
   display: flex;
   flex-direction: column;
@@ -135,6 +144,33 @@
   overflow: hidden;
 }
 
+.pfp-card--paper {
+  background-image: url('/player-panel/section-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.pfp-card--sent-wide-paper {
+  background-image: url('/player-panel/sent-wide-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.pfp-card--sent-square-paper {
+  background-image: url('/player-panel/sent-square-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
 .pfp-card-header {
   display: flex;
   gap: 20px;
@@ -175,6 +211,7 @@
 /* Passeur "add" button */
 .pfp-add-savoir {
   background: #b0cfd1;
+  border: none;
   border-radius: 18px;
   padding: 20px 40px;
   display: flex;
@@ -184,6 +221,16 @@
   gap: 12px;
   flex-shrink: 0;
   cursor: pointer;
+}
+
+.pfp-add-savoir--paper {
+  background-image: url('/player-panel/add-savoir-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+  min-height: 69px;
 }
 
 .pfp-add-icon {
@@ -240,7 +287,13 @@
 
 .pfp-leaf-slot:has(.pfp-fav-title) {
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  justify-content: flex-start;
+  padding-top: 8px;
+}
+
+.pfp-leaf-slot:has(.pfp-fav-title) .pfp-leaf-img {
+  width: 52%;
 }
 
 .pfp-fav-title {
@@ -252,6 +305,7 @@
   text-align: center;
   margin: 0;
   word-break: break-word;
+  max-width: 100%;
 }
 
 .pfp-leaf-img {
@@ -373,15 +427,19 @@
 .pfp-sent-leaf-slot {
   background: #e3e7b3;
   border-radius: 6px;
-  padding: 10px;
+  padding: 8px 10px 10px;
   width: 102px;
   height: 102px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  justify-content: flex-start;
+  gap: 4px;
   flex-shrink: 0;
+}
+
+.pfp-sent-leaf-slot .pfp-leaf-img {
+  width: 52%;
 }
 
 .pfp-sent-leaf-title {
@@ -393,6 +451,7 @@
   text-align: center;
   margin: 0;
   word-break: break-word;
+  max-width: 100%;
 }
 
 @media (max-width: 900px) {
