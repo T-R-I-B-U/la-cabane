@@ -40,7 +40,7 @@ function getReverseTarget(position, target) {
   }
 }
 
-function getCloserPov(basePov, distance = 2.4) {
+function getAdjustedPov(basePov, { forward = 0, right = 0 } = {}) {
   if (!basePov?.position || !basePov?.target) return basePov
 
   const dx = basePov.target.x - basePov.position.x
@@ -50,12 +50,28 @@ function getCloserPov(basePov, distance = 2.4) {
 
   if (!length) return basePov
 
+  const forwardDir = {
+    x: dx / length,
+    y: dy / length,
+    z: dz / length,
+  }
+
+  const rightLength = Math.hypot(forwardDir.z, forwardDir.x)
+  const rightDir =
+    rightLength > 0
+      ? {
+          x: -forwardDir.z / rightLength,
+          y: 0,
+          z: forwardDir.x / rightLength,
+        }
+      : { x: 0, y: 0, z: 0 }
+
   return {
     ...basePov,
     position: {
-      x: basePov.position.x + (dx / length) * distance,
-      y: basePov.position.y + (dy / length) * distance,
-      z: basePov.position.z + (dz / length) * distance,
+      x: basePov.position.x + forwardDir.x * forward + rightDir.x * right,
+      y: basePov.position.y + forwardDir.y * forward,
+      z: basePov.position.z + forwardDir.z * forward + rightDir.z * right,
     },
   }
 }
@@ -215,9 +231,9 @@ function resolveArbrePovs(platformPosition) {
   )
 
   resolvedPovs.nestMarie = {
-    ...getCloserPov(resolvedPovs.nest, 2.4),
-    fov: 52,
-    duration: 1.35,
+    ...getAdjustedPov(resolvedPovs.nest, { forward: 2.2, right: 0.65 }),
+    fov: 50,
+    duration: 1.8,
   }
 
   return resolvedPovs
