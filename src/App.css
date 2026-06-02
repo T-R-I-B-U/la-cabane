@@ -75,43 +75,48 @@
 }
 
 .custom-cursor::before {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: transparent;
-  box-shadow:
-    0 0 0 2px #476576,
-    0 1px 3px rgba(24, 39, 48, 0.14);
+  background: radial-gradient(
+    circle,
+    transparent 0 26%,
+    #476576 26% 37%,
+    rgba(255, 255, 255, 0.96) 37% 72%,
+    #476576 72% 84%,
+    transparent 84%
+  );
+  filter: drop-shadow(0 1px 3px rgba(24, 39, 48, 0.14));
 }
 
 .custom-cursor::after {
-  width: 5px;
-  height: 5px;
+  width: 0;
+  height: 0;
   background: transparent;
-  box-shadow: 0 0 0 1.5px #476576;
-}
-
-.custom-cursor--pointer::after {
-  width: 6px;
-  height: 6px;
+  box-shadow: none;
 }
 
 .custom-cursor--pointer::before {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   opacity: 0.96;
 }
 
-.custom-cursor--grabbing::after {
-  width: 4px;
-  height: 4px;
-  opacity: 0.9;
+.custom-cursor--pointer::after {
+  width: 0;
+  height: 0;
 }
 
 .custom-cursor--grabbing::before {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   opacity: 0.92;
+}
+
+.custom-cursor--grabbing::after {
+  width: 0;
+  height: 0;
+  opacity: 0.9;
 }
 
 /* ── App loader ──────────────────────────────────────────────────── */
