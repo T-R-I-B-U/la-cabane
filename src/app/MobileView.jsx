@@ -23,6 +23,10 @@ const DRAW_COLORS = [
 const CW = 338
 const CH = 629
 
+function formatAvailability(slotKey) {
+  return slotKey.replace('-', ' ')
+}
+
 function drawLeafImg(ctx, img) {
   ctx.clearRect(0, 0, CW, CH)
   ctx.save()
@@ -381,7 +385,7 @@ export function MobileView() {
                 ))}
               </div>
             </div>
-            <p className="mv-s5-subtitle">Donne un aspect unique à ton savoir&nbsp;!</p>
+            <p className="mv-s5-subtitle">Coloris ton savoir&nbsp;!</p>
           </div>
           <button className="mv-s5-btn" onClick={submit}>
             <img className="mv-s5-btn-bg" src="/phone/btn-dark.webp" alt="" aria-hidden="true" />
@@ -393,6 +397,8 @@ export function MobileView() {
   }
 
   if (step === 7) {
+    const selectedAvailability = [...availability]
+
     return (
       <div
         className="mv-s6-root"
@@ -409,12 +415,26 @@ export function MobileView() {
         <img className="mv-s6-bg" src="/phone/bg-light.webp" alt="" aria-hidden="true" />
         <div className="mv-s6-content">
           <div className={`mv-s6-leaf-outer ${flying ? 'mv-s6-leaf--flying' : ''}`}>
-            <img
-              className="mv-s6-leaf-img"
-              src={drawingData ?? '/savoir-leaf.webp'}
-              alt=""
-              aria-hidden="true"
-            />
+            <div className="mv-s6-leaf-stack">
+              <img
+                className="mv-s6-leaf-img"
+                src={drawingData ?? '/savoir-leaf.webp'}
+                alt=""
+                aria-hidden="true"
+              />
+              {selectedAvailability.length > 0 && (
+                <div className="mv-s6-availability" aria-label="Disponibilités sélectionnées">
+                  <p className="mv-s6-availability-label">Disponibilités</p>
+                  <div className="mv-s6-availability-list">
+                    {selectedAvailability.map((slotKey) => (
+                      <span key={slotKey} className="mv-s6-availability-chip">
+                        {formatAvailability(slotKey)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           <div className="mv-s6-bottom">
             <p className="mv-s6-title">J&apos;envoi mon savoir</p>
