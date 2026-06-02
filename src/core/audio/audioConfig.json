@@ -428,6 +428,16 @@
       "subtitles": "zoe/zoe-unripe.srt"
     },
     {
+      "id": "zoeRoast",
+      "type": "dialogue",
+      "speaker": "zoe",
+      "src": "zoe/zoe-roast.mp3",
+      "loop": false,
+      "volume": 0.7,
+      "autoplay": false,
+      "subtitles": "zoe/zoe-roast.srt"
+    },
+    {
       "id": "juiceMachine",
       "type": "sfx",
       "src": "Juice-Machine.mp3",
