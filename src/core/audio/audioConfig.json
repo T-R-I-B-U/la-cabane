@@ -411,6 +411,7 @@
       "id": "zoeFarewell",
       "type": "dialogue",
       "speaker": "zoe",
+      "src": "zoe/zoe-farewell.mp3",
       "loop": false,
       "volume": 1,
       "autoplay": false,
