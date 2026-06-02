@@ -231,6 +231,7 @@ export function useArbreFlow({
   const scheduledTimeoutsRef = useRef(new Set())
   const pendingPlatformReturnAfterIncomingSavoirRef = useRef(false)
   const pendingPlatformReturnOutroRef = useRef(false)
+  const pendingNestOutroAfterMarieRef = useRef(false)
   const zone = useActiveZone()
   const { playDialogue, stopDialogue, skipDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory } = useStoryFlow()
@@ -268,6 +269,7 @@ export function useArbreFlow({
     clearScheduledTimeouts()
     pendingPlatformReturnAfterIncomingSavoirRef.current = false
     pendingPlatformReturnOutroRef.current = false
+    pendingNestOutroAfterMarieRef.current = false
     setArbreActive(false)
     setArbreMovementLocked(false)
     setArbreDialogueActive(false)
@@ -327,6 +329,21 @@ export function useArbreFlow({
   }, [ladderOutroMode, completeStep, playDialogue, goToStep, povs])
 
   const handleArbreTransitionComplete = useCallback(() => {
+    if (pendingNestOutroAfterMarieRef.current) {
+      pendingNestOutroAfterMarieRef.current = false
+      completeStep('arbre.nestInteraction')
+      setArbreDialogueActive(true)
+      playDialogue('treeDialogue25', {
+        onDone: () => {
+          setArbreDialogueActive(false)
+          completeStep('arbre.treeDialogue25')
+          setAmbiance('musicEnd')
+          setArbreStoryCameraTransition({ ...povs.outroNest1 })
+        },
+      })
+      return
+    }
+
     if (pendingPlatformReturnOutroRef.current) {
       pendingPlatformReturnOutroRef.current = false
       setArbreDialogueActive(true)
@@ -376,27 +393,19 @@ export function useArbreFlow({
         onDone: () => {
           setArbreDialogueActive(false)
           completeStep('arbre.nidDialogue')
-          setArbreStoryCameraTransition({ ...povs.nestMarie })
+          setArbreStoryCameraTransition({ ...povs.nest })
         },
       })
     } else if (currentStepId === 'arbre.toNest') {
-      // Keep cam on nest throughout all dialogues — don't clear transition
       completeStep('arbre.toNest')
       setArbreDialogueActive(true)
+      setArbreStoryCameraTransition({ ...povs.nestMarie })
       playDialogue('marieNid1', {
         onDone: () => {
           setArbreDialogueActive(false)
           completeStep('arbre.nestDialogue1')
-          completeStep('arbre.nestInteraction')
-          setArbreDialogueActive(true)
-          playDialogue('treeDialogue25', {
-            onDone: () => {
-              setArbreDialogueActive(false)
-              completeStep('arbre.treeDialogue25')
-              setAmbiance('musicEnd')
-              setArbreStoryCameraTransition({ ...povs.outroNest1 })
-            },
-          })
+          pendingNestOutroAfterMarieRef.current = true
+          setArbreStoryCameraTransition({ ...povs.nest, duration: 1.4 })
         },
       })
     } else if (currentStepId === 'arbre.treeDialogue25') {
