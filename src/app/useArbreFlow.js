@@ -561,14 +561,18 @@ export function useArbreFlow({
   const activateLadderFromStory = useCallback(() => {
     // Mark as played so the zone effect doesn't re-run the init sequence when zone → 'arbre'
     playedRef.current = true
+    autoNestPathRef.current = true
     // Switch zone now so the ladder mesh becomes visible and ArbreScene mounts
     setZone('arbre')
     setArbreActive(true)
-    setArbreMovementLocked(false)
+    setArbreMovementLocked(true)
+    setArbreDialogueActive(false)
     setLadderIsStoryMode(true)
-    goToStep('arbre.atLadder')
-    setLadderClickActive(true)
-  }, [goToStep])
+    setLadderClickActive(false)
+    setStairsClickActive(false)
+    goToStep('arbre.ladderDown')
+    setArbreStoryCameraTransition({ ...povs.ladderDown })
+  }, [goToStep, povs])
 
   const triggerArbre = useCallback(() => {
     playedRef.current = false
