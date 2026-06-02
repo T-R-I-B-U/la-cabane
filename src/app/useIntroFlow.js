@@ -266,7 +266,7 @@ export function useIntroFlow({ sceneReady }) {
 
           if (thomasPullbackPov) {
             isThomasPullbackTransitionRef.current = true
-            setStoryCameraTransition({ ...thomasPullbackPov, duration: 1.1 })
+            setStoryCameraTransition({ ...thomasPullbackPov, duration: 1.9 })
             return
           }
 

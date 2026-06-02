@@ -222,6 +222,8 @@ export function useArbreFlow({
 
   const playedRef = useRef(false)
   const scheduledTimeoutsRef = useRef(new Set())
+  const pendingPlatformReturnAfterIncomingSavoirRef = useRef(false)
+  const pendingPlatformReturnOutroRef = useRef(false)
   const zone = useActiveZone()
   const { playDialogue, stopDialogue, skipDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory } = useStoryFlow()
@@ -257,6 +259,8 @@ export function useArbreFlow({
 
   const exitArbre = useCallback(() => {
     clearScheduledTimeouts()
+    pendingPlatformReturnAfterIncomingSavoirRef.current = false
+    pendingPlatformReturnOutroRef.current = false
     setArbreActive(false)
     setArbreMovementLocked(false)
     setArbreDialogueActive(false)
@@ -316,6 +320,19 @@ export function useArbreFlow({
   }, [ladderOutroMode, completeStep, playDialogue, goToStep, povs])
 
   const handleArbreTransitionComplete = useCallback(() => {
+    if (pendingPlatformReturnOutroRef.current) {
+      pendingPlatformReturnOutroRef.current = false
+      setArbreDialogueActive(true)
+      playDialogue('arbreFinal', {
+        onDone: () => {
+          setArbreDialogueActive(false)
+          setLadderClickActive(true)
+          setLadderOutroMode(true)
+        },
+      })
+      return
+    }
+
     if (currentStepId === 'arbre.leavesDialogue') {
       setGrowingFruitPlaying(true)
       setArbreDialogueActive(true)
@@ -324,7 +341,7 @@ export function useArbreFlow({
           setArbreDialogueActive(false)
           setGrowingFruitClickable(true)
           completeStep('arbre.leavesDialogue')
-          setArbreStoryCameraTransition({ ...povs.atPlatform })
+          pendingPlatformReturnAfterIncomingSavoirRef.current = true
         },
       })
     } else if (currentStepId === 'arbre.backAtBase') {
@@ -485,6 +502,13 @@ export function useArbreFlow({
 
   const handleIncomingSavoirClosed = useCallback(() => {
     if (!arbreActive) return
+    if (pendingPlatformReturnAfterIncomingSavoirRef.current) {
+      pendingPlatformReturnAfterIncomingSavoirRef.current = false
+      pendingPlatformReturnOutroRef.current = true
+      setArbreStoryCameraTransition({ ...povs.atPlatform })
+      return
+    }
+
     setArbreDialogueActive(true)
     playDialogue('arbreFinal', {
       onDone: () => {
@@ -493,7 +517,7 @@ export function useArbreFlow({
         setLadderOutroMode(true)
       },
     })
-  }, [arbreActive, playDialogue])
+  }, [arbreActive, playDialogue, povs])
 
   const arbreLeafInteractionsEnabled =
     (currentStepId === 'arbre.exploreLeaves' || arbreExploreSecondPhase) && !fruitsClickActive
