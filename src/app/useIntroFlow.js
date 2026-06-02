@@ -84,6 +84,7 @@ export function useIntroFlow({ sceneReady }) {
   const isThomasTransitionRef = useRef(false)
   const isThomasPullbackTransitionRef = useRef(false)
   const isAtelierBetweenTransitionRef = useRef(false)
+  const isSerreMiddleTransitionRef = useRef(false)
   const isSerreZoeTransitionRef = useRef(false)
   const isSerreRaspberryTransitionRef = useRef(false)
   const isSerreJuiceTransitionRef = useRef(false)
@@ -154,6 +155,7 @@ export function useIntroFlow({ sceneReady }) {
     journalCompletedRef.current = false
     isPostBookTransitionRef.current = false
     isThomasPullbackTransitionRef.current = false
+    isSerreMiddleTransitionRef.current = false
     isSerreZoeTransitionRef.current = false
     isSerreRaspberryTransitionRef.current = false
     isSerreJuiceTransitionRef.current = false
@@ -282,6 +284,12 @@ export function useIntroFlow({ sceneReady }) {
       return
     }
 
+    if (isSerreMiddleTransitionRef.current) {
+      isSerreMiddleTransitionRef.current = false
+      setZoePhaseActive(true)
+      return
+    }
+
     if (isSerreZoeTransitionRef.current) {
       isSerreZoeTransitionRef.current = false
       playDialogue('zoeIntro', {
@@ -361,18 +369,26 @@ export function useIntroFlow({ sceneReady }) {
 
     if (greenhouseTransitionStageRef.current === 'front') {
       greenhouseTransitionStageRef.current = 'corridor'
+      setAmbiance('ambianceGreenhouse')
       scheduleFlowTimeout(() => {
-        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseCorridor, duration: 2.5 })
+        setStoryCameraTransition({
+          ...STORY_CAMERA_POVS.greenhouseCorridor,
+          duration: 2.5,
+          easing: 'easeIn',
+        })
       }, 1000)
       return
     }
 
     if (greenhouseTransitionStageRef.current === 'corridor') {
       greenhouseTransitionStageRef.current = 'inside'
-      setAmbiance('ambianceGreenhouse')
-      scheduleFlowTimeout(() => {
-        setStoryCameraTransition({ ...STORY_CAMERA_POVS.greenhouseInside, duration: 2.5 })
-      }, 1000)
+      // No pause: chain straight to inside with matching velocity (easeIn → easeOut,
+      // equal durations) so the camera flows through the corridor without stopping.
+      setStoryCameraTransition({
+        ...STORY_CAMERA_POVS.greenhouseInside,
+        duration: 2.5,
+        easing: 'easeOut',
+      })
       return
     }
 
@@ -380,7 +396,10 @@ export function useIntroFlow({ sceneReady }) {
       greenhouseTransitionStageRef.current = null
       scheduleFlowTimeout(() => {
         playDialogue('serreNarration', {
-          onDone: () => setZoePhaseActive(true),
+          onDone: () => {
+            isSerreMiddleTransitionRef.current = true
+            setStoryCameraTransition({ ...STORY_CAMERA_POVS.serreMiddle, duration: 1.5 })
+          },
         })
       }, 500)
       return

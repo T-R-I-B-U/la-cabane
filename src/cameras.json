@@ -284,6 +284,22 @@
       "fov": 60
     },
     {
+      "id": "story.serreMiddle",
+      "label": "Serre milieu",
+      "group": "greenhouse",
+      "position": {
+        "x": -37.1884,
+        "y": 1.4846,
+        "z": -45.2436
+      },
+      "target": {
+        "x": -32.1934,
+        "y": 1.3374,
+        "z": -45.0757
+      },
+      "fov": 60
+    },
+    {
       "id": "story.serreZoe",
       "label": "Serre Zoe",
       "group": "greenhouse",
