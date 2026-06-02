@@ -60,32 +60,6 @@ export function TreeLeaves({
   const inArbreZone = useActiveZone() === 'arbre'
   const wasAnimatingRef = useRef(false)
 
-  const alphaMap = use(
-    loadStandaloneTexture(preferKtx2('/textures/detailedleaf-alphamap.png'), { flipY: false })
-  )
-
-  // Template glb ships geometry only (no material) — supply the leaf color map here.
-  const colorMap = use(
-    loadStandaloneTexture(preferKtx2('/textures/detailedleaf-color.png'), {
-      flipY: false,
-      colorSpace: THREE.SRGBColorSpace,
-    })
-  )
-
-  // Cache original material values to restore them on unmount or mode change
-  const originalProps = useMemo(() => {
-    if (!leafMesh) return null
-    return {
-      material: leafMesh.material,
-      alphaMap: leafMesh.material.alphaMap,
-      transparent: leafMesh.material.transparent,
-      alphaTest: leafMesh.material.alphaTest,
-      side: leafMesh.material.side,
-      emissive: leafMesh.material.emissive?.clone() || new THREE.Color(0, 0, 0),
-      emissiveIntensity: leafMesh.material.emissiveIntensity || 0,
-    }
-  }, [leafMesh])
-
   // Cache des matrices de base — source de vérité immuable
   const baseMatrices = useMemo(() => {
     if (!leafMesh) return null
@@ -194,12 +168,10 @@ export function TreeLeaves({
       leafMesh.setColorAt(i, _color.setRGB(g, g, g))
     }
     if (leafMesh.instanceColor) {
-      // eslint-disable-next-line react-hooks/immutability
       leafMesh.instanceColor.needsUpdate = true
     }
   }, [leafMesh])
 
-  /* eslint-disable react-hooks/immutability */
   useFrame((state) => {
     if (!leafMesh || !baseMatrices || !profileIndex || !basePositions) return
 
@@ -252,22 +224,123 @@ export function TreeLeaves({
     }
     if (hasAnimated) leafMesh.instanceMatrix.needsUpdate = true
   })
-  /* eslint-enable react-hooks/immutability */
+
+  // Géométrie low-poly détenue par le parent : sert à la fois au swap (enfant
+  // performance) et à l'outline de hover, pour qu'ils utilisent la même forme.
+  const lowPolyGeometry = useMemo(
+    () => (leafMesh ? makeLowPolyLeafGeometry(leafMesh.geometry) : null),
+    [leafMesh]
+  )
+  useEffect(() => () => lowPolyGeometry?.dispose(), [lowPolyGeometry])
 
   const edgesGeometry = useMemo(() => {
     if (!leafMesh) return null
-    return createOutlineGeometry(leafMesh.geometry, 40, 3)
-  }, [leafMesh])
+    const src =
+      leafMaterialMode === 'performance' && lowPolyGeometry ? lowPolyGeometry : leafMesh.geometry
+    return createOutlineGeometry(src, 40, 3)
+  }, [leafMesh, leafMaterialMode, lowPolyGeometry])
 
   const _outlineMaterial = useMemo(() => createOutlineMaterial(), [])
 
   useOutlineResolution(gl, _outlineMaterial)
 
+  if (!leafMesh || !edgesGeometry) return null
+
+  function syncProxy(id) {
+    if (!proxyRef.current) return
+    leafMesh.getMatrixAt(id, _instanceMatrix)
+    // Instance world matrix = InstancedMesh.matrixWorld × instance local matrix
+    _worldMatrix.multiplyMatrices(leafMesh.matrixWorld, _instanceMatrix)
+    // Decompose and recompose (no 1.1 scale anymore, exact 1:1 match)
+    _worldMatrix.decompose(_pos, _quat, _scl)
+    proxyRef.current.matrix.compose(_pos, _quat, _scl)
+    proxyRef.current.matrixAutoUpdate = false
+    proxyRef.current.matrixWorldNeedsUpdate = true
+  }
+
+  return (
+    <>
+      {leafMaterialMode === 'performance' ? (
+        <PerformanceLeafMaterial leafMesh={leafMesh} geometry={lowPolyGeometry} />
+      ) : (
+        <StandardLeafMaterial
+          leafMesh={leafMesh}
+          inArbreZone={inArbreZone}
+          leafMaterialMode={leafMaterialMode}
+        />
+      )}
+
+      <primitive
+        object={leafMesh}
+        onPointerMove={(e) => {
+          if (!active) return
+          const id = e.instanceId
+          if (id === undefined || !inRangeRef.current?.[id]) return
+          syncProxy(id)
+          if (proxyRef.current) proxyRef.current.visible = true
+          hoverOver(e)
+        }}
+        onPointerOut={(e) => {
+          if (proxyRef.current) proxyRef.current.visible = false
+          hoverOut(e)
+        }}
+        onPointerDown={(e) => {
+          e.stopPropagation()
+          if (!active || !onLeafClick || fruitHoverStore.anyHovered || fruitHoverStore.onCooldown)
+            return
+          // Under pointer lock R3F events cast from clientX/Y=0 (top-left, not center).
+          // Use the id tracked by the manual center raycaster instead.
+          const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId
+          if (id === undefined || id < 0 || !inRangeRef.current?.[id]) return
+          playOnce('clickMagic')
+          onLeafClick(id)
+        }}
+      />
+
+      <lineSegments
+        ref={proxyRef}
+        geometry={edgesGeometry}
+        material={_outlineMaterial}
+        visible={false}
+        matrixAutoUpdate={false}
+      />
+    </>
+  )
+}
+
+// Matériau "production" : textures color + alpha, PBR / translucidité / émissif.
+// Monté seulement hors mode performance — c'est lui qui déclenche le chargement
+// des textures feuille (~450K en ktx2), donc le mode performance ne le monte jamais.
+function StandardLeafMaterial({ leafMesh, inArbreZone, leafMaterialMode }) {
+  const alphaMap = use(
+    loadStandaloneTexture(preferKtx2('/textures/detailedleaf-alphamap.png'), { flipY: false })
+  )
+
+  // Template glb ships geometry only (no material) — supply the leaf color map here.
+  const colorMap = use(
+    loadStandaloneTexture(preferKtx2('/textures/detailedleaf-color.png'), {
+      flipY: false,
+      colorSpace: THREE.SRGBColorSpace,
+    })
+  )
+
+  // Cache original material values to restore them on unmount or mode change
+  const originalProps = useMemo(() => {
+    return {
+      material: leafMesh.material,
+      alphaMap: leafMesh.material.alphaMap,
+      transparent: leafMesh.material.transparent,
+      alphaTest: leafMesh.material.alphaTest,
+      side: leafMesh.material.side,
+      emissive: leafMesh.material.emissive?.clone() || new THREE.Color(0, 0, 0),
+      emissiveIntensity: leafMesh.material.emissiveIntensity || 0,
+    }
+  }, [leafMesh])
+
   // Cheap material for the distant canopy (cabane zone): plain diffuse + color
   // texture, no env-map / PBR per fragment. Full-screen PBR foliage is what
   // saturates fill-rate, so swap it out when the player isn't up in the tree.
   const lambertMaterial = useMemo(() => {
-    if (!leafMesh) return null
     return new THREE.MeshLambertMaterial({
       color: leafMesh.material.color?.clone() ?? new THREE.Color(0xffffff),
       side: THREE.DoubleSide,
@@ -277,7 +350,7 @@ export function TreeLeaves({
   useEffect(() => () => lambertMaterial?.dispose(), [lambertMaterial])
 
   useEffect(() => {
-    if (!leafMesh || !alphaMap || !originalProps) return
+    if (!alphaMap || !originalProps) return
     const originalRaycast = leafMesh.raycast
     const originalCastShadow = leafMesh.castShadow
     const originalReceiveShadow = leafMesh.receiveShadow
@@ -385,56 +458,101 @@ export function TreeLeaves({
     }
   }, [leafMesh, alphaMap, colorMap, lambertMaterial, inArbreZone, leafMaterialMode, originalProps])
 
-  if (!leafMesh || !edgesGeometry) return null
+  return null
+}
 
-  function syncProxy(id) {
-    if (!proxyRef.current) return
-    leafMesh.getMatrixAt(id, _instanceMatrix)
-    // Instance world matrix = InstancedMesh.matrixWorld × instance local matrix
-    _worldMatrix.multiplyMatrices(leafMesh.matrixWorld, _instanceMatrix)
-    // Decompose and recompose (no 1.1 scale anymore, exact 1:1 match)
-    _worldMatrix.decompose(_pos, _quat, _scl)
-    proxyRef.current.matrix.compose(_pos, _quat, _scl)
-    proxyRef.current.matrixAutoUpdate = false
-    proxyRef.current.matrixWorldNeedsUpdate = true
+// Silhouette de feuille ovale (14 triangles en éventail), dimensionnée sur la bounding
+// box de la carte d'origine pour garder échelle et orientation (l'axe le plus fin = la
+// normale de la carte). Large (largeur ≈ 0.66× longueur), plus large juste sous le
+// centre, pointe en haut, base resserrée — comme la texture détaillée.
+const LEAF_RIM = [
+  [0.5, 0.0],
+  [0.42, 0.12],
+  [0.28, 0.26],
+  [0.1, 0.33],
+  [-0.1, 0.34],
+  [-0.3, 0.28],
+  [-0.45, 0.12],
+  [-0.5, 0.0],
+  [-0.45, -0.12],
+  [-0.3, -0.28],
+  [-0.1, -0.34],
+  [0.1, -0.33],
+  [0.28, -0.26],
+  [0.42, -0.12],
+]
+
+function makeLowPolyLeafGeometry(srcGeometry) {
+  if (!srcGeometry.boundingBox) srcGeometry.computeBoundingBox()
+  const bb = srcGeometry.boundingBox
+  const size = new THREE.Vector3()
+  bb.getSize(size)
+  const center = new THREE.Vector3()
+  bb.getCenter(center)
+
+  const ext = [size.x, size.y, size.z]
+  const thin = ext.indexOf(Math.min(...ext))
+  const planar = [0, 1, 2].filter((a) => a !== thin)
+  const lengthAxis = ext[planar[0]] >= ext[planar[1]] ? planar[0] : planar[1]
+  const widthAxis = lengthAxis === planar[0] ? planar[1] : planar[0]
+
+  const dirL = new THREE.Vector3().setComponent(lengthAxis, 1)
+  const dirW = new THREE.Vector3().setComponent(widthAxis, 1)
+  const normal = new THREE.Vector3().setComponent(thin, 1)
+
+  const positions = [center.x, center.y, center.z]
+  const v = new THREE.Vector3()
+  for (const [a, b] of LEAF_RIM) {
+    v.copy(center)
+      .addScaledVector(dirL, a * ext[lengthAxis])
+      .addScaledVector(dirW, b * ext[widthAxis])
+    positions.push(v.x, v.y, v.z)
   }
 
-  return (
-    <>
-      <primitive
-        object={leafMesh}
-        onPointerMove={(e) => {
-          if (!active) return
-          const id = e.instanceId
-          if (id === undefined || !inRangeRef.current?.[id]) return
-          syncProxy(id)
-          if (proxyRef.current) proxyRef.current.visible = true
-          hoverOver(e)
-        }}
-        onPointerOut={(e) => {
-          if (proxyRef.current) proxyRef.current.visible = false
-          hoverOut(e)
-        }}
-        onPointerDown={(e) => {
-          e.stopPropagation()
-          if (!active || !onLeafClick || fruitHoverStore.anyHovered || fruitHoverStore.onCooldown)
-            return
-          // Under pointer lock R3F events cast from clientX/Y=0 (top-left, not center).
-          // Use the id tracked by the manual center raycaster instead.
-          const id = document.pointerLockElement ? _lastHoveredIdRef.current : e.instanceId
-          if (id === undefined || id < 0 || !inRangeRef.current?.[id]) return
-          playOnce('clickMagic')
-          onLeafClick(id)
-        }}
-      />
+  const indices = []
+  const n = LEAF_RIM.length
+  for (let i = 0; i < n; i++) indices.push(0, 1 + i, 1 + ((i + 1) % n))
 
-      <lineSegments
-        ref={proxyRef}
-        geometry={edgesGeometry}
-        material={_outlineMaterial}
-        visible={false}
-        matrixAutoUpdate={false}
-      />
-    </>
+  const normals = []
+  for (let i = 0; i <= n; i++) normals.push(normal.x, normal.y, normal.z)
+
+  const geo = new THREE.BufferGeometry()
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
+  geo.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3))
+  geo.setIndex(indices)
+  return geo
+}
+
+// Mode performance : aucune texture. Géométrie low-poly + Lambert vert plat. Le tint
+// par instance (gris 0.45-1.0 posé par le parent) multiplie la couleur → dégradé de
+// verts gratuit. Swap géométrie + matériau sur le mesh partagé, restauré au démontage.
+function PerformanceLeafMaterial({ leafMesh, geometry }) {
+  const material = useMemo(
+    // Base remontée pour que le tint moyen (gris 0.725) retombe sur le vert cible #9A9A43.
+    () => new THREE.MeshLambertMaterial({ color: 0xd4d45c, side: THREE.DoubleSide }),
+    []
   )
+
+  useEffect(() => {
+    const origGeometry = leafMesh.geometry
+    const origMaterial = leafMesh.material
+    const origCastShadow = leafMesh.castShadow
+    const origReceiveShadow = leafMesh.receiveShadow
+    /* eslint-disable react-hooks/immutability */
+    leafMesh.geometry = geometry
+    leafMesh.material = material
+    leafMesh.castShadow = true
+    leafMesh.receiveShadow = false
+    /* eslint-enable react-hooks/immutability */
+    return () => {
+      leafMesh.geometry = origGeometry
+      leafMesh.material = origMaterial
+      leafMesh.castShadow = origCastShadow
+      leafMesh.receiveShadow = origReceiveShadow
+    }
+  }, [leafMesh, geometry, material])
+
+  useEffect(() => () => material.dispose(), [material])
+
+  return null
 }

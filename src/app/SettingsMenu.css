@@ -43,6 +43,13 @@
   width: 100%;
 }
 
+/* Toggles booléens (2 pills) : label et pills sur une seule ligne pour gagner en hauteur. */
+.settings-card__section--inline {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .settings-card__label {
   font-family: 'Albert Sans', sans-serif;
   font-size: 20px;
