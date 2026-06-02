@@ -40,42 +40,6 @@ function getReverseTarget(position, target) {
   }
 }
 
-function getAdjustedPov(basePov, { forward = 0, right = 0 } = {}) {
-  if (!basePov?.position || !basePov?.target) return basePov
-
-  const dx = basePov.target.x - basePov.position.x
-  const dy = basePov.target.y - basePov.position.y
-  const dz = basePov.target.z - basePov.position.z
-  const length = Math.hypot(dx, dy, dz)
-
-  if (!length) return basePov
-
-  const forwardDir = {
-    x: dx / length,
-    y: dy / length,
-    z: dz / length,
-  }
-
-  const rightLength = Math.hypot(forwardDir.z, forwardDir.x)
-  const rightDir =
-    rightLength > 0
-      ? {
-          x: -forwardDir.z / rightLength,
-          y: 0,
-          z: forwardDir.x / rightLength,
-        }
-      : { x: 0, y: 0, z: 0 }
-
-  return {
-    ...basePov,
-    position: {
-      x: basePov.position.x + forwardDir.x * forward + rightDir.x * right,
-      y: basePov.position.y + forwardDir.y * forward,
-      z: basePov.position.z + forwardDir.z * forward + rightDir.z * right,
-    },
-  }
-}
-
 function resolveArbrePovs(platformPosition) {
   const pos = platformPosition ?? PLATFORM_POS
   const [px, py, pz] = pos
@@ -118,6 +82,13 @@ function resolveArbrePovs(platformPosition) {
       position: { x: -86.2501, y: 11.5867, z: -25.4644 },
       target: { x: -86.4017, y: 10.5867, z: -20.5678 },
       duration: 2.0,
+    },
+    nestMarie: {
+      cameraId: 'arbre.nestMarie',
+      position: { x: -87.456, y: 10.708, z: -22.237 },
+      target: { x: -89.268, y: 10.691, z: -17.578 },
+      fov: 50,
+      duration: 1.8,
     },
     // Outro cameras
     outroNest1: {
@@ -219,7 +190,7 @@ function resolveArbrePovs(platformPosition) {
     },
   }
 
-  const resolvedPovs = Object.fromEntries(
+  return Object.fromEntries(
     Object.entries(povs).map(([key, pov]) => [
       key,
       pov.reverseCamera
@@ -229,14 +200,6 @@ function resolveArbrePovs(platformPosition) {
           : pov,
     ])
   )
-
-  resolvedPovs.nestMarie = {
-    ...getAdjustedPov(resolvedPovs.nest, { forward: 2.2, right: 0.65 }),
-    fov: 50,
-    duration: 1.8,
-  }
-
-  return resolvedPovs
 }
 
 export function useArbreFlow({
