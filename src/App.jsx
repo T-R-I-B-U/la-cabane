@@ -89,7 +89,7 @@ export default function App() {
   const [isFlyModeActive, setIsFlyModeActive] = useState(false)
   const [debugDoors, setDebugDoors] = useState(false)
   const [debugCollisions, setDebugCollisions] = useState(false)
-  const [shaderEnabled, setShaderEnabled] = useState(false)
+  const [shaderEnabled, setShaderEnabled] = useState(true)
   const [shaderRadius, setShaderRadius] = useState(2)
   const [masterVolume, setMasterVolume] = useState(() => Math.round(getGlobalVolume() * 100))
   const [shadowsEnabled, setShadowsEnabled] = useState(true)
@@ -344,6 +344,7 @@ export default function App() {
     handlePlayerFruitPanelClose,
     triggerArbreBase,
     triggerArbreTop,
+    triggerNestStairs,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
@@ -560,6 +561,46 @@ export default function App() {
     }
     triggerArbreTop()
   }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
+  const handleGoToSentSavoirDebug = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(true)
+    setPostIntro(true)
+    setIncomingSavoir(null)
+    setLeafArriving(false)
+    setIsSavoirInteractionActive(false)
+    setIsSavoirPanelOpen(false)
+    setIsContactInteractionActive(false)
+    setIsContactPanelOpen(false)
+    setHasSentSavoir(true)
+    setSentSavoirDrawing('/savoir-leaf.webp')
+    setSentSavoirTitle('Feuille debug envoyee')
+    setIsPlayerFruitPanelOpen(true)
+
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+
+    triggerArbreTop()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
+  const handleGoToNestStairs = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerNestStairs()
+  }, [setPostIntro, triggerNestStairs])
 
   const handleGoToNestDialogue25 = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -1117,7 +1158,7 @@ export default function App() {
         explorationReady={explorationReady}
         onStepChange={handleGameStepChange}
       />
-      {!cinematicActive && <Subtitles />}
+      {!cinematicActive && <Subtitles raised={raspberryPhaseActive} />}
 
       {!cinematicActive && !isUiHidden && (
         <Crosshair
@@ -1334,6 +1375,8 @@ export default function App() {
             onGoToSortieSerre={jumpToSortieSerre}
             onGoToArbreBase={handleGoToArbreBase}
             onGoToArbreTop={handleGoToArbreTop}
+            onGoToSentSavoirDebug={handleGoToSentSavoirDebug}
+            onGoToNestStairs={handleGoToNestStairs}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>

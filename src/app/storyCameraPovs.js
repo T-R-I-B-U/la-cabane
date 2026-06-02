@@ -6,6 +6,7 @@ const CAMERA_ID_BY_KEY = {
   atelier: 'story.atelier',
   atelierBetween: 'story.atelier.between',
   talkThomas: 'story.thomas',
+  treeStory12: 'tree.story.tree.story.12',
   greenhouseFrontDoor: 'story.greenhouseFrontDoor',
   greenhouseCorridor: 'story.greenhouseCorridor',
   greenhouseInside: 'story.greenhouseInside',

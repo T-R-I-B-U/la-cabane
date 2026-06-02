@@ -540,6 +540,22 @@
       "fov": 60
     },
     {
+      "id": "arbre.nestMarie",
+      "label": "Arbre - nid Marie",
+      "group": "nest",
+      "position": {
+        "x": -87.456,
+        "y": 10.708,
+        "z": -22.237
+      },
+      "target": {
+        "x": -89.268,
+        "y": 10.691,
+        "z": -17.578
+      },
+      "fov": 50
+    },
+    {
       "id": "tree-story.map",
       "label": "map",
       "group": "tree-story",

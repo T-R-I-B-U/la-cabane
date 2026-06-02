@@ -17,37 +17,31 @@
 .mobile-landing-video__play {
   position: absolute;
   left: 50%;
-  bottom: max(40px, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100% - 40px);
-  padding: 20px 40px;
-  border: none;
-  border-radius: 360px;
-  background: none;
-  box-sizing: border-box;
+  width: 84px;
+  height: 84px;
+  padding: 0;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  background: rgba(16, 16, 16, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  backdrop-filter: blur(4px);
   cursor: pointer;
-  overflow: hidden;
 }
 
-.mobile-landing-video__play-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 360px;
-  pointer-events: none;
+.mobile-landing-video__play-icon {
+  width: 0;
+  height: 0;
+  margin-left: 6px;
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  border-left: 24px solid rgba(255, 255, 255, 0.96);
 }
 
-.mobile-landing-video__play span {
-  position: relative;
-  z-index: 1;
-  color: #eeded0;
-  font-family: 'Albert Sans', sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  white-space: nowrap;
+.mobile-landing-video__play:active {
+  transform: translate(-50%, -50%) scale(0.96);
 }

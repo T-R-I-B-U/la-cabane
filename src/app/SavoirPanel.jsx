@@ -78,7 +78,7 @@ export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf, hideFavo
               <p className="savoir-text">{savoir.text}</p>
             </div>
 
-            {!hideFavorites && savoir.slots && savoir.slots.length > 0 && (
+            {savoir.slots && savoir.slots.length > 0 && (
               <div className="savoir-avail-col">
                 <div className="savoir-avail-top">
                   <p className="savoir-avail-label">Disponibilité</p>
@@ -90,28 +90,30 @@ export function SavoirPanel({ savoir, onClose, leafColRef, pendingLeaf, hideFavo
                     ))}
                   </div>
                 </div>
-                <button
-                  type="button"
-                  className={`savoir-fav-btn${isFav ? ' savoir-fav-btn--active' : ''}${!isFav && isFull ? ' savoir-fav-btn--disabled' : ''}`}
-                  onClick={() => {
-                    if (!isFav && isFull) return
-                    playOnce('clickUi')
-                    favoritesStore.toggle(savoir)
-                  }}
-                  disabled={!isFav && isFull}
-                >
-                  {isFav ? 'Retirer des favoris' : 'Ajouter au favoris'}
-                  <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"
-                      fill={isFav ? '#3b5866' : 'none'}
-                      stroke="#3b5866"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </button>
+                {!hideFavorites && (
+                  <button
+                    type="button"
+                    className={`savoir-fav-btn${isFav ? ' savoir-fav-btn--active' : ''}${!isFav && isFull ? ' savoir-fav-btn--disabled' : ''}`}
+                    onClick={() => {
+                      if (!isFav && isFull) return
+                      playOnce('clickUi')
+                      favoritesStore.toggle(savoir)
+                    }}
+                    disabled={!isFav && isFull}
+                  >
+                    {isFav ? 'Retirer des favoris' : 'Ajouter au favoris'}
+                    <svg width="28" height="28" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z"
+                        fill={isFav ? '#3b5866' : 'none'}
+                        stroke="#3b5866"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                )}
               </div>
             )}
           </div>

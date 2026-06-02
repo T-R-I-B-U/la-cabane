@@ -27,6 +27,18 @@ const BASKET_SLOTS = [
 const BASKET_SCALE_IN = 0.9
 const RIPE_COUNT = 5
 
+// Same hover emissive as ladder/tree/workbench (useCenterScreenMeshInteraction).
+const HOVER_EMISSIVE = 0xffefbf
+const HOVER_EMISSIVE_INTENSITY = 0.35
+
+function setBerryEmissive(root, on) {
+  root?.traverse((c) => {
+    if (!c.isMesh || !c.material?.emissive) return
+    c.material.emissive.setHex(on ? HOVER_EMISSIVE : 0x000000)
+    c.material.emissiveIntensity = on ? HOVER_EMISSIVE_INTENSITY : 0
+  })
+}
+
 // World anchor on the outsideplant03 row nearest the basket (cabane.json).
 // Row at z≈-42.7: plants at x=-38.53, -39.26, -40.13 / y≈0.44.
 const GROUP_WORLD_POS = [-35.5, 1.0, -41.0]
@@ -39,13 +51,12 @@ const RASPBERRY_DEFS = [
   { position: [0.605, 0.52, 0.93], rotation: [0.2, 0.8, 0.3], isRipe: true },
   { position: [0.627, 0.312, 0.78], rotation: [-0.3, 2.1, 0.1], isRipe: false },
   // Plant 2 (world x≈-39.26) rot=(-1.604, 1.262, 1.335)
-  { position: [0.507, 0.54, 0.41], rotation: [0.1, 3.8, -0.2], isRipe: true },
-  { position: [0.42, 0.426, 0.37], rotation: [-0.2, 1.5, 0.4], isRipe: true },
-  { position: [0.395, 0.308, 0.42], rotation: [0.4, 4.2, -0.1], isRipe: false },
+  { position: [0.536, 0.578, 0.423], rotation: [0.1, 3.8, -0.2], isRipe: true },
+  { position: [0.391, 0.388, 0.357], rotation: [-0.2, 1.5, 0.4], isRipe: true },
   // Plant 3 (world x≈-40.13) rot=(-1.537,-1.262,-1.807)
-  { position: [0.996, 0.52, 0.42], rotation: [-0.1, 0.4, 0.5], isRipe: true },
-  { position: [0.96, 0.382, 0.38], rotation: [0.3, 2.7, -0.3], isRipe: true },
-  { position: [0.974, 0.312, 0.35], rotation: [-0.4, 5.1, 0.2], isRipe: false },
+  { position: [1.004, 0.567, 0.435], rotation: [-0.1, 0.4, 0.5], isRipe: true },
+  { position: [0.931, 0.342, 0.374], rotation: [0.3, 2.7, -0.3], isRipe: true },
+  { position: [0.973, 0.265, 0.333], rotation: [-0.4, 5.1, 0.2], isRipe: false },
 ]
 
 // ── Hide static raspberry meshes in the cabane model during minigame ──────────
@@ -269,6 +280,7 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
           const slot = collectedCountRef.current
           collectedCountRef.current += 1
           collectedSlots.current[idx] = slot
+          setBerryEmissive(meshRegistryRef.current[idx], false)
           const count = collectedCountRef.current
           onStateChange?.({ active: true, count, complete: count >= RIPE_COUNT })
         }
@@ -331,6 +343,23 @@ export function RaspberryMinigame({ isActive, onStateChange, onUnripeAttempt }) 
       )
       const hits = pickable.length ? raycaster.intersectObjects(pickable, true) : []
       cursorStore.setType(hits.length ? 'grab' : 'default')
+
+      let hoveredIdx = -1
+      if (hits.length) {
+        const hitObject = hits[0].object
+        for (let i = 0; i < meshRegistryRef.current.length; i++) {
+          const root = meshRegistryRef.current[i]
+          if (!root) continue
+          root.traverse((child) => {
+            if (child === hitObject) hoveredIdx = i
+          })
+          if (hoveredIdx !== -1) break
+        }
+      }
+      for (let i = 0; i < meshRegistryRef.current.length; i++) {
+        if (collectedSlots.current[i] !== null) continue
+        setBerryEmissive(meshRegistryRef.current[i], i === hoveredIdx)
+      }
     }
 
     for (let i = 0; i < RASPBERRY_DEFS.length; i++) {
