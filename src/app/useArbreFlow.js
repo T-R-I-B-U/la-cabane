@@ -232,6 +232,7 @@ export function useArbreFlow({
   const pendingPlatformReturnAfterIncomingSavoirRef = useRef(false)
   const pendingPlatformReturnOutroRef = useRef(false)
   const pendingNestOutroAfterMarieRef = useRef(false)
+  const autoNestPathRef = useRef(false)
   const zone = useActiveZone()
   const { playDialogue, stopDialogue, skipDialogue } = useNpcDialogue()
   const { currentStepId, completeStep, goToStep, resetStory } = useStoryFlow()
@@ -270,6 +271,7 @@ export function useArbreFlow({
     pendingPlatformReturnAfterIncomingSavoirRef.current = false
     pendingPlatformReturnOutroRef.current = false
     pendingNestOutroAfterMarieRef.current = false
+    autoNestPathRef.current = false
     setArbreActive(false)
     setArbreMovementLocked(false)
     setArbreDialogueActive(false)
@@ -374,7 +376,14 @@ export function useArbreFlow({
     } else if (currentStepId === 'arbre.backAtBase') {
       setArbreStoryCameraTransition(null)
       onBackAtBase?.()
-      setStairsClickActive(true)
+      if (autoNestPathRef.current) {
+        scheduleFlowTimeout(() => {
+          goToStep('arbre.toStairs02Down')
+          setArbreStoryCameraTransition({ ...povs.stairs02Down })
+        }, 300)
+      } else {
+        setStairsClickActive(true)
+      }
     } else if (currentStepId === 'arbre.outroPlatformTop') {
       completeStep('arbre.outroPlatformTop')
       setArbreStoryCameraTransition({ ...povs.outroPlatformLadderTop })
@@ -482,6 +491,7 @@ export function useArbreFlow({
     currentStepId,
     completeStep,
     exitArbre,
+    goToStep,
     onBackAtBase,
     onOutroComplete,
     onPlatformSpawn,
@@ -571,6 +581,7 @@ export function useArbreFlow({
     playedRef.current = true
     clearScheduledTimeouts()
     stopDialogue()
+    autoNestPathRef.current = false
     setArbreActive(true)
     setArbreMovementLocked(true)
     setArbreDialogueActive(false)
@@ -589,6 +600,7 @@ export function useArbreFlow({
     playedRef.current = true
     clearScheduledTimeouts()
     stopDialogue()
+    autoNestPathRef.current = false
     setArbreActive(true)
     setArbreMovementLocked(false)
     setArbreDialogueActive(false)
@@ -608,6 +620,7 @@ export function useArbreFlow({
     playedRef.current = true
     clearScheduledTimeouts()
     stopDialogue()
+    autoNestPathRef.current = false
     setArbreActive(true)
     setArbreMovementLocked(false)
     setArbreDialogueActive(false)
@@ -627,6 +640,7 @@ export function useArbreFlow({
     playedRef.current = true
     clearScheduledTimeouts()
     stopDialogue()
+    autoNestPathRef.current = false
     setArbreActive(true)
     setArbreMovementLocked(true)
     setArbreDialogueActive(false)
@@ -667,6 +681,33 @@ export function useArbreFlow({
     setArbreStoryCameraTransition({ ...povs.stairs02Down })
   }, [goToStep, povs])
 
+  const triggerAutoNestOutro = useCallback(() => {
+    playedRef.current = true
+    clearScheduledTimeouts()
+    stopDialogue()
+    autoNestPathRef.current = true
+    setArbreActive(true)
+    setArbreMovementLocked(true)
+    setArbreDialogueActive(true)
+    setArbreStoryCameraTransition(null)
+    setLadderClickActive(false)
+    setStairsClickActive(false)
+    setGrowingFruitPlaying(false)
+    setGrowingFruitClickable(false)
+    setFruitsClickActive(false)
+    setLadderIsStoryMode(false)
+    setLadderOutroMode(false)
+    setZone('arbre')
+    setGameStep(GAME_STEPS.ARBRE_INTRO)
+    playDialogue('arbreOutro', {
+      onDone: () => {
+        setArbreDialogueActive(false)
+        goToStep('arbre.outroPlatformTop')
+        setArbreStoryCameraTransition({ ...povs.outroPlatformTop })
+      },
+    })
+  }, [clearScheduledTimeouts, goToStep, playDialogue, povs, stopDialogue])
+
   return {
     arbreActive,
     arbreMovementLocked,
@@ -689,6 +730,7 @@ export function useArbreFlow({
     handleArbreTransitionComplete,
     handlePlayerFruitPanelClose,
     triggerNestDialogue25,
+    triggerAutoNestOutro,
     triggerNestStairs,
     triggerArbreBase,
     triggerArbreTop,

@@ -2,8 +2,11 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 
-function easeInOut(t) {
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+const EASINGS = {
+  linear: (t) => t,
+  easeIn: (t) => t * t,
+  easeOut: (t) => t * (2 - t),
+  easeInOut: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
 }
 
 export function StoryCameraTransition({ transition, onComplete }) {
@@ -43,7 +46,8 @@ export function StoryCameraTransition({ transition, onComplete }) {
     const { camera: frameCamera } = state
     elapsedRef.current += Math.min(delta, 0.1)
     const duration = transition.duration ?? 1.2
-    const t = easeInOut(Math.min(elapsedRef.current / duration, 1))
+    const ease = EASINGS[transition.easing] ?? EASINGS.easeInOut
+    const t = ease(Math.min(elapsedRef.current / duration, 1))
 
     frameCamera.position.lerpVectors(startPositionRef.current, targetPositionRef.current, t)
     frameCamera.quaternion.slerpQuaternions(

@@ -15,6 +15,7 @@ const CAMERA_ID_BY_KEY = {
   stairs01Top: 'story.stairs01Top',
   greenhouseCorridorExit: 'story.greenhouseCorridorExit',
   greenhouseFrontDoorExit: 'story.greenhouseFrontDoorExit',
+  serreMiddle: 'story.serreMiddle',
   serreZoe: 'story.serreZoe',
   serreRaspberry: 'story.serreRaspberry',
   serreJuice: 'story.serreJuice',
