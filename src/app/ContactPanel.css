@@ -9,8 +9,11 @@
 }
 
 .cp-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 18px;
+  background-image: url('/contact/contact-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  border-radius: 0;
   padding: 40px;
   width: calc(100vw - 120px);
   max-width: 1392px;
