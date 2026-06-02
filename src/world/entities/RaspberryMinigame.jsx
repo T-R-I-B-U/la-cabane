@@ -39,13 +39,12 @@ const RASPBERRY_DEFS = [
   { position: [0.605, 0.52, 0.93], rotation: [0.2, 0.8, 0.3], isRipe: true },
   { position: [0.627, 0.312, 0.78], rotation: [-0.3, 2.1, 0.1], isRipe: false },
   // Plant 2 (world x≈-39.26) rot=(-1.604, 1.262, 1.335)
-  { position: [0.507, 0.54, 0.41], rotation: [0.1, 3.8, -0.2], isRipe: true },
-  { position: [0.42, 0.426, 0.37], rotation: [-0.2, 1.5, 0.4], isRipe: true },
-  { position: [0.395, 0.308, 0.42], rotation: [0.4, 4.2, -0.1], isRipe: false },
+  { position: [0.536, 0.578, 0.423], rotation: [0.1, 3.8, -0.2], isRipe: true },
+  { position: [0.391, 0.388, 0.357], rotation: [-0.2, 1.5, 0.4], isRipe: true },
   // Plant 3 (world x≈-40.13) rot=(-1.537,-1.262,-1.807)
-  { position: [0.996, 0.52, 0.42], rotation: [-0.1, 0.4, 0.5], isRipe: true },
-  { position: [0.96, 0.382, 0.38], rotation: [0.3, 2.7, -0.3], isRipe: true },
-  { position: [0.974, 0.312, 0.35], rotation: [-0.4, 5.1, 0.2], isRipe: false },
+  { position: [1.004, 0.567, 0.435], rotation: [-0.1, 0.4, 0.5], isRipe: true },
+  { position: [0.931, 0.342, 0.374], rotation: [0.3, 2.7, -0.3], isRipe: true },
+  { position: [0.973, 0.265, 0.333], rotation: [-0.4, 5.1, 0.2], isRipe: false },
 ]
 
 // ── Hide static raspberry meshes in the cabane model during minigame ──────────
