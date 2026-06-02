@@ -91,6 +91,7 @@ const CHOICES = {
   gap: 20,
   alignItems: 'center',
   flexShrink: 0,
+  marginTop: 6,
   pointerEvents: 'auto',
 }
 
