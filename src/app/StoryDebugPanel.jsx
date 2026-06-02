@@ -13,6 +13,7 @@ export function StoryDebugPanel({
   onGoToSortieSerre,
   onGoToArbreBase,
   onGoToArbreTop,
+  onGoToSentSavoirDebug,
   onGoToNestDialogue25,
 }) {
   return (
@@ -60,6 +61,9 @@ export function StoryDebugPanel({
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToArbreTop}>
           Sommet arbre
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToSentSavoirDebug}>
+          Feuille envoyee debug
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToNestDialogue25}>
           Nid (dialogue 25)

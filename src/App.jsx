@@ -561,6 +561,39 @@ export default function App() {
     triggerArbreTop()
   }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
 
+  const handleGoToSentSavoirDebug = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(true)
+    setPostIntro(true)
+    setIncomingSavoir(null)
+    setLeafArriving(false)
+    setIsSavoirInteractionActive(false)
+    setIsSavoirPanelOpen(false)
+    setIsContactInteractionActive(false)
+    setIsContactPanelOpen(false)
+    setHasSentSavoir(true)
+    setSentSavoirDrawing('/savoir-leaf.webp')
+    setSentSavoirTitle('Feuille debug envoyee')
+    setIsPlayerFruitPanelOpen(true)
+
+    const platformCamera = getCameraPose('arbre.atPlatform')
+    setPlayerSpawn(platformCamera?.position ?? getPlatformSpawn(sceneLoadInfo?.platformPosition))
+    setPlayerSpawnTarget(platformCamera?.target ?? null)
+    setPlayerEyeHeight(PLAYER_HEIGHT)
+    setPlayerSpawnKey((k) => k + 1)
+    setUserMovementLocked(false)
+    setIsPlayerModeActive(true)
+    setIsFlyModeActive(false)
+    if (!document.pointerLockElement) {
+      setTimeout(() => {
+        const canvas = document.querySelector('canvas')
+        if (canvas && !document.pointerLockElement) canvas.requestPointerLock()
+      }, 10)
+    }
+
+    triggerArbreTop()
+  }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
   const handleGoToNestDialogue25 = useCallback(() => {
     arbreStoryContinuityRef.current = true
     setShouldRestorePointerLockAfterStoryUi(false)
@@ -1334,6 +1367,7 @@ export default function App() {
             onGoToSortieSerre={jumpToSortieSerre}
             onGoToArbreBase={handleGoToArbreBase}
             onGoToArbreTop={handleGoToArbreTop}
+            onGoToSentSavoirDebug={handleGoToSentSavoirDebug}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>
