@@ -153,6 +153,24 @@
   border-radius: 0;
 }
 
+.pfp-card--sent-wide-paper {
+  background-image: url('/player-panel/sent-wide-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
+.pfp-card--sent-square-paper {
+  background-image: url('/player-panel/sent-square-panel-bg.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-color: transparent;
+  border-radius: 0;
+}
+
 .pfp-card-header {
   display: flex;
   gap: 20px;

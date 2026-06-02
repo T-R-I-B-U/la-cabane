@@ -32,7 +32,7 @@ export function PlayerFruitPanel({
             {/* Colonne gauche : profil + apprenti */}
             <div className="pfp-left-col">
               {/* Carte profil */}
-              <div className="pfp-card pfp-left-profile-card">
+              <div className="pfp-card pfp-left-profile-card pfp-card--sent-wide-paper">
                 <button
                   type="button"
                   className="pfp-close-btn"
@@ -65,7 +65,7 @@ export function PlayerFruitPanel({
               </div>
 
               {/* Carte Apprenti */}
-              <div className="pfp-card">
+              <div className="pfp-card pfp-card--sent-wide-paper">
                 <div className="pfp-card-header">
                   <img
                     className="pfp-card-icon"
@@ -95,7 +95,7 @@ export function PlayerFruitPanel({
               {/* Ligne 1 : Passeur + Favoris */}
               <div className="pfp-row">
                 {/* Passeur */}
-                <div className="pfp-card">
+                <div className="pfp-card pfp-card--sent-square-paper">
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
@@ -115,7 +115,7 @@ export function PlayerFruitPanel({
                 </div>
 
                 {/* Favoris */}
-                <div className="pfp-card">
+                <div className="pfp-card pfp-card--sent-square-paper">
                   <div className="pfp-card-header">
                     <img
                       className="pfp-card-icon"
