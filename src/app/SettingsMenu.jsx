@@ -81,7 +81,7 @@ export function SettingsMenu({
           <GearIcon onClick={onClose} ariaLabel="Fermer les réglages" />
         </div>
 
-        <div className="settings-card__section">
+        <div className="settings-card__section settings-card__section--inline">
           <p className="settings-card__label">Performance</p>
           <RadioPills
             options={['Oui', 'Non']}
@@ -137,17 +137,17 @@ export function SettingsMenu({
           />
         </div>
 
-        <div className="settings-card__section settings-card__section--disabled">
+        <div className="settings-card__section settings-card__section--inline settings-card__section--disabled">
           <p className="settings-card__label">Occlusion ambiante</p>
           <RadioPills options={['Oui', 'Non']} value={ao} onChange={() => {}} />
         </div>
 
-        <div className="settings-card__section">
+        <div className="settings-card__section settings-card__section--inline">
           <p className="settings-card__label">Shaders</p>
           <RadioPills options={['Oui', 'Non']} value={shadersEnabled} onChange={onShadersChange} />
         </div>
 
-        <div className="settings-card__section">
+        <div className="settings-card__section settings-card__section--inline">
           <p className="settings-card__label">Ombres</p>
           <RadioPills options={['Oui', 'Non']} value={shadowsEnabled} onChange={onShadowsChange} />
         </div>
