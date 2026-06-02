@@ -634,6 +634,25 @@ export function useArbreFlow({
     setGameStep(GAME_STEPS.ARBRE_INTRO)
   }, [clearScheduledTimeouts, stopDialogue])
 
+  const triggerNestStairs = useCallback(() => {
+    playedRef.current = true
+    clearScheduledTimeouts()
+    stopDialogue()
+    setArbreActive(true)
+    setArbreMovementLocked(true)
+    setArbreDialogueActive(false)
+    setArbreStoryCameraTransition({ ...povs.stairs02Down })
+    setLadderClickActive(false)
+    setStairsClickActive(false)
+    setGrowingFruitPlaying(false)
+    setGrowingFruitClickable(false)
+    setFruitsClickActive(false)
+    setLadderIsStoryMode(false)
+    setZone('arbre')
+    goToStep('arbre.toStairs02Down')
+    setGameStep(GAME_STEPS.ARBRE_INTRO)
+  }, [clearScheduledTimeouts, goToStep, povs, stopDialogue])
+
   const handleNestInteractionComplete = useCallback(() => {
     completeStep('arbre.nestInteraction')
     setArbreDialogueActive(true)
@@ -681,6 +700,7 @@ export function useArbreFlow({
     handleArbreTransitionComplete,
     handlePlayerFruitPanelClose,
     triggerNestDialogue25,
+    triggerNestStairs,
     triggerArbreBase,
     triggerArbreTop,
     handleFruitClickDuringLeaves,

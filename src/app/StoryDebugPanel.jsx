@@ -14,6 +14,7 @@ export function StoryDebugPanel({
   onGoToArbreBase,
   onGoToArbreTop,
   onGoToSentSavoirDebug,
+  onGoToNestStairs,
   onGoToNestDialogue25,
 }) {
   return (
@@ -64,6 +65,9 @@ export function StoryDebugPanel({
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToSentSavoirDebug}>
           Feuille envoyee debug
+        </button>
+        <button type="button" className="camera-toggle" onClick={onGoToNestStairs}>
+          Escalier vers nid
         </button>
         <button type="button" className="camera-toggle" onClick={onGoToNestDialogue25}>
           Nid (dialogue 25)

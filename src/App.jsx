@@ -344,6 +344,7 @@ export default function App() {
     handlePlayerFruitPanelClose,
     triggerArbreBase,
     triggerArbreTop,
+    triggerNestStairs,
     triggerNestDialogue25,
     skipDialogue: skipArbreDialogue,
     activateLadderFromStory,
@@ -593,6 +594,13 @@ export default function App() {
 
     triggerArbreTop()
   }, [sceneLoadInfo?.platformPosition, setPostIntro, triggerArbreTop])
+
+  const handleGoToNestStairs = useCallback(() => {
+    arbreStoryContinuityRef.current = true
+    setShouldRestorePointerLockAfterStoryUi(false)
+    setPostIntro(true)
+    triggerNestStairs()
+  }, [setPostIntro, triggerNestStairs])
 
   const handleGoToNestDialogue25 = useCallback(() => {
     arbreStoryContinuityRef.current = true
@@ -1368,6 +1376,7 @@ export default function App() {
             onGoToArbreBase={handleGoToArbreBase}
             onGoToArbreTop={handleGoToArbreTop}
             onGoToSentSavoirDebug={handleGoToSentSavoirDebug}
+            onGoToNestStairs={handleGoToNestStairs}
             onGoToNestDialogue25={handleGoToNestDialogue25}
           />
         </Suspense>
