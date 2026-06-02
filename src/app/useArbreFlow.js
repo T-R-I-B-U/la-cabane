@@ -40,6 +40,26 @@ function getReverseTarget(position, target) {
   }
 }
 
+function getCloserPov(basePov, distance = 0.9) {
+  if (!basePov?.position || !basePov?.target) return basePov
+
+  const dx = basePov.target.x - basePov.position.x
+  const dy = basePov.target.y - basePov.position.y
+  const dz = basePov.target.z - basePov.position.z
+  const length = Math.hypot(dx, dy, dz)
+
+  if (!length) return basePov
+
+  return {
+    ...basePov,
+    position: {
+      x: basePov.position.x + (dx / length) * distance,
+      y: basePov.position.y + (dy / length) * distance,
+      z: basePov.position.z + (dz / length) * distance,
+    },
+  }
+}
+
 function resolveArbrePovs(platformPosition) {
   const pos = platformPosition ?? PLATFORM_POS
   const [px, py, pz] = pos
@@ -183,7 +203,7 @@ function resolveArbrePovs(platformPosition) {
     },
   }
 
-  return Object.fromEntries(
+  const resolvedPovs = Object.fromEntries(
     Object.entries(povs).map(([key, pov]) => [
       key,
       pov.reverseCamera
@@ -193,6 +213,13 @@ function resolveArbrePovs(platformPosition) {
           : pov,
     ])
   )
+
+  resolvedPovs.nestMarie = {
+    ...getCloserPov(resolvedPovs.nest, 0.9),
+    duration: 1.2,
+  }
+
+  return resolvedPovs
 }
 
 export function useArbreFlow({
@@ -369,7 +396,7 @@ export function useArbreFlow({
         onDone: () => {
           setArbreDialogueActive(false)
           completeStep('arbre.nidDialogue')
-          setArbreStoryCameraTransition({ ...povs.nest })
+          setArbreStoryCameraTransition({ ...povs.nestMarie })
         },
       })
     } else if (currentStepId === 'arbre.toNest') {
