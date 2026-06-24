@@ -39,9 +39,10 @@ function load() {
       ...clone(DEFAULT_CONFIG),
       ...parsed,
       cameras: mergeById(DEFAULT_CONFIG.cameras, parsed.cameras),
-      characters: Array.isArray(parsed.characters)
-        ? mergeById(DEFAULT_CONFIG.characters, parsed.characters)
-        : clone(DEFAULT_CONFIG.characters),
+      // Character positions are always sourced from cameras.json — never overridden by
+      // localStorage. Editor tweaks stay live in-memory but must be exported to the file
+      // to persist, avoiding stale saved positions masking file edits.
+      characters: clone(DEFAULT_CONFIG.characters),
     }
   } catch {
     return null
